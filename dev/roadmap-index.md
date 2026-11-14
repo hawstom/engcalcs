@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**86 open tasks.** Next (100): 5 · Soon (75): 13 · Someday (50): 32 · Maybe (25): 17 · Parked (5): 19
+**87 open tasks.** Next (100): 5 · Soon (75): 14 · Someday (50): 32 · Maybe (25): 17 · Parked (5): 19
 
 ## 100 — Next (5)
 
@@ -17,7 +17,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 858 — Contour plot controls that say what is plotted.
 - Task 859 — Libraries: Move to top, up, down and bottom buttons.
 
-## 75 — Soon (13)
+## 75 — Soon (14)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
@@ -32,6 +32,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 851 — Net1's legend box covers the Tank label on a phone.
 - ! Task 854 — A Text drawn in a scenario starts empty and vanishes if left empty.
 - Task 857 — A Volume unit in Settings for tank volumes.
+- Task 860 — Controls that differ by scenario.
 
 ## 50 — Someday (32)
 
@@ -114,5 +115,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-78 of 86 titles are within 4–12 words. `!` marks the rest;
+79 of 87 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

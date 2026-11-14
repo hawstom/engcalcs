@@ -108,7 +108,13 @@ var EngCalcs = EngCalcs || {};
 	// ~= 2.8) so an untouched label never shows one -- true only if it scales with that offset,
 	// hence textFactor(). Text rather than symbol factor: the threshold protects the reader's
 	// ability to tie a number back to its element, a judgment made at the scale of the text.
-	var LABEL_LEADER_THRESHOLD = 4;
+	// **3.4, DOWN FROM 4** (Tom, 2026-11-08: *"I would like to see leaders used a little sooner"*): a leader
+	// shows once the label's near edge is 3.4 text-sizes (about 29 px at the default font) from its element,
+	// not 4 (about 34 px). Over 64 views of Net3, Novato and the 600-junction network this draws 107 more
+	// leaders in 3503 and shows 48 fewer values in 19960 (a leader is a line, and a crossing hides a label).
+	// It stays above the default offset's resting distance, and 2.7 does not: there every label that has
+	// not moved shows a leader (3503 -> 5599). dev/lpn-spike/label-open-side-bench.js, BENCH_LEADER=<number>.
+	var LABEL_LEADER_THRESHOLD = 3.4;
 	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
 	function nodeLabelBase(n, full) {
 		var d = defaultLabelOffset(full);
@@ -142,12 +148,12 @@ var EngCalcs = EngCalcs || {};
 	// 807). The dodge depends on the arrows, which come and go with a solve and whose size is in
 	// screen pixels, so measuring a user's offset from it moved his label on every recalculation
 	// and every zoom step. His offset is a fact about the drawing; it is measured from one.
-	function linkLabelMid(l, along) {
+	function linkLabelMid(l, along, pointList) {
 		if (along === undefined && labelIsDragged(l)) {
-			return Geom.pointAlongPolyline(linkPointList(l), LINK_LABEL_ALONG);
+			return Geom.pointAlongPolyline(pointList || linkPointList(l), LINK_LABEL_ALONG);
 		}
 		var clear = (ARROW_NOMINAL_LEN * arrowFactor()) * 1.5;
-		return Geom.dodgeAlongPolyline(linkPointList(l), along === undefined ? LINK_LABEL_ALONG : along,
+		return Geom.dodgeAlongPolyline(pointList || linkPointList(l), along === undefined ? LINK_LABEL_ALONG : along,
 			arrowAlongDistances(l), clear, 0.12, 0.88);
 	}
 	// ---- A LONG PIPE CARRIES ITS LABEL SEVERAL TIMES --------------------------------------------
@@ -347,7 +353,7 @@ var EngCalcs = EngCalcs || {};
 		if (!holder.leader) { return; }
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
-		if (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
+		if (holder.leaderStruck || (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : (d <= leaderThreshold() && !holder.leaderDue))) { holder.leader.style.display = 'none'; return; }
 		// A -> B, both world points, nothing derived: an endpoint computed from the label box would
 		// move when the box's pixel width did, and the angle with it (Task 328).
 		holder.leader.style.display = '';
@@ -945,7 +951,10 @@ var EngCalcs = EngCalcs || {};
 	// The same label's one-line form, as insertInlineNodeLabels() places it: `w` its one-line width.
 	function inlineNodeSpec(n, fs, w) {
 		var d = defaultLabelOffset();
-		return { w: w, h: dataLabelBoxHeight(1), lines: null, leaderClean: true, offLinks: true,
+		// **TWO SCREEN PIXELS OF CLEAR GROUND ROUND A PIPE** (pre-review, 2026-11-06: N217 on Novato, a
+		// pipe grazing the first pixel of the glyphs, which are a pixel taller than the box the first-fit
+		// reasons with).
+		return { w: w, h: dataLabelBoxHeight(1), lines: null, leaderClean: true, offLinks: true, linkMargin: 2 / (state.s || 1),
 			sides: inlineNodeSides(nodeAt(n), d, fs, Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS)) };
 	}
 	// **WHERE A ONE-LINE NODE LABEL MAY GO: EAST OR WEST OF ITS NODE** (Task 734, Tom 2026-09-26:
@@ -969,6 +978,29 @@ var EngCalcs = EngCalcs || {};
 		ring.forEach(function (q) { delete q._r; delete q._i; out.push(q); });
 		return out;
 	}
+	// **A STACK THAT IS ABOUT TO BECOME A LINE IS NOT GROUND** (Task 812, Tom 2026-11-06, on N163 of
+	// Novato: *"there is room for its entire label as one line ... infinite space in yonder
+	// direction"*). The space was there; N163 was refused it because its neighbours' labels were still
+	// STANDING on it as stacks, and the neighbours were tried later in the drop order. So a label that
+	// takes its line gives its stack's ground back at once (`release`), and the labels that found
+	// nothing are tried once more (insertInlineNodeLabels()). A far-side run of candidates, 12 text
+	// heights out, was tried first and found nothing more on any of the 600-junction, Net1, Net3 or
+	// Novato views at any zoom, at 17% of the pass time: it is not here.
+	var LPN_OPEN_SIDE = true;
+	// **A STACK THAT SHOWS EVERYTHING AND A LINE THAT SHOWS EVERYTHING ARE NEAR-EQUAL, AND A TIE GOES TO
+	// THE LINE** (Tom, 2026-11-06: *"One-line is only very slightly less desirable than multi-line, if
+	// at all"*, and the one-line style should *"continue on inward"*). Tried after every label that
+	// lost something has had its turn, on strict ground, so a line is taken only where it overprints
+	// nothing and makes no pipe label yield. Measured over 64 views (Net3, Novato, the 600-junction
+	// network): +41 labels and +287 values for about +3% pass time. In Chromium on Novato N164, N166 and
+	// N265 go to lines at 12 to 16 notches; N163 cannot (the short pipe L181's label stands east of it).
+	// A tie that finds no place is not tried a second time: the same counts, a quarter of the time.
+	var LPN_YIELD = true;
+	var LPN_TIE_LINE = true;
+	// **A LABEL THAT LOST SOMETHING MAY TAKE GROUND HELD ONLY BY A PIPE LABEL THAT YIELDS** (`takeYield`;
+	// a tie may not). The pipe label is hidden by yieldStationedLabels() and is then tried level beside
+	// its pipe, so it often keeps a place. Over 64 views: +16 labels, +423 values, no view with fewer
+	// values than before. A tie taking such ground as well gained 14 values more and lost one in one view.
 	// The drop order, as ONE rule both the prediction and the real pass read. The lexicographic drop
 	// key becomes an ORDINAL here, so js/lpn-collide.js sees one number and never has to know what a
 	// demand is. Ties break on id, so the order is total and stable -- an unstable order would
@@ -2195,7 +2227,7 @@ var EngCalcs = EngCalcs || {};
 	// between two DOM writes, so each one forces a synchronous layout of the whole drawing -- the
 	// Task 440 finding, in a place that rebuilds every label rather than re-reading them. Counted
 	// only while the instrument is armed, so a shipped page pays one comparison per label.
-	var perfDebugCounts = { measures: 0, labelPasses: 0, elements: 0, stations: 0 };
+	var perfDebugCounts = { measures: 0, labelPasses: 0, elements: 0, stations: 0, levelTrials: 0, levelGained: 0 };
 	function perfDebugCount(what, n) {
 		if (perfDebugOn()) { perfDebugCounts[what] += (n === undefined ? 1 : n); }
 	}
@@ -2285,12 +2317,13 @@ var EngCalcs = EngCalcs || {};
 			'  | label passes ' + perfDebugCounts.labelPasses
 			+ '  | label measurements ' + perfDebugCounts.measures
 			+ '  | pipe label copies ' + perfDebugCounts.stations
+			+ '  | level trials ' + perfDebugCounts.levelTrials + ' gained ' + perfDebugCounts.levelGained
 			+ '  | tiles ' + tiles + '  | heap ' + perfDebugMem() +
 			'  | s ' + (state.s ? state.s.toExponential(3) : '?') +
 			'  | hold ' + comp;
 		perfDebugRows = [];
 		perfDebugCounts.measures = 0; perfDebugCounts.labelPasses = 0; perfDebugCounts.elements = 0;
-		perfDebugCounts.stations = 0;
+		perfDebugCounts.stations = 0; perfDebugCounts.levelTrials = 0; perfDebugCounts.levelGained = 0;
 		if (typeof console !== 'undefined' && console.log) { console.log('[lpn perf] ' + line); }
 		if (!perfDebugEl && document.body) {
 			perfDebugEl = document.createElement('div');
@@ -2853,7 +2886,7 @@ var EngCalcs = EngCalcs || {};
 	// (`inlineFrom`), so a drag frame lays out the same stacks and sets the same lines.
 	// COST: one strict first-fit over the labels tried, against the drawing; no node re-fit.
 	var LPN_INLINE_MAX_VIEW_FRAC = 0.25;
-	function insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, ring) {
+	function insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, ring, round) {
 		var ground = { boxes: obs.boxes.slice().concat(viewFrameBoxes()), segments: obs.segments.slice() }, byId = {}, min = leaderThreshold(), specs = [], out;
 		nodeLabels.forEach(function (sp) { byId[sp.id] = sp; });
 		// The ring pass's labels (free pipe labels, dragged ones) with the leaders the renderer draws.
@@ -2861,17 +2894,21 @@ var EngCalcs = EngCalcs || {};
 			f.boxes.forEach(function (b) { ground.boxes.push(b); });
 			if (f.leader) { ground.segments.push(f.leader); }
 		});
+		var retry = {};
+		list.forEach(function (it) { retry[it.id] = true; });
 		placed.forEach(function (r) {
 			var sp = byId[r.id];
 			if (r.dropped || !sp) { return; }
-			(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { ground.boxes.push(b); });
+			// A label tried in another form may give its stack's ground back to the ones after it
+			// (`release`), so the ground holds COPIES of its boxes: the placement it leaves stays whole.
+			(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { ground.boxes.push(retry[r.id] ? Object.assign({}, b) : b); });
 			if (Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y) > min) {
 				ground.segments.push(Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id));
 			}
 		});
 		list.forEach(function (it) {
 			var sp = byId[it.id];
-			if (sp) { specs.push(Object.assign({}, sp, it.spec)); }
+			if (sp) { specs.push(Object.assign({}, sp, it.spec, { release: LPN_OPEN_SIDE })); }
 		});
 		if (!specs.length) { return { placed: placed, took: [] }; }
 		out = Collide.placeLabelsFirstFit(specs, ground, { pad: pad, lastPad: pad, strict: true, leaderMin: min });
@@ -2882,7 +2919,16 @@ var EngCalcs = EngCalcs || {};
 			var it = list.filter(function (x) { return x.id === id; })[0];
 			Object.assign(byId[id], it.spec);
 		});
-		return { placed: placed.map(function (r) { return res[r.id] || r; }), took: took };
+		placed = placed.map(function (r) { return res[r.id] || r; });
+		// **A SECOND ROUND, BECAUSE THE FIRST GIVES GROUND BACK ONLY AS IT GOES** (Task 812): a label
+		// tried before its neighbour finds the neighbour's stack still standing on the ground it wants.
+		// Once the neighbour has gone to its line, the ones that found no place are tried again.
+		var needing = list.filter(function (it) { return !it.tie; });
+		if (LPN_OPEN_SIDE && !(round > 0) && took.length && needing.length && took.length < list.length) {
+			var again = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, needing.filter(function (it) { return !res[it.id]; }), ring, 1);
+			return { placed: again.placed, took: took.concat(again.took) };
+		}
+		return { placed: placed, took: took };
 	}
 	// **A ONE-LINE LABEL LIES ON THE MAP AND OFF ITS FURNITURE** (pre-review, 2026-10-18: on a 390 px
 	// phone a line ran off the map's right edge and under the labels legend). The map's edges, as four
@@ -2924,7 +2970,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
 			if (ne && ne.inline && ne.inlineFrom && n.lx === undefined) {
-				list.push({ id: nodeLabelKey(n.id), spec: inlineNodeSpec(n, fs, labelBoxWidth(ne)) });
+				list.push({ id: nodeLabelKey(n.id), spec: Object.assign(inlineNodeSpec(n, fs, labelBoxWidth(ne)), { takeYield: LPN_YIELD }) });
 			}
 		});
 		if (!list.length) { return placed; }
@@ -2937,6 +2983,7 @@ var EngCalcs = EngCalcs || {};
 			var n = nodeOf[r.id], ne = n && nodeEls[n.id];
 			if (!ne || ne.empty || !ne.allLines || ne.allLines.length < 2 || !byId[r.id]) { return; }
 			if (r.dropped || (ne.lines && ne.lines.length < ne.allLines.length)) { cand.push({ id: r.id, n: n, ne: ne }); }
+			else if (LPN_TIE_LINE && !ne.inline && n.lx === undefined) { cand.push({ id: r.id, n: n, ne: ne, tie: true }); }
 		});
 		if (!cand.length) { lastInlineTrial = null; return placed; }
 		// **PRICED BEFORE IT IS DRAWN.** Each label's one-line width comes from measureLevelForms(), the
@@ -2947,8 +2994,10 @@ var EngCalcs = EngCalcs || {};
 		cand.forEach(function (c, k) {
 			var m = reqs[k].m;
 			if (!m || !(m.wPx > 0) || m.wPx > maxPx) { return; }
-			list.push({ id: c.id, c: c, spec: inlineNodeSpec(c.n, fs, m.wPx / s0) });
+			list.push({ id: c.id, c: c, tie: !!c.tie, spec: Object.assign(inlineNodeSpec(c.n, fs, m.wPx / s0), { takeYield: LPN_YIELD && !c.tie }) });
 		});
+		// The labels that lost something first; the ties after them.
+		list.sort(function (a, b) { return (a.tie ? 1 : 0) - (b.tie ? 1 : 0); });
 		if (!list.length) { lastInlineTrial = null; return placed; }
 		res = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, inlineRing);
 		lastInlineTrial = { tried: list.length, took: res.took.length };
@@ -3101,6 +3150,58 @@ var EngCalcs = EngCalcs || {};
 	// ring pass's free and dragged labels, the stationed pipe labels that reach the drawing as
 	// obstacles, and the user's Text objects. Leaving one out reports zero about a picture that has
 	// crossings in it.
+	// **A SHORT LEADER WHERE THE LABEL COULD BE TAKEN FOR ANOTHER NODE'S** (Task 812, Tom, 2026-11-09:
+	// *"I want leaders more often at shorter distances"*; N167 *"is arguably ambiguous without a leader"*).
+	// A node label past LPN_SHORT_LEADER_TEXT text sizes from its node and inside the usual leader
+	// distance draws its leader when some other node stands as near its rows as its own does (within
+	// LPN_AMBIG_RATIO times that distance), and the short leader crosses no label, no leader and no
+	// other node's symbol. Nothing is moved: no label gives anything up for it, and a leader the
+	// placement did not know about is drawn only where nothing is in its way.
+	var LPN_SHORT_LEADER_TEXT = 1.2, LPN_AMBIG_RATIO = 1.5, LPN_AMBIG_PIPE_RATIO = 2, LPN_AMBIG_LEADERS = true;
+	function ambiguousShortLeaders(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
+		var min = leaderThreshold(), lo = min * LPN_SHORT_LEADER_TEXT / LABEL_LEADER_THRESHOLD, specs = {}, cands = [], out = {}, entries, pts;
+		function dist(px, py, boxes) {
+			var best = Infinity;
+			boxes.forEach(function (b) {
+				var dx = Math.max(Math.abs(px - b.cx) - b.w / 2, 0), dy = Math.max(Math.abs(py - b.cy) - b.h / 2, 0);
+				best = Math.min(best, Math.hypot(dx, dy));
+			});
+			return best;
+		}
+		nodeLabels.forEach(function (sp) { specs[sp.id] = sp; });
+		nodePlaced.forEach(function (r) {
+			var sp = specs[r.id], d, ne, bs;
+			if (r.dropped || !sp) { return; }
+			ne = nodeEls[r.id.slice(2)];
+			if (!ne || ne.hiddenCrossed || sp.dragged) { return; }
+			d = Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y);
+			bs = (r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : []);
+			if (d > lo && d <= min && bs.length) { cands.push({ r: r, sp: sp, bs: bs }); }
+		});
+		if (!cands.length) { return out; }
+		pts = doc.nodes.map(function (n) { var p = nodeAt(n); return { id: nodeLabelKey(n.id), x: p.x, y: p.y }; });
+		entries = crossingEntries(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs);
+		cands.forEach(function (c) {
+			var own = dist(c.sp.anchor.x, c.sp.anchor.y, c.bs), near = false, g, clear = true, i, j, e, o;
+			pts.forEach(function (q) { if (!near && q.id !== c.r.id && dist(q.x, q.y, c.bs) <= own * LPN_AMBIG_RATIO) { near = true; } });
+			if (!near) { return; }
+			g = Collide.segment(c.sp.anchor.x, c.sp.anchor.y, c.r.x, c.r.y, 'leader', c.r.id);
+			for (i = 0; clear && i < entries.length; i++) {
+				e = entries[i];
+				if (e.id === c.r.id) { continue; }
+				if (e.leader && Collide.segmentsCross(g, e.leader)) { clear = false; break; }
+				for (j = 0; j < e.boxes.length; j++) { if (Collide.segmentInBoxFraction(g, e.boxes[j]) > 0) { clear = false; break; } }
+			}
+			for (i = 0; clear && i < obs.boxes.length; i++) {
+				o = obs.boxes[i];
+				if (o.kind !== 'symbol' || !(o.w > 0)) { continue; }
+				if (Math.abs(o.cx - c.sp.anchor.x) <= o.w / 2 && Math.abs(o.cy - c.sp.anchor.y) <= o.h / 2) { continue; }
+				if (Collide.segmentInBoxFraction(g, o) > 0) { clear = false; }
+			}
+			if (clear) { out[c.r.id] = true; }
+		});
+		return out;
+	}
 	function crossingShedRank(id) {
 		var bare = id.slice(2), x;
 		if (id.charAt(0) === 'n') {
@@ -3110,17 +3211,8 @@ var EngCalcs = EngCalcs || {};
 		x = linkById(bare);
 		return (x && (x.type === 'pump' || x.type === 'valve')) ? 1 : 3;
 	}
-	function shedCrossingLabels(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
-		var min = leaderThreshold(), entries = [], specs = {}, res;
-		// **CLEARED FOR EVERY LABEL ON EVERY PASS**, for yieldStationedLabels()'s own reason: a
-		// label hidden once must be back in contention next time, or the drawing only ever loses
-		// labels.
-		doc.links.forEach(function (l) {
-			var le = linkEls[l.id]; if (le) { le.hiddenCrossed = false; }
-		});
-		doc.nodes.forEach(function (n) {
-			var ne = nodeEls[n.id]; if (ne) { ne.hiddenCrossed = false; }
-		});
+	function crossingEntries(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
+		var min = leaderThreshold(), entries = [], specs = {};
 		(nodeLabels || []).forEach(function (s) { specs[s.id] = s; });
 		(ringLabels || []).forEach(function (s) { specs[s.id] = s; });
 		function boxesOf(r) {
@@ -3154,7 +3246,22 @@ var EngCalcs = EngCalcs || {};
 				yields: !!f.yields, hideable: stationed,
 				rank: stationed ? crossingShedRank(f.id) : 0 });
 		});
+		return entries;
+	}
+	function shedCrossingLabels(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
+		var entries, res;
+		// **CLEARED FOR EVERY LABEL ON EVERY PASS**, for yieldStationedLabels()'s own reason: a
+		// label hidden once must be back in contention next time, or the drawing only ever loses
+		// labels.
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id]; if (le) { le.hiddenCrossed = false; }
+		});
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id]; if (ne) { ne.hiddenCrossed = false; }
+		});
+		entries = crossingEntries(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs);
 		res = Collide.shedCrossingSurvivors(entries, {});
+		lastShedEntries = entries;
 		// **IT IS A HIDE AND NOT A DROP, AND THE DIFFERENCE IS THE WHOLE OF THE PASS'S STABILITY.**
 		// The obvious wiring is the drop seam Task 398 already built -- mark the placement `dropped`
 		// and let the holder loop turn that into `hiddenDropped`. It oscillates: a dropped node
@@ -3177,6 +3284,10 @@ var EngCalcs = EngCalcs || {};
 	// phase three). For ?debug=labels to print. Not a decision input: nothing in the pass reads it
 	// back.
 	var lastCrossingShed = null;
+	// The entries the last final shed measured, for a harness to read. Not a decision input.
+	var lastShedEntries = null;
+	// The final placements the last pass drew, for a harness to measure afresh. Not a decision input.
+	var lastFinalGround = null;
 	// **A PIPE LABEL THAT CANNOT LIE ALONG ITS PIPE IS TRIED LEVEL BESIDE IT BEFORE IT HIDES**
 	// (dev/label-trials/port-plan.md Step 3). Along the pipe, a label hides when it has
 	// shed to its last value and is still crowded, when no station on its pipe is clear, when a
@@ -3198,7 +3309,8 @@ var EngCalcs = EngCalcs || {};
 	// *"Fully shedded links need to hide if they are still in conflict"*): a label with no such
 	// side stays hidden exactly as before. Only a lone label is tried; a chain keeps its stations.
 	// Longest pipe first, as the slide orders them, so the order is a function of the drawing.
-	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.35;
+	var LPN_LEVEL_LEAVE_SYMBOLS = true, LPN_LEVEL_SHED_CAP = 16, LPN_LEVEL_TRIAL_CAP = 24;
+	var LPN_LEVEL_FULL_FIRST = true, LPN_LEVEL_FULL_SIDES = 16, LPN_LEVEL_REACH_TEXT_HEIGHTS = 5, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.35;
 	// **A LEVEL LABEL CARRIES ITS LEADER UNLESS IT TOUCHES ITS PIPE** (pre-review of
 	// feat/label-beside, 2026-10-18: level labels 25-45 px from their pipe had no leader, because a
 	// data label draws one only past leaderThreshold(), and several sat as near another pipe as their
@@ -3279,8 +3391,11 @@ var EngCalcs = EngCalcs || {};
 		var out = [], s = state.s || 1;
 		reqs.forEach(function (q) {
 			if (!q.m || !(q.m.wPx > 0)) { return; }
-			var n = q.stacked ? q.lines.length : 1, w = q.m.wPx / s, h = dataLabelBoxHeight(n),
-				rows = q.stacked && q.m.rowWPx && q.m.rowWPx.length > 1 ? q.m.rowWPx.map(function (v) { return v / s; }) : null,
+			// **TO TEN FIGURES**: one scale reached by two wheel histories differs in its last bit, and a width of pixels over that scale
+			// with it; a side that grazes a box then flips between the two (zoom-pass-determinism-harness.js).
+			function fig(v) { return +v.toPrecision(10); }
+			var n = q.stacked ? q.lines.length : 1, w = fig(q.m.wPx / s), h = fig(dataLabelBoxHeight(n)),
+				rows = q.stacked && q.m.rowWPx && q.m.rowWPx.length > 1 ? q.m.rowWPx.map(function (v) { return fig(v / s); }) : null,
 				area = rows ? rows.reduce(function (a, v) { return a + v; }, 0) * (h / n) : w * h;
 			// The staircase, as drawn: a stack hung left of its point is drawn with its rows flush
 			// against the point (layoutLinkLabelAt()), as Collide.labelLineBoxes() models it.
@@ -3290,9 +3405,72 @@ var EngCalcs = EngCalcs || {};
 		out.sort(function (a, b) { return (b.nVal - a.nVal) || (a.area - b.area) || ((a.form.stacked ? 1 : 0) - (b.form.stacked ? 1 : 0)); });
 		return out;
 	}
+	// **A LEADER THAT RUNS THROUGH ANOTHER LABEL IS NOT DRAWN** (Task 812, pre-review 2026-11-09: leaders
+	// through a neighbour's row on Novato at 4 notches and Net3 at 6, new on this branch). Each pass above
+	// tested the leader it drew against the ground it knew; a label placed, moved or given a line after it
+	// was never tested against that leader, and the level labels came last of all. This is the one check
+	// on the drawing as it stands: every leader the renderer will draw (a node's, a free pipe label's, a
+	// level pipe label's, an ambiguity leader) against the rows of every other label drawn. The label
+	// keeps its place and loses only the leader; no label is hidden for it. It cannot make a new
+	// crossing, so it runs once, last. dev/lpn-spike/label-crossing-final-browser-harness.js.
+	var LPN_DROP_STRUCK = true;
+	function dropStruckLeaders(nodeLabels, nodePlaced, labels, placed, obs, holders) {
+		var min = leaderThreshold(), lmin = levelLeaderMin(), specs = {}, leaders = [], rows = [], struck = 0, air = effectiveFontSize() * LPN_LEVEL_PAD_FRAC;
+		doc.nodes.forEach(function (n) { var ne = nodeEls[n.id]; if (ne) { ne.leaderStruck = false; } });
+		doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le) { le.leaderStruck = false; } });
+		if (!LPN_DROP_STRUCK) { return 0; }
+		nodeLabels.concat(labels).forEach(function (sp) { specs[sp.id] = sp; });
+		function holderOf(id) { return id.charAt(0) === 'n' ? nodeEls[id.slice(2)] : linkEls[id.slice(2)]; }
+		// A row's box is the width the pass measured; the glyphs stand a pixel or two outside it. Air round
+		// the row, so a leader that grazes the box does not graze the letters.
+		function boxesOf(r) { return ((r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : [])).map(function (b) { return Collide.box(b.cx, b.cy, b.w + 2 * air, b.h + 2 * air, b.a); }); }
+		// A level label is drawn whatever it was along its pipe (its hiddenYielded stays set from there).
+		function shown(id) { var h = holderOf(id); return !!h && (!!h.levelBeside || (!h.hiddenDropped && !h.hiddenCrossed && !h.hiddenYielded)); }
+		nodePlaced.forEach(function (r) {
+			var sp = specs[r.id], h = holderOf(r.id), bs = boxesOf(r);
+			if (r.dropped || !sp || !h || !shown(r.id)) { return; }
+			bs.forEach(function (b) { rows.push({ id: r.id, b: b }); });
+			if (!sp.dragged && (Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y) > min || h.leaderDue)) {
+				leaders.push({ id: r.id, h: h, g: Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id) });
+			}
+		});
+		placed.forEach(function (r) {
+			var h = holders[r.id], g = r.leader;
+			if (r.dropped || !h || !shown(r.id)) { return; }
+			boxesOf(r).forEach(function (b) { rows.push({ id: r.id, b: b }); });
+			if (g && !(specs[r.id] && specs[r.id].dragged) && Math.hypot(g.bx - g.ax, g.by - g.ay) > min) { leaders.push({ id: r.id, h: h, g: g }); }
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id], key = linkLabelKey(l.id);
+			if (!le || !le.levelBeside || !shown(key)) { return; }
+			obs.boxes.forEach(function (o) { if (o.levelOwner === l.id) { rows.push({ id: key, b: Collide.box(o.cx, o.cy, o.w + 2 * air, o.h + 2 * air, o.a) }); } });
+			if (le.levelQuiet) { return; }
+			obs.segments.forEach(function (o) {
+				if (o.kind === 'leader' && o.owner === key && Math.hypot(o.bx - o.ax, o.by - o.ay) > lmin) { leaders.push({ id: key, h: le, g: o }); }
+			});
+		});
+		leaders.forEach(function (ld) {
+			for (var i = 0; i < rows.length; i++) {
+				if (rows[i].id !== ld.id && rows[i].b.w > 0 && Collide.segmentInBoxFraction(ld.g, rows[i].b) > 0) { ld.h.leaderStruck = true; struck++; return; }
+			}
+		});
+		return struck;
+	}
+	// **EVERYTHING THE LEVEL PASS READS IS TAKEN TO A MILLIONTH OF A DRAWING UNIT**: boxes and segments are measured in
+	// pixels over a scale, and one scale reached by two wheel histories differs in its last bit; a spot that grazes a box then flips
+	// between them, and the picture depends on the history (zoom-pass-determinism-harness.js). Nothing else on the map moves.
+	function snap(v) { return Math.round(v * 1e6) / 1e6; }
+	function snapPt(p) { return { x: snap(p.x), y: snap(p.y) }; }
+	// In place: a copy made with Object.assign() has another hidden-class shape than Collide's own boxes, and the first fit then ran half again slower
+	// (measured, 600-junction network). A millionth of a drawing unit is nothing to the labels that are drawn from them.
+	function snapBox(b) { b.cx = snap(b.cx); b.cy = snap(b.cy); b.w = snap(b.w); b.h = snap(b.h); return b; }
+	function snapSeg(g) { g.ax = snap(g.ax); g.ay = snap(g.ay); g.bx = snap(g.bx); g.by = snap(g.by); return g; }
 	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
-		var specs = [], min = leaderThreshold(), d = defaultLabelOffset(), home0 = Math.hypot(d.x, d.y),
-			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), byKey = {}, fsNow = fs + 'px';
+		var fsNow = fs + 'px';
+		fs = snap(fs);
+		var shedCands = [];
+		var specs = [], min = snap(leaderThreshold()), d = snapPt(defaultLabelOffset()), home0 = snap(Math.hypot(d.x, d.y)),
+			reach = snap(Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS)), nearReach = snap(Math.max(home0 * 3, fs * 3)), byKey = {};
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
 			if (le) { le.levelForm = null; le.levelAt = null; }
@@ -3304,24 +3482,48 @@ var EngCalcs = EngCalcs || {};
 			// form the shed left it, its last value, and hides as before if no side is clean.
 			// And one that lost a crossing along its pipe (shedCrossingLabels()): level, it is placed
 			// off every leader, so it crosses nothing (Tom's Net1 at 14 notches out, 2026-10-18).
-			if (!(linkLabelTooShort(l, le) || le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded || le.hiddenCrossed)) { return; }
-			var mid = linkLabelMid(l), pts = linkPointList(l), sides = [];
+			var hid = linkLabelTooShort(l, le) || le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded || le.hiddenCrossed,
+				// **AND ONE THAT IS DRAWN ALONG ITS PIPE WITH A FIELD SHED TRIES IT TOO, WITH ALL ITS FIELDS** (Task 812,
+				// Tom, 2026-11-09: *"It's bad that pipe leaders are so eager to get along the pipes that they shed
+				// properties when there is convenient open space to show everything on a leader."*).
+				shedOnly = !hid && LPN_LEVEL_FULL_FIRST && !!le.allLines && le.allLines.length > (le.lines || []).length && le.allLines.length > 1;
+			if (!(hid || shedOnly)) { return; }
+			// **THE SHED ONES ARE CAPPED** (Task 812, round 6): each costs a measured set of forms and a trial of sixteen sides, and on a dense
+			// network most find nothing (the 600-junction network at 6 notches: 219 tried, 18 gained). The ones missing the most fields, then the
+			// longest pipes, are tried; the rest stay as they are.
+			if (shedOnly) { shedCands.push({ l: l, le: le, len: Geom.polylineLength(linkPointList(l)), missing: le.allLines.length - (le.lines || []).length }); return; }
+			buildSpec(l, le, false);
+		});
+		shedCands.sort(function (p, q) { return (q.missing - p.missing) || (q.len - p.len) || (p.l.id < q.l.id ? -1 : (p.l.id > q.l.id ? 1 : 0)); });
+		shedCands.slice(0, LPN_LEVEL_SHED_CAP).forEach(function (c) { buildSpec(c.l, c.le, true); });
+		function buildSpec(l, le, shedOnly) {
+			var pts = linkPointList(l), mid = snapPt(linkLabelMid(l, undefined, pts)), sides = [];
 			// The sides round one point of the pipe: its corners, then rings out to `reach` on either
 			// side of the pipe, nearest first. `at` marks a point other than the label's own.
-			function sidesAt(p, along, rings) {
+			function sidesAt(p, along, rings, lite) {
 				var dir = linkDirectionAt(l, p, pts),
 					deg = Math.atan2(dir.by - dir.ay, dir.bx - dir.ax) * 180 / Math.PI,
 					arcs = Collide.openArcs([deg, deg + 180]),
 					out = Collide.cardinalSides(p, d, arcs, {}),
-					ring = Collide.polarCandidates(p, arcs[0], home0, reach, { rings: rings }).concat(
-						Collide.polarCandidates(p, arcs[1], home0, reach, { rings: rings }));
-				ring.forEach(function (q, i) { q._r = Math.hypot(q.x - p.x, q.y - p.y); q._i = i; });
-				ring.sort(function (a, b) { return (a._r - b._r) || (a._i - b._i); });
-				ring.forEach(function (q) { delete q._r; delete q._i; out.push(q); });
+
+					// The rings out to 3 text heights are the ones laid before reach grew; the rings beyond
+					// are added after them, flagged `far`, for the second sweep (below).
+					ring = Collide.polarCandidates(p, arcs[0], home0, nearReach, { rings: rings }).concat(
+						Collide.polarCandidates(p, arcs[1], home0, nearReach, { rings: rings })),
+					farRing = (reach > nearReach && !lite) ? Collide.polarCandidates(p, arcs[0], home0, reach, { rings: rings }).concat(
+						Collide.polarCandidates(p, arcs[1], home0, reach, { rings: rings })) : [];
+				function byRadius(set, far) {
+					set.forEach(function (q, i) { q._r = Math.hypot(q.x - p.x, q.y - p.y); q._i = i; });
+					set = set.filter(function (q) { return !far || q._r > nearReach + 0.5; });
+					set.sort(function (a, b) { return (a._r - b._r) || (a._i - b._i); });
+					set.forEach(function (q) { q.far = far; delete q._r; delete q._i; out.push(q); });
+				}
+				byRadius(ring, false);
+				byRadius(farRing, true);
 				if (along !== null) { out.forEach(function (q) { q.anchor = p; q.along = along; }); }
 				return out;
 			}
-			sides = sidesAt(mid, null, 4);
+			sides = sidesAt(mid, null, shedOnly ? 3 : 4, shedOnly);
 			// **AND THEN FROM THE NEAREST CLEAR STATION** (Task 812). The label's own point is dodged
 			// off the flow arrow at mid-pipe, which on a short pipe puts it by an end node, where
 			// every leader starts inside that node's symbol (Tom's Net1, 2026-10-18: the short
@@ -3331,16 +3533,16 @@ var EngCalcs = EngCalcs || {};
 			// elsewhere a station of its own pipe adds a few labels for twice the level rung's time
 			// (measured on the 600-junction network at fit: 34 labels, the rung 290 -> 1,220 ms).
 			var ends = [nodeAt(nodeById(l.from)), nodeAt(nodeById(l.to))];
-			if (ends.some(function (e) { return e && Math.hypot(e.x - mid.x, e.y - mid.y) < home0; })) {
+			if (!shedOnly && ends.some(function (e) { return e && Math.hypot(e.x - mid.x, e.y - mid.y) < home0; })) {
 				LPN_LEVEL_STATIONS.forEach(function (a) {
-					Array.prototype.push.apply(sides, sidesAt(Geom.pointAlongPolyline(pts, a), a, 2));
+					Array.prototype.push.apply(sides, sidesAt(snapPt(Geom.pointAlongPolyline(pts, a)), a, 2));
 				});
 			}
-			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: linkLabelBase(l),
-				dragged: false, sides: sides, len: Geom.polylineLength(linkPointList(l)),
+			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: snapPt(linkLabelBase(l)),
+				dragged: false, sides: sides, len: Geom.polylineLength(pts),
 				w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: -fs * 0.85,
-				lines: labelRowWidths(le), nVal: (le.lines || []).length, l: l });
-		});
+				lines: labelRowWidths(le), nVal: (le.lines || []).length, l: l, shedTrial: shedOnly });
+		}
 		// Every candidate's other forms, measured in one batch.
 		// **ONE BATCH FOR EVERY LABEL'S FORMS**: every hidden element written, then every one read,
 		// so a wheel notch at a size not yet measured costs one layout, not one per label.
@@ -3352,19 +3554,36 @@ var EngCalcs = EngCalcs || {};
 				var f = levelFormsFrom(sp.reqs);
 				delete sp.reqs;
 				if (f.length) { sp.forms = f; }
+				// The forms showing EVERY field, the smaller footprint first.
+				var lel = linkEls[sp.l.id], all = (lel.allLines || lel.lines || []).length, full = (sp.forms || []).filter(function (q) { return q.nVal === all; });
+				if (full.length) { sp.fullForms = full; sp.allCount = all; }
+				if (sp.shedTrial) {
+					// Its own spec is the first of them, so a side that takes it takes the whole label, never a shed one.
+					delete sp.forms;
+					if (!full.length) { sp.skip = true; return; }
+					sp.has = sp.nVal;
+					sp.w = full[0].w; sp.h = full[0].h; sp.lines = full[0].lines; sp.nVal = full[0].nVal;
+					if (full.length > 1) { sp.forms = full.slice(1); }
+				}
 			});
 		});
-		if (!specs.length) { return; }
-		specs.sort(function (a, b) { return (b.len - a.len) || (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)); });
-		specs.forEach(function (sp, i) { sp.priority = specs.length - i; byKey[sp.id] = sp; delete sp.len; });
+		var shedSpecs = specs.filter(function (sp) { return sp.shedTrial && !sp.skip; });
+		specs = specs.filter(function (sp) { return !sp.shedTrial; });
+		if (!specs.length && !shedSpecs.length) { return; }
+		function prioritise(list) {
+			list.sort(function (a, b) { return (b.len - a.len) || (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)); });
+			list.forEach(function (sp, i) { sp.priority = list.length - i; byKey[sp.id] = sp; });
+		}
+		prioritise(specs);
+		prioritise(shedSpecs);
 		// Everything on the map now: the drawing, the stationed labels, the dragged ones, and every
 		// node and free label the passes above placed, with the leaders the renderer will draw.
-		var ground = { boxes: nodeObs.boxes.slice(), segments: nodeObs.segments.slice() };
+		var ground = perfDebugAccum('  lv:snap', function () { return { boxes: nodeObs.boxes.map(snapBox), segments: nodeObs.segments.map(snapSeg) }; });
 		function addPlaced(spec, r) {
 			var h = holders[r.id];
 			if (!spec || r.dropped || (h && (h.hiddenDropped || h.hiddenCrossed))) { return; }
 			(r.boxes && r.boxes.length ? r.boxes : (r.box ? [r.box] : [])).forEach(function (b) {
-				var c = Collide.box(b.cx, b.cy, b.w, b.h, b.a); c.kind = 'label'; ground.boxes.push(c);
+				var c = Collide.box(snap(b.cx), snap(b.cy), snap(b.w), snap(b.h), b.a); c.kind = 'label'; ground.boxes.push(c);
 			});
 			// **A STACK HUNG LEFT IS DRAWN WITH ITS ROWS FLUSH LEFT**, not flush right as
 			// Collide.labelLineBoxes() models it: dataLabelOrigin() puts the text's x at the box's
@@ -3373,11 +3592,11 @@ var EngCalcs = EngCalcs || {};
 			// Chromium: up to 10 px deep on Net3 at 2x).
 			if (!spec.side && spec.lines && spec.lines.length > 1 && r.x < spec.anchor.x) {
 				Collide.labelLineBoxes(Object.assign({}, spec, { side: 'right' }), { x: r.x - spec.w, y: r.y }).forEach(function (b) {
-					b.kind = 'label'; ground.boxes.push(b);
+					b.kind = 'label'; ground.boxes.push(snapBox(b));
 				});
 			}
-			if (Math.hypot(r.x - spec.anchor.x, r.y - spec.anchor.y) > min) {
-				ground.segments.push(Collide.segment(spec.anchor.x, spec.anchor.y, r.x, r.y, 'leader', r.id));
+			if (Math.hypot(r.x - spec.anchor.x, r.y - spec.anchor.y) > min || (h && h.leaderDue)) {
+				ground.segments.push(Collide.segment(snap(spec.anchor.x), snap(spec.anchor.y), snap(r.x), snap(r.y), 'leader', r.id));
 			}
 		}
 		var specOf = {};
@@ -3394,17 +3613,77 @@ var EngCalcs = EngCalcs || {};
 		// near enough to draw no leader is taken only where its own pipe is the nearest pipe to its
 		// rows, by a fifth of a font size (`near`); a side further out carries a leader to its pipe,
 		// which says it instead. A label with no such side stays hidden.
-		var out = perfDebugAccum('  lv:fit', function () { return Collide.placeLabelsFirstFit(specs, ground, { pad: fs * LPN_LEVEL_PAD_FRAC, lastPad: fs * LPN_LEVEL_PAD_FRAC, strict: true,
-			leaderMin: levelLeaderMin(), quietMax: min, near: fs * LPN_LEVEL_NEAR_FRAC }); });
-		out.forEach(function (r) {
+		// **GROUND OUT TO 3 TEXT HEIGHTS IS SPENT FIRST, THE FAR RINGS ONLY BY WHAT IS STILL HIDDEN**
+		// (Task 812; Net3 on a 390 px phone at 6 notches: with the far rings in the one sweep, a long
+		// pipe took a far spot and three shorter pipes lost the near spots they had, 87 -> 86 labels, 135
+		// -> 129 values). Two sweeps over the same ground: the first with every side within reach 3, as
+		// before; the second only for the labels it dropped, with every side to the full reach, on the
+		// ground the first left. No label that fits near its pipe loses its place to one that reaches.
+		var fitOpts = { pad: snap(fs * LPN_LEVEL_PAD_FRAC), lastPad: snap(fs * LPN_LEVEL_PAD_FRAC), strict: true,
+			leaderMin: snap(levelLeaderMin()), quietMax: min, near: snap(fs * LPN_LEVEL_NEAR_FRAC) };
+		function withSides(sp, keep) {
+			var idx = [], c = Object.assign({}, sp);
+			c.sides = sp.sides.filter(function (q, i) { if (keep(q)) { idx.push(i); return true; } return false; });
+			c._idx = idx;
+			return c;
+		}
+		function backToFullSides(r, c) { if (r.side >= 0 && c._idx) { r.side = c._idx[r.side]; } return r; }
+		function fitSpecs(list, ground, nearOnly) { return perfDebugAccum(nearOnly ? '  lv:fit2' : '  lv:fit', function () {
+			var near = list.map(function (sp) { return withSides(sp, function (q) { return !q.far; }); }), nearBy = {}, by = {},
+				first, left, second = [], ground2;
+			near.forEach(function (c) { nearBy[c.id] = c; });
+			list.forEach(function (sp) { by[sp.id] = sp; });
+			first = Collide.placeLabelsFirstFit(near, ground, fitOpts).map(function (r) { return backToFullSides(r, nearBy[r.id]); });
+			left = nearOnly ? [] : first.filter(function (r) { return r.dropped && by[r.id].sides.some(function (q) { return q.far; }); });
+			if (!left.length) { return first; }
+			ground2 = { boxes: ground.boxes.slice(), segments: ground.segments.slice() };
+			first.forEach(function (r) {
+				if (r.dropped) { return; }
+				(r.boxes && r.boxes.length ? r.boxes : [r.box]).forEach(function (b) { ground2.boxes.push(b); });
+				if (r.leader) { ground2.segments.push(r.leader); }
+			});
+			var leftBy = {}, again = left.map(function (r) { var c = withSides(by[r.id], function () { return true; }); leftBy[c.id] = c; return c; });
+			Collide.placeLabelsFirstFit(again, ground2, fitOpts).forEach(function (r) { second.push(backToFullSides(r, leftBy[r.id])); });
+			var secBy = {};
+			second.forEach(function (r) { secBy[r.id] = r; });
+			return first.map(function (r) { return secBy[r.id] || r; });
+		}); }
+		function applyLevel(out, ground) { out.forEach(function (r) {
 			var sp = byKey[r.id], le = sp && linkEls[sp.l.id];
 			if (!le || r.dropped) { return; }
 			le.levelBeside = true;
-			le.levelForm = (r.form !== undefined && sp.forms && sp.forms[r.form]) ? sp.forms[r.form].form : null;
+			le.levelForm = (r.form !== undefined && r.forms && r.forms[r.form]) ? r.forms[r.form].form : null;
 			// No leader where the pass found its own pipe plainly the nearest (Collide's `quietMax`).
 			le.levelQuiet = !r.leader;
+			// **A QUIET LABEL WITH ANOTHER PIPE ABOUT AS NEAR SAYS WHOSE IT IS WITH A LEADER** (Task 812, Tom,
+			// 2026-11-09: *"L181 and L185 would be reassuringly confirmed if they had leaders"*). The same
+			// reading as ambiguousShortLeaders(): another pipe within LPN_AMBIG_RATIO times its own distance,
+			// and a leader that crosses no label, no leader and no symbol (a pipe's anchor is no node's own, so a
+			// leader starting inside an end node's symbol runs through it).
+			if (LPN_AMBIG_LEADERS && le.levelQuiet) {
+				var qa = r.anchor || sp.anchor, qg = Collide.segment(qa.x, qa.y, r.x, r.y, 'leader', r.id), own = Infinity, other = Infinity, qbs = r.boxes || [r.box], qok = Math.hypot(r.x - qa.x, r.y - qa.y) > levelLeaderMin();
+				ground.segments.forEach(function (o) {
+					if (o.kind !== 'link') { return; }
+					qbs.forEach(function (b) {
+						var dd = Collide.segmentBoxDistance(o, b);
+						if (o.owner === sp.id) { own = Math.min(own, dd); } else { other = Math.min(other, dd); }
+					});
+				});
+				if (qok && own < Infinity && other <= own * LPN_AMBIG_PIPE_RATIO) {
+					ground.boxes.forEach(function (o) {
+						if (!qok || !(o.w > 0) || o.owner === r.id || (o.kind !== 'label' && o.kind !== 'levellabel' && o.kind !== 'symbol')) { return; }
+						// **A LEADER FROM A PIPE SHORTER THAN ITS END SYMBOLS LEAVES THEM** (Tom, 2026-11-09, L185 on Novato: *"would be reassuringly
+						// confirmed if they had leaders"*): the symbol the anchor stands in is not in its way, any other is. Only here: as a way to seat a
+						// label in the sweeps it cost Novato 107 pipe labels and 7% of its fields (Chromium, round 6).
+						if (LPN_LEVEL_LEAVE_SYMBOLS && o.kind === 'symbol' && (o.round ? Math.hypot(o.cx - qa.x, o.cy - qa.y) <= o.w / 2 : (Math.abs(o.cx - qa.x) <= o.w / 2 && Math.abs(o.cy - qa.y) <= o.h / 2))) { return; }
+						if (Collide.segmentInBoxFraction(qg, o) > 0) { qok = false; }
+					});
+					ground.segments.forEach(function (o) { if (qok && o.kind === 'leader' && o.owner !== r.id && Collide.segmentsCross(qg, o)) { qok = false; } });
+					if (qok) { le.levelQuiet = false; r.leader = qg; }
+				}
+			}
 			// Where its leader starts and its text hangs, from the station it was placed from.
-			var side = r.side >= 0 ? sp.sides[r.side] : null, a = r.anchor || sp.anchor;
+			var side = r.side >= 0 ? (r.sideList || sp.sides)[r.side] : null, a = r.anchor || sp.anchor;
 			le.levelAt = { along: side && side.along !== undefined ? side.along : null, ex: r.x - a.x, ey: r.y - a.y };
 			le.nudge = { x: r.dx, y: r.dy };
 			le.nudgeManual = false;
@@ -3413,8 +3692,86 @@ var EngCalcs = EngCalcs || {};
 			// harnesses that read `label` boxes back out of this list attribute them by owner.
 			(r.boxes || [r.box]).forEach(function (b) { b.kind = 'levellabel'; b.levelOwner = sp.l.id; obs.boxes.push(b); });
 			if (r.leader) { obs.segments.push(r.leader); }
+		}); }
+		var base = { boxes: ground.boxes.slice(), segments: ground.segments.slice() },
+			out = specs.length ? fitSpecs(specs, ground) : [];
+		out.forEach(function (r) { r.forms = byKey[r.id].forms; });
+		// **A LABEL THAT SHOWS ALL ITS FIELDS IS NEVER SHED FOR A SPOT THAT WOULD HOLD THEM ALL** (Tom, 2026-11-09). What is
+		// placed above is the smallest form each label could have; now every label that shows fewer fields than it has,
+		// whether it arrived hidden or drawn along its pipe with fields shed, tries its full forms on every side, on
+		// the ground everything else left (its own place given back). The ones that find a clean spot take it; the rest
+		// keep what they have. A label with nothing shown went first above, so it never loses a place to one that has some.
+		var trial = shedSpecs.slice(), placedBy = {}, going = {};
+		out.forEach(function (r) { placedBy[r.id] = r; });
+		specs.forEach(function (sp) {
+			var r = placedBy[sp.id], now;
+			if (!LPN_LEVEL_FULL_FIRST || !r || r.dropped || !sp.fullForms) { return; }
+			now = (r.form !== undefined && sp.forms && sp.forms[r.form]) ? sp.forms[r.form].nVal : sp.nVal;
+			if (now >= sp.allCount) { return; }
+			var full = sp.fullForms, c = Object.assign({}, sp, { has: now, w: full[0].w, h: full[0].h, lines: full[0].lines, nVal: full[0].nVal, forms: full.length > 1 ? full.slice(1) : undefined });
+			if (!c.forms) { delete c.forms; }
+			trial.push(c); going[sp.id] = true;
 		});
-		specs.forEach(function (sp) { delete sp.l; delete sp.forms; });
+		// **ONLY SO MANY ARE TRIED**: the ones missing the most fields first, then the longest pipes (the 600-junction network: 129 tried at one view, 4 gained).
+		trial.forEach(function (sp) { sp.miss = sp.allCount - (sp.has || 0); });
+		trial.sort(function (p, q) { return (q.miss - p.miss) || (q.len - p.len) || (p.id < q.id ? -1 : (p.id > q.id ? 1 : 0)); });
+		trial = trial.slice(0, LPN_LEVEL_TRIAL_CAP);
+		shedSpecs = shedSpecs.filter(function (sp) { return trial.indexOf(sp) >= 0; });
+		var fullOf = {};
+		shedSpecs.concat(specs).forEach(function (sp) { fullOf[sp.id] = sp.fullForms; });
+		if (trial.length) {
+			trial.sort(function (a, b) { return (b.len - a.len) || (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)); });
+			trial.forEach(function (sp, i) {
+				sp.priority = trial.length - i;
+				// **A SAMPLE OF THE SIDES, SPREAD OVER THE RINGS, NOT THE NEAREST FEW**: they are ordered by radius, and the
+				// nearest sixteen are all on the first ring, where a whole label lies across its own pipe. Measured on the 600-junction
+				// network, all of the sides cost half as much time again for the last tenth of the gain.
+				if (sp.sides.length > LPN_LEVEL_FULL_SIDES) {
+					var keep = Math.min(4, sp.sides.length), rest = sp.sides.slice(keep), want = LPN_LEVEL_FULL_SIDES - keep, step = rest.length / want, pick = [], k;
+					for (k = 0; k < want; k++) { pick.push(rest[Math.floor(k * step)]); }
+					sp.sides = sp.sides.slice(0, keep).concat(pick);
+				}
+			});
+			// **THE GROUND TO A MILLIONTH**: boxes and segments are measured in pixels over a scale, and one scale reached by two wheel
+			// histories differs in its last bit; a spot that grazes a box then flips between them
+			// (zoom-pass-determinism-harness.js).
+			var ground3 = perfDebugAccum('  lv:snap3', function () { return { boxes: base.boxes.map(snapBox), segments: base.segments.map(snapSeg) }; });
+			// A label that is trying for a whole spot keeps its first one on the ground too (a label never blocks itself): if it finds
+			// none it stays there, and no other may have taken the place.
+			out.forEach(function (r) {
+				if (r.dropped) { return; }
+				(r.boxes && r.boxes.length ? r.boxes : [r.box]).forEach(function (b) { ground3.boxes.push(snapBox(b)); });
+				if (r.leader) { ground3.segments.push(snapSeg(r.leader)); }
+			});
+			var out2 = fitSpecs(trial, ground3, true), byId2 = {}, trialBy = {};
+			if (typeof window !== 'undefined') { window.__lvTrials = trial.length; window.__lvSides = out2.filter(function (r) { return !r.dropped; }).map(function (r) { return r.side; }); }
+			perfDebugCount('levelTrials', trial.length); perfDebugCount('levelGained', out2.filter(function (r) { return !r.dropped; }).length);
+			trial.forEach(function (sp) { trialBy[sp.id] = sp; });
+			out2.forEach(function (r) {
+				if (r.dropped) { return; }
+				// The form that won, among the full ones: the spec's own is the first, the others follow.
+				r.form = r.form === undefined ? 0 : r.form + 1;
+				r.forms = fullOf[r.id];
+				r.sideList = trialBy[r.id].sides;
+				byId2[r.id] = r;
+			});
+			// What stands: the first placements, those that found a full spot replaced by it. A label that found none keeps its own.
+			var final = out.map(function (r) { return byId2[r.id] || r; });
+			shedSpecs.forEach(function (sp) { if (byId2[sp.id]) { final.push(byId2[sp.id]); } });
+			var gone = {};
+			shedSpecs.forEach(function (sp) { if (byId2[sp.id]) { gone[sp.l.id] = true; } });
+			// The ground the readers of the ambiguity leader see: every label that stands.
+			var ground4 = { boxes: base.boxes.slice(), segments: base.segments.slice() };
+			final.forEach(function (r) {
+				if (r.dropped) { return; }
+				(r.boxes && r.boxes.length ? r.boxes : [r.box]).forEach(function (b) { ground4.boxes.push(b); });
+				if (r.leader) { ground4.segments.push(r.leader); }
+			});
+			applyLevel(final, ground4);
+			// The along-pipe box of a label that left is ground nobody holds now.
+			obs.boxes = obs.boxes.filter(function (b) { return b.linkOwner === undefined || !gone[b.linkOwner]; });
+		} else { applyLevel(out, ground); }
+		specs.concat(shedSpecs).forEach(function (sp) { delete sp.l; delete sp.forms; delete sp.fullForms; delete sp.len; });
 	}
 	// **WHAT A LEVEL LABEL'S ELEMENT SHOWS** (Task 812). A level label in another form than the one
 	// it arrived in has that form written into its own <text>; anything else shows the content the
@@ -3581,6 +3938,17 @@ var EngCalcs = EngCalcs || {};
 		// the repair and the crossing hides, so not one of them sees it, and it can move nobody.
 		nodePlaced = shedNodes ? runInlineTrial(nodeLabels, nodePlaced, nodeObs, pad, fsNow, placed)
 			: reinsertInlineNodeLabels(nodeLabels, nodePlaced, nodeObs, pad, fs, placed);
+		// **AND THE HIDES ARE JUDGED AGAIN ON WHAT THE READER WILL SEE** (Task 812, Tom, 2026-11-09: N161 on
+		// Novato had no label and *"this one would not cross other labels"*). The first shed measured the
+		// stacks; a label that then took its line left the pair its neighbour was hidden for. Only where
+		// something was hidden, and only after a one-line label moved: the labels it left have nothing
+		// to be hidden for.
+		lastFinalGround = { nodeLabels: nodeLabels, nodePlaced: nodePlaced, labels: labels, placed: placed, obs: obs };
+		if (lastCrossingShed && lastCrossingShed.hidden.length) {
+			lastCrossingShed = perfDebugAccum('  cl:crossShed2', function () { return shedCrossingLabels(nodeLabels, nodePlaced, labels, placed, obs); });
+		}
+		var leaderDue = LPN_AMBIG_LEADERS ? perfDebugAccum('  cl:ambig', function () { return ambiguousShortLeaders(nodeLabels, nodePlaced, labels, placed, obs); }) : {};
+		doc.nodes.forEach(function (n) { var ne = nodeEls[n.id]; if (ne) { ne.leaderDue = !!leaderDue[nodeLabelKey(n.id)]; } });
 		placed.concat(nodePlaced).forEach(function (r) {
 			var h = holders[r.id];
 			if (!h) { return; }
@@ -3596,6 +3964,7 @@ var EngCalcs = EngCalcs || {};
 		perfDebugAccum('  cl:level', function () {
 			placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, labels, placed, holders, fs);
 		});
+		perfDebugAccum('  cl:struck', function () { dropStruckLeaders(nodeLabels, nodePlaced, labels, placed, obs, holders); });
 		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
 		// **THE METERS GO LAST, ON THE GROUND EVERYTHING ELSE HAS LEFT** (Task 247). They are the
 		// only labels on this page with two fixed positions and no relaxation, so they can only be
@@ -59476,19 +59845,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var nn = nodeById(t.dataset.nodelbl), posN = nodeLabelPos(nn), w4 = screenToWorld(e.clientX, e.clientY);
 				// **A LABEL PICKED UP IS A STACK** (Task 734): its one-line form is the placement's
 				// answer to a crowded view, and a label the user places is the user's, as a dragged
-				// pipe label stacks (composeRows()). Restacked before the grab point is measured.
-				if (nodeEls[t.dataset.nodelbl] && nodeEls[t.dataset.nodelbl].inline) {
-					writeNodeLabelGlyphs(nodeEls[t.dataset.nodelbl], nn, nodeEls[t.dataset.nodelbl].lines, effectiveFontSize() + 'px', false);
-					measureLabelWidths(nodeEls[t.dataset.nodelbl]);
-					layoutNodeLabel(t.dataset.nodelbl);
-				}
-				var neN = nodeEls[t.dataset.nodelbl],
-					gxN = neN ? w4.x - (neN.side === 'left' ? posN.x - labelBoxWidth(neN) : posN.x) : null;
-				// A label restacked under the cursor is narrower than the line that was grabbed: the grab
-				// point is held within the stack, so the stack comes to the cursor rather than the cursor
-				// being left beside it.
+				// pipe label stacks (composeRows()). **IT RESTACKS WHEN THE DRAG ARMS, NOT ON THE PRESS**
+				// (restackNodeLabelInHand()): a press that has not yet travelled its slop leaves a long
+				// one-line label as it is under the pointer, instead of shrinking it to its left end,
+				// a label's width away, until the first frame of the drag brings it back.
+				var neN = nodeEls[t.dataset.nodelbl], restackN = !!(neN && neN.inline),
+					gxN = (neN && !restackN) ? w4.x - (neN.side === 'left' ? posN.x - labelBoxWidth(neN) : posN.x) : null;
 				if (neN && gxN !== null) { gxN = Math.max(0, Math.min(labelBoxWidth(neN), gxN)); }
-				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y, gx: gxN };
+				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y, gx: gxN,
+					restack: restackN ? { w: w4, pos: posN } : null };
 				Object.assign(drag, common);
 			} else if (t.dataset.linklbl !== undefined) {
 				// GRABBING A REPEAT COLLAPSES THE CHAIN TO WHERE IT WAS GRABBED, and this line is the
@@ -60649,6 +61014,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		drag.snapped = true;
 		saveUndoSnapshot();
 	}
+	// The restack a pick-up owes a one-line node label (Task 734), done on the first frame of the drag. The grab
+	// point is held within the narrower stack, so the stack comes to the cursor rather than the cursor being
+	// left beside it.
+	function restackNodeLabelInHand() {
+		var r = drag.restack, id = drag.id, nn = nodeById(id), ne = nodeEls[id], bw;
+		if (!r) { return; }
+		drag.restack = null;
+		if (!nn || !ne) { return; }
+		if (ne.inline) {
+			writeNodeLabelGlyphs(ne, nn, ne.lines, effectiveFontSize() + 'px', false);
+			measureLabelWidths(ne);
+			layoutNodeLabel(id);
+		}
+		bw = labelBoxWidth(ne);
+		drag.gx = Math.max(0, Math.min(bw, r.w.x - (ne.side === 'left' ? r.pos.x - bw : r.pos.x)));
+	}
 	function applyDrag() {
 		if (drag.type === 'pinch') {
 			if (pointers.size !== 2) { return; }
@@ -60845,6 +61226,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			scheduleSolve();
 		} else if (drag.type === 'nodelbl') {
 			snapshotDragOnce();
+			restackNodeLabelInHand();
 			var w6 = screenToWorld(p.x, p.y), nn2 = nodeById(drag.id),
 				held6 = (drag.gx !== null && drag.gx !== undefined && nodeEls[drag.id])
 					? heldLabelEnd(nodeEls[drag.id], nn2, w6, drag) : { x: w6.x + drag.offX, y: w6.y + drag.offY },
@@ -63602,7 +63984,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			placedSide: h.placedSide, side: h.side, lines: h.lines ? h.lines.slice() : null,
 			lineCount: h.lineCount, shedCount: h.shedCount || 0,
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
-			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
+			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, leaderDue: !!h.leaderDue, leaderStruck: !!h.leaderStruck, hiddenDropped: !!h.hiddenDropped,
 			crowdHidden: !!h.crowdHidden,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
 			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
@@ -63657,7 +64039,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.shedCount = c.shedCount;
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
 		h.hiddenBlocked = c.hiddenBlocked;
-		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
+		h.hiddenCrossed = c.hiddenCrossed; h.leaderDue = !!c.leaderDue; h.leaderStruck = !!c.leaderStruck; h.hiddenDropped = c.hiddenDropped;
 		h.crowdHidden = c.crowdHidden;
 		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;

@@ -8,7 +8,205 @@
 			saveToStorage(); requestLabelRefresh();
 		},
 		solved: function () { return !!lastSolveResult; },
+		inlineTrial: function () { return lastInlineTrial; },
+		crossShed: function () { return lastCrossingShed; },
+		nodeLeaders: function (ids) {
+			var o = {};
+			ids.forEach(function (id) { var ne = nodeEls[id]; o[id] = !!(ne && ne.leader && ne.leader.style.display !== 'none' && ne.leader.style.visibility !== 'hidden' && ne.leader.getAttribute('x1') != null); });
+			return o;
+		},
+		shedEntries: function () { return lastShedEntries; },
+		// Why a hidden node label found no one-line place: the final ground, the label set in once with each
+		// constraint of the one-line trial taken off in turn. Returns which variants find a side.
+		whyNode: function (id) {
+			var g = lastFinalGround, n = nodeById(id), ne = nodeEls[id], fs = effectiveFontSize(), pad = fs * LPN_ALIGNED_PAD_FRAC, s0 = state.s || 1, out = {}, min = leaderThreshold(), reqs, m, base, key = nodeLabelKey(id);
+			reqs = measureLevelForms([{ lines: ne.allLines, stacked: false }], fs); m = reqs[0].m;
+			base = Object.assign({}, g.nodeLabels.filter(function (q) { return q.id === key; })[0] || { id: key, anchor: nodeAt(n), home: nodeLabelBase(n), priority: 1, dragged: false }, inlineNodeSpec(n, fs, m.wPx / s0), { takeYield: true });
+			function ground() {
+				var gr = { boxes: g.obs.boxes.slice().concat(viewFrameBoxes()), segments: g.obs.segments.slice() };
+				ringForeigners(g.placed).forEach(function (f) { f.boxes.forEach(function (b) { gr.boxes.push(b); }); if (f.leader) { gr.segments.push(f.leader); } });
+				g.nodePlaced.forEach(function (r) { var sp = g.nodeLabels.filter(function (q) { return q.id === r.id; })[0]; if (r.dropped || !sp || r.id === key) { return; } (r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { gr.boxes.push(Object.assign({}, b)); }); if (Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y) > min) { gr.segments.push(Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id)); } });
+				return gr;
+			}
+			function tryIt(name, mod, opts) {
+				var spec = Object.assign({}, base, mod || {}), r = Collide.placeLabelsFirstFit([spec], ground(), Object.assign({ pad: pad, lastPad: pad, strict: true, leaderMin: min }, opts || {}))[0];
+				out[name] = r && !r.dropped ? { x: Math.round((r.x - spec.anchor.x) * s0), y: Math.round((r.y - spec.anchor.y) * s0) } : null;
+			}
+			tryIt('asTried');
+			tryIt('noLinkMargin', { linkMargin: 0 });
+			tryIt('onLinks', { offLinks: false, linkMargin: 0 });
+			tryIt('noLeaderClean', { leaderClean: false });
+			tryIt('nonStrict', { linkMargin: 0, offLinks: false }, { strict: false });
+			(function () {
+				var a = nodeAt(n), d = defaultLabelOffset(), home = Math.hypot(d.x, d.y), far = [], k;
+				[12, 16, 20, 28].forEach(function (reachTH) {
+					var sides = Collide.polarCandidates(a, { start: 0, end: 359.99 }, home, fs * reachTH, { rings: 8, tol: 0, max: 600, angleStep: 10 });
+					tryIt('anyAngle' + reachTH + 'TH', { sides: sides, linkMargin: 2 / s0 });
+					tryIt('far' + reachTH + 'permissive', { sides: sides, offLinks: false, linkMargin: 0 }, { strict: false });
+					tryIt('far' + reachTH + 'noLeaderClean', { sides: sides, leaderClean: false, linkMargin: 0 });
+					tryIt('anyAngle' + reachTH + 'THstack', { sides: sides, linkMargin: 2 / s0, w: (ne.rowWPx ? Math.max.apply(null, ne.rowWPx) : 100) / s0 * 0 + base.w * 0.35, h: dataLabelBoxHeight(5) });
+				});
+			}());
+			(function () {
+				var a = nodeAt(n), d = defaultLabelOffset(), home = Math.hypot(d.x, d.y), gr = ground(), sides = Collide.polarCandidates(a, { start: 0, end: 359.99 }, home, fs * 8, { rings: 8, tol: 0, max: 600, angleStep: 10 }), tally = {}, free = 0;
+				var spec = Object.assign({}, base, { sides: sides });
+				sides.forEach(function (c) {
+					var bs = Collide.labelLineBoxes(spec, c), hit = null;
+					bs.forEach(function (b) { gr.boxes.forEach(function (o) { if (!hit && o.w > 0 && Collide.boxOverlapDepth(Collide.box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a), o) > 0) { hit = (o.kind || '?') + (o.owner ? ':' + o.owner : o.linkOwner ? ':l' + o.linkOwner : ''); } }); });
+					if (!hit) { free++; var g2 = Collide.segment(a.x, a.y, c.x, c.y, 'leader', key), why = null; gr.boxes.forEach(function (o) { if (!why && o.w > 0 && o.owner !== key && Collide.segmentInBoxFraction(g2, o) > 0) { why = 'leaderThru ' + (o.kind || '?') + (o.owner ? ':' + o.owner : o.linkOwner ? ':l' + o.linkOwner : ''); } }); gr.segments.forEach(function (o) { if (!why && o.kind === 'leader' && o.owner !== key && Collide.segmentsCross(g2, o)) { why = 'leaderCross ' + o.owner; } }); hit = why ? why : 'FREE'; }
+					tally[hit] = (tally[hit] || 0) + 1;
+				});
+				out.tally8TH = { n: sides.length, free: free, why: tally };
+			}());
+			out.stackCands = (g.nodeLabels.filter(function (q) { return q.id === key; })[0] || {}).sides ? g.nodeLabels.filter(function (q) { return q.id === key; })[0].sides.length : null;
+			return out;
+		},
+		// Every drawn leader that runs through a row of another label (Task 812). A row is the tspan that carries an x
+		// and the ones after it; a leader is tested as the segment it is, against the rows as the glyphs fill them,
+		// not against the box round a ragged stack. Labels set along a pipe (rotated) are left out, as the bbox audit did.
+		leaderStrikes: function () {
+			var c = svg.getBoundingClientRect(), L = [], R = [], out = [];
+			function vis(t) { return !!t && !!t.textContent && t.checkVisibility({ visibilityProperty: true, opacityProperty: true }); }
+			function rows(t) {
+				var res = [], cur = null, ts = t.querySelectorAll('tspan'), i, r;
+				for (i = 0; i < ts.length; i++) {
+					r = ts[i].getBoundingClientRect();
+					if (!(r.width > 0)) { continue; }
+					if (ts[i].hasAttribute('x') || !cur) { cur = { l: r.left, t: r.top, r: r.right, b: r.bottom }; res.push(cur); }
+					else { cur.l = Math.min(cur.l, r.left); cur.t = Math.min(cur.t, r.top); cur.r = Math.max(cur.r, r.right); cur.b = Math.max(cur.b, r.bottom); }
+				}
+				if (!res.length) { r = t.getBoundingClientRect(); res.push({ l: r.left, t: r.top, r: r.right, b: r.bottom }); }
+				return res;
+			}
+			function add(k, h) {
+				if (!h) { return; }
+				var e = h.leader;
+				if (e && e.style.display !== 'none' && e.style.visibility !== 'hidden' && e.getAttribute('x1') != null && (!h.text || vis(h.text))) {
+					L.push({ k: k, ax: +e.getAttribute('x1') * state.s + state.tx, ay: +e.getAttribute('y1') * state.s + state.ty, bx: +e.getAttribute('x2') * state.s + state.tx, by: +e.getAttribute('y2') * state.s + state.ty });
+				}
+				if (h.text && vis(h.text) && !/rotate/.test(h.text.getAttribute('transform') || '')) {
+					rows(h.text).forEach(function (r) { R.push({ k: k, l: r.l - c.left, t: r.t - c.top, r: r.r - c.left, b: r.b - c.top }); });
+				}
+			}
+			function hit(g, r) {
+				var t0 = 0, t1 = 1, dx = g.bx - g.ax, dy = g.by - g.ay, p = [-dx, dx, -dy, dy], q = [g.ax - r.l - 1, r.r - 1 - g.ax, g.ay - r.t - 1, r.b - 1 - g.ay], k, u;
+				for (k = 0; k < 4; k++) {
+					if (p[k] === 0) { if (q[k] < 0) { return false; } continue; }
+					u = q[k] / p[k];
+					if (p[k] < 0) { if (u > t1) { return false; } if (u > t0) { t0 = u; } } else { if (u < t0) { return false; } if (u < t1) { t1 = u; } }
+				}
+				return t0 < t1;
+			}
+			doc.nodes.forEach(function (n) { add('N' + n.id, nodeEls[n.id]); });
+			doc.links.forEach(function (l) { add('L' + l.id, linkEls[l.id]); });
+			L.forEach(function (g) { var seen = {}; R.forEach(function (r) { if (r.k !== g.k && !seen[r.k] && hit(g, r)) { seen[r.k] = true; out.push(g.k + ' through ' + r.k); } }); });
+			return out;
+		},
+		// Every label the last crossing hide hid, and which of them cross nothing in the entries it measured.
+		hiddenCrossedAudit: function () {
+			var g = lastFinalGround, E = g ? crossingEntries(g.nodeLabels, g.nodePlaced, g.labels, g.placed, g.obs) : [], pairs = EngCalcs.lpnCollide.labelCrossings(E).pairs, inPair = {}, out = { hidden: [], unjustified: [], forms: window.__lpnForm.nodeForms(['161']) };
+			pairs.forEach(function (p) { inPair[p[0]] = true; inPair[p[1]] = true; });
+			E.forEach(function (e) {
+				var h = e.id.charAt(0) === 'n' ? nodeEls[e.id.slice(2)] : linkEls[e.id.slice(2)];
+				if (h && h.hiddenCrossed) { out.hidden.push(e.id); if (!inPair[e.id]) { out.unjustified.push(e.id); } }
+			});
+			return out;
+		},
 		fit: function () { zoomExtent(); },
+		// Pipe labels in the view, counted as drawn: shown, fields shown of fields asked, shed (shown with
+		// fewer fields than asked), hidden, level, leaders. (Task 812, round 5.)
+		pipeFields: function () {
+			var c = svg.getBoundingClientRect(), o = { pipes: 0, shown: 0, rows: 0, asked: 0, shed: 0, hidden: 0, level: 0, leaders: 0 }, byId = {};
+			doc.nodes.forEach(function (n) { byId[n.id] = n; });
+			function inV(p) { var x = p.x * state.s + state.tx, y = p.y * state.s + state.ty; return x >= 0 && x <= c.width && y >= 0 && y <= c.height; }
+			doc.links.forEach(function (l) {
+				var le = linkEls[l.id], a, b, f, n;
+				if (!le || le.empty) { return; }
+				a = nodeAt(byId[l.from]); b = nodeAt(byId[l.to]);
+				if (!a || !b || !(inV(a) || inV(b))) { return; }
+				o.pipes++; o.asked += (le.allLines || le.lines || []).length;
+				if (le.text && le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true })) {
+					f = le.levelBeside && le.levelForm; n = f ? f.lines.length : (le.lines || []).length;
+					o.shown++; o.rows += n; if (n < (le.allLines || le.lines || []).length) { o.shed++; }
+					if (le.levelBeside) { o.level++; }
+					if (le.leader && le.leader.style.display !== 'none' && le.leader.style.visibility !== 'hidden') { o.leaders++; }
+				} else { o.hidden++; }
+			});
+			return o;
+		},
+		// Every pipe label in the view as drawn: id -> {shown, values, asked, level, leader}. (Task 812, round 6.)
+		pipeStates: function () {
+			var c = svg.getBoundingClientRect(), o = {}, byId = {};
+			doc.nodes.forEach(function (n) { byId[n.id] = n; });
+			function inV(p) { var x = p.x * state.s + state.tx, y = p.y * state.s + state.ty; return x >= 0 && x <= c.width && y >= 0 && y <= c.height; }
+			doc.links.forEach(function (l) {
+				var le = linkEls[l.id], a, b, f, vis;
+				if (!le || le.empty) { return; }
+				a = nodeAt(byId[l.from]); b = nodeAt(byId[l.to]);
+				if (!a || !b || !(inV(a) || inV(b))) { return; }
+				vis = !!(le.text && le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true }));
+				f = le.levelBeside && le.levelForm;
+				o[l.id] = { shown: vis, values: vis ? (f ? f.lines.length : (le.lines || []).length) : 0, asked: (le.allLines || le.lines || []).length, level: !!le.levelBeside,
+					leader: !!(vis && le.leader && le.leader.style.display !== 'none' && le.leader.style.visibility !== 'hidden'),
+					why: vis ? '' : ['hiddenCrowded', 'hiddenBlocked', 'hiddenYielded', 'hiddenCrossed', 'hiddenDropped', 'hiddenShort'].filter(function (k) { return le[k]; }).join('+') || 'other' };
+			});
+			return o;
+		},
+		// What holds the ground round a pipe label's middle, for the label with ALL its fields in its one-line and stacked forms:
+		// each of the sides (any angle, out to 8 text heights) tried against the final ground, the first blocker tallied. (Task 812, round 6.)
+		whyPipe: function (id) {
+			var g = lastFinalGround, l = linkById(id), le = linkEls[id], fs = effectiveFontSize(), pts = linkPointList(l), mid = linkLabelMid(l, undefined, pts),
+				d = defaultLabelOffset(), home = Math.hypot(d.x, d.y), pad = fs * LPN_LEVEL_PAD_FRAC, key = linkLabelKey(id), out = { forms: [] }, gr, reqs, forms, all;
+			gr = { boxes: g.obs.boxes.slice().concat(viewFrameBoxes()), segments: g.obs.segments.slice() };
+			g.nodePlaced.forEach(function (r) {
+				var sp = g.nodeLabels.filter(function (q) { return q.id === r.id; })[0];
+				if (r.dropped || !sp) { return; }
+				(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { var c = Object.assign({}, b); c.tag = r.id; gr.boxes.push(c); });
+			});
+			g.placed.forEach(function (r) { if (r.dropped || r.id === key) { return; } (r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { var c = Object.assign({}, b); c.tag = r.id; gr.boxes.push(c); }); });
+			reqs = levelFormRequests(le); measureLevelForms(reqs, fs + 'px'); forms = levelFormsFrom(reqs);
+			all = (le.allLines || le.lines || []).length;
+			forms.filter(function (q) { return q.nVal === all; }).forEach(function (f) {
+				var sides = Collide.polarCandidates(mid, { start: 0, end: 359.99 }, home, fs * 8, { rings: 8, tol: 0, max: 600, angleStep: 10 }), tally = {}, free = 0,
+					spec = { id: key, anchor: mid, home: mid, w: f.w, h: f.h, lines: f.lines, yOff: -fs * 0.85, sides: sides };
+				sides.forEach(function (c) {
+					var bs = Collide.labelLineBoxes(spec, c), hit = null;
+					bs.forEach(function (b) { gr.boxes.forEach(function (o) {
+						if (!hit && o.w > 0 && o.kind !== 'link' && Collide.boxOverlapDepth(Collide.box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a), o) > 0) { hit = (o.kind || '?') + ':' + (o.tag || o.owner || (o.linkOwner !== undefined ? 'L' + o.linkOwner : '') || o.levelOwner || ''); }
+					}); });
+					if (!hit) {
+						var g2 = Collide.segment(mid.x, mid.y, c.x, c.y, 'leader', key), why = null;
+						gr.boxes.forEach(function (o) { if (!why && o.w > 0 && (o.kind === 'label' || o.kind === 'levellabel' || o.kind === 'symbol') && Collide.segmentInBoxFraction(g2, o) > 0) { why = 'leaderThru ' + o.kind + ':' + (o.tag || o.owner || o.levelOwner || ''); } });
+						gr.segments.forEach(function (o) { if (!why && o.kind === 'leader' && o.owner !== key && Collide.segmentsCross(g2, o)) { why = 'leaderCross ' + o.owner; } });
+						if (!why) { free++; }
+						hit = why || 'FREE';
+					}
+					tally[hit] = (tally[hit] || 0) + 1;
+				});
+				out.forms.push({ values: f.nVal, stacked: !!f.stacked, w: Math.round(f.w * state.s), h: Math.round(f.h * state.s), n: sides.length, free: free, tally: tally });
+			});
+			return out;
+		},
+		// The map at Zoom to fit, then `k` wheel notches (1.1 each) in about its middle.
+		fitNotch: function (k, around) {
+			var p;
+			zoomExtent();
+			p = around ? nodeAt(nodeById(around)) : window.__lpnForm.centre();
+			applyView({ cx: p.x, cy: p.y, s: state.s * Math.pow(1.1, k) });
+		},
+		// One wheel notch in about `around` (or the middle): the scale times 1.1, nothing else.
+		zoomStep: function (around) { var p = around ? nodeAt(nodeById(around)) : window.__lpnForm.centre(); applyView({ cx: p.x, cy: p.y, s: state.s * 1.1 }); },
+		zoomOutStep: function (around) { var p = around ? nodeAt(nodeById(around)) : window.__lpnForm.centre(); applyView({ cx: p.x, cy: p.y, s: state.s / 1.1 }); },
+		// The zoom bank (Task 812, round 7): buckets held, their size as JSON, hits so far, and a switch for the bank.
+		bankStats: function () { var n = Object.keys(labelCache.entries).length, b = 0; Object.keys(labelCache.entries).forEach(function (k) { b += JSON.stringify(labelCache.entries[k]).length; }); return { buckets: n, jsonBytes: b, hits: labelCacheHits }; },
+		bankSwitch: function (on) { labelCacheEnabled = !!on; },
+		scale: function () { return state.s; },
+		linksShown: function () { var o = {}; doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le && le.text && le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true })) { o[l.id] = (le.levelBeside ? 'level ' : 'along ') + (le.lines || []).length; } }); return o; },
+		rescale: function (s, c) { state.s = s; state.tx = c.tx; state.ty = c.ty; setTransform(); if (state.s !== lastLayoutScale) { onZoomChanged(); } refreshLabelText(); },
+		centre: function () { var r = svg.getBoundingClientRect(); return screenToWorld(r.left + r.width / 2, r.top + r.height / 2); },
+		allForms: function () { var ids = doc.nodes.map(function (n) { return n.id; }); return window.__lpnForm.nodeForms(ids); },
+		viewAt: function (id, s) { var p = nodeAt(nodeById(id)); applyView({ cx: p.x, cy: p.y, s: s }); },
+		centerOn: function (id) { var p = nodeAt(nodeById(id)); applyView({ cx: p.x, cy: p.y, s: state.s }); },
 		content: function () { refreshLabelText(); },
 		timeContent: function (n) {
 			var t = [], i, t0;
@@ -26,9 +224,19 @@
 			ids.forEach(function (id) {
 				var le = linkEls[id], f = le && le.levelBeside && le.levelForm;
 				if (!le) { out[id] = null; return; }
-				out[id] = { shown: !!le.text.textContent && le.text.checkVisibility({ visibilityProperty: true }),
+				out[id] = { shown: !!le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true }),
 					level: !!le.levelBeside, leader: !!(le.leader && le.leader.style.display !== 'none' && le.leader.style.visibility !== 'hidden'),
 					stacked: !!(f && f.stacked), values: f ? f.lines.length : (le.lines || []).length, text: le.text.textContent };
+			});
+			return out;
+		},
+		// Node labels' forms, for the open-side browser harness: 'line idehp', 'stack hp', 'hid'.
+		nodeForms: function (ids) {
+			var out = {};
+			ids.forEach(function (id) {
+				var ne = nodeEls[id];
+				out[id] = !ne ? '-' : (!(ne.text && ne.text.textContent && ne.text.checkVisibility({ visibilityProperty: true, opacityProperty: true })) ? ('hid' + (ne.hiddenDropped ? ' dropped' : '') + (ne.hiddenCrossed ? ' crossed' : '') + (ne.crowdHidden ? ' crowd' : '') + (ne.hiddenBlocked ? ' blocked' : '')) :
+					((ne.inline ? 'line ' : 'stack ') + (ne.lines || []).map(function (l) { return l.field.charAt(0); }).join('')));
 			});
 			return out;
 		},
@@ -43,7 +251,7 @@
 		read: function (tolPx, ambPx) {
 			var s = state.s, W = svg.clientWidth, H = svg.clientHeight, tol = tolPx / s, amb = ambPx / s,
 				v = { labels: 0, values: 0, nodes: 0, nodeInline: 0, nodeStacked: 0, pipes: 0, along: 0, level: 0, levelLeader: 0,
-					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [] },
+					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], strandedLevel: [], sig: [] },
 				items = [], circles = [], texts = [];
 			// To a quarter of a screen pixel: a label measured at another zoom differs from one measured
 			// at this one in the hundredths of a pixel (the font's hinting), which no reader can see.
@@ -196,11 +404,13 @@
 				if (g) {
 					v.levelLeader++;
 					if (other < own) { v.leaderNearOther++; }
-					circles.forEach(function (c) { if (ptSeg(c.x, c.y, g) < c.r - tol) { v.N3.push('L' + l.id + ' leader through ' + c.id); } });
-					// a pipe label's leader starts on its pipe, never inside an end node's symbol
+					// The symbol a leader starts in is not in its way: a pipe shorter than its end symbols has its middle inside them (round 5).
+					circles.forEach(function (c) { if (Math.hypot(c.x - g.ax, c.y - g.ay) < c.r) { return; } if (ptSeg(c.x, c.y, g) < c.r - tol) { v.N3.push('L' + l.id + ' leader through ' + c.id); } });
 					return;
 				}
-				// No leader: its own pipe must be the nearest, by `amb`.
+				// No leader: its own pipe must be the nearest, by `amb`. Except a label whose leader would have run
+				// through another label (dropStruckLeaders()): it keeps its place and goes without, counted in `strandedLevel`.
+				if (linkEls[l.id].leaderStruck) { if (other <= own + amb) { v.strandedLevel.push(l.id); } return; }
 				if (other <= own + amb) { v.astray.push(l.id + '(' + (own * s).toFixed(1) + ' px vs ' + who + ' ' + (other * s).toFixed(1) + ')'); }
 			});
 			// N1: rows of two labels, a row on a node symbol, a row on a Text item.
@@ -221,7 +431,7 @@
 			});
 			v.labels = v.nodes + v.pipes;
 			v.sig = v.sig.join('\n');
-			return v;
+			v.scale = s; v.centre = { tx: state.tx, ty: state.ty }; v.nodesAll = window.__lpnForm.allForms(); v.linksAll = window.__lpnForm.linksShown(); return v;
 		}
 	};
 	window.__lpnForm.perf = function () {
@@ -236,7 +446,7 @@
 		function one(key, h) {
 			var e = h && h.leader, a, b, r, c, dx, dy;
 			if (!e || e.style.display === 'none' || e.style.visibility === 'hidden' || e.getAttribute('x1') == null) { return; }
-			var shown = !h.text || (!!h.text.textContent && h.text.checkVisibility({ visibilityProperty: true }));
+			var shown = !h.text || (!!h.text.textContent && h.text.checkVisibility({ visibilityProperty: true, opacityProperty: true }));
 			a = sc(+e.getAttribute('x1'), +e.getAttribute('y1')); b = sc(+e.getAttribute('x2'), +e.getAttribute('y2'));
 			r = h.text ? h.text.getBoundingClientRect() : null; c = svg.getBoundingClientRect();
 			dx = (r && shown) ? Math.max(r.left - c.left - b.x, 0, b.x - (r.right - c.left)) : 0;

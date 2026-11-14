@@ -1,0 +1,34 @@
+{
+	"source": "Mapbox Terrain-RGB (mapbox.terrain-rgb, .pngraw), zoom 14, nearest pixel as the page reads it, taken 2026-11-13",
+	"zoom": 14,
+	"design": {
+		"well": {
+			"pumpingLevelBelowGroundFt": 160,
+			"pumpingLevelBelowGroundM": 49,
+			"towerFt": 100,
+			"towerM": 30.5
+		}
+	},
+	"metres": {
+		"extension": {
+			"SYS": 365,
+			"HYD-P": 366.6,
+			"HYD-F": 368.7,
+			"EXT-1": 371,
+			"EXT-2": 368.1,
+			"FH-1": 369,
+			"EXT-3": 371.5
+		},
+		"well": {
+			"WELL-1": 452.6,
+			"WH-1": 452.6,
+			"C-1": 452.6,
+			"C-2": 452.6,
+			"C-3": 452.6,
+			"C-4": 452.5,
+			"C-5": 452.5,
+			"FH-1": 452.5,
+			"TANK-1": 452.5
+		}
+	}
+}

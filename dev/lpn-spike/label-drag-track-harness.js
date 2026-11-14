@@ -199,8 +199,9 @@ async function main() {
 	const executablePath = env.findChromium();
 	const browser = await chromium.launch({ executablePath });
 	try {
-		const ex = process.env.EX ? process.env.EX.split(',') : ['lpn_ex_net3_title', 'lpn_ex_net3_title', 'lpn_ex_valves_title'];
-		// Twelve cases, not twenty-four, so the whole harness fits the runner's 300 s: the two
+		const ex = process.env.EX ? process.env.EX.split(',') : ['lpn_ex_net3_title', 'lpn_ex_valves_title'];
+		// Eight cases (Net3 once: the restack-on-press defect is deterministic), so the harness fits
+		// the runner's 300 s under load (twelve took 260 s alone): the two
 		// pixel ratios and the two zooms are paired off rather than crossed.
 		const matrix = [[1, 0], [2, 4]];
 		for (const exKey of ex) for (const [dpr, zin] of matrix) for (const kind of (process.env.KIND ? [process.env.KIND] : ['node', 'link'])) {

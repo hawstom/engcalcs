@@ -130,17 +130,34 @@ function labelRects(a, re) {
 	return a.page.evaluate((src) => {
 		const rx = new RegExp(src);
 		return Array.from(document.querySelectorAll('text.lpn-lbl[data-linklbl]'))
+			// ONE ROW ONLY. The defect probed is a halo painted over the run beside it on the same row. A stack's
+			// next row paints its own halo over the row above's edge pixels (a pixel or two in 350, in every stacked
+			// label, node labels included), and that is a different thing: pipe labels set in a stack are not probed.
+			.filter((t) => Array.from(t.children).filter((c) => c.hasAttribute('x')).length <= 1)
 			.filter((t) => rx.test(t.textContent || '') && getComputedStyle(t).visibility !== 'hidden')
 			.map((t) => { const r = t.getBoundingClientRect(); return { x: r.left - 2, y: r.top - 2, w: r.width + 4, h: r.height + 4, text: t.textContent }; });
 	}, re);
 }
 async function probeAll(a, re) {
-	const rects = await labelRects(a, re);
-	const out = { labels: rects.length, ink: 0, lost: 0 };
-	for (const r of rects) {
-		const p = await lostInk(a, r);
-		out.ink += p.ink; out.lost += p.lost;
-		if (process.env.HALO_DEBUG) { console.log('    ' + p.lost + ' of ' + p.ink + ' ' + r.text); }
+	// The one-row pipe labels of the opening view and of two views zoomed in about the middle (the placement sets
+	// most of Net1's pipe labels in a stack at the opening scale; closer in, more of them fit on one row).
+	const out = { labels: 0, ink: 0, lost: 0 };
+	const c = await a.page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.left + r.width / 2, y: Math.min(r.top + r.height / 2, innerHeight / 2) }; });
+	const seen = {};
+	for (let view = 0; view < 3; view++) {
+		if (view > 0) {
+			await a.page.mouse.move(c.x, c.y);
+			for (let i = 0; i < 3; i++) { await a.page.mouse.wheel(0, -240); await a.settle(60); }
+			await a.settle(800);
+		}
+		for (const r of await labelRects(a, re)) {
+			const vp = a.page.viewportSize();
+			if (seen[r.text] || r.x < 0 || r.y < 0 || r.x + r.w > vp.width || r.y + r.h > vp.height) { continue; }
+			seen[r.text] = true;
+			const p = await lostInk(a, r);
+			out.labels++; out.ink += p.ink; out.lost += p.lost;
+			if (process.env.HALO_DEBUG) { console.log('    view ' + view + ': ' + p.lost + ' of ' + p.ink + ' ' + r.text); }
+		}
 	}
 	return out;
 }
