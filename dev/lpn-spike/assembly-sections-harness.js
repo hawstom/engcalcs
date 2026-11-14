@@ -131,7 +131,7 @@ function network() {
 	L.setMode('add-pumpplus'); press(400, 150, hitLink(p1.id));
 	L.setMode('add-valveplus'); press(750, 150, hitLink(p2.id));
 	// And a Well with tank, W2, apart from the rest: the browser harnesses of the Well's pump controls open it (well-controls-browser-harness.js).
-	L.setMode('add-welltank'); press(1200, 600); press(1350, 600); press(1350, 750);
+	L.setMode('add-welltank'); press(200, 500); press(330, 500); press(330, 640);
 	L.setProp(L.linkById('W2V'), 'curveId', 'DD1'); L.setProp(L.linkById('W2'), 'curveId', 'PC1');
 	L.setProp(L.nodeById('W2P'), 'elev', 150); L.setProp(L.nodeById('W2R'), 'elev', 120);
 	L.setProp(L.nodeById('T1'), 'elev', 150); L.setProp(L.nodeById('T1'), 'maxLevel', 3); L.setProp(L.nodeById('T1'), 'level', 1.5);

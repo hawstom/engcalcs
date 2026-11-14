@@ -173,14 +173,23 @@ async function main() {
 		for (let i = 0; i < 5 && (await armed()) !== 'add-welltank'; i++) { await P.keyboard.press('6'); await a.settle(150); }
 		ok('key 6 cycles on to Well with tank', (await armed()) === 'add-welltank');
 		const tankAt = { x: at.x + 250, y: at.y - 150 };
-		const nBefore = (await circles(a)).length;
+		const nodeIds = () => P.evaluate(() => Array.from(new Set(Array.from(document.querySelectorAll('#lpn_canvas [data-node]')).map((e) => e.getAttribute('data-node')))));
+		const idsBefore = await nodeIds();
+		// A point of open ground, scanned outward from a start (nothing with a data-node or data-link under it).
+		const freeNear = (sx, sy) => P.evaluate(([x0, y0]) => {
+			for (let r = 0; r < 400; r += 25) { for (let k = 0; k < 16; k++) { const x = x0 + r * Math.cos(k * Math.PI / 8), y = y0 + r * Math.sin(k * Math.PI / 8), e = document.elementFromPoint(x, y); if (e && e.closest && e.closest('#lpn_canvas') && !e.closest('[data-node],[data-link]') && !e.closest('.lpn-node-symbol-box,.lpn-link-symbol')) { return { x: x, y: y }; } } }
+			return null;
+		}, [sx, sy]);
 		await P.mouse.click(tankAt.x, tankAt.y); await a.settle(300);
-		await P.mouse.click(tankAt.x + 90, tankAt.y - 20); await a.settle(300);
-		await P.mouse.click(tankAt.x + 90, tankAt.y - 110); await a.settle(300);
+		const teeAt = await freeNear(tankAt.x + 120, tankAt.y - 40);
+		await P.mouse.click(teeAt.x, teeAt.y); await a.settle(300);
+		const tkAt = await freeNear(teeAt.x + 150, teeAt.y - 80);
+		await P.mouse.click(tkAt.x, tkAt.y); await a.settle(300);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(200);
 		const allC = await circles(a);
 		const wtR = allC.find((c) => /W\d+R$/.test(c.id) && Math.abs(c.x - tankAt.x) < 400 && allC.filter((d) => Math.abs(d.x - c.x) < 1e-9 && Math.abs(d.y - c.y) < 1e-9).length === 3);
-		ok('a Well with tank is a well of three nodes at one point plus a tee and a tank, five nodes added', !!wtR && allC.length === nBefore + 5, String(allC.length - nBefore));
+		const idsAfter = (await nodeIds()).filter((i) => idsBefore.indexOf(i) < 0);
+		ok('a Well with tank is a well of three nodes at one point plus a tee and a tank, five nodes added', !!wtR && idsAfter.length === 5, idsAfter.join(','));
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		await P.keyboard.press('5'); await a.settle(150);
 		ok('key 5 arms Pipe', (await armed()) === 'add-pipe');
