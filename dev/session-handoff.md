@@ -106,6 +106,7 @@ lines rather than appending corrections.
 - **Task 860 (75) opened:** controls by scenario; Sue says whole named sets are sounder than per-control overrides. Mary: LoadBuilder = bulk meter-to-network assignment; we do it one customer at a time.
 - **Trap met:** the master preview (8100) was stale; run `generate.sh` after every master push.
 - **Pushed master ac85c45ae** (three full runs: the first failed 7 label harnesses, the second timed out `label-drag-track-harness.js` at 260 s alone against the runner's 300 s; Net3 now runs once, 152 s). Master merged into all five waiting branches after the push.
+- **Ponytail plugin uninstalled 11-14** on CC's advice (it rewrote every agent's brief); its two new rules are CLAUDE.md's "Changing code". Next, once priority 100 clears: one audit of `js/lpn-*.js` and `dev/scripts/` by one briefed agent, findings to a `dev/*.md`, roadmap entries proposed for his priorities.
 - SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/dc1e8689-543b-4568-b1d0-667fe08c4d1e/scratchpad (common-rules.md, rerun logs).
 
 ## STATE — 2026-11-08 night (seventy-second session, Opus main, Sonnet agents)
