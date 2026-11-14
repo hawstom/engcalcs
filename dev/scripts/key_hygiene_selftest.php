@@ -137,6 +137,56 @@ foreach ($fixtures as [$want, $js, $php, $keys, $shape]) {
     }
 }
 
+// ---- FINDING 1b's NAMED LIST, AND THE TWO SHAPES IT GOT WRONG ------------------------------------
+//
+// The 2026-11 audit found three functions listed as "reached from nothing" that were live. A named
+// IIFE is called where it stands, and what it calls is reached through it; and a regex literal after
+// `return` hid a call site, so the function it called looked uncalled. A person acting on the list
+// would have deleted working code, and the list printed only a count, so nobody could check it.
+{
+    $deadNames = function (array $js) {
+        $r = ecReachabilityCandidates($js, [], [], []);
+        $names = [];
+        foreach ($r['dead'] as $u) { $names[] = $u['name']; }
+        sort($names);
+        return [$names, $r['dead']];
+    };
+    $cases = [
+        ['IIFE, both spellings: its own name and what it calls are reached',
+            ['a.js' => "(function () {\n"
+                . "\tfunction helperOne() { return 1; }\n\tfunction helperTwo() { return 2; }\n"
+                . "\t(function wireOne() { helperOne(); }());\n"
+                . "\t(function wireTwo() { helperTwo(); })();\n"
+                . "})();\n"],
+            []],
+        ['IIFE inside a function nobody calls is not reached, nor is what it calls',
+            ['a.js' => "function outerFn() {\n\t(function wireIn() { helperIn(); }());\n}\nfunction helperIn() { return 1; }\n"],
+            ['helperIn', 'outerFn', 'wireIn']],
+        ['a named function expression that is NOT invoked is still dead',
+            ['a.js' => "var holder = [(function notCalled() { return 1; })];\nfunction lonely() { return 2; }\n"],
+            ['lonely', 'notCalled']],
+        ['a regex literal after return, holding a quote, must not hide a later call site',
+            ['a.js' => "function quoteIt(t) {\n\treturn /[\\t\"]/.test(t) ? '\"' + t : t;\n}\n"
+                . "function copyOut(x) { return quoteIt(x); }\ncopyOut('a');\n"],
+            []],
+        ['a function nobody calls is named with the line of its name',
+            ['a.js' => "var x = 1;\n\nfunction neverCalled() { return 1; }\n"],
+            ['neverCalled']],
+    ];
+    foreach ($cases as [$shape, $js, $want]) {
+        list($got, $units) = $deadNames($js);
+        sort($want);
+        if ($got !== $want) {
+            $fail++; printf("FAIL  dead list [%s], expected [%s]\n      %s\n", implode(',', $got), implode(',', $want), $shape);
+        }
+    }
+    list(, $units) = $deadNames(['a.js' => "var x = 1;\n\nfunction neverCalled() { return 1; }\n"]);
+    $u = reset($units);
+    if (!$u || $u['line'] !== 3 || $u['file'] !== 'a.js') {
+        $fail++; echo "FAIL  a dead function was not reported with its file and line\n";
+    }
+}
+
 // The MASK is the part everything else rests on, so it is pinned directly rather than only through
 // its effects: a string body must vanish from the code view and survive in the key view.
 $src = "var a = 'lpn_hidden'; // comment_name\n";
