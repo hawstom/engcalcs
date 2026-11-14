@@ -204,6 +204,14 @@ echo "   before deleting anything.\n";
 printf("   %d function(s) reached from nothing; %d turned away as undecidable:\n",
     count($walk['dead']), array_sum($walk['turned']));
 foreach ($walk['turned'] as $why => $n) { printf("     %5d  %s\n", $n, $why); }
+if ($walk['dead']) {
+    echo "   Reached from nothing (file:line  name). A deliberately parked function says so in a\n";
+    echo "   comment beside it; the rest are deletable once a grep for the name finds no caller:\n";
+    foreach ($walk['dead'] as $u) {
+        printf("     %s:%d  %s%s\n", str_replace($root . '/', '', $u['file']), $u['line'],
+            $u['owner'] !== null ? $u['owner'] . '.' : '', $u['name']);
+    }
+}
 if ($walk['candidates']) {
     echo "\n";
     foreach ($walk['candidates'] as [$k, $readers]) { printf("   %-42s read only by %s\n", $k, $readers); }

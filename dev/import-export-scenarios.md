@@ -33,7 +33,7 @@ All carry the whole tree, Presentation and Calculation included. None needs a sc
 | 2 | File > Open example… | `openExample` | Whole tree; opens a copy in a new tab | X |
 | 3 | File > Recent files > (name) | `openRecentFile`, list in `fileMenuRows`  | Whole tree | X |
 | 4 | File > Save, Save as…, Save all (download where the browser cannot connect) | `saveCurrent`, `saveAs`, `downloadProjectFile` | Whole tree, written | P (Save as to another file makes X) |
-| 5 | File > Convert as… (project or `.inp` file route: `pickGeoFile`, `openAsGeoFile`) | `convertAs`, `openConvertAsBox` | Whole tree; rewrites coordinates and units on every scenario's stored numbers (`dev/scenario-alternatives.md`) | X |
+| 5 | File > Convert as… (project or `.inp` file route: `openAsGeoFile`) | `convertAs`, `openConvertAsBox` | Whole tree; rewrites coordinates and units on every scenario's stored numbers (`dev/scenario-alternatives.md`) | X |
 | 6 | Project tab menu > Duplicate | `saveProjectAs`, menu in the project tab menu | Whole tree | X |
 
 ### 1b. Imports of other things

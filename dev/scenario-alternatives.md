@@ -350,8 +350,8 @@ the read-only Alternatives table gains their two columns before the calculation-
 ### Stage 3: every reader routed (2026-10-06)
 
 **Done.** About 110 read sites in some 75 functions now read the open scenario's value through
-`settingFor()`, by four shorthands: `scnSetting(member)`, `scnLabels(path)`, `scnProject(member)`
-and `scnDefaultPattern()`. A reader that runs per element asks for a leaf (a number, a flag), which
+`settingFor()`, by three shorthands: `scnSetting(member)`, `scnLabels(path)` and `scnProject(member)`.
+A reader that runs per element asks for a leaf (a number, a flag), which
 is never copied; a pass that wants a whole map (`refreshLabelTextPass()`, `customerLabelLines()`)
 asks once and hands it down. `settingFor()` builds nothing in Base or in a scenario that holds no
 setting: it is one walk of the project's own object. Beside the readers:
@@ -1348,7 +1348,7 @@ equal instead.
 Settings in scenarios: same file, section "SETTINGS IN SCENARIOS": `LPN_SETTING_CATEGORY_OF`,
 `categoryOfSetting()` (also `categoryOf(path, 'setting')`), `settingFor(scn, path)`,
 `effectiveSetting(path)`, `setScenarioSetting()`, `sanitizeScenarioSettings()`; the reader
-shorthands `scnSetting()`, `scnLabels()`, `scnProject()`, `scnDefaultPattern()`; the one switch
+shorthands `scnSetting()`, `scnLabels()`, `scnProject()`; the one switch
 a harness blinds, `scenarioSettingsBlock()`; the view, `outwardViewOf()`, `heldView()`,
 `setScenarioView()`, `followScenarioView()`; the export, `inpExportDocument()`.
 

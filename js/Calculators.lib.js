@@ -139,10 +139,6 @@ EngCalcs.tipHtml = function (text) {
 	}
 	return out.join('');
 };
-// The same text as one plain string, for a place that cannot show paragraphs (a native title).
-EngCalcs.tipPlain = function (text) {
-	return String(text == null ? '' : text).replace(/\\n\\n/g, '\n\n');
-};
 function ecWireExplanationGlyph(el, glyph) {
 	// An expando, not a data- attribute: markup copied by innerHTML and put back (the grievance
 	// button restores its label so) must not arrive believing it is already wired.
@@ -1483,60 +1479,6 @@ EngCalcs.writeVelocityCheck = function (elId, status, labels) {
 		el.classList.add('ec-status-ok');
 	} else {
 		el.innerHTML = '';
-	}
-};
-
-/**
-	* readTableInputs() reads current table inputs from the "CalcsTable" element
-	* into the global tableData array.  Modifies tableData.
-	*
-	*/
-EngCalcs.readTableInputs = function () {
-	'use strict';
-	var columnCounter, rowCounter, rowElement;
-	for (rowCounter=0; rowCounter<tableData.length; rowCounter++) {
-		rowElement = document.getElementById("CalcsBody").getElementsByTagName('tr')[rowCounter];
-		for (columnCounter=0; columnCounter<columnFormats.length; columnCounter++) {
-			/**
-				* The format of the columnFormats is like this:  
-				*   t = text
-				*   i,12 = a 12 character input box
-				*   s,option1,option2,option3,optioni =  a drop-down list
-				*/
-			if (columnFormats[columnCounter].substr(0, 1) == "i") {
-				tableData[rowCounter][columnCounter] = rowElement.getElementsByTagName('td')[columnCounter].getElementsByTagName('input')[0].value;
-			}
-		}
-	}
-};
-
-/**
-	* writeTableData () saves tableData (inputs and outputs) 
-	* into the "CalcsTable" element of the page.
-	*
-	*/
-EngCalcs.writeTableData = function () {
-	'use strict';
-	var columnCounter, rowCounter, rowElement;
-	for (rowCounter=0; rowCounter<tableData.length; rowCounter++) {
-		rowElement = document.getElementById("CalcsBody").getElementsByTagName('tr')[rowCounter];
-		for (columnCounter=0; columnCounter<tableData[0].length; columnCounter++) {
-			/**
-				* The format of the columnFormats is like this:  
-				*   t = text
-				*   i,12 = a 12 character input box
-				*   s,option1,option2,option3,optioni =  a drop-down list
-				*/
-			switch(columnFormats[columnCounter].substr(0, 1)) {
-				case 'i':
-					rowElement.getElementsByTagName('td')[columnCounter].getElementsByTagName('input')[0].value = tableData[rowCounter][columnCounter];
-					break;
-				case 's':
-					break;
-				default:
-					rowElement.getElementsByTagName('td')[columnCounter].innerHTML = tableData[rowCounter][columnCounter].toFixed(2);
-			}
-		}
 	}
 };
 
