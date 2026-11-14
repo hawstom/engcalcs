@@ -389,24 +389,6 @@ the block.
     those queries decides which, and `market-researcher` is the seat that can look.
   - **The page is in no repository** — `~/webdev/hawsedc.subset/` is a hand-kept subset, not a
     checkout — so an edit ships by hand, and clicks split across `hawsedc.com` and `www.hawsedc.com`.
-- 50|620| **[H] A changed icon never reaches a returning visitor.**
-  The precache cannot invalidate it. Found 2026-09-10, the day the water tower shipped: it appeared instantly on librewaternet.org and
-  not-epanet.org and NOT on the app. Tom: *"I see it at LWN and NOT, but not at lpn."* Ctrl+F5 fixed
-  it for him, which no ordinary visitor will do.
-  - **The cause is a deliberate design with one uncovered case.** `CACHE_VERSION` was removed on
-    purpose (`lib/ServiceWorker.lib.php`) and invalidation rides entirely on `?v=<filemtime>` in the
-    URL, so a changed file changes its own cache key and nothing has to be remembered. But
-    `ecSwAssetUrl()` deliberately puts no query on an image, because `<link rel="icon">` and
-    `manifest.json` name icons without one -- and `ecSwAssetFiles()` precaches
-    `icons/*.{svg,png,ico}` anyway. **An icon is therefore the one precached asset whose content can
-    change while its cache key cannot.** JS and CSS are fine; this is not a general cache bug.
-  - Two candidate fixes, and the second is probably right: bust `?v=` onto icon URLs at BOTH ends
-    (the pages and `ecSwAssetUrl()`, which `sw_manifest_check.php` already holds identical), or make
-    the generated worker's own bytes change when any precached asset's mtime does, so `install` re-runs
-    and `addAll` overwrites. The second fixes every icon at once and touches no public URL; check
-    whether `addAll` would then be served from the HTTP cache anyway.
-  - Nothing is broken today -- the icon on disk is correct and a new visitor sees it. This is about
-    the NEXT icon change, and about anything else precached that is named without a query.
 - 50|622| **[H] A refused terrain lookup is reported as an unreachable one.**
   The message says "You may be offline" when we reached the service and it refused us. Found 2026-09-10 while diagnosing KDH's report that DEM and satellite were down at
   librewaternet.org/app. They were: the Mapbox token is URL-restricted to hawsedc.com, so every
