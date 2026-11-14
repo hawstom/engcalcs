@@ -1,0 +1,191 @@
+// THE .inp READER AND WRITER KEEP WHAT THE FILE SAYS. Run with:
+//   node dev/lpn-spike/inp-fidelity-harness.js
+//
+// Three breaches of "Import reports every difference, never drops silently; import then export is
+// byte-identical for unedited values", found by the 2026-11 code audit (F1, F2, F4):
+//
+//   1. HEAD LOSS FORMULA. docFromInp() copied the OPEN project's friction method and never read the
+//      file's [OPTIONS] Headloss. A D-W file imported as H-W, and an H-W file opened beside a D-W
+//      project read C = 100 as a D-W roughness. Held here against the vendored EPANET engine run on
+//      the file itself: the imported project solves to EPANET's heads.
+//   2. TANK MinVol AND Overflow ([TANKS] columns 7 and 9) were read past in silence, and a tank
+//      row came back out as `... 0`.
+//   3. A `;` in a label, and [TITLE] lines 2 and 3. EPANET's own reader (the engine, input2.c, and
+//      the Delphi GUI's Uimport.pas StripComment) cuts a LABEL at its first `;` even inside quotes;
+//      a TITLE line is taken whole, `;` included, and a title is as many lines as the file has.
+//
+// The expectation is the file: each comparison reads the exported text through a deliberately dumber
+// second reader, never through the parser under test.
+
+'use strict';
+
+const fs = require('fs');
+const { ROOT, setUnitSet, loadLoopedNetwork, warmEpanet } = require('./lpn-dom-stub.js');
+require(ROOT + 'js/lpn-patterns.js');
+require(ROOT + 'js/lpn-time.js');
+require(ROOT + 'js/lpn-inp.js');
+require(ROOT + 'js/lpn-net.js');
+global.alert = global.window.alert = function () { };
+
+const L = loadLoopedNetwork(
+	"\t\tgetDoc: function () { return doc; }, migrateSaved: migrateSaved, applySaved: applySaved,\n" +
+	"\t\tserializeProject: serializeProject, assembleModel: assembleModel,\n" +
+	"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections,\n" +
+	"\t\tapplyUnitSelections: applyUnitSelections, seedDefaultInputs: seedDefaultInputs,\n" +
+	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
+	"\t\t\tworld = el('g', {}, svg);\n" +
+	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
+	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
+	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
+	"\t\t\trubberBandEl = el('line', {}, world); },\n"
+);
+L.buildLayers();
+setUnitSet('us');
+L.seedDefaultInputs();
+const EC = global.EngCalcs;
+
+let fails = 0;
+function ok(name, cond, extra) {
+	console.log((cond ? '  ok   ' : '  FAIL ') + name + (extra === undefined ? '' : '   ' + extra));
+	if (!cond) { fails++; }
+}
+
+// ---- the dumber reader: section -> rows of tokens, comments cut at the first `;` ---------------
+function tokensBySection(text) {
+	const out = {};
+	let section = null;
+	for (const raw of text.split(/\r?\n/)) {
+		const line = raw.replace(/;.*$/, '').trim();
+		if (!line) { continue; }
+		const m = /^\[(\w+)\]/.exec(line);
+		if (m) { section = m[1].toUpperCase(); out[section] = out[section] || []; continue; }
+		if (!section) { continue; }
+		out[section].push(line.split(/\s+/));
+	}
+	return out;
+}
+const rowsOf = (text, sec) => (tokensBySection(text)[sec] || []).map((r) => r.join(' '));
+
+// ---- the files -----------------------------------------------------------------------------
+const COORDS = `[COORDINATES]
+ J1 0 0
+ J2 100 0
+ J3 100 100
+ R1 -100 0
+
+`;
+const NET = (units, headloss, pipes, junctions, reservoir) => `[TITLE]
+fidelity probe
+
+[JUNCTIONS]
+${junctions}
+
+[RESERVOIRS]
+${reservoir}
+
+[PIPES]
+${pipes}
+
+${COORDS}[OPTIONS]
+ Units              	${units}
+ Headloss           	${headloss}
+
+[END]
+`;
+const SI_DW = NET('LPS', 'D-W',
+	' P1 R1 J1 1000 300 0.25 0 Open\n P2 J1 J2 800 200 0.30 0 Open\n P3 J2 J3 600 200 0.15 0 Open\n P4 J1 J3 900 150 0.20 0 Open',
+	' J1 20 5\n J2 18 8\n J3 15 6', ' R1 100');
+const US_DW = NET('GPM', 'D-W',
+	' P1 R1 J1 3000 12 0.85 0 Open\n P2 J1 J2 2500 8 1.00 0 Open\n P3 J2 J3 2000 8 0.50 0 Open\n P4 J1 J3 3000 6 0.70 0 Open',
+	' J1 50 100\n J2 45 120\n J3 40 90', ' R1 300');
+const SI_CM = NET('LPS', 'C-M',
+	' P1 R1 J1 1000 300 0.013 0 Open\n P2 J1 J2 800 200 0.0130 0 Open\n P3 J2 J3 600 200 0.012 0 Open\n P4 J1 J3 900 150 0.014 0 Open',
+	' J1 20 5\n J2 18 8\n J3 15 6', ' R1 100');
+const SI_HW = NET('LPS', 'H-W',
+	' P1 R1 J1 1000 300 100 0 Open\n P2 J1 J2 800 200 120 0 Open\n P3 J2 J3 600 200 130 0 Open\n P4 J1 J3 900 150 110 0 Open',
+	' J1 20 5\n J2 18 8\n J3 15 6', ' R1 100');
+
+// ---- the page's path: units strip first, then the document ----------------------------------
+function importDoc(text, name) {
+	const parsed = EC.lpnInpParse(text);
+	if (!parsed.ok) { throw new Error('parse failed: ' + JSON.stringify(parsed)); }
+	L.applyUnitSelections(L.inpUnitSelections(parsed));
+	return { parsed, doc: L.docFromInp(parsed, name || 'probe') };
+}
+function exportOf(doc) {
+	const out = EC.lpnExportInp(doc);
+	if (!out.ok) { throw new Error('export refused: ' + JSON.stringify(out)); }
+	return out;
+}
+function open(doc) { L.applySaved(L.migrateSaved(JSON.parse(JSON.stringify(doc)))); }
+
+let mod = null;
+async function rawHeads(inpText) {
+	const ws = new mod.Workspace();
+	await ws.loadModule();
+	ws.writeFile('r.inp', inpText);
+	const p = new mod.Project(ws);
+	p.open('r.inp', 'r.rpt', 'r.out');
+	p.openH(); p.initH(0); p.runH();
+	const h = {};
+	for (let i = 1, n = p.getCount(0); i <= n; i++) { h[p.getNodeId(i)] = p.getNodeValue(i, 10); }	// EN_HEAD
+	p.closeH(); p.close();
+	return h;
+}
+function worst(a, b, scale) {
+	let w = 0;
+	for (const id in b) { if (a[id] !== undefined) { w = Math.max(w, Math.abs(a[id] - b[id] * scale)); } }
+	return w;
+}
+
+(async function () {
+	await warmEpanet();
+	mod = await EC.lpnEpanetLoad('file://' + ROOT + 'js/vendor/epanet-js.js');
+	const HEAD_TOL = 0.02;		// metres; EPANET is single precision and the two engines carry slightly different water viscosity
+
+	// =============================================================================================
+	console.log('1. THE HEAD LOSS FORMULA COMES FROM THE FILE');
+	for (const [label, text, method, word] of [['D-W, SI', SI_DW, 'dw', 'D-W'], ['C-M, SI', SI_CM, 'manning', 'C-M'],
+		['H-W, SI', SI_HW, 'hw', 'H-W']]) {
+		// An open project of ANOTHER method: the old code cloned it.
+		const other = importDoc(method === 'dw' ? SI_CM : SI_DW);
+		open(other.doc);
+		const { parsed, doc } = importDoc(text);
+		ok(label + ': the imported project says ' + method, (doc.settings.method || 'hw') === method, String(doc.settings.method));
+		const out = exportOf(doc);
+		ok(label + ': re-export states Headloss ' + word, rowsOf(out.inp, 'OPTIONS').indexOf('Headloss ' + word) >= 0);
+		ok(label + ': every pipe row comes back as the file wrote it',
+			JSON.stringify(rowsOf(out.inp, 'PIPES')) === JSON.stringify(rowsOf(text, 'PIPES')),
+			JSON.stringify(rowsOf(out.inp, 'PIPES')));
+		ok(label + ': the report states no head loss difference', !(parsed.dropped || []).some((d) => d.code === 'headloss-formula'));
+		ok(label + ': the export reports no roughness difference',
+			!out.differences.some((d) => d.code === 'roughness-method' || d.code === 'unit-converted'), JSON.stringify(out.differences));
+		// Solved by both engines against EPANET on the file itself.
+		open(doc);
+		const ref = await rawHeads(text), scale = parsed.scale.head;
+		const model = L.assembleModel();
+		ok(label + ': the model is solved by ' + method, model.method === method, model.method);
+		const nat = EC.lpnSolve(model, { tol: 1e-9 });
+		ok(label + ': built-in solver is within ' + HEAD_TOL + ' m of EPANET on the file', nat.ok && worst(nat.heads, ref, scale) < HEAD_TOL,
+			nat.ok ? worst(nat.heads, ref, scale).toFixed(4) + ' m' : JSON.stringify(nat.issues));
+		const ep = await EC.lpnSolveEpanet(L.assembleModel(), {});
+		ok(label + ': EPANET through the page is within ' + HEAD_TOL + ' m of EPANET on the file', ep.ok && worst(ep.heads, ref, scale) < HEAD_TOL,
+			ep.ok ? worst(ep.heads, ref, scale).toFixed(4) + ' m' : JSON.stringify(ep.issues));
+	}
+	{
+		// US Darcy-Weisbach: EPANET's roughness is in millifeet, a unit this page's Roughness
+		// selector does not offer. Carried as written, and the project refuses to solve.
+		const { doc } = importDoc(US_DW);
+		ok('D-W, US: the imported project says dw', doc.settings.method === 'dw');
+		const out = exportOf(doc);
+		ok('D-W, US: re-export states Headloss D-W', rowsOf(out.inp, 'OPTIONS').indexOf('Headloss D-W') >= 0);
+		ok('D-W, US: every pipe row comes back as the file wrote it',
+			JSON.stringify(rowsOf(out.inp, 'PIPES')) === JSON.stringify(rowsOf(US_DW, 'PIPES')), JSON.stringify(rowsOf(out.inp, 'PIPES')));
+		open(doc);
+		const issues = EC.lpnDiagnose(L.assembleModel());
+		ok('D-W, US: the solve is refused by name (roughness in millifeet)', issues.some((d) => d.code === 'roughness-unit'), JSON.stringify(issues));
+	}
+
+	console.log(fails ? '\n' + fails + ' FAILED' : '\nall fidelity checks passed');
+	process.exit(fails ? 1 : 0);
+}()).catch((e) => { console.log(e && e.stack || e); process.exit(2); });

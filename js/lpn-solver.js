@@ -607,6 +607,14 @@ EngCalcs.lpnDiagnose = function (model, options) {
 		if (EngCalcs.lpnIsFixedHead(node)) { fixed.push(node.id); }
 	}
 
+	// A DARCY-WEISBACH ROUGHNESS IN A UNIT THIS PAGE DOES NOT OFFER (audit 2026-11, F1). A US `.inp`
+	// states it in millifeet; the numbers were carried exactly as written and read as nothing else,
+	// so there is nothing honest to solve with until the user states what they mean (the same
+	// outcome CLAUDE.md gives any unit the page does not recognise: draw it, refuse to solve, say which).
+	if (model.roughnessUnitRefused) {
+		issues.push({ code: 'roughness-unit', ids: [String(model.roughnessUnitRefused)] });
+	}
+
 	// AN ACTIVE VALVE MAY NOT SIT DIRECTLY ON A RESERVOIR OR A TANK. This is EPANET's own rule
 	// (input error 219), and it exists because a PRV/PSV/FCV controls the pressure or flow at a
 	// node whose head is already fixed by the vessel -- two boundary conditions on one node, so

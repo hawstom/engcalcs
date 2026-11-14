@@ -175,6 +175,10 @@
 		return out;
 	}
 
+	// EPANET's three head loss formulas, as the page's friction method keys.
+	var HEADLOSS_METHOD = { 'H-W': 'hw', 'D-W': 'dw', 'C-M': 'manning' };
+	EngCalcs.lpnInpHeadlossMethod = HEADLOSS_METHOD;
+
 	function num(tok, fallback) {
 		var v = parseFloat(tok);
 		return isFinite(v) ? v : (fallback === undefined ? 0 : fallback);
@@ -726,13 +730,14 @@
 			pressSI = us ? PSI_M : 1,       // file PRESSURE unit -> m of water (emitters, PRV/PSV)
 			qSI = fu.toSI;
 
-		// The page computes Hazen-Williams and has no control for anything else yet, so a D-W or
-		// C-M file would import roughness numbers that are then read as a
-		// Hazen-Williams C. The numbers are kept AS WRITTEN rather than converted into a fake C --
-		// converting would destroy the file's own data to produce an answer that is still wrong --
-		// and the caller is told, loudly, that the results will not match the source until the
-		// friction-method control ships.
-		if (headloss !== 'H-W') { drop('headloss-formula', [], headloss); }
+		// **THE HEAD LOSS FORMULA IS THE FILE'S** (audit 2026-11, F1). The page computes all three of
+		// EPANET's (H-W, D-W, C-M) in both engines, so docFromInp() takes the method from
+		// `headloss` below and a supported word is no difference at all. The roughness numbers
+		// cross as written and are read in EPANET's own unit for that formula: a C for H-W, a
+		// Manning n for C-M, and for D-W millimetres in an SI file and MILLIFEET in a US one
+		// (EPANET 2.2 manual, Network Data). Only a word EPANET itself refuses (its error 213) is
+		// still reported, and the roughness is then read as H-W's C.
+		if (!HEADLOSS_METHOD[headloss]) { drop('headloss-formula', [], headloss); }
 
 		// ---- [PATTERNS] and [TIMES] (ROADMAP Tasks 248.01, 248.02) ----
 		//
@@ -1619,6 +1624,9 @@
 			// keeps a second copy of these constants.
 			scale: { len: lenSI, dia: diaSI, head: headSI, press: pressSI, flow: qSI },
 			headloss: headloss,
+			// The unit EPANET reads a D-W roughness in for this file (millifeet in a US file,
+			// millimetres in an SI one); null for the two dimensionless formulas.
+			roughnessUnit: headloss === 'D-W' ? (us ? 'millifeet' : 'mm') : null,
 			emitterExponent: emitterExponent,
 			// Every [OPTIONS] key this file stated that is not the flow unit, the head-loss formula
 			// or the default pattern -- sparse, so absent is "the file did not say" (Task 553).
@@ -2831,6 +2839,28 @@
 			diff('unit-converted', [], what + ': ' + projUnit + ' -> ' + fileUnit);
 			return { same: false, mul: ff / fp };
 		}
+		// **D-W ROUGHNESS IS A LENGTH IN EPANET'S OWN UNIT** (EPANET 2.2 manual, Network Data):
+		// millimetres in an SI file, MILLIFEET in a US one. Millimetres is a unit this page offers,
+		// so an SI project whose Roughness selector shows millimetres passes its characters through
+		// and any other unit converts, said once. Millifeet is not offered: a project that carries a
+		// US file's own roughness (`settings.roughnessFileUnit`) writes it back untouched, and one
+		// typed on this page in feet or inches is converted into it, said once. H-W's C and C-M's n
+		// are dimensionless and pass through.
+		var cRough = { same: true, mul: 1 };
+		// A document saved before the Roughness selector existed has no unit to convert from; it is
+		// written as stored, as it always was.
+		if ((doc.settings || {}).method === 'dw' && units.lpn_u_roughness) {
+			if (sys === 'si') {
+				cRough = converter(units.lpn_u_roughness, 'mm', 'roughness');
+			} else if ((doc.settings || {}).roughnessFileUnit !== 'millifeet') {
+				var rtab = EngCalcs.unitFactors || {},
+					rfp = Object.prototype.hasOwnProperty.call(rtab, units.lpn_u_roughness) ? rtab[units.lpn_u_roughness] : undefined;
+				if (rfp !== undefined) {
+					cRough = { same: false, mul: rtab.ft * 1000 / rfp };
+					diff('unit-converted', [], 'roughness: ' + units.lpn_u_roughness + ' -> millifeet');
+				}
+			}
+		}
 		var cLen = converter(units.lpn_u_length, fileU.len, 'length'),
 			cDia = converter(units.lpn_u_diameter, fileU.dia, 'diameter'),
 			cHead = converter(units.lpn_u_elevhead, fileU.head, 'elevation'),
@@ -3152,7 +3182,7 @@
 				pipes.push(row([lk.id, lk.from, lk.to,
 					n(cLen, lk, '_length', eff(lk, 'length') || 0),
 					dia,
-					n(PLAIN, lk, '_roughness', eff(lk, 'roughness') || 0),
+					n(cRough, lk, '_roughness', eff(lk, 'roughness') || 0),
 					minorLossText(lk),
 					pipeStatus]) + descOf(lk));
 			}
@@ -3631,13 +3661,6 @@
 		}
 		var method = settings.method || 'hw',
 			headloss = { hw: 'H-W', dw: 'D-W', manning: 'C-M' }[method] || 'H-W';
-		if (method !== 'hw') {
-			// EPANET's D-W roughness is in millifeet (US) or millimetres (SI), and its C-M roughness
-			// is Manning's n. This page's roughness field is neither reliably -- it holds what the
-			// user typed in whatever the roughness selector shows. Written as stored, and said out
-			// loud, because converting it would be inventing a number.
-			diff('roughness-method', [], headloss);
-		}
 		// **[CURVES] IS THE LIBRARY, WRITTEN IN THE DOCUMENT'S OWN ORDER** (Task 586).
 		//
 		// **EACH AXIS TAKES THE CONVERTER ITS KIND NAMES.** A head, efficiency or head-loss curve's

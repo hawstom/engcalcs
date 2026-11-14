@@ -47314,7 +47314,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var LPN_INP_FLOW_SAME = { GPM: 1, MGD: 1, IMGD: 1, CFS: 1, AFD: 1, LPS: 1, LPM: 1, MLD: 1, CMH: 1, CMD: 1 };
 	function inpUnitSelections(parsed) {
 		var us = parsed.unitSystem === 'us';
-		return {
+		var sel = {
 			lpn_u_length: us ? 'ft' : 'm',
 			lpn_u_elevhead: us ? 'fth2o' : 'mh2o',
 			lpn_u_pressure: us ? 'psi' : 'mh2o',
@@ -47323,6 +47323,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_u_velocity: us ? 'ftps' : 'mps'
 			// No lpn_u_gradient: head-loss gradient is dimensionless and an .inp does not name one.
 		};
+		// **A D-W FILE'S ROUGHNESS IS IN EPANET'S OWN UNIT** (audit 2026-11, F1): millimetres in an
+		// SI file, which this page offers, so the Roughness selector moves onto it and the file's
+		// digits are the digits stored. A US file's is millifeet, which no selector offers; nothing
+		// is moved and docFromInp() marks the project instead (`settings.roughnessFileUnit`).
+		if (parsed.roughnessUnit === 'mm') { sel.lpn_u_roughness = 'mm'; }
+		return sel;
 	}
 
 
@@ -47650,6 +47656,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// here. Sparse, so a file stating none leaves the new project stating none.
 			settings: (function () {
 				var s = JSON.parse(JSON.stringify(settings));
+				// **THE FRICTION METHOD IS THE FILE'S, NEVER THE OPEN PROJECT'S** (audit 2026-11, F1).
+				// [OPTIONS] Headloss says which formula the roughness numbers are written for; a
+				// file that says nothing is EPANET's own default, H-W. The numbers stay exactly as
+				// written. D-W roughness is millimetres in an SI file (the selector is on it, see
+				// inpUnitSelections) and millifeet in a US one, which the page cannot show: the
+				// project is marked and refuses to solve, by name, until the user states a unit.
+				var fileMethod = LPN_INP_UPDATE_METHOD[String(parsed.headloss || 'H-W').toUpperCase()] || 'hw';
+				if (fileMethod !== (s.method || 'hw') || fileMethod === 'dw') {
+					// The default for the NEXT pipe follows the method, as it does when the method is
+					// switched (switchMethod()); existing pipes are the file's and are never touched.
+					s.defaults = s.defaults || {};
+					s.defaults.roughness = defaultRoughnessFor(fileMethod);
+				}
+				s.method = fileMethod;
+				delete s.roughnessFileUnit;
+				if (fileMethod === 'dw' && parsed.roughnessUnit === 'millifeet') { s.roughnessFileUnit = 'millifeet'; }
 				s.hydraulics = parsed.hydraulics || {};
 				s.qualityOptions = parsed.qualityOptions || {};
 				s.fileOptions = parsed.fileOptions || {};
@@ -48314,11 +48336,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The refusals, as rows. A units mismatch is refused by NAME and never converted.
 	function inpUpdateRefusals(parsed) {
 		return inpRefusalRows(inpUnitSelections(parsed), LPN_INP_UPDATE_METHOD[String(parsed.headloss || 'H-W').toUpperCase()] || 'hw',
-			String(parsed.headloss || 'H-W').toUpperCase());
+			String(parsed.headloss || 'H-W').toUpperCase(), parsed.roughnessUnit === 'millifeet');
 	}
 	// The rows, for any source: `want` the units the file states by family, `fm` its friction method
 	// key and `fmLabel` how to name it. A family the file does not state (undefined) is not compared.
-	function inpRefusalRows(want, fm, fmLabel) {
+	function inpRefusalRows(want, fm, fmLabel, millifeet) {
 		var pc = EngCalcs.pageConfig || {}, have = readUnitSelections(), out = [],
 			names = { lpn_u_length: pc.lpn_field_length || 'Length', lpn_u_diameter: pc.lpn_field_diameter || 'Diameter',
 				lpn_u_elevhead: pc.lpn_field_elev || 'Elevation', lpn_u_pressure: pc.lpn_result_pressure || 'Pressure',
@@ -48328,6 +48350,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			out.push((pc.lpn_inpup_unit_row || '{family}: the file uses {file} and this project uses {project}.')
 				.replace('{family}', names[u]).replace('{file}', inpUnitOptionText(u, want[u])).replace('{project}', inpUnitOptionText(u, have[u])));
 		});
+		// A Darcy-Weisbach file's roughness unit (millimetres) against the project's, where both are
+		// Darcy-Weisbach; a project that cannot show the file's unit is refused the same way.
+		if (fm === 'dw' && frictionMethod() === 'dw') {
+			if (want.lpn_u_roughness !== undefined && have.lpn_u_roughness !== want.lpn_u_roughness) {
+				out.push((pc.lpn_inpup_unit_row || '{family}: the file uses {file} and this project uses {project}.')
+					.replace('{family}', pc.lpn_field_roughness || 'Roughness').replace('{file}', inpUnitOptionText('lpn_u_roughness', want.lpn_u_roughness))
+					.replace('{project}', inpUnitOptionText('lpn_u_roughness', have.lpn_u_roughness)));
+			} else if (want.lpn_u_roughness === undefined && millifeet) {
+				out.push((pc.lpn_inpup_unit_row || '{family}: the file uses {file} and this project uses {project}.')
+					.replace('{family}', pc.lpn_field_roughness || 'Roughness').replace('{file}', 'millifeet')
+					.replace('{project}', inpUnitOptionText('lpn_u_roughness', have.lpn_u_roughness)));
+			}
+		}
 		out.unitRows = out.length;
 		if (fm !== frictionMethod()) {
 			out.push((pc.lpn_inpup_method_row || 'Head loss formula: the file uses {file} and this project uses {project}.')
@@ -61742,10 +61777,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function onUnitChange(sel, name) {
 		var pc = EngCalcs.pageConfig || {}, from = unitPrev[name], to = unitKey(name);
 		if (!from || !to || from === to) { rememberUnitSelections(); return; }
+		// **A ROUGHNESS CARRIED IN A UNIT THE PAGE DOES NOT OFFER** (`settings.roughnessFileUnit`,
+		// a US Darcy-Weisbach file's millifeet) is what the user answers by choosing a unit here:
+		// Non-destructive says the numbers mean the chosen unit, Destructive converts them OUT of
+		// the file's unit into it, and either way the project is solvable again.
+		var fileRough = name === 'lpn_u_roughness' && settings.roughnessFileUnit === 'millifeet';
 		if (!unitChangeNeedsDialog(name)) {
 			// Nothing typed that this unit decides, so the new unit simply stands. Still saved: the
 			// units are part of the PROJECT (there are no browser units on this page), so the choice
 			// has to survive the next open exactly as an element would.
+			if (fileRough) { delete settings.roughnessFileUnit; }
 			rememberUnitSelections();
 			afterUnitChange(unitFromMap(name, from));
 			return;
@@ -61762,6 +61803,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ label: pc.lpn_units_nondestructive || 'Non-destructive', fn: function () {
 				var n = countUnitValues(name);
 				applyOneUnit(name, to);
+				if (fileRough) { delete settings.roughnessFileUnit; }
 				rememberUnitSelections();
 				afterUnitChange(unitFromMap(name, from));
 				setNotice(String(pc.lpn_status_reinterpreted || 'Values ({n}) now mean {unit}. Nothing was rewritten.')
@@ -61787,10 +61829,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// projects clears the undo stack (clearUndo()), so after a project switch the original
 			// inputs live only in the file on disk -- which is untouched until the user saves.
 			{ label: pc.lpn_units_destructive || 'Destructive', fn: function () {
-				var fOld = EngCalcs.unitFactors[from], fNew = EngCalcs.unitFactors[to], n;
+				var fOld = fileRough ? EngCalcs.unitFactors.ft * 1000 : EngCalcs.unitFactors[from],
+					fNew = EngCalcs.unitFactors[to], n;
 				saveUndoSnapshot();
 				applyOneUnit(name, to);
 				n = (fOld && fNew) ? convertUnitValues(name, fNew / fOld) : 0;
+				if (fileRough) { delete settings.roughnessFileUnit; }
 				rememberUnitSelections();
 				afterUnitChange(unitFromMap(name, from));
 				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
@@ -65746,6 +65790,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			switchMethod();
 			function switchMethod() {
 				settings.method = now;
+				delete settings.roughnessFileUnit;   // the numbers are about to be re-entered for the new formula
 				// The DEFAULT follows the method -- future elements only, never existing ones, per the
 				// Default inputs section's own stated rule. Without this, a user who switches to Manning
 				// and draws a pipe gets C = 130 as an n.
@@ -79788,6 +79833,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// absent option leaves the number exactly as it was.
 		var hyd = scnSetting('hydraulics') || {};
 		var model = { nodes: nodes, links: links, method: frictionMethod(),
+			// The unit a Darcy-Weisbach file's roughness was written in when this page cannot show it
+			// (EngCalcs.lpnDiagnose refuses the solve by name).
+			roughnessUnitRefused: (frictionMethod() === 'dw' && settings.roughnessFileUnit) || undefined,
 			visc: 1.007e-6 * (hyd.viscosity || 1),
 			emitterExponent: scnSetting('emitterExponent'),
 			// Carried whole so js/lpn-epanet.js can write the ones only EPANET acts on -- accuracy,
@@ -79951,6 +79999,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
+		// The wording of this one is Tom's to rule on; until it is, the code and the unit name stand.
+		if (issue.code === 'roughness-unit') { return (pc.lpn_diag_roughness_unit || 'roughness-unit') + ': ' + issue.ids.join(', '); }
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir or a tank. The network needs at least one known water level before it can be solved.'; }
 		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'A pipe or pump connects to a node that no longer exists:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir or tank:') + ' ' + issue.ids.join(', '); }
