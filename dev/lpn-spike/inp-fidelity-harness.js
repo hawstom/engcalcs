@@ -328,6 +328,76 @@ overflow ${word}
 		ok('the probe can fail: Overflow YES and NO give EPANET different heads', apart > 0.05, apart.toFixed(3) + ' m');
 	}
 
+	// =============================================================================================
+	console.log('\n3. SEMICOLONS IN LABELS AND TITLES; ALL TITLE LINES');
+	const LBL = (title, labels) => `[TITLE]
+${title}
+
+[JUNCTIONS]
+ J1 20 2
+
+[RESERVOIRS]
+ R1 100
+
+[PIPES]
+ P1 R1 J1 1000 300 100 0 Open
+
+[COORDINATES]
+ J1 0 0
+ R1 -100 0
+
+[LABELS]
+${labels}
+
+[OPTIONS]
+ Units LPS
+ Headloss H-W
+
+[END]
+`;
+	{
+		const full = LBL('Smith; phase 2\nsecond line ; with semi\n  third line', ' 5 5 "Zone A; north"\n 6 6 "Plain" J1');
+		const { parsed, doc } = importDoc(full);
+		const labelText = (d) => d.labels.map((x) => x._text);
+		ok('a quoted label keeps its `;`', JSON.stringify(labelText(doc)) === JSON.stringify(['Zone A; north', 'Plain']), JSON.stringify(labelText(doc)));
+		const out = exportOf(doc);
+		ok('the label comes back out quoted whole', /"Zone A; north"/.test(out.inp), out.inp.split('[LABELS]')[1].split('[')[0].trim());
+		const back = importDoc(out.inp);
+		ok('and reads back as written', JSON.stringify(labelText(back.doc)) === JSON.stringify(['Zone A; north', 'Plain']));
+		const titleOf = (t) => t.split('[TITLE]')[1].split(/\n\s*\n/)[0].replace(/^\n/, '');
+		ok('all three title lines come back as the file wrote them, `;` and spacing included',
+			titleOf(out.inp) === 'Smith; phase 2\nsecond line ; with semi\n  third line', JSON.stringify(titleOf(out.inp)));
+		// EPANET's own reader on the exported file: the title is whole, three lines.
+		const ws = new mod.Workspace(); await ws.loadModule();
+		ws.writeFile('t.inp', out.inp.replace(/\[LABELS\][\s\S]*?\n\n/, ''));
+		const p = new mod.Project(ws); p.open('t.inp', 't.rpt', 't.out');
+		const tt = p.getTitle();
+		ok('the vendored EPANET engine reads those three lines whole', tt.line1 === 'Smith; phase 2' && tt.line2 === 'second line ; with semi' && tt.line3 === '  third line', JSON.stringify(tt));
+		// A renamed project is titled by its new name: the carried lines speak for the old one.
+		const renamed = JSON.parse(JSON.stringify(doc)); renamed.project.name = 'Renamed; again';
+		ok('a project the user renamed is titled by its new name', titleOf(exportOf(renamed).inp) === 'Renamed; again');
+		// A project named with a `;` and never imported.
+		const named = JSON.parse(JSON.stringify(doc)); named.project.name = 'Smith; phase 2'; delete named.project.inpTitle;
+		ok('a project name with a `;` exports whole', titleOf(exportOf(named).inp) === 'Smith; phase 2');
+	}
+
+	// EPA's own Net1, Net2 and Net3: the title (two lines in Net1) now goes back out as the file wrote
+	// it, and the sections the other round-trip harnesses hold token for token are unchanged.
+	console.log('\n4. EPA NETWORKS STILL EXPORT THEMSELVES');
+	for (const net of ['Net1', 'Net2', 'Net3']) {
+		const text = fs.readFileSync(ROOT + 'dev/lpn-spike/reference/' + net + '.inp', 'utf8');
+		const { doc } = importDoc(text, net);
+		const out = exportOf(doc);
+		const titleOf = (t) => t.split('[TITLE]')[1].split(/\n\s*\n/)[0].replace(/^\r?\n/, '').replace(/\r/g, '');
+		ok(net + ': [TITLE] comes back as the file wrote it', titleOf(out.inp) === titleOf(text), JSON.stringify(titleOf(out.inp)));
+		const a = tokensBySection(text), b = tokensBySection(out.inp);
+		let same = true;
+		['JUNCTIONS', 'RESERVOIRS', 'TANKS', 'PIPES', 'PUMPS', 'VALVES', 'COORDINATES'].forEach((sec) => {
+			if (JSON.stringify((a[sec] || []).map((r) => r.slice(0, 7))) !== JSON.stringify((b[sec] || []).map((r) => r.slice(0, 7)))) { same = false; console.log('     differs: ' + sec); }
+		});
+		ok(net + ': every element row comes back as the file wrote it (tank rows included)', same);
+	}
+
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall fidelity checks passed');
 	process.exit(fails ? 1 : 0);
 }()).catch((e) => { console.log(e && e.stack || e); process.exit(2); });

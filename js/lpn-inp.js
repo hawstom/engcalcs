@@ -179,6 +179,17 @@
 	var HEADLOSS_METHOD = { 'H-W': 'hw', 'D-W': 'dw', 'C-M': 'manning' };
 	EngCalcs.lpnInpHeadlossMethod = HEADLOSS_METHOD;
 
+	// The index of the first `;` that is not inside a double-quoted string, or -1.
+	function semicolonOutsideQuotes(line) {
+		var inQuote = false, k, c;
+		for (k = 0; k < line.length; k++) {
+			c = line.charAt(k);
+			if (c === '"') { inQuote = !inQuote; }
+			else if (c === ';' && !inQuote) { return k; }
+		}
+		return -1;
+	}
+
 	function num(tok, fallback) {
 		var v = parseFloat(tok);
 		return isFinite(v) ? v : (fallback === undefined ? 0 : fallback);
@@ -386,7 +397,7 @@
 			section = '',
 			rawSections = {},   // name -> array of token arrays, for the sections we read below
 			seen = {},          // name -> row count, for the ones we only count
-			i, line, semi, toks, cmt;
+			i, line, semi, toks, cmt, titleLines = [];
 
 		var carried = {};   // section name -> the file's own lines, for every section not read below
 		// The `;PUMP:`-style line last seen inside [CURVES], waiting for the row it describes.
@@ -408,7 +419,21 @@
 		}
 		for (i = 0; i < lines.length; i++) {
 			line = lines[i];
+			// **[TITLE] IS TEXT, TAKEN WHOLE** (audit 2026-11, F4): every line the file has, `;`
+			// included. EPANET's engine keeps three lines and its GUI (Uimport.pas ReadTitleData) the
+			// first as the title and the rest as notes, each as the LINE, with no comment stripped;
+			// a blank line, or one that is only a comment, is skipped by both. The page keeps all of
+			// them and writes all of them back.
+			if (section === 'TITLE' && !/^\s*\[/.test(line)) {
+				if (line.slice(0, line.indexOf(';') < 0 ? line.length : line.indexOf(';')).trim()) { titleLines.push(line); }
+				continue;
+			}
 			semi = line.indexOf(';');
+			// **A LABEL'S TEXT IS QUOTED, so a `;` inside the quotes is the text's own** (audit 2026-11,
+			// F4). EPANET itself cuts a label at its first `;` even inside the quotes (the engine's
+			// gettokens, the GUI's StripComment), so a file written by this page with a `;` in a label
+			// reads in EPANET as the shorter text; here the quoted string is kept whole.
+			if (section === 'LABELS' && semi >= 0) { semi = semicolonOutsideQuotes(line); }
 			cmt = '';
 			// **ONE SECTION'S DATA IS WRITTEN AS A COMMENT, AND IT IS [DEMANDS].** A demand
 			// CATEGORY -- the name of who is drawing this water -- is a trailing `;Elm Acres`, not
@@ -1603,9 +1628,7 @@
 			backdrop.offset = backdropOffset || [0, 0];
 		}
 
-		var title = '';
-		rows = rawSections.TITLE || [];
-		if (rows.length) { title = rows[0].join(' '); }
+		var title = titleLines.length ? titleLines[0] : '';
 
 		// **AN EFFICIENCY CURVE IS A LIBRARY CURVE LIKE ANY OTHER** (Task 586). [ENERGY] is a
 		// carried section, so the pumps' `EFFIC` rows are read back out of it here -- but only to
@@ -1630,6 +1653,8 @@
 		return {
 			ok: true,
 			title: title,
+			// Every title line, each whole (EPANET's own reader keeps three, its GUI all of them).
+			titleLines: titleLines,
 			flowUnits: flowKey,
 			unitSystem: fu.system,
 			lengthUnit: us ? 'ft' : 'm',
@@ -3701,7 +3726,16 @@
 			EngCalcs.lpnCurveLines(c, xc, yc).forEach(function (ln) { curves.push(ln); });
 		});
 		var title = opts.title !== undefined ? opts.title : ((doc.project && doc.project.name) || '');
-		var inp = '[TITLE]\n' + String(title).replace(/[\r\n]+/g, ' ') + '\n\n' +
+		// **THE FILE'S OWN TITLE LINES GO BACK OUT, while the project still has the name it was
+		// opened under** (audit 2026-11, F4): the carried text speaks for that name and no other, so
+		// a project the user renamed is titled by its new name, as it always was. A `;` is part of a
+		// title line; EPANET reads the line whole.
+		var inpTitle = (doc.project && doc.project.inpTitle) || null,
+			titleOut = (opts.title === undefined && inpTitle && inpTitle.lines && inpTitle.lines.length &&
+				inpTitle.name === (doc.project && doc.project.name))
+				? inpTitle.lines.map(String).join('\n')
+				: String(title).replace(/[\r\n]+/g, ' ');
+		var inp = '[TITLE]\n' + titleOut + '\n\n' +
 			// [JUNCTIONS] is written even when empty: it is one of the three sections lpnInpParse()
 			// tests for to decide the text is an `.inp` at all.
 			'[JUNCTIONS]\n' + (junctions.length ? junctions.join('\n') + '\n' : '') + '\n' +

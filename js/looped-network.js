@@ -47637,12 +47637,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// gets {0, 0} and nothing moves.
 		return rebaseDocument({
 			v: LPN_STORAGE_VERSION,
-			project: geo
+			project: (function () {
 				// Written only when geographic, the same rule newProject() follows: an absent key is
 				// the grid default, and saying 'grid' out loud would put a word in every file that
 				// has always meant itself by saying nothing.
-				? { name: name, activeScenario: 'base', coords: LPN_COORDS_GEO }
-				: { name: name, activeScenario: 'base' },
+				var pr = geo ? { name: name, activeScenario: 'base', coords: LPN_COORDS_GEO } : { name: name, activeScenario: 'base' };
+				// **THE FILE'S [TITLE], EVERY LINE, KEPT BESIDE THE NAME IT ARRIVED UNDER** (audit
+				// 2026-11, F4). The project is named by the file; the title is text the file states
+				// and goes back out as written for as long as the name is unchanged.
+				if (parsed.titleLines && parsed.titleLines.length) { pr.inpTitle = { name: name, lines: parsed.titleLines.slice() }; }
+				return pr;
+			}()),
 			// **A LAT/LON DOCUMENT IS NEVER REBASED**, which is why the origin is stated here rather
 			// than chosen: rebaseDocument() exists for survey coordinates in the hundreds of
 			// thousands, and degrees start from zero by definition. georefStart() writes the same
