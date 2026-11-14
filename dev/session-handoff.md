@@ -105,6 +105,7 @@ lines rather than appending corrections.
 - **`feat/usage-using` (8108), waits his look:** Using table counts browser-days (logs hold no visit id); headings Browsers (said yes) / Visits (said yes) / Visits (others) on Looking, Calculations on Calculating. True visits need a per-load token in the beacon: consent wording, his call.
 - **Task 860 (75) opened:** controls by scenario; Sue says whole named sets are sounder than per-control overrides. Mary: LoadBuilder = bulk meter-to-network assignment; we do it one customer at a time.
 - **Trap met:** the master preview (8100) was stale; run `generate.sh` after every master push.
+- **Pushed master ac85c45ae** (three full runs: the first failed 7 label harnesses, the second timed out `label-drag-track-harness.js` at 260 s alone against the runner's 300 s; Net3 now runs once, 152 s). Master merged into all five waiting branches after the push.
 - SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/dc1e8689-543b-4568-b1d0-667fe08c4d1e/scratchpad (common-rules.md, rerun logs).
 
 ## STATE — 2026-11-08 night (seventy-second session, Opus main, Sonnet agents)
