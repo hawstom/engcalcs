@@ -169,14 +169,18 @@ async function main() {
 		ok('dragging the Well moves all three, still coincident', wc.length === 3 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9) && Math.abs(wc[0].x - home.x) > 1, JSON.stringify(wc));
 		await undo();
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
-		// Well with tank: four nodes at one point, dragged as one.
+		// Well with tank (round 7): three presses, the well, the tee, the tank. The well is three nodes at one point; the tee and the tank stand apart.
 		for (let i = 0; i < 5 && (await armed()) !== 'add-welltank'; i++) { await P.keyboard.press('6'); await a.settle(150); }
 		ok('key 6 cycles on to Well with tank', (await armed()) === 'add-welltank');
 		const tankAt = { x: at.x + 250, y: at.y - 150 };
+		const nBefore = (await circles(a)).length;
 		await P.mouse.click(tankAt.x, tankAt.y); await a.settle(300);
+		await P.mouse.click(tankAt.x + 90, tankAt.y - 20); await a.settle(300);
+		await P.mouse.click(tankAt.x + 90, tankAt.y - 110); await a.settle(300);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(200);
-		const tankNodes = async () => { const all = await circles(a), r = all.find((c) => /W\d+R$/.test(c.id) && Math.abs(c.x - tankAt.x) < 400 && all.filter((d) => Math.abs(d.x - c.x) < 1e-9 && Math.abs(d.y - c.y) < 1e-9).length === 4); return r ? all.filter((c) => Math.abs(c.x - r.x) < 1e-9 && Math.abs(c.y - r.y) < 1e-9) : []; };
-		ok('a Well with tank is four nodes at one point', (await tankNodes()).length === 4);
+		const allC = await circles(a);
+		const wtR = allC.find((c) => /W\d+R$/.test(c.id) && Math.abs(c.x - tankAt.x) < 400 && allC.filter((d) => Math.abs(d.x - c.x) < 1e-9 && Math.abs(d.y - c.y) < 1e-9).length === 3);
+		ok('a Well with tank is a well of three nodes at one point plus a tee and a tank, five nodes added', !!wtR && allC.length === nBefore + 5, String(allC.length - nBefore));
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		await P.keyboard.press('5'); await a.settle(150);
 		ok('key 5 arms Pipe', (await armed()) === 'add-pipe');

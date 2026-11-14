@@ -78,29 +78,32 @@ async function main() {
 
 		console.log('\n--- the Well ---');
 		await P.keyboard.press('Escape');
-		await clickAt('W1T');
+		await clickAt('W1P');
 		let hs = await heads();
-		ok('the Well\'s box shows seven headings', hs.length === 7, hs.map((h) => h.t).join(' | '));
+		ok('the Well\'s box shows five headings', hs.length === 5, hs.map((h) => h.t).join(' | '));
 		ok('they stand in order down the box', hs.every((h, i) => i === 0 || h.top > hs[i - 1].top), JSON.stringify(hs.map((h) => Math.round(h.top))));
 		ok('each is bold, one line, clipped and never ellipsed, and inside the box', hs.every((h) => +h.fw >= 600 && h.ws === 'nowrap' && h.ov === 'hidden' && h.to === 'clip' && h.left >= h.fl - 1 && h.right <= h.fr + 1), JSON.stringify(hs[0]));
 		const rowsOk = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-asm-section > div')).every((d) => /lpn-gprops/.test(d.className) && getComputedStyle(d).display === 'grid'));
 		ok('the rows under each heading are laid in the box\'s own grid', rowsOk);
 		const noOverflow = await P.evaluate(() => { const f = document.getElementById('lpn_popup_fields'); return f.scrollWidth <= f.clientWidth + 1; });
 		ok('nothing runs past the box horizontally', noOverflow);
-		const tankInputs = await P.evaluate(() => { const s = document.querySelector('[data-asm-member="W1T"]'); return Array.from(s.querySelectorAll('label')).map((l) => l.textContent.replace(/\s+/g, ' ').trim()); });
-		ok('the Tank section holds results only (its inputs are in the entry area above)', ['Head', 'Depth', 'Available volume'].every((n) => tankInputs.some((x) => x.indexOf(n) === 0)) && !tankInputs.some((x) => /Initial depth|Tank diameter|Base elevation/.test(x)), tankInputs.join(' | '));
+		const outRows = await P.evaluate(() => { const s = document.querySelector('[data-asm-member="W1P"]'); return Array.from(s.querySelectorAll('label')).map((l) => l.textContent.replace(/\s+/g, ' ').trim()); });
+		const dRows = await P.evaluate(() => { const s = document.querySelector('[data-asm-member="W1D"]'); return Array.from(s.querySelectorAll('label')).map((l) => l.textContent.replace(/\s+/g, ' ').trim()); });
+		ok('the outlet W1P shows Head and Pressure; the drawdown node W1D shows Head alone (pressure only at the outlet)', outRows.some((x) => /^Pressure/.test(x)) && dRows.some((x) => /^Head/.test(x)) && !dRows.some((x) => /^Pressure/.test(x)), outRows.join(' | ') + ' / ' + dRows.join(' | '));
+		const flows = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((l) => /^Flow/.test(l.textContent.trim())).length);
+		ok('Flow appears once in the Well\'s box, above the headings', flows === 1, String(flows));
 		const chooser = await P.evaluate(() => { const s = document.getElementById('lpn_pgraph_member'), f = document.getElementById('lpn_pgraph_field'); return s && f ? { val: s.value, below: s.getBoundingClientRect().top < f.getBoundingClientRect().top, n: s.options.length } : null; });
-		ok('the graph at the foot has the "Graph which sub-asset?" chooser above its quantity chooser', !!chooser && chooser.n === 7 && chooser.val === 'link:W1' && chooser.below, JSON.stringify(chooser));
-		if (PICS) { await P.screenshot({ path: path.join(PICS, 'well-selected-properties-v6.png') }); }
+		ok('the graph at the foot has the "Graph which sub-asset?" chooser above its quantity chooser', !!chooser && chooser.n === 5 && chooser.val === 'link:W1' && chooser.below, JSON.stringify(chooser));
+		if (PICS) { await P.screenshot({ path: path.join(PICS, 'well-selected-properties-v10.png') }); }
 
 		console.log('\n--- the right-click menu ---');
 		await P.keyboard.press('Escape');
-		const wc = await centreOf('W1T');
+		const wc = await centreOf('W1P');
 		await P.mouse.click(wc.x, wc.y, { button: 'right' });
 		await a.settle(500);
 		const rows = await P.evaluate(() => Array.from(document.querySelectorAll('.lpn-ctx-menu button, .lpn-ctxmenu button, [role="menu"] [role="menuitem"], #lpn_ctx_menu button')).map((b) => b.textContent.trim()));
 		const tsRows = rows.filter((r) => /^Time series graph/.test(r));
-		ok('right-click on the Well lists a Time series graph row for each sub-asset, upstream to downstream', tsRows.length === 7 && tsRows[3] === 'Time series graph: Pump W1' && tsRows[6] === 'Time series graph: Tank W1T', JSON.stringify(tsRows));
+		ok('right-click on the Well lists a Time series graph row for each sub-asset, upstream to downstream', tsRows.length === 5 && tsRows[3] === 'Time series graph: Pump W1' && tsRows[4] === 'Time series graph: Junction W1P', JSON.stringify(tsRows));
 		const clicked = await P.evaluate(() => { const b = Array.from(document.querySelectorAll('.lpn-ctx-menu button, .lpn-ctxmenu button, [role="menu"] [role="menuitem"], #lpn_ctx_menu button')).find((x) => /Pump W1$/.test(x.textContent.trim())); if (b) { b.click(); return true; } return false; });
 		await a.settle(900);
 		const bubbles = await P.evaluate(() => document.querySelectorAll('.lpn-tsb, .lpn-ts-bubble, [data-tsb]').length);
@@ -113,7 +116,7 @@ async function main() {
 		ok('Pump+: Junction P1U, Pump P1, Junction P1D', JSON.stringify(hs.map((h) => h.t)) === JSON.stringify(['Junction P1U', 'Pump P1', 'Junction P1D']), hs.map((h) => h.t).join(' | '));
 		const pumpRows = await P.evaluate(() => Array.from(document.querySelectorAll('[data-asm-member="P1"] label, [data-asm-member="P1U"] label')).map((l) => l.textContent.replace(/\s+/g, ' ').trim()));
 		ok('with the Pump+ in a run, its sections show results (Flow under the Pump, Head under a junction)', pumpRows.some((x) => /^Flow/.test(x)) && pumpRows.some((x) => /^Head/.test(x)), pumpRows.join(' | '));
-		if (PICS) { await P.screenshot({ path: path.join(PICS, 'pump-plus-selected-properties-v6.png') }); }
+		if (PICS) { await P.screenshot({ path: path.join(PICS, 'pump-plus-selected-properties-v10.png') }); }
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {

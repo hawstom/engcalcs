@@ -1,7 +1,7 @@
 // WELL WITH TANK IS THREE POINTS: A WELL, A TEE AND A TANK. Run with:
 //   node dev/lpn-spike/well-tank-three-point-harness.js
 //
-// Task 822, round 7 (Tom, 2026-11-12: "Cramming a tank into that point makes no sense. I don't want to keep the one-point well with tank. Change it to
+// Task 822, round 7 (Tom, round 6 pass: "Cramming a tank into that point makes no sense. I don't want to keep the one-point well with tank. Change it to
 // the three-point assembly that I outlined": "three points specified by the user (well, tee (unless they are generally at the well head), and
 // tank) and three associated symbols. It's a cross between an assembly and a wizard. It still knows that it's an assembly to simplify controls
 // entry."). Covered:
@@ -125,12 +125,14 @@ console.log('\n--- 1. three presses ---');
 	ok('the first press places the Well: five elements, the simple form', doc.nodes.length === 3 && doc.links.length === 2 && doc.assemblies.length === 1 && !doc.assemblies[0].tank, JSON.stringify(doc.assemblies));
 	ok('and the status bar asks for the tee', L.lastNotice().indexOf(TEE_PROMPT) === 0 || /tee/i.test(L.lastNotice()), L.lastNotice());
 	ok('the wizard is waiting for the tee', !!L.pending() && L.pending().stage === 'tee');
+	ok('the mode hint says the same (the notice expires in 8 s, the hint stays)', byId.lpn_mode_hint && /tee/i.test(byId.lpn_mode_hint.textContent), byId.lpn_mode_hint && byId.lpn_mode_hint.textContent);
 	press(500, 150);
 	ok('the second press makes an ordinary junction there and a pipe from the well outlet to it', doc.nodes.length === 4 && L.nodeById('J1') && L.nodeById('J1').type === 'junction' && L.nodeById('J1').x === 500 && L.nodeById('J1').y === 150 &&
 		doc.links.some((l) => l.type === 'pipe' && l.from === 'W1P' && l.to === 'J1' && !l.virtual), doc.links.map((l) => l.id + ' ' + l.type + ' ' + l.from + '>' + l.to).join('; '));
 	const p1 = doc.links.find((l) => l.type === 'pipe');
 	ok('that pipe takes its length from the drawing (Auto), and it is not zero', p1.lenAuto === true && L.linkAutoLength(p1, true) > 0, p1.lenAuto + ' ' + L.linkAutoLength(p1, true));
 	ok('and the status bar asks for the tank', /tank/i.test(L.lastNotice()) && L.lastNotice().indexOf('tee') !== 0 || L.lastNotice().indexOf(TANK_PROMPT) === 0, L.lastNotice());
+	ok('and so does the mode hint, for the tank', byId.lpn_mode_hint && /^Now specify the tank/.test(byId.lpn_mode_hint.textContent), byId.lpn_mode_hint && byId.lpn_mode_hint.textContent);
 	press(500, 400);
 	const a = doc.assemblies[0];
 	ok('the third press makes an ordinary tank there and a pipe from the tee to it', doc.nodes.length === 5 && L.nodeById('T1') && L.nodeById('T1').type === 'tank' && L.nodeById('T1').x === 500 && L.nodeById('T1').y === 400 &&

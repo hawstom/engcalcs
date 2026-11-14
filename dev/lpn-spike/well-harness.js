@@ -2,7 +2,7 @@
 //   node dev/lpn-spike/well-harness.js
 //
 // Task 822 (dev/assemblies.md; Tom's Well properties of 2026-10-25: groundwater static elevation, a general purpose valve for the drawdown
-// curve, a pump curve; "Pump+ and Well on Pump"; 2026-11-12: "W1, W1R, W1D, and W1P"). R (W1R) is a reservoir at the static elevation, D (W1D) the
+// curve, a pump curve; "Pump+ and Well on Pump"; the round 6 pass: "W1, W1R, W1D, and W1P"). R (W1R) is a reservoir at the static elevation, D (W1D) the
 // drawdown node, the pump's upstream junction, P (W1P) the pump's outlet at the ground, where the system's pipes attach; V (W1V) is a GPV from R
 // to D whose head-loss curve is the drawdown against pumping rate, W1 the pump from D to P. The tank form is three points (well-tank-three-point-harness.js).
 // Every assertion drives the page's own tool and handlers and reads the result out of `doc`. Covered:

@@ -45,12 +45,12 @@
 define('EC_ICON_OPEN_TAG', '<svg class="ec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
 	. ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">');
 
-// **THE WELL'S UPPER CYLINDER IS ONE NUMBER** (Tom, 2026-11-12: colleagues are being asked whether it should be much narrower, only a little wider
+// **THE WELL'S UPPER CYLINDER IS ONE NUMBER** (Tom, round 6 pass: colleagues are being asked whether it should be much narrower, only a little wider
 // than the deep cylinder). Half its width in the 24-unit frame, either side of the centre line at x = 12; the deep cylinder is 1.5 either side.
 // A change here changes the toolbar icon, the map symbol and its grab shape, which JS derives from the icon's first path (wellSilhouette()).
 define('EC_WELL_UPPER_HALF', 5);
 
-// **THE WELL'S DRAWING** (Tom's sketch of 2026-10-25, WELL, and his 2026-11-12 notes): a ground line across the top that runs past the pit on both
+// **THE WELL'S DRAWING** (Tom's sketch of 2026-10-25, WELL, and his notes from the round 6 pass): a ground line across the top that runs past the pit on both
 // sides; a wide upper cylinder; below it a narrow, deep cylinder with a closed bottom; the drawdown curves, which fall from the ground line's
 // ends to meet the narrow cylinder above its bottom. Two holes are drilled and nothing is wider at the bottom. The FIRST path is the outline of the
 // two cylinders: JS closes it for the symbol's backdrop and grab shape.
@@ -59,7 +59,7 @@ function ecWellDrawing() {
 	return '<path d="M' . $l . ' 4V11H10.5V21.5H13.5V11H' . $r . 'V4"/><path d="M2 4H22"/>'
 		. '<path d="M2 13C6 13 9.3 14.2 10.5 18M22 13C18 13 14.7 14.2 13.5 18"/>';
 }
-// **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (Tom, 2026-11-12: the earlier one drew the tank underground):
+// **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (Tom, round 6 pass: the earlier one drew the tank underground):
 // the well's drawing at 0.62 hanging from a ground line, with a tank standing ABOVE that line beside it. Strokes keep their width.
 function ecWellTankIcon() {
 	$well = str_replace('<path ', '<path vector-effect="non-scaling-stroke" ', ecWellDrawing());

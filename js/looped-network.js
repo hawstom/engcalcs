@@ -40334,6 +40334,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function updateModeHint() {
 		var el = document.getElementById('lpn_mode_hint'); if (!el) { return; }
 		var pc = EngCalcs.pageConfig || {}, key = MODE_HINT_KEYS[mode];
+		// A Well with tank half made says what it waits for, here as well as in the status bar's notice, which expires (wellTankStep()).
+		if (mode === 'add-welltank' && wellTankPending) { key = wellTankPending.stage === 'tee' ? 'lpn_welltank_tee_prompt' : 'lpn_welltank_tank_prompt'; }
 		el.textContent = key ? (pc[key] || '') : '';
 		placeLegends();
 	}
@@ -40577,7 +40579,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **A WELL HAS THREE NODES** (R the groundwater reservoir, D the drawdown node, P the pump outlet; Task 822), a pump or a valve two. `nodes` is
 	// stored for a well only; the other kinds keep `up` and `down`. Everything that walks an assembly's COINCIDENT nodes asks here.
 	function assemblyNodeIds(a) { return a.nodes ? a.nodes.slice() : [a.up, a.down]; }
-	// **A WELL WITH TANK ALSO KNOWS ITS TEE, ITS TANK AND THE TWO PIPES THAT JOIN THEM** (Round 7; Tom, 2026-11-12: "a cross between an assembly and a
+	// **A WELL WITH TANK ALSO KNOWS ITS TEE, ITS TANK AND THE TWO PIPES THAT JOIN THEM** (Round 7; Tom, round 6 pass: "a cross between an assembly and a
 	// wizard. It still knows that it's an assembly to simplify controls entry"). They stand at their own points and are ordinary elements, so they are
 	// NOT in assemblyNodeIds() (which is where the group's nodes are coincident, selected together, dragged together and labelled as one); they are
 	// in this list, which is what deleting, renaming, the .inp and the saved file ask. `tee` and `tank` are node IDs, `branch` the pipe IDs
@@ -40693,7 +40695,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} finally { assemblyBlockBuilding = false; }
 		return (any || ls.node.id || ls.link.id) ? lines : [];
 	}
-	// **A WELL'S LABEL BLOCK** (Round 7; Tom, 2026-11-12, his example: `W1 Z = 999', Q=99 gpm` / `W1R H=899'` / `W1D H= 799'` / `W1P H=1099', P=40 psi`).
+	// **A WELL'S LABEL BLOCK** (Round 7; Tom, round 6 pass, his example: `W1 Z = 999', Q=99 gpm` / `W1R H=899'` / `W1D H= 799'` / `W1P H=1099', P=40 psi`).
 	// The heading is the well's ID with the two numbers that are the well's own: Z, the ground elevation (the outlet node's), and Q, the pump's flow;
 	// there is one flow in a well, so no other row carries one. One row per member node that has a value to show: the groundwater reservoir and the
 	// drawdown node show H (a pressure there makes no sense), the pump outlet shows H and P. The drawdown valve has no row: its flow is the pump's.
@@ -40824,7 +40826,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return a;
 	}
 	/**
-	 * **A WELL: THREE NODES AT ONE POINT, TWO LINKS** (Task 822; Tom, 2026-11-06: "Pump+ and Well on Pump"; 2026-11-12: "W1, W1R, W1D, and W1P").
+	 * **A WELL: THREE NODES AT ONE POINT, TWO LINKS** (Task 822; Tom, 2026-11-06: "Pump+ and Well on Pump"; the round 6 pass: "W1, W1R, W1D, and W1P").
 	 * The pump is the well and carries its ID, W1; the rest take it with a letter: W1R the groundwater Reservoir, W1D the Drawdown node (the pump's
 	 * upstream node, where the water stands once the pump draws), W1V the drawdown Valve, W1P the pump's outlet, the Pump node the system's pipes
 	 * attach to and the one that carries the ground elevation and the drawing.
@@ -40837,7 +40839,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The groundwater's depth below the ground a new Well opens on, a round number in the displayed unit: 100 ft, or 30 m. The unit's
 	// own key is 'fth2o' (head in feet of water), not 'ft'; with the wrong key the 30 m was converted and a Well opened 98.4252 ft down.
 	function wellStaticDepth() { return niceDefault('lpn_u_elevhead', 'fth2o', 100, 30); }
-	// **A WELL HAS A TANK ONLY IF IT WAS MADE WITH ONE** (Task 822; Tom, 2026-11-12): "Cramming a tank into that point makes no sense", so the tank is
+	// **A WELL HAS A TANK ONLY IF IT WAS MADE WITH ONE** (Task 822; Tom, round 6 pass): "Cramming a tank into that point makes no sense", so the tank is
 	// not a member at the well's point; `tank` on the grouping names an ordinary tank elsewhere, on a pipe from an ordinary tee.
 	function wellHasTank(a) { return !!(a && a.kind === 'well' && a.tank && nodeById(a.tank)); }
 	function completeWell(d, x, y) {
@@ -40872,7 +40874,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (typeof e1 === 'number' && typeof e2 === 'number') { r.node.elev = +(e1 + frac * (e2 - e1)).toFixed(4); }   // base-write: construction
 		return completeWell(r.node, undefined, undefined);
 	}
-	// **WELL WITH TANK: A WIZARD OVER AN ASSEMBLY** (Round 7; Tom, 2026-11-12: "three points specified by the user (well, tee (unless they are
+	// **WELL WITH TANK: A WIZARD OVER AN ASSEMBLY** (Round 7; Tom, round 6 pass: "three points specified by the user (well, tee (unless they are
 	// generally at the well head), and tank) and three associated symbols"). Three presses, each prompted in the status bar: the well (placed as
 	// a Well is, splice and all), the tee, the tank. The tee may be the well's own point (then the pipe joining them is a virtual pipe, as a pipe of
 	// no length is), an existing junction, a point on a pipe (which splits it) or open ground; the tank an existing tank or open ground. The result
@@ -40881,7 +40883,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The wizard's state is one object; each press checks that the well it names is still there (Undo may have removed it), and the act is one undo step.
 	var wellTankPending = null;   // { id: the Well's assembly id, stage: 'tee' | 'tank', tee: node id }
 	function wellTankPrompt(key, fallback) { setNotice(String((EngCalcs.pageConfig || {})[key] || fallback)); }
-	function wellTankCancel() { if (wellTankPending) { wellTankPending = null; setNotice(''); } }
+	function wellTankCancel() { if (wellTankPending) { wellTankPending = null; setNotice(''); updateModeHint(); } }
 	// A pipe of no length is a virtual pipe, and one drawn between coincident points says so.
 	function wellTankPipe(from, to) {
 		var f = nodeById(from), t = nodeById(to);
@@ -40908,6 +40910,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			wellTankPending.tee = tee.id; wellTankPending.stage = 'tank';
 			wellTankPending.pipe1 = wellTankPipe(wellOut.id, tee.id).id;
 			wellTankPrompt('lpn_welltank_tank_prompt', 'Now specify the tank: a tank or a point on the map. Press Escape to stop with the well and its tee.');
+			updateModeHint();
 			return true;
 		}
 		if (hit && hit.type === 'tank' && !assemblyOfNode(hit.id) && wellTankNotOurs(a, hit.id)) { tank = hit; }
@@ -40917,6 +40920,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		a.tee = wellTankPending.tee; a.tank = tank.id; a.branch = [wellTankPending.pipe1, p2.id];
 		wellTankPending = null;
 		setNotice('');
+		updateModeHint();
 		syncAssemblyGlyphs();
 		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[1] }));
 		scheduleSolve();
@@ -40943,6 +40947,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (kind === 'welltank') {
 			wellTankPending = { id: a.id, stage: 'tee' };
 			wellTankPrompt('lpn_welltank_tee_prompt', 'Now specify the tee: a junction, a point on a pipe, or the well\'s own point. Press Escape to stop with the well alone.');
+			updateModeHint();
 		}
 	}
 	// No mark is drawn on the map symbol of a Pump+ or Valve+ (Tom, 2026-11-08): the two coincident nodes already
@@ -40962,7 +40967,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dissolveAssembly(a);
 		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[a.kind === 'well' ? 1 : 0] }));
 	}
-	// **A MORPH OF ANY MEMBER OF AN ASSEMBLY SEPARATES IT FIRST** (Round 7; Tom, 2026-11-12: "ensure that Morph works with the + assemblies before we
+	// **A MORPH OF ANY MEMBER OF AN ASSEMBLY SEPARATES IT FIRST** (Round 7; Tom, round 6 pass: "ensure that Morph works with the + assemblies before we
 	// merge this"). Water > Morph changes a node or link into another type; a Pump+ whose pump became a pipe, or a Well whose reservoir became a tank,
 	// is no longer the thing its group says, so the group ends as Explode ends it (the elements stay, as the user left them) and the morph then
 	// goes on as it does for any element. It happens inside the Morph's own undo step, so one Undo restores both. The tee, tank and pipes of a
@@ -41139,7 +41144,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **A WELL'S BOX** (Task 822): the top is the entry area and holds EVERY input of the Well: the pump's identity, the ground, the static level,
 	// the two curves (drawdown on the general purpose valve, head lift on the pump) and, for a Well with a tank, the pump's on and off depths. The
-	// tank is an ordinary tank with a box of its own. **THEN THE ONE FLOW, ONCE** (Tom, 2026-11-12: "I think it needs flow only once (possibly before
+	// tank is an ordinary tank with a box of its own. **THEN THE ONE FLOW, ONCE** (Tom, round 6 pass: "I think it needs flow only once (possibly before
 	// all the subheadings) and pressure only at the outlet (last node)"), and below it each member's heading holds results only, with a pressure
 	// under the outlet alone. The ground elevation is on the outlet node (the third) and the static elevation on the reservoir; setProp() writes
 	// each one's mate.
@@ -65448,7 +65453,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['P', pc.lpn_tool_add_pump || 'Pump'],
 			['V', pc.lpn_tool_add_valve || 'Valve'],
 			['M', pc.lpn_tool_add_meter || 'Customer'],
-			// A well's pump is the well, W1; its reservoir, upstream node, drawdown valve and tank are W1R, W1U, W1V and W1T (Task 822).
+			// A well's pump is the well, W1; its reservoir, drawdown node, drawdown valve and outlet are W1R, W1D, W1V and W1P (Task 822).
 			['W', pc.lpn_tool_add_well || 'Well']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input'), wrap = document.createElement('span');

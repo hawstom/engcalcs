@@ -170,51 +170,43 @@ upper right of the bowtie, over the corner as in Tom's sketch, in ink with a pap
   Properties shows "Virtual pipe (length = 0)" when the box is not ticked. Stand-in width: the largest diameter among the
   ordinary pipes of the network being run (the scenario's own).
 
-### Well, slice 1 (Sue's design, 2026-11-09; `dev/lpn-spike/well-harness.js`)
+### Well, slice 1 (Sue's design, 2026-11-09; `dev/lpn-spike/well-harness.js`), as it stands after Round 7
 
-The Pump button's third form (Pump, Pump+, Well). Seven ordinary elements at one point, the last two added by the tee below; the five first built: **R** a reservoir whose head is
-the groundwater's static elevation, **S** the pump's suction (a junction, no demand, same elevation), **T** an open-air
-tank at the ground elevation where the system's pipes attach, **G** a GPV from R to S whose head-loss curve is the
-drawdown against pumping rate (it includes the point 0, 0), **P** the pump from S to T whose curve is the head lifted
-from the pumping level (the static elevation less the drawdown), not from the static elevation.
+The Pump button's third form (Pump, Pump+, Well, Well with tank). Five ordinary elements at one point: **R** a reservoir whose head is the
+groundwater's static elevation, **D** the drawdown node (the pump's upstream junction, no demand, same elevation as R), **V** a GPV from R to D whose
+head-loss curve is the drawdown against pumping rate (it includes the point 0, 0), **W** the pump from D to **P** its outlet, the junction the system's
+pipes attach to and the one that carries the ground elevation and the drawing. The pump's curve is the head lifted from the pumping level (the static
+elevation less the drawdown), not from the static elevation.
 
-- **IDs and symbol (Tom, 2026-11-09):** the well is its pump and carries its ID, W1 from a new project prefix **W** (Settings, beside
-  the others; the pump prefix's Apply to all leaves well pumps alone). Its members are W1R (reservoir), W1U (the
-  pump's upstream node, S above), W1V (the drawdown valve, G) and W1T (the tank). It is drawn as one symbol, the toolbar icon's own
-  paths (ground line, casing, slim pipe, drawdown curve), on the tank's node; the other two nodes and both links draw as nothing.
-  A new well's static elevation is the ground less 100 ft or 30 m; where the ground waits for the DEM, the static level follows the
-  fill, and no door that reads the land surface ever writes R or S.
-- **Grouping:** `{ id: P, kind: 'well', nodes: [R, S, T, D], links: [G, P, B] }`; pump and valve groups keep `up` and `down`. The
-  `.inp` comment is `;ASSEMBLY: well R S T D G P B`, and the reader restores it only when all seven exist (R a reservoir, S and D
-  junctions, T a tank), else `assembly-unresolved`. A slice-1 well, `well R S T G P` (three nodes, two links, no tee), still opens
-  and is written back as it was; its pipes join the tank.
-- **Shared values:** x and y reach every node; the static water level elevation typed on R or S reaches the other of the two; the
-  ground elevation typed on T reaches D and the other way. A pipe that ends on or starts at a well joins D (a slice-1 well: T).
-  Splicing into a pipe makes D the node both halves attach to, with the ground interpolated along the pipe.
-- **Scenarios:** the static elevation and the two curve references (G's and P's `curveId`) are overridable through
-  `setProp()` as any node elevation and curve reference is. The tank's ground elevation and depths follow the ordinary
-  tank rules.
-- **Solvers:** `EngCalcs.lpnDiagnose` no longer refuses a GPV on a reservoir or tank (EPANET's error 219 covers PRV, PSV
-  and FCV only; a PBV is still refused). Both engines solve a well; the pump's discharge head equals static elevation less
-  drawdown(Q) plus pump head(Q) to better than 1e-8 m.
-- **Not built:** the pressure tank (slice 2, waiting on Tom's answers); a drawdown
-  picture on the icon; the Assemblies table.
+- **IDs and symbol (Tom, 2026-11-09 and the round 6 pass: "W1, W1R, W1D, and W1P"):** the well is its pump and carries its ID, W1 from a project prefix **W**
+  (Settings, beside the others; the pump prefix's Apply to all leaves well pumps alone). Its members are W1R (Reservoir), W1D (Drawdown node), W1V
+  (Drawdown valve) and W1P (Pump outlet). A file written before Round 7 keeps its own IDs (W1U for the drawdown node, W1D for the outlet): import and
+  opening never rename. It is drawn as one symbol, the toolbar icon's own paths, on the outlet node; the other nodes and both links draw as nothing.
+  A new well's static elevation is the ground less 100 ft or 30 m; where the ground waits for the DEM, the static level follows the fill, and no door
+  that reads the land surface ever writes R or D.
+- **Grouping:** `{ id: W, kind: 'well', nodes: [R, D, P], links: [V, W] }`; pump and valve groups keep `up` and `down`. The `.inp` comment is
+  `;ASSEMBLY: well R D P V W`, restored only when all five exist (R a reservoir, D and P junctions), else `assembly-unresolved`.
+- **Shared values:** x and y reach every node; the static water level elevation typed on R or D reaches the other of the two; the ground elevation typed
+  on P reaches nothing else. A pipe that ends on or starts at a well joins P. Splicing into a pipe makes P the node both halves attach to, with the
+  ground interpolated along the pipe.
+- **Scenarios:** the static elevation and the two curve references (V's and W's `curveId`) are overridable through `setProp()`.
+- **Solvers:** `EngCalcs.lpnDiagnose` does not refuse a GPV on a reservoir (EPANET's error 219 covers PRV, PSV and FCV only; a PBV is still refused).
+  Both engines solve a well; the pump's discharge head equals static elevation less drawdown(Q) plus pump head(Q) to better than 1e-8 m.
+- **Not built:** the pressure tank (Boyle's law; the open-air tank is Round 7's Well with tank), the Assemblies table.
 
 ### The Well's tee (Mary, 2026-11-09; `dev/lpn-spike/well-tee-harness.js`)
 
-EPANET's `tankstatus()` (hydstatus.c) shuts the one link whose flow would fill a full tank, so pump -> tank -> system pipes
-silences the pump at full level and the tank alone feeds the system (Tom: "Do we need a tee and an off-line tank"). The Well is
-now R -> G (drawdown valve W1V) -> S (W1U) -> pump W1 -> **D (W1D, the tee)** -> **B (W1B, a virtual pipe)** -> T (W1T, the tank);
-the system's pipes join D. A full tank shuts only B. Measured in both engines on a 10 L/s demand with the tank full: pump 0.0100000316
-m3/s, branch 0; with the tank half full the branch takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6; EPANET's B is the
-stand-in pipe, so D stands a millimetre or two above T). Elevation: T and D share the ground, R and S the static level. Explode keeps all
-seven. Not done: Tom's wish for an exploded view of a selected assembly.
+EPANET's `tankstatus()` (hydstatus.c) shuts the one link whose flow would fill a full tank, so pump -> tank -> system pipes silences the pump at full
+level and the tank alone feeds the system (Tom: "Do we need a tee and an off-line tank"). The tank therefore hangs on a branch off a tee and never
+stands between the pump and the system. In Round 7 the tee and the tank are ordinary elements at points the user gives (Well with tank, below); the
+property holds: measured in both engines on a 10 L/s demand with the tank full, pump 0.0100000316 m3/s, branch 0; with the tank half full the branch
+takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 
 ### Sub-element sections and the graph (Tom, 2026-11-09; `assembly-sections-harness.js`, `assembly-sections-browser-harness.js`)
 
 - **The box:** the assembly's own entry area first (ID, Description, Tag, Elevation, Static water level elevation, the two curves, the
   pump's or valve's own inputs, Closed, Active, Explode), then one heading per sub-element from upstream to downstream, titled with its
-  kind and ID (Well: Reservoir W1R, Drawdown valve W1V, Junction W1U, Pump W1, Junction W1D, Virtual pipe W1B, Tank W1T; Pump+ and
+  kind and ID (Well: Reservoir W1R, Drawdown valve W1V, Junction W1D, Pump W1, Junction W1P; Pump+ and
   Valve+: Junction, Pump or Valve, Junction). Under each, the rows that element owns, from the ordinary box's own row functions
   (`junctionResultFields`, `linkResultFields`, `tankResultFields`, `reservoirResultFields`, `tankDepthFields`): its solved head,
   pressure, flow, velocity, head loss and status; the Tank's Base elevation, depths and diameter. Not collapsible: every edit rebuilds the box.
@@ -262,14 +254,57 @@ seven. Not done: Tom's wish for an exploded view of a selected assembly.
 
 ### Round 6 (Tom, 2026-11-11; `well-simple-harness.js`, `well-round6-browser-harness.js`)
 
-- **Two Well forms on the Pump button** (Pump, Pump+, Well, Well with tank). **Well** is the simple one: reservoir W1R, drawdown valve W1V, pump node W1U, pump W1, discharge node W1D; the pipes join D, which carries the ground elevation and the drawing. `;ASSEMBLY: well R U D V P`. **Well with tank** is the former Well (tee, virtual pipe, tank, Pump on below / Pump off above), unchanged apart from the fixes below. A Well has a tank only if its third node is one (`wellHasTank()`).
-- **The box:** the top holds every input (for the tank form the pump levels and the tank's base elevation, depths and diameter); each member's heading holds results only and always shows its rows, blank before a run.
-- **One label block per assembly**, on its output node, placed by the ordinary node pass (the assembly's own placer is retired). Headed by the assembly ID with the device's values; one row per other member that has values, led by that member's ID; rows shed first-to-last, the heading last. The popup opens beside it, not on it.
-- **Symbol:** symmetrical, smaller, pump below the drawdown level, ground line past the casing; no valve symbol.
+- **Two Well forms on the Pump button** (Pump, Pump+, Well, Well with tank). **Well** is the simple one (Slice 1 above gives its members and IDs after
+  Round 7). **Well with tank** was a one-point form here; Round 7 replaced it.
+- **The box:** the top holds every input; each member's heading holds results only and always shows its rows, blank before a run.
+- **One label block per assembly**, on its output node, placed by the ordinary node pass (the assembly's own placer is retired). Headed by the assembly
+  ID with the device's values; one row per other member that has values, led by that member's ID; rows shed first-to-last, the heading last. The
+  popup opens beside it, not on it. Round 7 states a Well's block exactly (below).
+- **Symbol:** symmetrical, ground line past the pit, no valve symbol; Round 7 redrew it from Tom's sketch.
 - **Controls editor** redraws when the Well writes or releases a control while it is open.
+
+### Round 7 (Tom, round 6 pass, from his round 6 browser pass; `well-simple-harness.js`, `well-label-rows-harness.js`, `well-tank-three-point-harness.js`, `assembly-morph-harness.js`)
+
+- **Well member IDs** (*"How about Reservoir R, Drawdown D, and Pump outlet P. In other words, W1, W1R, W1D, and W1P?"*): W1R reservoir, W1D the
+  drawdown node (was W1U), W1V the drawdown valve, W1 the pump, W1P the pump outlet (was W1D). Files before this keep their IDs; nothing is renamed on
+  import. The Explode tips are unchanged, in the words Tom approved.
+- **The label block** (his example: `W1 Z = 999', Q=99 gpm` / `W1R H=899'` / `W1D H= 799'` / `W1P H=1099', P=40 psi`): the heading is the ID with Z (the
+  outlet's ground elevation) and Q (the pump's flow), nothing else; W1R and W1D give H, W1P gives H and P; the drawdown valve has no row. The numbers are
+  the ordinary fields', so the label settings govern which show. Order of the two heading numbers: `WELL_HEADING_FIELDS` (Z then Q, as in his example;
+  he also asked *"Do we want to try to put Q first after the W1 ID?"*, so it is a one-word swap if he wants it).
+- **The Properties box:** flow once, above the headings (the pump's); pressure only under the outlet. The reservoir's Pressure row is gone too.
+- **The symbol** (his sketch of 2026-10-25, WELL): a ground line, a wide upper cylinder, a narrow deep cylinder with a closed bottom below it, the drawdown
+  curves meeting the narrow one above its bottom; the box at the bottom (it read as a pump) is gone. The upper cylinder's width is
+  `EC_WELL_UPPER_HALF` in `lib/Icons.lib.php`, one line; the map symbol's grab shape is derived from the icon's first path, so one number moves all.
+  He is asking colleagues whether it should be much narrower, only a little wider than the deep one.
+- **Well with tank is three points** (*"Physically and geographically, a well is a location/point with a reservoir, drawdown, and pump. Cramming a tank into
+  that point makes no sense"*): the Pump button cycles Pump, Pump+, Well, Well with tank. Three presses, each prompted in the status bar: the well
+  (placed as a Well is, spliced into a pipe or on open ground), the tee, the tank. The tee may be the well's own point (the pipe joining them is then a
+  virtual pipe), an existing junction, a point on a pipe (which splits it) or open ground; the tank an existing tank or open ground; a press on the wrong
+  kind of node is refused in the status bar and asked again. Result: an ordinary Well, an ordinary junction, an ordinary tank and two ordinary pipes with
+  lengths from the drawing (Auto), the whole act one Undo step. Escape or another tool stops it, leaving what is placed.
+  - **Grouping:** the Well's grouping gains `tee`, `tank` and `branch` [the two pipes]. They are ordinary elements at their own points: not coincident
+    members (clicking the tank selects the tank, a drag of the well moves the well), but the group knows them, so deleting or morphing any of them ends
+    the group, a rename follows, and `.inp` and the project file carry them. This is what keeps the pump's controls in one place: the Well's box asks Pump on
+    below / Pump off above once; the tank's own depths are on the tank's own box.
+  - **`.inp`:** `;ASSEMBLY: well R D P V W ON=3 OFF=6 TEE=x TANK=y PIPES=a,b`.
+  - **Old files:** a one-point Well with a tank (`well R U T D V P B`, or the earlier `well R S T V P`) opens as its elements, all kept, with its controls as
+    ordinary controls; the status bar (project file) or the import report (`.inp`, code `assembly-well-tank`) says so. The one-point form's code is gone.
+  - **Still open:** the pressure tank (Boyle's law; Tom's 2026-10-25 notes: total volume, pump-on and pump-off pressure, empty pressure). Only the
+    open-air tank is built.
+  - **The toolbar icon** for Well with tank is `ecWellTankIcon()` in `lib/Icons.lib.php`, one small function: the well at 0.62 below a ground line with a
+    tank standing above the line (Tom: the earlier drawing put the tank underground; proofs are with him).
+- **Morph** (*"I think we need to have on our checklist to ensure that Morph works with the + assemblies before we merge this."*): a Morph of ANY member
+  (nodes and links of Pump+, Valve+, Well and a Well with tank's tee, tank and pipes) first separates the group as Explode does, inside the Morph's own
+  undo step, then changes the type as for any element; the status bar says which group was separated; one Undo restores both. In a scenario the type
+  is an override as always and the group is separated for every scenario (the grouping belongs to the document). Morphing an ordinary element leaves every
+  group alone. Tried on every member into every other type, in Base and in a scenario (`assembly-morph-harness.js`, 287 checks).
+- **Merge checklist, before this branch goes to master:** Morph works with every + form (done, above); Pump+/Valve+/Well/Well with tank open and save
+  from old files (done); the pressure tank is not built (said in the public text, if any).
+- **The pump's selected circle** is unchanged (Tom wondered if it is "cartoonishly large"); its radius is in the round 7 report.
 
 ### Open, from Tom's 2026-11-11 notes
 
-- **Well with tank as a three-point form** (*"I envision that a well with tank will need three points specified by the user (well, tee (unless they are generally at the well head), and tank) and three associated symbols. It's a cross between an assembly and a wizard. It still knows that it's an assembly to simplify controls entry."*): well, tee, tank, three symbols, assembly plus wizard; well with open-air and with pressure tank. Not built.
+- **The pressure tank** for Well with tank (Boyle's law curve; total volume, pump-on and pump-off pressure, empty pressure; see Slice 2 above). The three-point form with an open-air tank is built (Round 7).
 - **Auto curve** (*"especially when there are no curves available, to offer 'Auto curve' that creates a reasonable curve given the nearby or project diameters"*), seeded from Jacob's s = BQ + CQ^2.
 - **Whether the Well's controls should be overridable by scenario** (*"Probably they should be [overridable by scenario], but do we currently have a controls alternative category? And what does WTG do?"*).

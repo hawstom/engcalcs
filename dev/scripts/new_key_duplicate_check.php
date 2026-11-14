@@ -36,7 +36,7 @@ $allow = [
     'lpn_inpup_i_rules'        => 'lowercase noun inside a sentence, not a heading',
     'lpn_tool_add_valveplus'   => 'Valve+ is a different tool from Valve: the valve with its two nodes (Task 822); the plus is the point',
     'lpn_tool_add_well'        => 'Well is a different tool from Pump: the well with its reservoir, drawdown valve, pump node and discharge node (Task 822)',
-    'lpn_tool_add_welltank'    => 'Well with tank is a different tool from Well: the same well pumping into a tee with a tank on a branch (Task 822)',
+    'lpn_tool_add_welltank'    => 'Well with tank is a different tool from Well: a well, a tee and a tank at three points the user gives (Task 822)',
     'lpn_tool_add_pumpplus'    => 'Pump+ is a different tool from Pump: the pump with its two nodes (Task 822); the plus is the point',
 ];
 
