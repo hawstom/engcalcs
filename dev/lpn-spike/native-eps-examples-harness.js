@@ -158,7 +158,7 @@ function withEnergyDoc(file, speed) {
 	const d = JSON.parse(speed ? withSpeedPattern(file) : fs.readFileSync(ROOT + 'examples/' + file, 'utf8'));
 	d.patterns = (d.patterns || []).concat([{ id: 'TARIFF', multipliers: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.4, 2, 2, 2, 1.4, 1, 0.8, 0.5] }]);
 	d.settings = d.settings || {};
-	d.settings.energy = { globalEfficiency: 70, globalPrice: 0.11, demandCharge: 7, globalPattern: 'TARIFF', effic: {} };
+	d.settings.energy = { globalEfficiency: 65, globalPrice: 0.11, demandCharge: 7, globalPattern: 'TARIFF', effic: {} };
 	d.curves = d.curves || [];
 	let first = true;
 	d.links.forEach((l) => {
@@ -189,7 +189,7 @@ async function compareEnergy(file, speed) {
 	const tr = await T.truth(EC, model);
 	const df = T.diff(nat.energy, tr.bin);
 	const rows = nat.energy ? nat.energy.pumps : [];
-	ok(label, df.good && rows.length === pumps.length && nat.energy.totalCostPerDay > 0 && nat.energy.demandCharge > 0 && rows.some((r) => r.usage > 0.05 && r.avgEfficiency > 0.2 && Math.abs(r.avgEfficiency - 0.7) > 1e-3),
+	ok(label, df.good && rows.length === pumps.length && nat.energy.totalCostPerDay > 0 && nat.energy.demandCharge > 0 && rows.some((r) => r.usage > 0.05 && r.avgEfficiency > 0.2 && Math.abs(r.avgEfficiency - 0.65) > 1e-3),
 		'worst gaps: usage ' + df.worst.usage.toExponential(1) + ', efficiency ' + df.worst.avgEfficiency.toExponential(1) + ', kWh/m3 ' + df.worst.kwhPerM3.toExponential(1) +
 		', avg kW ' + df.worst.avgKw.toExponential(1) + ', peak kW ' + df.worst.peakKw.toExponential(1) + ', cost ' + df.worst.costPerDay.toExponential(1) +
 		'  [' + rows.map((r) => r.id + ' ' + (r.usage * 100).toFixed(1) + '% ' + r.avgKw.toFixed(1) + ' kW ' + (r.avgEfficiency * 100).toFixed(1) + '%').join(', ') + '; demand ' + nat.energy.demandCharge.toFixed(1) + ']' + df.detail);
