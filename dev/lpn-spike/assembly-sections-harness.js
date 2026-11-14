@@ -3,8 +3,8 @@
 //
 // Task 822 (Tom, 2026-11-09: "add headings for the sub-assets"; "results areas for every subasset from upstream to downstream";
 // "we will need a way to ask 'Graph which sub-asset?'"). Covered:
-//   1. a Well's box: its entry area first, then one heading per sub-element, upstream to downstream, each titled with its kind and ID,
-//      the Tank's own inputs (Initial depth ... Tank diameter) under the Tank heading, and each element's results under its own;
+//   1. a Well's box: its entry area first, then the well's one Flow, then one heading per member, upstream to downstream, each titled with its kind
+//      and ID, results only, a pressure under the outlet alone;
 //   2. a Pump+ and a Valve+: Junction, Pump or Valve, Junction;
 //   3. the field is "Static water level elevation";
 //   4. the time series graph of an assembly: a "Graph which sub-asset?" chooser lists the members in order, opens on the pump, and choosing
@@ -119,16 +119,15 @@ function entryLabels() {
 }
 function network() {
 	const doc = fresh();
-	L.setMode('add-welltank'); press(200, 150);
+	L.setMode('add-well'); press(200, 150);
 	const j = L.addNode('junction', 600, 150); j._demand = 10;
 	const j2 = L.addNode('junction', 900, 150); j2._demand = 5;
-	const p1 = L.addLink('pipe', 'W1D', j.id, []), p2 = L.addLink('pipe', j.id, j2.id, []);
+	const p1 = L.addLink('pipe', 'W1P', j.id, []), p2 = L.addLink('pipe', j.id, j2.id, []);
 	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) });
 	doc.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
 	L.setProp(doc.links[0], 'curveId', 'DD1'); L.setProp(doc.links[1], 'curveId', 'PC1');
-	L.setProp(L.nodeById('W1T'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
-	L.setProp(L.nodeById('W1T'), 'maxLevel', 3); L.setProp(L.nodeById('W1T'), 'level', 1.5);
-	// A Pump+ spliced into the pipe from the Well's tee, and a Valve+ into the next one, so both carry flow.
+	L.setProp(L.nodeById('W1P'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
+	// A Pump+ spliced into the pipe from the Well's outlet, and a Valve+ into the next one, so both carry flow.
 	L.setMode('add-pumpplus'); press(400, 150, hitLink(p1.id));
 	L.setMode('add-valveplus'); press(750, 150, hitLink(p2.id));
 	return doc;
@@ -137,32 +136,25 @@ function network() {
 const doc = network();
 L.setMode('select');
 console.log('\n--- 1. the Well\'s box ---');
-L.openPopup('W1T', 10, 10);
+L.openPopup('W1P', 10, 10);
 let secs = sections();
 const titles = secs.map((s) => s.title);
-ok('seven headings, upstream to downstream, each a kind and an ID', JSON.stringify(titles) ===
-	JSON.stringify(['Reservoir W1R', 'Drawdown valve W1V', 'Junction W1U', 'Pump W1', 'Junction W1D', 'Virtual pipe W1B', 'Tank W1T']), JSON.stringify(titles));
+ok('five headings, upstream to downstream, each a kind and an ID', JSON.stringify(titles) ===
+	JSON.stringify(['Reservoir W1R', 'Drawdown valve W1V', 'Junction W1D', 'Pump W1', 'Junction W1P']), JSON.stringify(titles));
 const entry = entryLabels();
 console.log('        entry area: ' + entry.join(' | '));
 ok('the entry area comes first and holds the curves and the static level', entry.some((x) => /Static water level elevation/.test(x)) && entry.some((x) => /Drawdown curve/.test(x)) && entry.some((x) => /Pump head curve/.test(x)));
 ok('the field is named Static water level elevation', PC.lpn_field_well_static === 'Static water level elevation');
-// Tom, 2026-11-11: the top is the entry area and holds every input of the Well; the headings below hold results only.
-const ei = ['Pump on below', 'Pump off above', 'Base elevation', 'Initial depth', 'Minimum depth', 'Maximum depth', 'Tank diameter'].map((n) => entry.findIndex((x) => x.indexOf(n) === 0));
-ok('the entry area holds the pump levels and the tank\'s base elevation, depths and diameter, in that order', ei.every((i) => i >= 0) && ei.every((v, i) => i === 0 || v > ei[i - 1]), entry.join(' | '));
-const tank = secs.find((s) => s.title === 'Tank W1T');
-ok('the Tank section holds results only: Head, Pressure, Depth, Available volume', !tank.labels.some((x) => /Initial depth|Minimum depth|Maximum depth|Tank diameter|Base elevation/.test(x)) && ['Head', 'Pressure', 'Depth', 'Available volume'].every((n) => tank.labels.some((x) => x.indexOf(n) === 0)), tank.labels.join(' | '));
-console.log('        tank section: ' + tank.labels.join(' | '));
+ok('the one Flow follows the entry area, once', entry.filter((x) => /^Flow/.test(x)).length === 1);
 L.runSolve();
 await until(() => L.getDoc() && true, 50);
 await wait(1500);
-L.openPopup('W1T', 10, 10);
+L.openPopup('W1P', 10, 10);
 secs = sections();
 const by = (t) => secs.find((s) => s.title === t);
 console.log('        solved: ' + secs.map((s) => s.title + ' [' + s.labels.join('; ') + ']').join('\n                '));
-ok('the junctions show Head and Pressure', ['Junction W1U', 'Junction W1D'].every((t) => by(t).labels.some((x) => /^Head/.test(x)) && by(t).labels.some((x) => /^Pressure/.test(x))));
-ok('the Pump shows Flow and Head, and the Virtual pipe its Flow', by('Pump W1').labels.some((x) => /^Flow/.test(x)) && by('Pump W1').labels.some((x) => /^Head/.test(x)) && by('Virtual pipe W1B').labels.some((x) => /^Flow/.test(x)));
-ok('the Drawdown valve shows its Flow', by('Drawdown valve W1V').labels.some((x) => /^Flow/.test(x)));
-ok('the Tank shows Head, Pressure, Depth and Available volume', ['Head', 'Pressure', 'Depth', 'Available volume'].every((n) => by('Tank W1T').labels.some((x) => x.indexOf(n) === 0)));
+ok('Junction W1P shows Head and Pressure; W1D shows Head alone', by('Junction W1P').labels.some((x) => /^Head/.test(x)) && by('Junction W1P').labels.some((x) => /^Pressure/.test(x)) && by('Junction W1D').labels.some((x) => /^Head/.test(x)) && !by('Junction W1D').labels.some((x) => /^Pressure/.test(x)));
+ok('the Pump shows Head and its Status, no Flow; the Drawdown valve no Flow', by('Pump W1').labels.some((x) => /^Head/.test(x)) && !by('Pump W1').labels.some((x) => /^Flow/.test(x)) && !by('Drawdown valve W1V').labels.some((x) => /^Flow/.test(x)));
 
 console.log('\n--- 2. Pump+ and Valve+ ---');
 L.openPopup('P1U', 10, 10);
@@ -185,22 +177,22 @@ L.runSolve();
 EC.lpnTimeRunNow();
 const ran = await until(() => EC.lpnTimeRunState().frames > 0, 90000);
 ok('the extended period run finished', ran, JSON.stringify(EC.lpnTimeRunState()));
-L.openPopup('W1T', 10, 10);
+L.openPopup('W1P', 10, 10);
 const g = byId.lpn_popup_graph;
 const gsel = (id) => { let r = null; walk(g, (e) => { if (e.id === id) { r = e; } }); return r; };
 const which = gsel('lpn_pgraph_member');
 ok('the Well\'s graph has a "Graph which sub-asset?" chooser', !!which && PC.lpn_pgraph_which === 'Graph which sub-asset?');
 const opts = which ? (which.children || which.childNodes).map((o) => o.textContent) : [];
-ok('it lists the seven members upstream to downstream', JSON.stringify(opts) === JSON.stringify(['Reservoir W1R', 'Drawdown valve W1V', 'Junction W1U', 'Pump W1', 'Junction W1D', 'Virtual pipe W1B', 'Tank W1T']), JSON.stringify(opts));
+ok('it lists the five members upstream to downstream', JSON.stringify(opts) === JSON.stringify(['Reservoir W1R', 'Drawdown valve W1V', 'Junction W1D', 'Pump W1', 'Junction W1P']), JSON.stringify(opts));
 ok('it opens on the pump', which && which.value === 'link:W1', which && which.value);
 const chartIds = () => { const ids = []; walk(g, (e) => { if (e.tagName === 'text' || e.nodeType === 3) { ids.push(String(e.textContent || '')); } }); return ids.join(' | '); };
 const fieldOpts1 = (gsel('lpn_pgraph_field').children || gsel('lpn_pgraph_field').childNodes).map((o) => o.value);
 ok('the pump offers pump results (flow, head)', fieldOpts1.indexOf('flow') >= 0);
-which.value = 'node:W1T'; ((which._listeners || {}).change || []).forEach((f) => f({ type: 'change', target: which }));
+which.value = 'node:W1P'; ((which._listeners || {}).change || []).forEach((f) => f({ type: 'change', target: which }));
 const fieldOpts2 = (gsel('lpn_pgraph_field').children || gsel('lpn_pgraph_field').childNodes).map((o) => o.value);
-ok('choosing the Tank redraws with the tank\'s own quantities', fieldOpts2.indexOf('level') >= 0 || fieldOpts2.indexOf('volume') >= 0 || fieldOpts2.indexOf('head') >= 0, JSON.stringify(fieldOpts2));
+ok('choosing the outlet redraws with a junction\'s own quantities', fieldOpts2.indexOf('pressure') >= 0 || fieldOpts2.indexOf('head') >= 0, JSON.stringify(fieldOpts2));
 ok('and the choice differs from the pump\'s list', JSON.stringify(fieldOpts1) !== JSON.stringify(fieldOpts2), JSON.stringify([fieldOpts1, fieldOpts2]));
-ok('the chosen member is remembered for the session on re-open', (L.closePopup(), L.openPopup('W1T', 10, 10), gsel('lpn_pgraph_member').value === 'node:W1T'));
+ok('the chosen member is remembered for the session on re-open', (L.closePopup(), L.openPopup('W1P', 10, 10), gsel('lpn_pgraph_member').value === 'node:W1P'));
 L.openPopup('P1U', 10, 10);
 const w2 = gsel('lpn_pgraph_member');
 ok('a Pump+ lists Junction, Pump, Junction and opens on the pump', !!w2 && w2.value === 'link:P1' && (w2.children || w2.childNodes).length === 3);

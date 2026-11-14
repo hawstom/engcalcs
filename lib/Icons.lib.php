@@ -45,6 +45,27 @@
 define('EC_ICON_OPEN_TAG', '<svg class="ec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
 	. ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">');
 
+// **THE WELL'S UPPER CYLINDER IS ONE NUMBER** (Tom, 2026-11-12: colleagues are being asked whether it should be much narrower, only a little wider
+// than the deep cylinder). Half its width in the 24-unit frame, either side of the centre line at x = 12; the deep cylinder is 1.5 either side.
+// A change here changes the toolbar icon, the map symbol and its grab shape, which JS derives from the icon's first path (wellSilhouette()).
+define('EC_WELL_UPPER_HALF', 5);
+
+// **THE WELL'S DRAWING** (Tom's sketch of 2026-10-25, WELL, and his 2026-11-12 notes): a ground line across the top that runs past the pit on both
+// sides; a wide upper cylinder; below it a narrow, deep cylinder with a closed bottom; the drawdown curves, which fall from the ground line's
+// ends to meet the narrow cylinder above its bottom. Two holes are drilled and nothing is wider at the bottom. The FIRST path is the outline of the
+// two cylinders: JS closes it for the symbol's backdrop and grab shape.
+function ecWellDrawing() {
+	$l = 12 - EC_WELL_UPPER_HALF; $r = 12 + EC_WELL_UPPER_HALF;
+	return '<path d="M' . $l . ' 4V11H10.5V21.5H13.5V11H' . $r . 'V4"/><path d="M2 4H22"/>'
+		. '<path d="M2 13C6 13 9.3 14.2 10.5 18M22 13C18 13 14.7 14.2 13.5 18"/>';
+}
+// **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (Tom, 2026-11-12: the earlier one drew the tank underground):
+// the well's drawing at 0.62 hanging from a ground line, with a tank standing ABOVE that line beside it. Strokes keep their width.
+function ecWellTankIcon() {
+	$well = str_replace('<path ', '<path vector-effect="non-scaling-stroke" ', ecWellDrawing());
+	return '<g transform="translate(-0.74 8.52) scale(.62)">' . $well . '</g><path d="M0.5 11H23.5"/><path d="M15 4H22V11H15Z"/>';
+}
+
 $ec_icons = array(
 
 	// ---- Menu bar ----
@@ -246,14 +267,10 @@ $ec_icons = array(
 	'chain'      => '<circle cx="5.75" cy="5.75" r="4.25"/><path d="M8.8 8.8L15.2 15.2" stroke-dasharray="2.2 1.9" stroke-linecap="butt"/><circle cx="18.25" cy="18.25" r="4.25" stroke-dasharray="2.4 2" stroke-linecap="butt"/>',
 	// **VIRTUAL PIPE** (Task 822; Tom's sketch, 2026-10-25): the pipe icon's two end ticks with the run dotted.
 	'virtual'    => '<path d="M5 12H19" stroke-linecap="butt" stroke-dasharray="1.2 2.4"/><path d="M5 7.5V16.5M19 7.5V16.5"/>',
-	// **PUMP+** (same sketch): the pump with a small plus on its outlet, which marks the assembly form.
-	// **WELL** (Tom's sketch, 2026-10-25): the ground line across the top, a casing that steps in to a slim pipe running down, and the
-	// drawdown curve dipping to the pipe from both sides. One drawing, which is also the Well's map symbol.
-	// Symmetrical about the pipe; the ground line runs past the casing on both sides; the pump stands at the bottom of the pipe, below the
-	// drawdown curves, which meet the pipe above it (Tom, 2026-11-11, from the same sketch).
-	'well'       => '<path d="M2 4H22"/><path d="M7 4V11H10.5V17"/><path d="M17 4V11H13.5V17"/><path d="M9 17H15V22H9Z"/><path d="M2 13C6 13 9.3 13.8 10.5 15.8M22 13C18 13 14.7 13.8 13.5 15.8"/>',
-	// **WELL WITH TANK**: the well's drawing at 0.62 beside a small tank, the two joined at the ground (strokes keep their width).
-	'welltank'   => '<g transform="translate(0 2.5) scale(.62)"><path vector-effect="non-scaling-stroke" d="M2 4H22"/><path vector-effect="non-scaling-stroke" d="M7 4V11H10.5V17"/><path vector-effect="non-scaling-stroke" d="M17 4V11H13.5V17"/><path vector-effect="non-scaling-stroke" d="M9 17H15V22H9Z"/><path vector-effect="non-scaling-stroke" d="M2 13C6 13 9.3 13.8 10.5 15.8M22 13C18 13 14.7 13.8 13.5 15.8"/></g><path d="M16 9H22V16H16Z"/><path d="M13.5 5H19V9"/>',
+	// **WELL**: see ecWellDrawing(). One drawing, which is also the Well's map symbol. Symmetrical; the ground line runs past the pit on both sides.
+	'well'       => ecWellDrawing(),
+	// **WELL WITH TANK**: see ecWellTankIcon().
+	'welltank'   => ecWellTankIcon(),
 	'valveplus'  => '<path d="M3 3v18l9-9z"/><path d="M21 3v18l-9-9z"/><path d="M19 0V10M14 5H24"/>',
 	'pumpplus'   => '<path d="M9 7H22.5V13H15A6 6 0 1 1 9 7Z"/><path d="M19 0V10M14 5H24"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',

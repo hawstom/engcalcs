@@ -422,12 +422,14 @@
 				if (gm) {
 					var gt = gm[2].split(/\s+/).filter(Boolean), gOpt = {};
 					// `ON=3 OFF=6` after a well's ids: the pump-on and pump-off tank depths its two controls were written from.
-					gt = gt.filter(function (tk) { var kv = /^(ON|OFF)=(.+)$/i.exec(tk); if (kv) { gOpt[kv[1].toLowerCase()] = kv[2]; return false; } return true; });
+					// `TEE=` `TANK=` `PIPES=a,b` after a Well with tank's ids: its tee, its tank and the two pipes between them (Round 7).
+					gt = gt.filter(function (tk) { var kv = /^(ON|OFF|TEE|TANK|PIPES)=(.+)$/i.exec(tk); if (kv) { gOpt[kv[1].toLowerCase()] = kv[2]; return false; } return true; });
 					if (gm[1].toUpperCase() === 'VIRTUAL') { markVirtual = markVirtual.concat(gt); }
 					else if (gt[0].toLowerCase() === 'well') {
-						// `;ASSEMBLY: well R U D V P` is the simple Well: groundwater reservoir, pump node, discharge node, drawdown valve, pump.
-						// `;ASSEMBLY: well R S T D G P B`: reservoir, pump's upstream node, tank, tee, drawdown valve, pump, virtual pipe to the tank.
-						// A slice-1 well, `well R S T G P` (no tee), is still read. Anything else is not one.
+						// `;ASSEMBLY: well R D P V W` is the Well: groundwater reservoir, drawdown node, pump outlet, drawdown valve, pump. A Well with tank
+						// adds `TEE=x TANK=y PIPES=a,b`. Two older forms put the tank at the Well's own point and are read as their elements, with a
+						// report: `well R S T D G P B` (reservoir, pump's upstream node, tank, tee, drawdown valve, pump, virtual pipe) and the
+						// earlier `well R S T G P` (no tee). Anything else is not one.
 						if (gt.length === 6) { markAssemblies.push({ kind: 'well', nodes: gt.slice(1, 4), links: gt.slice(4), opt: gOpt }); }
 						else if (gt.length === 8) { markAssemblies.push({ kind: 'well', nodes: gt.slice(1, 5), links: gt.slice(5), opt: gOpt }); }
 					}
@@ -1384,15 +1386,24 @@
 		// A pipe named by `;VIRTUAL:` comes back virtual; an assembly comes back only if every element it
 		// names is in the file as the right kind. One that is not is reported, never half-restored.
 		markVirtual.forEach(function (vid) { if (linkIndex[vid] && linkIndex[vid].type === 'pipe') { linkIndex[vid].virtual = true; } });
-		var assemblies = [], assemblyBad = [];
+		var assemblies = [], assemblyBad = [], wellTankOld = [];
 		markAssemblies.forEach(function (a) {
-			var un, dn, wn, good;
+			var un, dn, wn, good, w, pipes, opt;
 			if (a.kind === 'well') {
 				wn = a.nodes.map(function (id) { return nodeIndex[id]; });
-				// A simple Well (no tank) is R, U, D: three nodes, the third a junction. Else the third is the tank.
+				// A Well is R, D, P: a reservoir and two junctions. When the third is a tank the file is a one-point Well with a tank, a form that is no
+				// longer made: every element is kept and none is grouped, and it is reported.
 				if (wn[0] && wn[1] && wn[2] && wn[0].type === 'reservoir' && wn[1].type === 'junction' && (wn[2].type === 'tank' ? (a.nodes.length < 4 || (wn[3] && wn[3].type === 'junction')) : (wn[2].type === 'junction' && a.nodes.length === 3)) &&
 					a.links.every(function (id) { return !!linkIndex[id]; })) {
-					assemblies.push({ id: a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: true, _opt: a.opt });
+					if (wn[2].type === 'tank') { wellTankOld.push(a.links[1]); return; }
+					opt = a.opt || {};
+					w = { id: a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: true, _opt: opt };
+					pipes = String(opt.pipes || '').split(',');
+					if (nodeIndex[opt.tee] && nodeIndex[opt.tee].type === 'junction' && nodeIndex[opt.tank] && nodeIndex[opt.tank].type === 'tank' && pipes.length === 2 &&
+						pipes.every(function (id) { return !!linkIndex[id]; })) {
+						w.tee = opt.tee; w.tank = opt.tank; w.branch = pipes;
+					}
+					assemblies.push(w);
 				} else { assemblyBad.push(a.links[0]); }
 				return;
 			}
@@ -1402,6 +1413,7 @@
 			else { assemblyBad.push(a.links[0]); }
 		});
 		if (assemblyBad.length) { drop('assembly-unresolved', assemblyBad, null, 'link'); }
+		if (wellTankOld.length) { drop('assembly-well-tank', wellTankOld, null, 'link'); }
 
 		if (activeValveIds.length) { drop('valve-active', activeValveIds, null, 'link'); }
 
@@ -1473,8 +1485,8 @@
 		// ABOVE off) for that pump and tank. A control edited by hand, or gone, leaves the well without that level and the control an
 		// ordinary one, so the file always opens.
 		assemblies.forEach(function (a) {
-			var opt = a._opt, tank = a.nodes && a.nodes[2], pump = a.links[1];
-			if (a.kind === 'well' && nodeIndex[tank] && nodeIndex[tank].type !== 'tank') { opt = null; }
+			var opt = a._opt, tank = a.tank, pump = a.links[1];
+			if (a.kind === 'well' && !(nodeIndex[tank] && nodeIndex[tank].type === 'tank')) { opt = null; }
 			delete a._opt;
 			if (!opt || a.kind !== 'well') { return; }
 			[['on', 'open', 'below', 'pumpOn'], ['off', 'closed', 'above', 'pumpOff']].forEach(function (k) {
@@ -3758,11 +3770,12 @@
 			doc.links.forEach(function (l2) { if (!offLink[l2.id]) { live[l2.id] = 1; } });
 			if (virtualIds.length) { out += ';VIRTUAL: ' + virtualIds.join(' ') + '\n'; }
 			(doc.assemblies || []).forEach(function (a) {
-				var ends = a && a.kind === 'well' ? a.nodes : a && [a.up, a.down];
+				var ends = a && a.kind === 'well' ? a.nodes : a && [a.up, a.down], tail = a && a.kind === 'well' && a.tank && a.tee && a.branch ? [a.tee, a.tank].concat(a.branch) : [];
 				if (!a || !ends || !ends.every(Boolean) || !a.links || !a.links.length) { return; }
-				if (ends.some(function (id) { return omitted[id]; }) || !a.links.every(function (id) { return live[id]; })) { return; }
+				if (ends.concat(tail.slice(0, 2)).some(function (id) { return omitted[id]; }) || !a.links.concat(tail.slice(2)).every(function (id) { return live[id]; })) { return; }
 				out += ';ASSEMBLY: ' + [a.kind || 'pump'].concat(ends, a.links).join(' ') +
-					(a.kind === 'well' && wellOwns(a, 'open') ? ' ON=' + a.pumpOn : '') + (a.kind === 'well' && wellOwns(a, 'closed') ? ' OFF=' + a.pumpOff : '') + '\n';
+					(a.kind === 'well' && wellOwns(a, 'open') ? ' ON=' + a.pumpOn : '') + (a.kind === 'well' && wellOwns(a, 'closed') ? ' OFF=' + a.pumpOff : '') +
+					(tail.length ? ' TEE=' + tail[0] + ' TANK=' + tail[1] + ' PIPES=' + tail[2] + ',' + tail[3] : '') + '\n';
 			});
 			return out ? out + '\n' : '';
 		}

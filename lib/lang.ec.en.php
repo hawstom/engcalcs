@@ -662,8 +662,12 @@ $ec_lang['lpn_tool_add_well']='Well';
 $ec_lang['lpn_tool_add_well_tip']='Add a well: its groundwater reservoir, drawdown valve, pump node, pump, and discharge node at one point. Specify a point on the map, or specify a pipe to split it and put the well in it.';
 $ec_lang['lpn_mode_add_well']='Mode: Add Well. Specify a point on the map to add a well with its groundwater reservoir, drawdown valve, pump node, pump, and discharge node, or specify a pipe to split it and put the well in it. Press Escape or switch to Select mode to stop.';
 $ec_lang['lpn_tool_add_welltank']='Well with tank';
-$ec_lang['lpn_tool_add_welltank_tip']='Add a well that pumps into a tee with a tank on a branch: its groundwater reservoir, drawdown valve, pump node, pump, tee, virtual pipe, and tank at one point. Specify a point on the map, or specify a pipe to split it and put the well in it.';
-$ec_lang['lpn_mode_add_welltank']='Mode: Add Well with tank. Specify a point on the map to add a well with its tee and tank, or specify a pipe to split it and put the well in it. Press Escape or switch to Select mode to stop.';
+$ec_lang['lpn_tool_add_welltank_tip']='Add a well with a tank: a well, a tee, and a tank, each at a point you specify, joined by pipes. The well\'s pump can be controlled by the tank level. Specify the well first, on the map or on a pipe to split it, then the tee, then the tank.';
+$ec_lang['lpn_mode_add_welltank']='Mode: Add Well with tank. Specify a point on the map for the well, or specify a pipe to split it and put the well in it. Then specify the tee and the tank. Press Escape or switch to Select mode to stop.';
+$ec_lang['lpn_welltank_tee_prompt']='Now specify the tee: a junction, a point on a pipe, or the well\'s own point. Press Escape to stop with the well alone.';
+$ec_lang['lpn_welltank_tank_prompt']='Now specify the tank: a tank or a point on the map. Press Escape to stop with the well and its tee.';
+$ec_lang['lpn_welltank_tee_refused']='The tee must be a junction that is not part of another assembly. Specify the tee again.';
+$ec_lang['lpn_welltank_tank_refused']='The tank must be a tank that is not part of another assembly. Specify the tank again.';
 $ec_lang['lpn_field_well_static']='Static water level elevation';
 $ec_lang['lpn_field_well_static_tip']='Elevation of the static water level, the groundwater surface with the pump off. The groundwater reservoir and the pump node stand at this elevation.';
 $ec_lang['lpn_well_drawdown_valve']='Drawdown valve';
@@ -1794,6 +1798,7 @@ $ec_lang['lpn_morph_vertex_done']='Morphed {n} into vertices. At each, the two p
 // {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
 // when a node type was chosen), separated by commas.
 $ec_lang['lpn_morph_other_kind']='A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}';
+$ec_lang['lpn_morph_exploded']='Morph separated {ids} into ordinary elements, as Explode does. Undo restores it.';
 // The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
 // scenario, beside the override marker.
 $ec_lang['lpn_field_type_tip']='The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario\'s type.';
@@ -2479,6 +2484,7 @@ $ec_lang['lpn_inp_drop_patterns']='This page did not read the demand patterns, b
 $ec_lang['lpn_inp_drop_demand_pattern']='These junctions have demands that vary over the run. Their patterns were imported in full, and the demand shown is the value at the time on the clock.';
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept, it is being solved, and each of them shows it in the Emitter coefficient box in its properties.';
 $ec_lang['lpn_inp_drop_assembly']='The file groups these pumps with nodes it does not contain, so the group was not restored. The nodes and pumps that are there came in as plain elements.';
+$ec_lang['lpn_inp_drop_well_tank']='These are one-point wells with a tank, a form this page no longer draws. Their reservoir, drawdown valve, pump, tee, virtual pipe, and tank are kept as ordinary elements, and their pump controls as ordinary controls.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
 $ec_lang['lpn_inp_drop_curve_missing']='This pump refers to a curve that is not in the file. The pump was imported without a curve, so it adds no head.';
 $ec_lang['lpn_inp_drop_pump_other']='This pump is described by the power it draws, rather than by a curve. It was imported without a curve, so it adds no head.';

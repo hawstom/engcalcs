@@ -2,13 +2,14 @@
 //   node dev/lpn-spike/well-tee-harness.js
 //
 // Task 822 (Mary, 2026-11-09, from EPANET's hydstatus.c tankstatus(): a link whose flow fills a full tank is
-// temporarily closed; Tom: "Do we need a tee and an off-line tank"). The pump discharges to a tee node D; the system's
-// pipes join D; the tank T hangs on a virtual pipe from D. Covered, in BOTH engines:
+// temporarily closed; Tom: "Do we need a tee and an off-line tank"). Round 7 makes the Well with tank three points: the pump discharges to the
+// well's outlet P, a pipe runs to a tee, and a pipe runs from the tee to the tank. The system's pipes join the outlet or the tee; the tank
+// hangs on its branch. Covered, in BOTH engines, on the well, tee and tank stood at one point (the two pipes virtual):
 //   1. with the tank full and the pump able to lift above it, the pump still delivers the system demand (flow > 0) and
 //      the tank's branch carries nothing;
-//   2. with the tank half full the branch carries the surplus and the pump pumps more than the demand;
-//   3. a slice-1 well (three nodes, `;ASSEMBLY: well R S T G P`) still opens, and the new form round-trips.
-// The expected numbers are EPANET's own, from running this network (EXPECT below).
+//   2. with the tank half full the branch carries the surplus and the pump pumps more than the demand.
+// The expected numbers are EPANET's own, from running this network (EXPECT below), and are the numbers the one-point form gave: the topology is
+// the same. The old one-point form's files are covered by well-tank-three-point-harness.js, section 7.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -97,18 +98,24 @@ function network(level) {
 	const doc = fresh();
 	L.setMode('add-welltank');
 	press(200, 150);
+	press(200, 150, hitNode('W1P'));   // the tee on the well's own point: a virtual pipe
+	press(400, 150);                  // the tank, 200 away; its pipe is made virtual below, so the numbers are the one-point form's
+	const a = doc.assemblies[0];
+	L.linkById(a.branch[1]).virtual = true;
 	const j = L.addNode('junction', 600, 150);
 	j._demand = 10;
-	L.addLink('pipe', 'W1D', j.id, []);
+	L.addLink('pipe', 'W1P', j.id, []);
 	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) });
 	doc.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
 	L.setProp(doc.links[0], 'curveId', 'DD1');
 	L.setProp(doc.links[1], 'curveId', 'PC1');
-	L.setProp(L.nodeById('W1T'), 'elev', 150);
+	L.setProp(L.nodeById('W1P'), 'elev', 150);
+	L.setProp(L.nodeById(a.tee), 'elev', 150);
+	L.setProp(L.nodeById(a.tank), 'elev', 150);
 	L.setProp(L.nodeById('W1R'), 'elev', 120);
-	L.setProp(L.nodeById('W1T'), 'minLevel', 0);
-	L.setProp(L.nodeById('W1T'), 'maxLevel', 3);
-	L.setProp(L.nodeById('W1T'), 'level', level);
+	L.setProp(L.nodeById(a.tank), 'minLevel', 0);
+	L.setProp(L.nodeById(a.tank), 'maxLevel', 3);
+	L.setProp(L.nodeById(a.tank), 'level', level);
 	return doc;
 }
 // EXPECT: filled from EPANET (m3/s). Full tank: pump 0.010, branch 0. Half full: tank head 151.5, pump above the demand.
@@ -121,9 +128,9 @@ for (const [label, level] of [['full', 3], ['half full', 1.5]]) {
 	const model = L.currentModel();
 	const eng = [['built-in', EC.lpnSolve(model)], ['EPANET', await EC.lpnSolveEpanet(model, { moduleUrl: NODE_ENGINE_URL })]];
 	for (const [nm, r] of eng) {
-		const q = r.flows.W1, qb = r.flows.W1B, ex = EXPECT[label];
+		const a = doc.assemblies[0], q = r.flows.W1, qb = r.flows[a.branch[1]], ex = EXPECT[label];
 		ok(nm + ': solved and converged', r.ok && r.converged, JSON.stringify(r.engineError || r.issues || ''));
-		console.log('        ' + nm + ': pump ' + q + ', branch ' + qb + ', tee ' + r.heads.W1D + ', tank ' + r.heads.W1T);
+		console.log('        ' + nm + ': pump ' + q + ', branch ' + qb + ', tee ' + r.heads[a.tee] + ', tank ' + r.heads[a.tank]);
 		if (level === 3) {
 			ok(nm + ': the pump still delivers the system demand through a full tank', q > 0 && Math.abs(q - 0.010) <= 1e-7, q);
 			ok(nm + ': the full tank\'s branch carries nothing', Math.abs(qb) <= 1e-9, qb);
@@ -135,29 +142,6 @@ for (const [label, level] of [['full', 3], ['half full', 1.5]]) {
 			ok(nm + ': branch flow equals EPANET\'s ' + ex.branch, Math.abs(qb - ex.branch) <= 5e-6, qb);
 		}
 	}
-}
-
-console.log('\n--- a slice-1 well, with no tee, still opens and works ---');
-{
-	const doc = network(1.5);
-	// Rebuild the old five-member form from the new one: the pipe joins the tank, no tee, no branch.
-	const old = JSON.parse(JSON.stringify(L.serializeProject()));
-	old.assemblies = [{ id: 'W1', kind: 'well', nodes: ['W1R', 'W1U', 'W1T'], links: ['W1V', 'W1'] }];
-	old.nodes = old.nodes.filter((n) => n.id !== 'W1D');
-	old.links = old.links.filter((l) => l.id !== 'W1B');
-	old.links.forEach((l) => { if (l.to === 'W1D') { l.to = 'W1T'; } if (l.from === 'W1D') { l.from = 'W1T'; } });
-	L.applySaved(L.migrateSaved(old)); L.buildDom();
-	const d2 = L.getDoc();
-	ok('opened: one well of three nodes and two links', d2.assemblies.length === 1 && d2.assemblies[0].nodes.length === 3 && d2.assemblies[0].links.length === 2, JSON.stringify(d2.assemblies));
-	const inp = EC.lpnExportInp(L.serializeProject(), {}).inp;
-	ok('its comment is the five-member line', /^;ASSEMBLY: well W1R W1U W1T W1V W1$/m.test(inp), (inp.match(/^;ASSEMBLY.*$/m) || [''])[0]);
-	const parsed = EC.lpnInpParse(inp);
-	ok('and reads back as a three-node well', parsed.assemblies.length === 1 && parsed.assemblies[0].nodes.length === 3 && !(parsed.dropped || []).some((d) => d.code === 'assembly-unresolved'));
-	ok('a pipe on a slice-1 well joins the tank', L.getDoc().links.some((l) => l.type === 'pipe' && (l.from === 'W1T' || l.to === 'W1T')));
-	const r = EC.lpnSolve(L.currentModel());
-	ok('it solves', r.ok && r.converged);
-	const e = EC.lpnExportInp(L.serializeProject(), {});
-	void e;
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));
