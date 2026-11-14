@@ -38,16 +38,10 @@
 
 	/**
 	 * Build a pattern record. `multipliers` is copied, so the record does not alias the caller's
-	 * array, and a caller appending a second [PATTERNS] line uses lpnPatternAppend below.
+	 * array.
 	 */
 	EC.lpnPatternMake = function (id, multipliers) {
 		return { id: String(id), multipliers: (multipliers || []).slice() };
-	};
-
-	EC.lpnPatternAppend = function (pattern, multipliers) {
-		var i;
-		for (i = 0; i < multipliers.length; i++) { pattern.multipliers.push(multipliers[i]); }
-		return pattern;
 	};
 
 	/**
@@ -102,20 +96,6 @@
 		i = EC.lpnPatternIndex(mult.length, t, patternStep, patternStart);
 		if (i < 0) { return 1; }
 		return isFinite(mult[i]) ? mult[i] : 1;
-	};
-
-	/**
-	 * The same question asked of a whole table at once: id -> multiplier at `t`.
-	 * `patterns` is an array of pattern records. A caller holding a base demand and a pattern id
-	 * multiplies; nothing here knows what the multiplier is FOR, which is why the same function
-	 * serves a demand, a reservoir head, a pump speed and a price.
-	 */
-	EC.lpnPatternValuesAt = function (patterns, t, patternStep, patternStart) {
-		var out = {}, i;
-		for (i = 0; i < (patterns || []).length; i++) {
-			out[patterns[i].id] = EC.lpnPatternValue(patterns[i], t, patternStep, patternStart);
-		}
-		return out;
 	};
 
 	EC.lpnPatternById = function (patterns, id) {

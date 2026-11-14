@@ -244,7 +244,7 @@ if (BLIND && process.env.LPN_SEAM_OVERRIDE === '1') {
 		ok('Presentation: the scenario\'s map differs (text size and a head label)', own.map !== plain.map);
 		ok('...its labels legend names the head field it turned on', own.legends !== plain.legends);
 		ok('Calculation: the scenario solves to its own accuracy', own.accuracy === 1e-4 && plain.accuracy !== 1e-4, own.accuracy + ' vs ' + plain.accuracy);
-		ok('...with its own viscosity in the solver\'s model', JSON.parse(own.model).visc === 1.007e-6 * 2 && JSON.parse(plain.model).visc !== JSON.parse(own.model).visc);
+		ok('...with its own viscosity in the solver\'s model', JSON.parse(own.model).visc === EngCalcs.EPANET_VISCOS * 2 && JSON.parse(plain.model).visc !== JSON.parse(own.model).visc);
 		ok('...under its own friction method, which the solver is handed', JSON.parse(own.model).method === 'dw' && JSON.parse(plain.model).method === 'hw');
 		ok('...and the answer differs', own.solve !== plain.solve);
 		const optLine = (inp, re) => (inp.split('\n').filter((l) => re.test(l))[0] || '').trim();
