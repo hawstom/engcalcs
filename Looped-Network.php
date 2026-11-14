@@ -3618,6 +3618,7 @@ EngCalcs.pageConfig = {
 	lpn_menu_project: <?=json_encode($ec_lang['lpn_menu_project'])?>,
 	lpn_morph_other_kind: <?=json_encode($ec_lang['lpn_morph_other_kind'])?>,
 	lpn_morph_exploded: <?=json_encode($ec_lang['lpn_morph_exploded'])?>,
+	lpn_assembly_exploded: <?=json_encode($ec_lang['lpn_assembly_exploded'])?>,
 	lpn_field_type_tip: <?=json_encode($ec_lang['lpn_field_type_tip'])?>,
 	lpn_morph_menu: <?=json_encode($ec_lang['lpn_morph_menu'])?>,
 	lpn_morph_tip: <?=json_encode($ec_lang['lpn_morph_tip'])?>,

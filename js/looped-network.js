@@ -3004,6 +3004,9 @@ var EngCalcs = EngCalcs || {};
 		placed.forEach(function (r) {
 			var n = nodeOf[r.id], ne = n && nodeEls[n.id];
 			if (!ne || ne.empty || !ne.allLines || ne.allLines.length < 2 || !byId[r.id]) { return; }
+			// **AN ASSEMBLY'S BLOCK IS ALWAYS ROWS** (Round 7; Tom's example block: a heading, then one row per member). It is never folded into a line,
+			// whether the stack lost a row (it sheds rows instead) or the line only ties with it.
+			if (assemblyBlockLines(ne.allLines)) { return; }
 			if (r.dropped || (ne.lines && ne.lines.length < ne.allLines.length)) { cand.push({ id: r.id, n: n, ne: ne }); }
 			else if (LPN_TIE_LINE && !ne.inline && n.lx === undefined) { cand.push({ id: r.id, n: n, ne: ne, tie: true }); }
 		});
@@ -40672,6 +40675,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// member's ID so a reader can tell whose value it is. Every other member's label is empty, so nothing else is drawn or placed.
 	// A member that would show only an ID adds no row. The ID is a member's tag, so it is shown whether or not the settings show IDs.
 	var assemblyBlockBuilding = false;
+	// Are these label lines an assembly's block (their rows carry a shed rank, which an ordinary node's lines never do)?
+	function assemblyBlockLines(lines) { return !!(lines && lines.length && lines[0] && lines[0].shedRank !== undefined); }
 	function assemblyLabelBlock(e, group, ls, extrema) {
 		var a, lines = [], any = false, order, sep;
 		if (assemblyBlockBuilding || !doc.assemblies || !doc.assemblies.length) { return null; }
@@ -40767,6 +40772,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (ne.wellSym) { ne.wellSym.classList.toggle('lpn-asm-hid', !isT); }
 			if (ne.symbol) { ne.symbol.classList.toggle('lpn-asm-hid', isT); }
 			if (isT || n.type === 'tank') { ne.hit.setAttribute('d', nodeHitSilhouette(n)); }
+			// **THE WELL WINS A PRESS ON ITS SYMBOL** (Round 7): a Well with tank's tee may stand on the well's own point, and its small grab disc
+			// then lay over the middle of the symbol. The Well's grab shape is the last thing in the layer, so it is the topmost at every point of it.
+			if (isT && ne.hit.parentNode === nodesLayer && nodesLayer.lastChild !== ne.hit) { nodesLayer.appendChild(ne.hit); }
 			syncNodeHit(n, ne.hit);
 			positionNodeSymbol(n.id);
 		});
@@ -40959,12 +40967,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		releaseAssemblyControls(a.id);
 		syncAssemblyGlyphs();
 		assemblyAllNodeIds(a).forEach(function (nid) { if (nodeEls[nid]) { layoutNodeLabel(nid); } });
+		// The assembly's one label block is gone with the group: every member's own label is drawn again at once, not at the next pass.
+		labelCacheTaint(); labelRefreshPending = true; flushLabelRefresh();
 		if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === a.id) { closePopup(); }
 	}
 	function explodeAssembly(id) {
 		var a = assemblyById(id);
 		if (!a) { return; }
 		dissolveAssembly(a);
+		// The status bar says what Explode did, for every kind (Perry, round 7: nothing said so).
+		setNotice(String((EngCalcs.pageConfig || {}).lpn_assembly_exploded || 'Separated {id} into ordinary elements. Undo restores it.').replace('{id}', function () { return String(a.id); }));
 		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[a.kind === 'well' ? 1 : 0] }));
 	}
 	// **A MORPH OF ANY MEMBER OF AN ASSEMBLY SEPARATES IT FIRST** (Round 7; Tom, round 6 pass: "ensure that Morph works with the + assemblies before we
@@ -41005,6 +41017,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			gone.forEach(function (a) { releaseAssemblyControls(a.id); });
 			syncAssemblyGlyphs();
 			gone.forEach(function (a) { assemblyNodeIds(a).forEach(function (nid) { if (nodeEls[nid]) { layoutNodeLabel(nid); } }); });
+			labelCacheTaint(); labelRefreshPending = true; flushLabelRefresh();
 		}
 	}
 	function renameInAssemblies(oldId, newId) {

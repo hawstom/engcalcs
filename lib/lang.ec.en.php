@@ -1799,6 +1799,7 @@ $ec_lang['lpn_morph_vertex_done']='Morphed {n} into vertices. At each, the two p
 // when a node type was chosen), separated by commas.
 $ec_lang['lpn_morph_other_kind']='A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}';
 $ec_lang['lpn_morph_exploded']='Morph separated {ids} into ordinary elements, as Explode does. Undo restores it.';
+$ec_lang['lpn_assembly_exploded']='Separated {id} into ordinary elements. Undo restores it.';
 // The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
 // scenario, beside the override marker.
 $ec_lang['lpn_field_type_tip']='The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario\'s type.';

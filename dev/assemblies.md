@@ -299,6 +299,12 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   undo step, then changes the type as for any element; the status bar says which group was separated; one Undo restores both. In a scenario the type
   is an override as always and the group is separated for every scenario (the grouping belongs to the document). Morphing an ordinary element leaves every
   group alone. Tried on every member into every other type, in Base and in a scenario (`assembly-morph-harness.js`, 287 checks).
+- **Perry's round 7 fixes** (`well-panel-steps-browser-harness.js`, which walks the preview panel's steps as written): the block is never folded into one line
+  (`tryInlineNodeLabels()` skips assembly blocks; their rows shed instead); the Well's grab shape is the topmost in the layer, so a tee on the well's own
+  point never takes a press on the symbol; Explode redraws the labels at once and the status bar says what it did, for every kind (`lpn_assembly_exploded`).
+  A Well spliced into a crowded pipe (Net1's L21) has its whole block hidden at fit and for the first zoom notches: honest crowding, not rank. The block
+  is dropped by first-fit because it refuses every side where a pipe runs under it (the rule that stops its rows lying across a pipe); raising its
+  drop rank changed nothing. The test project the panel names is `dev/lpn-spike/well-test-net1.lwn` (Net1 with the curves Drawdown and WellPump, Head ticked).
 - **Merge checklist, before this branch goes to master:** Morph works with every + form (done, above); Pump+/Valve+/Well/Well with tank open and save
   from old files (done); the pressure tank is not built (said in the public text, if any).
 - **The pump's selected circle** is unchanged (Tom wondered if it is "cartoonishly large"); its radius is in the round 7 report.
