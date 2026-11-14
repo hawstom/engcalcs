@@ -113,26 +113,26 @@ $send   = $series['send'];
 function ur_h($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); }
 
 /** The two charts of one pre-built series, side by side, each with its own scale and its own unit. */
-function ur_charts($series, $range, $caption, $source)
+function ur_charts($series, $range, $caption, $source, $unit = 'use')
 {
     $daily = ecUsageFinalizeDaily($series['daily'], $range);
     $tot   = $series['bucketTotals'];
     echo '<h3>' . ur_h($caption) . '</h3>';
     echo '<p class="src">' . ur_h($source) . '</p>';
     echo '<div class="pair">';
-    echo '<figure><figcaption>SAID YES: ' . $tot['visitor'] . ' use(s), from '
+    echo '<figure><figcaption>SAID YES: ' . $tot['visitor'] . ' ' . $unit . '(s), from '
        . ecUsageSeriesBrowsers($series) . ' browser(s)'
-       . ($series['uncoded'] ? ' plus ' . $series['uncoded'] . ' use(s) with no code' : '')
+       . ($series['uncoded'] ? ' plus ' . $series['uncoded'] . ' ' . $unit . '(s) with no code' : '')
        . '</figcaption>'
-       . ecUsageBarsSvg($daily['visitor'], 'uses (said yes)', 'var(--people)') . '</figure>';
-    echo '<figure><figcaption>OTHERS: ' . $tot['visit'] . ' use(s)</figcaption>'
-       . ecUsageBarsSvg($daily['visit'], 'uses (others)', 'var(--loads)') . '</figure>';
+       . ecUsageBarsSvg($daily['visitor'], $unit . 's (said yes)', 'var(--people)') . '</figure>';
+    echo '<figure><figcaption>OTHERS: ' . $tot['visit'] . ' ' . $unit . '(s)</figcaption>'
+       . ecUsageBarsSvg($daily['visit'], $unit . 's (others)', 'var(--loads)') . '</figure>';
     echo '</div>';
 }
 
 /** One table of a pre-built series' field tally: two said-yes columns (browsers, uses) and the
  * others column. No total column anywhere. */
-function ur_table($series, $field, $caption, $source, $limit = 40)
+function ur_table($series, $field, $caption, $source, $limit = 40, $unit = 'Uses')
 {
     $c = $series['countBy'][$field];
     $keys = array_keys($c['visitor'] + $c['visit']);
@@ -148,8 +148,8 @@ function ur_table($series, $field, $caption, $source, $limit = 40)
     echo '<h3>' . ur_h($caption) . '</h3>';
     echo '<p class="src">' . ur_h($source) . '</p>';
     if (!$keys) { echo '<p class="none">No rows in this window.</p>'; return; }
-    echo '<table><thead><tr><th>' . ur_h($field) . '</th><th>Browsers (said yes)</th><th>Uses (said yes)</th>'
-       . '<th>Uses (others)</th></tr></thead><tbody>';
+    echo '<table><thead><tr><th>' . ur_h($field) . '</th><th>Browsers (said yes)</th><th>' . $unit . ' (said yes)</th>'
+       . '<th>' . $unit . ' (others)</th></tr></thead><tbody>';
     $n = 0;
     foreach ($keys as $k) {
         if ($limit && $n++ >= $limit) { echo '<tr><td colspan="4" class="none">'
@@ -228,23 +228,34 @@ p.unused { color: #777; font-size: .85rem; margin: .2rem 0 .8rem; }
 </p>
 
 <div class="banner">
-<strong>Key to the three columns from 2026-10-08 forward:</strong>
+<strong>Key to the columns from 2026-10-08 forward:</strong>
 <br><strong>Browsers (said yes)</strong> is the de-duplicated count of browsers doing the action.
 It's intended to be close to a count of how many <strong>users</strong> did the action.
-<br><strong>Uses (said yes)</strong> is uses of the action by the same users as above, every use
-counted. Before <?= $cutover === '' ? 'the change' : ur_h($cutover) ?>, said-yes uses were
-counted once per page per browser session. A said-yes row from before 2026-10-08 carries no code, so it counts
-here as a use and never as a browser.
-<br><strong>Uses (others)</strong> is uses of the action by browsers that did not say yes. Nothing
-may be stored to de-duplicate them, so every page load counts.
+<br>The next two columns count rows, and the heading says what a row is. Under <em>Looking</em> they
+are <strong>Visits (said yes)</strong> and <strong>Visits (others)</strong>: a row is one visit to a
+page, written once the visit is 10 seconds old, so a visitor who reloads the page is counted again.
+Under <em>Calculating</em> they are <strong>Calculations (said yes)</strong> and
+<strong>Calculations (others)</strong>: a row is one calculation after the first 10 seconds, so a
+visitor trying five pipe sizes is five rows. Under every other heading they are <strong>Uses (said yes)</strong>
+and <strong>Uses (others)</strong>: a row is one use of the action. The said-yes column counts the
+same users as Browsers (said yes), every row counted. The others column counts browsers that did not
+say yes; nothing may be stored to de-duplicate them, so every row counts. Before
+<?= $cutover === '' ? 'the change' : ur_h($cutover) ?>, said-yes rows were counted once per page per
+browser session. A said-yes row from before 2026-10-08 carries no code, so it counts here as a row and
+never as a browser.
+<br><strong>Using</strong> counts browser-days, not visits. The logs hold nothing that says which visit
+a calculation belonged to, and nothing is added to them or stored on a device to find out. A
+browser-day is one browser that said yes, calculating on one page on one UTC day. To compare people
+looking with people calculating, read the Browsers (said yes) column in Looking and in Using or
+Calculating.
 <br>For logs before <?= $cutover === '' ? 'the change (no later log has been written yet)' : ur_h($cutover) ?>,
-reported in a window that reaches back before it, there is confusion on this point: Uses (said yes)
-was counted once per page per browser session and Uses (others) every time, so the two Uses columns
-are not addable. From <?= $cutover === '' ? 'the change' : ur_h($cutover) ?> on, Uses (said yes) and Uses (others) are
+reported in a window that reaches back before it, there is confusion on this point: the said-yes count
+was counted once per page per browser session and the others count every time, so the two columns
+are not addable. From <?= $cutover === '' ? 'the change' : ur_h($cutover) ?> on, the said-yes and others columns are
 addable.
-<?php if ($reachesBefore): ?><br><strong>This window reaches back before <?= $cutover === '' ? 'the change' : ur_h($cutover) ?>, so its two Uses
+<?php if ($reachesBefore): ?><br><strong>This window reaches back before <?= $cutover === '' ? 'the change' : ur_h($cutover) ?>, so its two count
 columns are not addable.</strong>
-<?php else: ?><br><strong>This window starts on or after <?= ur_h($cutover) ?>, so its two Uses columns are addable.</strong>
+<?php else: ?><br><strong>This window starts on or after <?= ur_h($cutover) ?>, so its two count columns are addable.</strong>
 <?php endif; ?>
 <br><strong>Looking and Calculating:</strong> Under <em>Looking</em> and <em>Calculating</em>, a row
 is written by the page's script once the visit is at least 10 seconds old (and, for Calculating,
@@ -267,28 +278,65 @@ a security boundary.
 <h2>Looking</h2>
 <?php
 ur_charts($view, $range, 'Looking per day',
-    'log/engcalcs-human-view.log, field 1 (timestamp), bucketed on the last field');
+    'log/engcalcs-human-view.log, field 1 (timestamp), bucketed on the last field', 'visit');
 ur_table($view, 'page', 'Looking, by page',
-    'log/engcalcs-human-view.log, field 2 (page basename)');
+    'log/engcalcs-human-view.log, field 2 (page basename)', 40, 'Visits');
 ur_table($view, 'lang', 'Language the page was served in',
-    'log/engcalcs-human-view.log, field 3 (served language)');
+    'log/engcalcs-human-view.log, field 3 (served language)', 40, 'Visits');
 ur_table($view, 'pointer', 'Device pointer',
     'log/engcalcs-human-view.log, field 5. A row with four fields before the bucket predates the '
-  . 'column (2026-09-08) and reads as (none), never as fine.');
+  . 'column (2026-09-08) and reads as (none), never as fine.', 40, 'Visits');
 ur_table($view, 'themeKind', 'Theme, chosen or theme of the day',
     'log/engcalcs-human-view.log, field 6. chosen is a theme the visitor picked; day is the theme of '
-  . 'the day. (none) is a page with no themes or a row from before the column.');
+  . 'the day. (none) is a page with no themes or a row from before the column.', 40, 'Visits');
 ur_table($view, 'theme', 'Theme shown',
     'log/engcalcs-human-view.log, field 6 (the theme name, or day). Looped-Network is the only '
-  . 'themed page.');
+  . 'themed page.', 40, 'Visits');
+?>
+
+<h2>Using</h2>
+<p class="src">log/engcalcs-calc-usage.log, field 1 (timestamp), field 2 (page basename) and the
+browser code. The logs hold nothing that says which visit a calculation belonged to, so a visit
+cannot be counted. A browser-day is one browser calculating on one page on one UTC day, however
+many calculations or visits it made. Only browsers that said yes carry a code, so there is no
+others column: an others row cannot be tied to any other row.</p>
+<?php
+$usingBd  = ecUsageSeriesBrowserDays($calc);
+$usingCod = ecUsageSeriesBrowsers($calc);
+$usingKeys = array_values(array_filter(array_keys($calc['countBy']['page']['visitor']),
+    function ($k) use ($calc) { return ecUsageSeriesBrowserDays($calc, 'page', $k) > 0; }));
+usort($usingKeys, function ($a, $b) use ($calc) {
+    $d = ecUsageSeriesBrowserDays($calc, 'page', $b) - ecUsageSeriesBrowserDays($calc, 'page', $a);
+    return $d !== 0 ? $d : strcmp($a, $b);
+});
+echo '<h3>Using, by page</h3>';
+if (!$usingBd) {
+    echo '<p class="none">No browser that said yes calculated in this window.</p>';
+} else {
+    echo '<p class="src">SAID YES: ' . $usingBd . ' browser-day(s), from ' . $usingCod . ' browser(s)'
+       . ($calc['uncoded'] ? ', plus ' . $calc['uncoded'] . ' calculation(s) with no code, which cannot be placed' : '')
+       . '. The rows below do not add up to this line: a browser using two pages in one day is one browser here.</p>';
+    echo '<table><thead><tr><th>page</th><th>Browsers (said yes)</th><th>Browser-days (said yes)</th>'
+       . '</tr></thead><tbody>';
+    $n = 0;
+    foreach ($usingKeys as $k) {
+        if ($n++ >= 40) { echo '<tr><td colspan="3" class="none">' . (count($usingKeys) - 40)
+            . ' further value(s) not listed</td></tr>'; break; }
+        $bd = ecUsageSeriesBrowserDays($calc, 'page', $k);
+        echo '<tr><td>' . ur_h($k) . '</td><td>' . ecUsageSeriesBrowsers($calc, 'page', $k)
+           . '</td><td>' . $bd . '</td></tr>';
+    }
+    echo '</tbody></table>';
+}
 ?>
 
 <h2>Calculating</h2>
 <?php
 ur_charts($calc, $range, 'Calculating per day',
-    'log/engcalcs-calc-usage.log, field 1 (timestamp)');
+    'log/engcalcs-calc-usage.log, field 1 (timestamp)', 'calculation');
 ur_table($calc, 'page', 'Calculating, by page',
-    'log/engcalcs-calc-usage.log, field 2 (page basename)');
+    'log/engcalcs-calc-usage.log, field 2 (page basename). One row per calculation, so a visitor '
+  . 'trying five pipe sizes is five rows.', 40, 'Calculations');
 ?>
 
 <h2>Naming a calculation</h2>
