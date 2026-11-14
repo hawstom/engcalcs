@@ -183,6 +183,9 @@ offline. **Exempt** (strictly necessary for a service the visitor requested, the
 holds no identifier and nothing the visitor entered, only responses to same-origin GETs with the query
 string stripped, and it is sent nowhere. Erase everything does
 NOT clear it (it is not a visitor's data); clearing site data does. `privacy.php` lists it.
+Task 620 changed what is kept here by nothing: a changed icon, or a changed engine file already cached,
+now overwrites its own entry (the worker's bytes carry a digest of those files), so the same URLs hold
+newer bytes and no new entry, key or store appears.
 
 **The EPANET engine (Task 726, Tom, 2026-10-05: *"EPANET pre-fetch slowly: Yes."*).**
 `js/vendor/epanet-js.js` (664 KB) and the 1.3 KB `js/vendor/slim/index.js` it imports were

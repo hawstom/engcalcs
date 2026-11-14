@@ -72,7 +72,20 @@ function ecJsCodeMask($src, $keepStringBodies = false)
             if (!$keepStringBodies) { $blank($i + 1, $j - 1); }   // keep the quotes, blank the body
             $prev = $c; $i = $j; continue;
         }
-        if ($c === '/' && $prev !== '' && strpos('(,=:[!&|?{};+', $prev) !== false) {
+        // A regex literal opens after an operator OR after one of these keywords. `return /["']/.test(t)`
+        // is the second case: the previous character is the `n` of `return`, which no operator list
+        // holds, so without the keyword test the quote inside the class opened a string that ran on,
+        // blanked a live call site, and listed `paneQuoteCell` as called by nobody.
+        $afterKeyword = false;
+        if ($c === '/' && $prev !== '' && ctype_alpha($prev)) {
+            $k = $i - 1;
+            while ($k >= 0 && ctype_space($src[$k])) { $k--; }
+            $e = $k;
+            while ($k >= 0 && (ctype_alnum($src[$k]) || $src[$k] === '_' || $src[$k] === '$')) { $k--; }
+            $afterKeyword = in_array(substr($src, $k + 1, $e - $k),
+                ['return', 'typeof', 'case', 'in', 'of', 'delete', 'void', 'throw', 'else', 'do', 'yield', 'await'], true);
+        }
+        if ($c === '/' && $prev !== '' && ($afterKeyword || strpos('(,=:[!&|?{};+', $prev) !== false)) {
             $j = $i + 1; $inClass = false;
             while ($j < $n && $src[$j] !== "\n") {
                 if ($src[$j] === '\\') { $j += 2; continue; }
@@ -120,12 +133,26 @@ function ecJsFunctionUnits($src)
                 elseif ($mask[$k] === '}') { $depth--; if ($depth === 0) { $end = $k + 1; break; } }
             }
             if ($end === null) { $unparsed++; continue; }
+            // A NAMED IIFE -- `(function wire() {...}());` or `(function wire() {...})();` -- is called
+            // where it stands, by whatever encloses it, and its name appears nowhere else.
+            $iife = false;
+            if ($kind === 'local' && preg_match('/^[^\w.$]?function\s+/', $m[0][$idx][0])) {
+                $kw = $m[0][$idx][1] + strpos($m[0][$idx][0], 'function');
+                $b = $kw - 1;
+                while ($b >= 0 && ctype_space($mask[$b])) { $b--; }
+                $a = $end;
+                if ($a < $n && $mask[$a] === ')') { $a++; }
+                while ($a < $n && ctype_space($mask[$a])) { $a++; }
+                $iife = $b >= 0 && strpos('(!+-~', $mask[$b]) !== false && $a < $n && $mask[$a] === '(';
+            }
             $units[] = [
                 'name'  => $hit[0],
                 'owner' => $owners ? $owners[$idx][0] : null,
                 'kind'  => $kind,
                 'start' => $m[0][$idx][1],
                 'end'   => $end,
+                'at'    => $hit[1],
+                'iife'  => $iife,
             ];
         }
     }
@@ -142,7 +169,7 @@ function ecJsFunctionUnits($src)
  *                                as dead is the noise this walk exists to avoid.
  * @param array $langKeys         every defined English key
  * @param array $dynamicPrefixes  families the runtime assembles by prefix (finding 1's list)
- * @return array ['candidates' => [[key, readers]], 'dead' => [id => unit], 'turned' => [why => n]]
+ * @return array ['candidates' => [[key, readers]], 'dead' => [id => unit, each with 'file' and 'line'], 'turned' => [why => n]]
  */
 /**
  * `$harnessSources` is OPTIONAL and, when given, is held apart from `$phpSources` rather than
@@ -227,6 +254,21 @@ function ecReachabilityCandidates(array $jsSources, array $phpSources, array $la
         if (isset($literals[$name])) {
             $reached[$id] = true; $bump('name appears in a string literal - may be dispatched by name'); continue;
         }
+        // A named IIFE is called where it stands: it is reached exactly when the code around it is,
+        // and the functions it calls are reached through it. The name test below would find no
+        // caller, since an IIFE's name is never written a second time.
+        if (!empty($u['iife'])) {
+            $outer = null; $outerLen = PHP_INT_MAX;
+            foreach ($units[$u['file']] as $j => $o) {
+                if ("{$u['file']}#$j" === $id) { continue; }
+                if ($u['start'] >= $o['start'] && $u['start'] < $o['end'] && ($o['end'] - $o['start']) < $outerLen) {
+                    $outer = $j; $outerLen = $o['end'] - $o['start'];
+                }
+            }
+            $refsInto[$id] = [$outer === null ? null : "{$u['file']}#$outer"];
+            if ($outer === null) { $reached[$id] = true; }
+            continue;
+        }
         $re = '/(?<![\w$])' . preg_quote($name, '/') . '(?![\w$])/';
         $holders = [];
         foreach ($phpSources as $ps) {
@@ -270,7 +312,12 @@ function ecReachabilityCandidates(array $jsSources, array $phpSources, array $la
     } while ($grew);
 
     $dead = [];
-    foreach ($ids as $id => $u) { if (!isset($reached[$id])) { $dead[$id] = $u; } }
+    foreach ($ids as $id => $u) {
+        if (isset($reached[$id])) { continue; }
+        // the line of the NAME, for the printed list
+        $u['line'] = substr_count($jsSources[$u['file']], "\n", 0, $u['at']) + 1;
+        $dead[$id] = $u;
+    }
 
     // A key whose every naming site sits inside a dead unit reaches no screen.
     $candidates = [];

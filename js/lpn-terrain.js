@@ -427,7 +427,6 @@
 				'not ask again. A no is not stored at all.')
 		];
 	}
-	EC.lpnTerrainContourConsentText = function () { return contourConsentParagraphs().join('\n\n'); };
 	var gridRunning = false;
 	EC.lpnTerrainGrid = function (points, done) {
 		function finish(h, info) { if (typeof done === 'function') { done(h, info || {}); } }

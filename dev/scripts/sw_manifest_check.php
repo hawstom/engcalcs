@@ -53,6 +53,14 @@ foreach (array_keys($assetExcluded) as $rel) {
     }
 }
 
+// Task 620: a runtime-cached file with no ?v= is covered by the worker's digest only while it is
+// named here, so a rename must not leave the entry pointing at nothing.
+foreach (array_keys(ecSwRuntimeUnversioned()) as $rel) {
+    if (!is_file($root . '/' . $rel)) {
+        $problems[] = "ecSwRuntimeUnversioned() names $rel, which no longer exists -- fix or delete the entry";
+    }
+}
+
 $pageExcluded = ecSwPageExclusions();
 foreach (glob($root . '/*.php') as $file) {
     $name = basename($file);
