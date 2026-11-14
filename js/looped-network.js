@@ -47379,7 +47379,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A tank's [TANKS] Elevation is its BASE, so the file's characters ride with `bottomElev`.
 		LPN_INP_TOK_TANK = {
 			elev: 'bottomElev', level: '_level', minLevel: 'minLevel', maxLevel: 'maxLevel',
-			diameter: 'tankDiameter', x: 'x', y: 'y'
+			diameter: 'tankDiameter', minVol: 'minVolume', x: 'x', y: 'y'
 		},
 		LPN_INP_TOK_LINK = {
 			length: '_length', diameter: '_diameter', roughness: '_roughness', k: '_k',
@@ -47475,8 +47475,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					_level: n.level,
 					minLevel: n.minLevel,
 					maxLevel: n.maxLevel,
-					tankDiameter: n.diameter
+					tankDiameter: n.diameter,
+					minVolume: n.minVol
 				}, LPN_INP_TOK_TANK);
+				// **MinVol AND Overflow, THE FILE'S OWN** (audit 2026-11, F2), on the same limb as the
+				// vessel's geometry. Present only where the file stated them. MinVol is in the length
+				// unit cubed, as the file wrote it; Overflow is the file's word. Nothing on the page
+				// edits either; both engines are handed them by assembleModel().
+				if (n.overflow) { tk.overflow = n.overflow; }
+				if (n.volColumn) { tk.volColumn = n.volColumn; }
 				// The ground starts as the same number in the same characters, so a DXF or GeoJSON
 				// written straight after import states it as the file did.
 				// Rebuilt rather than added to, so the bag reads in the order a migrated v11 project's
@@ -79636,7 +79643,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					diameter: toSI(effective(n, 'tankDiameter') || 0, 'lpn_u_length'),
 					// The volume curve's NAME as this scenario states it; js/lpn-time.js attaches the
 					// curve's points (overridable since 2026-10-12, so the document's name is not enough).
-					volCurveName: effective(n, 'volCurve') || null
+					volCurveName: effective(n, 'volCurve') || null,
+					// **THE FILE'S MinVol AND Overflow** (audit 2026-11, F2), for both engines: MinVol in
+					// cubic metres (the length unit cubed), Overflow as a flag. Absent where the file
+					// stated none, so a tank drawn here is built exactly as before.
+					minVolume: (typeof n.minVolume === 'number' && n.minVolume > 0)
+						? n.minVolume * Math.pow(toSI(1, 'lpn_u_length'), 3) : undefined,
+					overflow: (n.overflow && /^y/i.test(String(n.overflow))) ? true : undefined
 				};
 			}
 			return n.type === 'reservoir'

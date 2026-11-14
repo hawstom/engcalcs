@@ -23,6 +23,7 @@ const fs = require('fs');
 const { ROOT, setUnitSet, loadLoopedNetwork, warmEpanet } = require('./lpn-dom-stub.js');
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
+require(ROOT + 'js/lpn-native-run.js');
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-net.js');
 global.alert = global.window.alert = function () { };
@@ -132,6 +133,24 @@ async function rawHeads(inpText) {
 	p.closeH(); p.close();
 	return h;
 }
+async function rawSeries(inpText) {
+	const ws = new mod.Workspace();
+	await ws.loadModule();
+	ws.writeFile('r.inp', inpText);
+	const p = new mod.Project(ws);
+	p.open('r.inp', 'r.rpt', 'r.out');
+	p.openH(); p.initH(0);
+	const out = {};
+	for (;;) {
+		const t = p.runH();
+		const h = {};
+		for (let i = 1, n = p.getCount(0); i <= n; i++) { h[p.getNodeId(i)] = p.getNodeValue(i, 10); }
+		out[t] = h;
+		if (p.nextH() <= 0) { break; }
+	}
+	p.closeH(); p.close();
+	return out;
+}
 function worst(a, b, scale) {
 	let w = 0;
 	for (const id in b) { if (a[id] !== undefined) { w = Math.max(w, Math.abs(a[id] - b[id] * scale)); } }
@@ -184,6 +203,129 @@ function worst(a, b, scale) {
 		open(doc);
 		const issues = EC.lpnDiagnose(L.assembleModel());
 		ok('D-W, US: the solve is refused by name (roughness in millifeet)', issues.some((d) => d.code === 'roughness-unit'), JSON.stringify(issues));
+	}
+
+	// =============================================================================================
+	console.log('\n2. TANK MinVol AND Overflow');
+	const TANKS = (rows) => `[TITLE]
+tank probe
+
+[JUNCTIONS]
+ J1 20 2
+
+[RESERVOIRS]
+ R1 100
+
+[TANKS]
+${rows}
+
+[PIPES]
+ P1 R1 J1 1000 300 100 0 Open
+ P2 J1 T1 500 200 100 0 Open
+
+[COORDINATES]
+ J1 0 0
+ R1 -100 0
+ T1 100 0
+ T2 100 100
+
+[OPTIONS]
+ Units LPS
+ Headloss H-W
+
+[END]
+`.replace('J1 T1 500 200 100 0 Open', 'J1 T1 500 200 100 0 Open');
+	for (const [label, rows] of [
+		['MinVol 500, Overflow YES', ' T1 20 10 2 20 30 500 * YES'],
+		['MinVol with a curve and Overflow no', ' T1 20 10 2 20 30 500.0 VC1 no'],
+		['MinVol 0 stated', ' T1 20 10 2 20 30 0']]) {
+		const text = TANKS(rows) + '';
+		const full = text.replace('[PIPES]', '[CURVES]\n VC1 2 400\n VC1 20 4000\n\n[PIPES]');
+		const { parsed, doc } = importDoc(full);
+		const out = exportOf(doc);
+		ok(label + ': the tank row comes back as the file wrote it',
+			JSON.stringify(rowsOf(out.inp, 'TANKS')) === JSON.stringify(rowsOf(full, 'TANKS')),
+			JSON.stringify(rowsOf(out.inp, 'TANKS')) + ' vs ' + JSON.stringify(rowsOf(full, 'TANKS')));
+	}
+	{
+		const full = TANKS(' T1 20 10 2 20 30 500 * YES');
+		const { doc } = importDoc(full);
+		open(doc);
+		const t = L.assembleModel().nodes.filter((n) => n.id === 'T1')[0];
+		ok('the model hands both engines MinVol 500 m3 and Overflow', t && t.minVolume === 500 && t.overflow === true,
+			t ? JSON.stringify([t.minVolume, t.overflow]) : 'no tank');
+		const { doc: doc2 } = importDoc(TANKS(' T1 20 10 2 20 30'));
+		open(doc2);
+		const t2 = L.assembleModel().nodes.filter((n) => n.id === 'T1')[0];
+		ok('a tank that states neither leaves them off the model', t2 && !(t2.minVolume > 0) && !t2.overflow);
+	}
+
+	{
+		// A tank that fills to its top over six hours. With Overflow YES the inflow link stays open
+		// at the top; without it EPANET closes the link into a full tank, and the heads differ. The
+		// file's value has to reach the engine for the page's run to match EPANET's on the file.
+		const seen = {};
+		for (const word of ['YES', 'NO']) {
+			const eps = `[TITLE]
+overflow ${word}
+
+[JUNCTIONS]
+ J1 20 1
+
+[RESERVOIRS]
+ R1 100
+
+[TANKS]
+ T1 90 5 0 8 5 100 * ${word}
+
+[PIPES]
+ P1 R1 J1 1000 300 100 0 Open
+ P2 J1 T1 500 200 100 0 Open
+
+[COORDINATES]
+ J1 0 0
+ R1 -100 0
+ T1 100 0
+
+[TIMES]
+ Duration 6:00
+ Hydraulic Timestep 1:00
+
+[OPTIONS]
+ Units LPS
+ Headloss H-W
+
+[END]
+`;
+			const { parsed, doc } = importDoc(eps);
+			open(doc);
+			const ref = await rawSeries(eps);
+			const run = await EC.lpnEpanetRun(L.assembleModel(), {});
+			let w = 0, frames = 0;
+			(run.frames || []).forEach((f) => {
+				const r = ref[f.t];
+				if (!r) { return; }
+				frames++;
+				for (const id in r) { if (f.heads[id] !== undefined) { w = Math.max(w, Math.abs(f.heads[id] - r[id])); } }
+			});
+			ok('EPS, Overflow ' + word + ': the page\'s EPANET run matches EPANET on the file at every hour',
+				run.ok && frames >= 6 && w < 0.005, frames + ' hours, worst ' + w.toFixed(4) + ' m');
+			// ...and by the built-in loop, which copies EPANET's tank rules.
+			const nrun = EC.lpnNativeRun(L.assembleModel());
+			let nw = 0, nframes = 0;
+			(nrun.frames || []).forEach((f) => {
+				const r = ref[f.t];
+				if (!r) { return; }
+				nframes++;
+				for (const id in r) { if (f.heads[id] !== undefined) { nw = Math.max(nw, Math.abs(f.heads[id] - r[id])); } }
+			});
+			ok('EPS, Overflow ' + word + ': the built-in run matches EPANET on the file at every hour',
+				nrun.ok && nframes >= 6 && nw < 0.005, nframes + ' hours, worst ' + nw.toFixed(4) + ' m');
+			seen[word] = ref;
+		}
+		let apart = 0;
+		for (const t in seen.YES) { for (const id in seen.YES[t]) { apart = Math.max(apart, Math.abs(seen.YES[t][id] - seen.NO[t][id])); } }
+		ok('the probe can fail: Overflow YES and NO give EPANET different heads', apart > 0.05, apart.toFixed(3) + ' m');
 	}
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall fidelity checks passed');

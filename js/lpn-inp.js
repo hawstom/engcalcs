@@ -1003,6 +1003,20 @@
 			mergeTok(tn, 'minLevel', r[3], tn.minLevel);
 			mergeTok(tn, 'maxLevel', r[4], tn.maxLevel);
 			mergeTok(tn, 'diameter', r[5], tn.diameter);
+			// **MinVol (column 7) AND Overflow (column 9) ARE THE FILE'S** (audit 2026-11, F2). They
+			// were read past in silence and the row came back out as `... 0`. MinVol is a volume in
+			// the file's length unit cubed, kept with its own characters like every number here;
+			// Overflow is kept as the word the file wrote (`YES`, `no`) because it is carried, never
+			// computed with, and the ninth column cannot be written without the eighth, so a `*`
+			// placed there is remembered as the file wrote it. Both engines read them from the model
+			// (js/lpn-epanet.js, js/lpn-native-run.js), which docs' assembleModel() fills.
+			if (r[6] !== undefined && isFinite(parseFloat(r[6]))) {
+				tn.minVol = mergeTok(tn, 'minVol', r[6], num(r[6]));
+			}
+			if (r[8] !== undefined && r[8] !== '') {
+				tn.overflow = r[8];
+				if (r[7] === '*' || r[7] === '0') { tn.volColumn = r[7]; }
+			}
 			// A VOLUME CURVE makes the tank non-cylindrical, and this page holds only a diameter.
 			// The level -> head relationship a steady-state solve uses is unaffected (the surface is
 			// still Elev + InitLvl), so the imported network solves identically; what is lost is how
@@ -3006,10 +3020,16 @@
 					n(cHead, nd, 'minLevel', eff(nd, 'minLevel') || 0),
 					n(cHead, nd, 'maxLevel', eff(nd, 'maxLevel') || 0),
 					n(cLen, nd, 'tankDiameter', eff(nd, 'tankDiameter') || 0),
-					'0'];
+					// MinVol, as the file wrote it (a volume: the length unit cubed). Absent is EPANET's
+					// own 0, "no separate minimum volume".
+					(typeof nd.minVolume === 'number' && isFinite(nd.minVolume))
+						? n(cLen.same ? PLAIN : { same: false, mul: Math.pow(cLen.mul, 3) }, nd, 'minVolume', nd.minVolume) : '0'];
 				if (eff(nd, 'volCurve')) {
 					tankRow.push(String(eff(nd, 'volCurve')));
+				} else if (nd.overflow) {
+					tankRow.push(nd.volColumn || '*');   // the eighth column stands aside for the ninth
 				}
+				if (nd.overflow) { tankRow.push(String(nd.overflow)); }
 				tanks.push(row(tankRow) + descOf(nd));
 			} else {
 				// **THE PATTERN COLUMN IS THE JUNCTION'S OWN OR NOTHING** (Task 423). A blank column
