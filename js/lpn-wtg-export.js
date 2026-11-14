@@ -962,6 +962,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// Each states a guess at a column or a code that no saved project has ever shown (dev/wtg-export.md, "Candidates under test").
 	// The page never passes it, so the shipped export and its list of what is not written do not change until
 	// WaterGEMS has confirmed a candidate.
+	const scenTally = { scenarios: 0, alts: {} };
 	if (opts.candidate) { writeCandidates(opts.candidate); }
 	function writeCandidates(cand) {
 		const secs = parsed.inpSections || {};
@@ -986,6 +987,94 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				report.candidateWritten = (report.candidateWritten || 0) + 1;
 			});
 		}
+	}
+
+	// ---- CHILD SCENARIOS (candidate, Task 749, 2026-11-13): `opts.candidate.scenarios` = [{ name, parsed | inp }], each the
+	// project scenario's resolved network read as the Base's is (lpnInpParse of lpnExportInp with that scenario's resolver),
+	// a child of Base. Written only when every difference from Base is a pipe diameter or a junction's demand rows' base
+	// flows (the two a saved pair shows; scenarioOverrides() names the rest and the scenario is then left out whole).
+	// Structure OBSERVED (dev/wtg-export.md, "Child scenarios"): an HMIScenario row with ParentID Base; per alternative type
+	// an HMIScenarioAlternative row, IsLocal 0 naming Base's alternative, or IsLocal 1 naming a child alternative (an
+	// HMIAlternative row with ParentID the Base alternative and Level 2) that holds, for each element edited, ALL that element's
+	// rows of that alternative's tables, edited; an element with no row there takes Base's. Ten calculation-option rows,
+	// IsLocal 0. One QBATDefinition support element (type 1000) comes with the first child scenario. ----
+	function writeScenarios(list) {
+		const baseScen = rowsOf(db, 'SELECT MIN(ScenarioID) AS s FROM HMIScenario WHERE ParentID IS NULL AND IsDeleted = 0')[0].s;
+		const physAlt = ((proto.pipe.filter((r) => r.table === 'IdahoPipe_Physical_Data')[0] || {}).row || {}).AlternativeID;
+		const demandAlt = altOfType[20];
+		const altTables = tables.filter((t) => { const c = colsOf(db, t); return c.indexOf('DomainElementID') >= 0 && c.indexOf('AlternativeID') >= 0; });
+		const typeOfAlt = (a) => rowsOf(db, 'SELECT AlternativeTypeID AS t FROM HMIAlternative WHERE AlternativeID = ?', [a])[0].t;
+		const taken = {};
+		taken[rowsOf(db, 'SELECT Label FROM HMIModelingElement WHERE ElementID = ?', [baseScen])[0].Label] = 1;
+		report.scenarios = [];
+		let qbat = false;
+		function copyRows(e, from, to) {
+			altTables.forEach((t) => {
+				rowsOf(db, 'SELECT * FROM "' + t + '" WHERE DomainElementID = ? AND AlternativeID = ?', [e, from]).forEach((r) => {
+					delete r.ItemID; r.AlternativeID = to; insert(db, t, r);
+				});
+			});
+		}
+		list.forEach((s) => {
+			const name = String((s && s.name) || '').trim(), rec = { name: name, written: false };
+			report.scenarios.push(rec);
+			if (!name || taken[name]) { rec.reason = 'name'; lost('scenario "' + name + '" not written: its name is empty or already used'); return; }
+			if (s.parent !== undefined && s.parent !== null && s.parent !== '') { rec.reason = 'nested'; lost('scenario ' + name + ' not written: only children of Base are written'); return; }
+			const sp = s.parsed || (s.inp ? EngCalcs.lpnInpParse(s.inp) : null);
+			if (!sp || sp.ok === false) { rec.reason = 'unreadable'; lost('scenario ' + name + ' not written: its network could not be read'); return; }
+			const ov = scenarioOverrides(parsed, sp);
+			if (ov.unsupported.length) {
+				rec.reason = 'unsupported'; rec.unsupported = ov.unsupported;
+				lost('scenario ' + name + ' not written, it overrides what this writer does not store: ' + ov.unsupported.map((u) => u.what + ' (' + u.ids.slice(0, 6).join(', ') + (u.ids.length > 6 ? ', ...' : '') + ')').join('; '));
+				return;
+			}
+			taken[name] = 1;
+			if (!qbat) {
+				const qid = newId();
+				supportElement(qid, 1000, '', '');
+				db.run('UPDATE HMIModelingElement SET SmartLabel = NULL WHERE ElementID = ?', [qid]);
+				insert(db, 'QBATDefinition', { SupportElementID: qid, QBATDefinition_HMIActiveTopologyAlternative: altOfType[3], QBATDefinition_HMIActiveTopologyIncludeConnectedNodes: 1, HMIActiveTopologyMode: 0, HMIActiveTopologyQueriesCount: 0 });
+				qbat = true;
+			}
+			const local = {};
+			function childAlt(parentAlt) {
+				const id = newId(), type = typeOfAlt(parentAlt);
+				modeling(id, 1, name);
+				insert(db, 'HMIAlternative', { AlternativeID: id, ParentID: parentAlt, AlternativeTypeID: type, IsDeleted: 0, DomainDataSetID: 1, Level: 2 });
+				scenTally.alts[type] = (scenTally.alts[type] || 0) + 1;
+				local[parentAlt] = id;
+				return id;
+			}
+			const pAlt = ov.diameters.length ? childAlt(physAlt) : null, dAlt = ov.demands.length ? childAlt(demandAlt) : null;
+			const sid = newId();
+			modeling(sid, 2, name);
+			insert(db, 'HMIScenario', { ScenarioID: sid, ParentID: baseScen, IsDeleted: 0, DomainDataSetID: 1 });
+			rowsOf(db, 'SELECT AlternativeTypeID AS t, AlternativeID AS a FROM HMIScenarioAlternative WHERE ScenarioID = ?', [baseScen]).forEach((r) => {
+				const mine = local[r.a];
+				insert(db, 'HMIScenarioAlternative', { ScenarioID: sid, AlternativeTypeID: r.t, AlternativeID: mine || r.a, IsLocal: mine ? 1 : 0 });
+			});
+			rowsOf(db, 'SELECT NumericalEngineTypeID AS n, CalculationOptionsID AS c FROM HMIScenarioCalculationOptions WHERE ScenarioID = ?', [baseScen]).forEach((r) => {
+				insert(db, 'HMIScenarioCalculationOptions', { ScenarioID: sid, NumericalEngineTypeID: r.n, CalculationOptionsID: r.c, IsLocal: 0 });
+			});
+			ov.diameters.forEach((d) => {
+				const e = pipeElId[d.id];
+				copyRows(e, physAlt, pAlt);
+				db.run('UPDATE IdahoPipe_Physical_Data SET Physical_PipeDiameter = ? WHERE DomainElementID = ? AND AlternativeID = ?', [d.inches * IN_TO_FT, e, pAlt]);
+			});
+			ov.demands.forEach((d) => {
+				const e = elId['n:' + d.id];
+				copyRows(e, demandAlt, dAlt);
+				const items = rowsOf(db, 'SELECT ItemID FROM IdahoDemandNode_Demand_DemandCollection WHERE DomainElementID = ? AND AlternativeID = ? ORDER BY ItemID', [e, dAlt]);
+				items.forEach((it, i) => {
+					db.run('UPDATE IdahoDemandNode_Demand_DemandCollection SET DemandCollection_BaseFlow = ? WHERE ItemID = ?', [d.bases[i] * demandMult * GPM_TO_CFS, it.ItemID]);
+				});
+			});
+			scenTally.scenarios++;
+			rec.written = true; rec.id = sid; rec.pipeDiameters = ov.diameters.length; rec.junctionDemands = ov.demands.length;
+			(report.addedScenarios = report.addedScenarios || []).push(sid);
+			carried('scenario ' + name + ' (child of Base): ' + ov.diameters.length + ' pipe diameter' + (ov.diameters.length === 1 ? '' : 's') + ', ' + ov.demands.length + ' junction demand' + (ov.demands.length === 1 ? '' : 's') + ' overridden');
+			report.candidateWritten = (report.candidateWritten || 0) + 1;
+		});
 	}
 
 	// ---- AN AGE OR TRACE RUN: written on the page's path (Tom's round 3, 2026-11-03). He saw Age and Trace R in the
@@ -1116,11 +1205,18 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		+ 'EpaNetEngine_LiquidSpecificGravity = ?, EpaNetEngine_LiquidKinematicViscosity = ?' + (hasExtra ? ', EpaNetEngine_ExtraIterations = 10' : ''),
 		[EPOCH_2000 + (T.startClock || 0), sg, 1.1e-5 * visc]);
 
+	// ---- child scenarios last, so every Base element keeps the id it has with none ----
+	if (opts.candidate && opts.candidate.scenarios) { writeScenarios(opts.candidate.scenarios); }
+
 	// ---- counts, dataset notes ----
 	db.run('UPDATE HMIElementTypeCount SET Count = 0 WHERE ElementType IN (3,4)');
 	Object.keys(live).forEach((k) => { db.run('UPDATE HMIElementTypeCount SET Count = ? WHERE ElementType = 3 AND ElementTypeID = ?', [live[k], Number(k)]); });
 	Object.keys(supportLive).forEach((k) => { db.run('UPDATE HMIElementTypeCount SET Count = ? WHERE ElementType = 4 AND ElementTypeID = ?', [supportLive[k], Number(k)]); });
 	db.run('UPDATE HMIElementTypeCount SET Count = 1 WHERE ElementType IN (1,2) AND Count > 1');
+	if (scenTally.scenarios) {
+		db.run('UPDATE HMIElementTypeCount SET Count = ? WHERE ElementType = 2 AND ElementTypeID = 0', [1 + scenTally.scenarios]);
+		Object.keys(scenTally.alts).forEach((k) => { db.run('UPDATE HMIElementTypeCount SET Count = Count + ? WHERE ElementType = 1 AND ElementTypeID = ?', [scenTally.alts[k], Number(k)]); });
+	}
 	// A new project identity, so WaterGEMS does not take this for the saved project it was made from.
 	db.run('UPDATE HMIDomainDataSet SET Name = ?, Notes = ?, Guid = randomblob(16)', [opts.name || 'Net3', String(parsed.title || '').trim()]);
 
@@ -1151,7 +1247,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 function symbolMultiplier(extentFt) {
 	return Math.max(1, Math.round((extentFt || 0) / 500));
 }
-function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives, extentFt) {
+function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives, extentFt, addedScenarios) {
 	const eol = text.indexOf('\r\n') >= 0 ? '\r\n' : '\n';
 	const lines = text.split(eol);
 	const gone = new Set(removedScenarios.map(String)), goneAlt = new Set(removedAlternatives.map(String));
@@ -1164,6 +1260,12 @@ function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives, 
 		out.push(ln.replace(/ScenarioId="(\d+)"(?= \/>)/g, (all, id) => gone.has(id) ? 'ScenarioId="' + keepScenario + '"' : all));
 	});
 	let t = out.join(eol);
+	// A child scenario written beside Base: the animation setting row and the tree node a saved project has for it
+	// (Tom's save of 2026-11-13 added these two and nothing else to the .wtg).
+	if (addedScenarios && addedScenarios.length) {
+		t = t.replace(/(<ScenarioAnimationSettingStorageElement ScenarioCount="\d+">)/, (all) => all + addedScenarios.map((id) => eol + '    <ScenarioSettings ScenarioID="' + id + '" TimeStepIndex="0" IncrementIndex="0" />').join(''));
+		t = t.replace(/(<Node Identifier="1" IsGuid="false" IsInt="true" \/>)/, (all) => all + addedScenarios.map((id) => eol + '    <Node Identifier="' + id + '" IsGuid="false" IsInt="true" />').join(''));
+	}
 	// Counts that follow what was removed.
 	t = t.replace(/<ComputeStatusIndicator ScenarioCount="\d+"/, '<ComputeStatusIndicator ScenarioCount="' + (t.match(/<Scenario ScenarioId=/g) || []).length + '"');
 	t = t.replace(/<ScenarioAnimationSettingStorageElement ScenarioCount="\d+"/, '<ScenarioAnimationSettingStorageElement ScenarioCount="' + (t.match(/<ScenarioSettings /g) || []).length + '"');
@@ -1348,6 +1450,58 @@ function energyNotWritten(lines, patternIds) {
 	});
 }
 
+/**
+ * What a project scenario overrides, as this writer can store it (candidate; dev/wtg-export.md, "Child scenarios").
+ * Both arguments are the lpnInpParse() of a network: Base's, and the scenario's resolved values written as Base's are.
+ * Returns { diameters: [{ id, inches }], demands: [{ id, bases: [gpm, ...] }], unsupported: [{ what, ids }] }.
+ * The two supported kinds: a pipe's diameter, and the base flows of a junction's demand rows (the same rows, the same
+ * patterns). Every other difference, an asset in one network only, any other property of any asset, any other part
+ * of the file, is named in `unsupported`, and the caller leaves the scenario out whole.
+ */
+function scenarioOverrides(base, scen) {
+	const out = { diameters: [], demands: [], unsupported: [] }, bad = {};
+	const flag = (what, id) => { (bad[what] = bad[what] || []).push(id); };
+	const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+	const without = (o, drop) => { const c = {}; Object.keys(o).forEach((k) => { if (k !== 'tok' && drop.indexOf(k) < 0) { c[k] = o[k]; } }); return c; };
+	const rowsOfNode = (n) => [{ base: n.demand, pattern: n.demandPattern }].concat(n.extraDemands || []).filter((d) => d.base);
+	function each(a, b, test) {
+		const bm = {}, sm = {};
+		(a || []).forEach((x) => { bm[x.id] = x; });
+		(b || []).forEach((x) => { sm[x.id] = x; });
+		Object.keys(bm).forEach((id) => { if (!sm[id]) { flag('asset only in Base', id); } });
+		Object.keys(sm).forEach((id) => { if (!bm[id]) { flag('asset only in the scenario', id); } });
+		Object.keys(bm).forEach((id) => { if (sm[id]) { test(bm[id], sm[id]); } });
+	}
+	function keysDiffer(label, id, x, y) {
+		Object.keys(Object.assign({}, x, y)).forEach((k) => { if (!same(x[k], y[k])) { flag(label + ' ' + k, id); } });
+	}
+	each(base.nodes, scen.nodes, (a, b) => {
+		if (a.type !== 'junction' || b.type !== 'junction') { keysDiffer(a.type, a.id, without(a, []), without(b, [])); return; }
+		const ra = rowsOfNode(a), rb = rowsOfNode(b);
+		const norm = (n) => Object.assign(without(n, ['demand', 'extraDemands']), { extra: (n.extraDemands || []).map((d) => without(d, ['base'])) });
+		keysDiffer('junction', a.id, norm(a), norm(b));
+		if (ra.length !== rb.length || ra.some((d, i) => (d.pattern || null) !== (rb[i].pattern || null))) { flag('junction demand rows (number or pattern)', a.id); return; }
+		if (ra.some((d, i) => d.base !== rb[i].base)) { out.demands.push({ id: a.id, bases: rb.map((d) => d.base) }); }
+	});
+	each(base.links, scen.links, (a, b) => {
+		if (a.type === 'pipe' && b.type === 'pipe') {
+			keysDiffer('pipe', a.id, without(a, ['diameter']), without(b, ['diameter']));
+			if (a.diameter !== b.diameter) { out.diameters.push({ id: a.id, inches: b.diameter }); }
+		} else {
+			// A pump states no diameter; the .inp reader lends it the largest pipe's at its ends (js/lpn-inp.js), which is no override.
+			const drop = a.type === 'pump' ? ['diameter'] : [];
+			keysDiffer(a.type, a.id, without(a, drop), without(b, drop));
+		}
+	});
+	const SKIP = { nodes: 1, links: 1, title: 1, dropped: 1, ok: 1 };
+	Object.keys(Object.assign({}, base, scen)).forEach((k) => {
+		if (SKIP[k] || same(base[k], scen[k])) { return; }
+		flag('file part ' + k, '');
+	});
+	out.unsupported = Object.keys(bad).map((w) => ({ what: w, ids: bad[w].filter((x) => x !== '') }));
+	return out;
+}
+
 function plan(doc, opts) {
 	const out = EngCalcs.lpnExportInp(doc, opts || {});
 	if (!out || !out.ok) { return { ok: false, error: out && out.error, detail: out && out.detail }; }
@@ -1530,7 +1684,7 @@ async function build(planned, o) {
 	if (R.integrity !== 'ok' || R.foreignKeyViolations) {
 		throw fail('integrity', 'The file written failed its own integrity check (' + R.integrity + ', ' + R.foreignKeyViolations + ' foreign key violations), so it was not offered.', null, 'integrity');
 	}
-	const wtg = patchWtgXml(o.wtg, R.removedChildScenarios, 1, R.removedChildAlternatives, R.extentFt);
+	const wtg = patchWtgXml(o.wtg, R.removedChildScenarios, 1, R.removedChildAlternatives, R.extentFt, R.addedScenarios);
 	return { sqlite: out.bytes, wtg: wtg, report: R };
 }
 
@@ -1541,6 +1695,6 @@ EngCalcs.lpnWtgExportSetEngine = function (initSqlJs, wasmBinary) { injected = {
 EngCalcs.lpnWtgExportTestedSchemas = TESTED_SCHEMAS.slice();
 // For the spike's command line and harness (dev/lpn-spike/wtg-export.js): the pieces under the page.
 EngCalcs.lpnWtgExportInternals = { writeWtg: writeWtg, patchWtgXml: patchWtgXml, symbolMultiplier: symbolMultiplier, smartLabel: smartLabel,
-	referenceSchedule: referenceSchedule, GPM_TO_CFS: GPM_TO_CFS, carriableRules: carriableRules, energyNotWritten: energyNotWritten };
+	referenceSchedule: referenceSchedule, GPM_TO_CFS: GPM_TO_CFS, carriableRules: carriableRules, energyNotWritten: energyNotWritten, scenarioOverrides: scenarioOverrides };
 
 }(typeof globalThis !== 'undefined' ? globalThis : this));
