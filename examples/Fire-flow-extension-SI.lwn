@@ -52,7 +52,7 @@
 			"type": "junction",
 			"x": 67.1,
 			"y": 188.95,
-			"elev": 366,
+			"elev": 366.6,
 			"_demand": 0,
 			"desc": "Test pressure hydrant. Reads the pressure during the hydrant flow test: 43.5 m static, 39.5 m at 38 L/s, 34 m at 76 L/s."
 		},
@@ -61,7 +61,7 @@
 			"type": "junction",
 			"x": 120.23,
 			"y": 190.87,
-			"elev": 366.5,
+			"elev": 368.7,
 			"_demand": 0,
 			"desc": "Test flow hydrant, on the existing 300 mm main. The flow test draws 38 and 76 L/s here. The extension ties in at this junction."
 		},
@@ -70,7 +70,7 @@
 			"type": "junction",
 			"x": 225.53,
 			"y": 194.79,
-			"elev": 367.5,
+			"elev": 371,
 			"_demand": 0.4,
 			"desc": "First junction of the loop, two houses."
 		},
@@ -79,7 +79,7 @@
 			"type": "junction",
 			"x": 221.83,
 			"y": 302.83,
-			"elev": 370.5,
+			"elev": 368.1,
 			"_demand": 0.8,
 			"desc": "Four houses."
 		},
@@ -88,9 +88,9 @@
 			"type": "junction",
 			"x": 330.83,
 			"y": 306.66,
-			"elev": 374,
+			"elev": 369,
 			"_demand": 0,
-			"desc": "Fire hydrant junction, the high point of the loop and the design point for fire flow: 95 L/s with 14 m residual.",
+			"desc": "Fire hydrant junction, the far end of the loop and the design point for fire flow: 95 L/s with 14 m residual.",
 			"_fireFlow": 95
 		},
 		{
@@ -107,7 +107,7 @@
 			"type": "reservoir",
 			"x": 13.96,
 			"y": 187.04,
-			"_head": 366,
+			"_head": 366.6,
 			"desc": "System reservoir. Stands for the existing distribution system, as a fixed head at the elevation of the pressure hydrant, with PMP-1 giving its pressure and flow from the hydrant flow test."
 		}
 	],

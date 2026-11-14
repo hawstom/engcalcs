@@ -369,8 +369,11 @@ async function sectionSide(a, c, mid) {
 	await page.evaluate(() => { const e = document.getElementById('ec-consent'); if (e) { e.remove(); } });
 	p = await probe(page, 'node', S.id);
 	ok('after a reload it still hangs right', p && p.side === 'right' && p.lside === 'right', p ? 'side ' + p.side + ', stored ' + p.lside : 'no label');
-	// Now past half the width: it flips.
-	await wheel(a, mid, 10, -1);
+	// Now past half the width: it flips. Zoomed in about the label itself, so it stays on the map whichever label the
+	// placement left stacked (the ones nearest the middle are often one-line now, and a zoom about the middle carried
+	// the one that was left off the screen).
+	const lblAt = await page.evaluate((id) => { const r = document.querySelector('#lpn_canvas text[data-nodelbl="' + id + '"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, S.id);
+	await wheel(a, lblAt, 10, -1);
 	const nodeSX2 = await page.evaluate((id) => {
 		const e = document.querySelector('#lpn_canvas [data-node="' + id + '"]');
 		const r = e.getBoundingClientRect(); return r.left + r.width / 2;
