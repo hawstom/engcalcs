@@ -1810,7 +1810,7 @@
 		LPERFT3 = 28.317,                  // L per ft3 (types.h LperFT3)
 		Q_BIGNUM = 1e10,                   // types.h BIG
 		Q_TINY = 1e-6,                     // types.h TINY
-		VISCOS = 1.1e-5,                   // ft2/s (types.h), the default kinematic viscosity
+		VISCOS = EC.EPANET_VISCOS_FT2S,    // ft2/s (types.h), the default kinematic viscosity, defined once in PipeHydraulics.lib.js
 		DIFFUS = 1.3e-8,                   // ft2/s (types.h), the default diffusivity (chlorine)
 		Q_PI = Math.PI,
 		MIX1 = 0, MIX2 = 1, FIFO = 2, LIFO = 3,

@@ -69,7 +69,6 @@ const twoLoopManning = Object.assign({}, twoLoopGrid, {
 const twoLoopDw = Object.assign({}, twoLoopGrid, {
 	name: 'two-loop-darcy-weisbach',
 	method: 'dw',
-	visc: 1.007e-6,
 	links: twoLoopGrid.links.map(l => Object.assign({}, l, { roughness: 0.00015 }))
 });
 

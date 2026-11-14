@@ -429,9 +429,13 @@ function checkSuiteConsistency() {
 		{ diameter: d, length: L, roughness: e, f: f }, 'dw', 1.007e-6);
 	const theirsDw = EngCalcs.bpnFriction(
 		{ diameter: d, length: L, q: q, rough: 0, roughSi: e }, 'dw', 1.007e-6).hf;
-	report(Math.abs(mineDw.r * q * q - theirsDw) < 1e-12,
-		'Darcy-Weisbach head loss agrees with branched-network.js',
-		`${fmt(mineDw.r * q * q, 9)} vs ${fmt(theirsDw, 9)} m`);
+	// The two differ by exactly one constant on purpose: the looped network carries EPANET's g
+	// (32.2 ft/s2, EngCalcs.EPANET_G_DW) so it matches the EPANET engine; the branched calculator keeps
+	// EngCalcs.G. Scale out that one ratio and nothing else may remain.
+	const mineDwAtG = mineDw.r * q * q * EngCalcs.EPANET_G_DW / EngCalcs.G;
+	report(Math.abs(mineDwAtG - theirsDw) < 1e-12,
+		'Darcy-Weisbach head loss agrees with branched-network.js (g aside)',
+		`${fmt(mineDwAtG, 9)} vs ${fmt(theirsDw, 9)} m`);
 
 	// Task 213: the suite's Hazen-Williams IS EPANET's, so assert it against
 	// EPANET's published US-unit form evaluated independently in US units, rather

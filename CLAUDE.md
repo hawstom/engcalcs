@@ -86,7 +86,7 @@ language. `lib/config.inc.php` reads `APP_ENV`: `development` → `DEBUG_MODE=tr
 | `lib/Canonical.lib.php` | `ecCanonicalPaths()` — the one place a pretty URL is declared |
 | `lib/Language.Settings.php` | Per-language `QUALITY` weight used in Accept-Language negotiation |
 | `css/engcalcs.min.css` | **Generated, committed, and the file pages link.** Edit `css/engcalcs.css` (comments live there), then `php dev/scripts/build_css.php`; `check_all` fails when it is stale |
-| `js/PipeHydraulics.lib.js` | The suite's one Hazen-Williams constant pair (EPANET's) and `hwSlope()` |
+| `js/PipeHydraulics.lib.js` | EPANET's constants, defined once: the Hazen-Williams pair and `hwSlope()`, the default viscosity (`EPANET_VISCOS`), g for D-W (`EPANET_G_DW`), and `dwFriction()`, the one friction factor |
 | `js/lpn-geom.js` | `lpn_` pure geometry. No DOM |
 | `js/lpn-collide.js` | `lpn_` label collision avoidance. No DOM |
 | `js/lpn-rules.js` | `lpn_` EPANET `[RULES]` grammar. No DOM |
