@@ -1490,7 +1490,7 @@ var EngCalcs = EngCalcs || {};
 		if (!le.repeats) { le.repeats = []; }
 		while (le.repeats.length > n) {
 			var gone = le.repeats.pop();
-			dropStackHalo(gone.text); gone.text.remove();
+			gone.text.remove();
 			if (gone.lblHit) { gone.lblHit.remove(); }
 		}
 		while (le.repeats.length < n) {
@@ -4091,43 +4091,6 @@ var EngCalcs = EngCalcs || {};
 				tspan.textContent = seg.text;
 			});
 		});
-		stackHalo(textEl, rows.length > 1);
-	}
-	// **A STACK'S HALOS ARE PAINTED BENEATH ITS INK** (found 2026-11-13). The browser paints `paint-order:
-	// stroke fill` one text piece at a time, and every row is a piece, so a row's white stroke landed on
-	// the last pixel or two of the row above's ink. Inside one tspan the strokes already go down before
-	// the ink (see above); across rows they cannot, so a label of two rows or more is drawn as two
-	// layers: a <use> of the label beneath it that paints the halo only, and the label itself, now
-	// ink only (`.lpn-stacked`, css/engcalcs.css). The <use> is live, so it follows every move, resize
-	// and show/hide of the label with no code of its own; it only has to be made and removed.
-	// A label not yet in the DOM stays one layer, as before. The layer is made once per label and
-	// points at nothing while the label is one row: the layout pass rewrites a label's rows many times
-	// a settle, and making and removing an element each time was most of the cost, while a <use> that
-	// still pointed at its label rebuilt its copy at every rewrite.
-	var stackHaloSeq = 0;
-	function stackHalo(textEl, stacked) {
-		var u = textEl.lpnHaloUse, parent = textEl.parentNode;
-		if (!stacked) {
-			if (u && haloOn(textEl)) { u.removeAttribute('href'); textEl.classList.remove('lpn-stacked'); }
-			return;
-		}
-		if (!parent || !parent.insertBefore) { return; }
-		if (!u || u.parentNode !== parent) {
-			if (!textEl.getAttribute('id')) { textEl.setAttribute('id', 'lpn-lbl-' + (++stackHaloSeq)); }
-			u = el('use', { 'class': 'lpn-halo-use', href: '#' + textEl.getAttribute('id') });
-			parent.insertBefore(u, textEl);
-			textEl.lpnHaloUse = u;
-		}
-		if (!haloOn(textEl)) { u.setAttribute('href', '#' + textEl.getAttribute('id')); textEl.classList.add('lpn-stacked'); }
-	}
-	function haloOn(textEl) { return (' ' + (textEl.getAttribute('class') || '') + ' ').indexOf(' lpn-stacked ') >= 0; }
-	// Call wherever a label's <text> is removed, so its halo layer goes with it.
-	function dropStackHalo(textEl) {
-		var u = textEl && textEl.lpnHaloUse;
-		if (!u) { return; }
-		if (u.parentNode) { u.parentNode.removeChild(u); }
-		textEl.lpnHaloUse = null;
-		textEl.classList.remove('lpn-stacked');
 	}
 	// The width every consumer of a data label's box should use. Just the text -- the POINT of Task
 	// 333's extrema change. A badge hanging off the END of a decorated number sticks out past the
@@ -8247,7 +8210,6 @@ var EngCalcs = EngCalcs || {};
 		return Object.prototype.hasOwnProperty.call(m, k) ? m[k] : (m[k] = settingFor(activeScenario(), ['labelSettings'].concat(path || [])));
 	}
 	function scnProject(member) { return settingFor(activeScenario(), ['project', member]); }
-	function scnDefaultPattern() { return settingFor(activeScenario(), ['defaultPattern']) || null; }
 	// Deletes one path from a scenario's block and prunes every container it emptied, down to the
 	// block itself. Raw: it asks no table, which is what lets the load-time sanitizer remove what
 	// setScenarioSetting() would refuse to touch.
@@ -14697,7 +14659,6 @@ var EngCalcs = EngCalcs || {};
 		if (lines.length < 2) {
 			while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
 			textEl.textContent = lines[0];
-			stackHalo(textEl, false);
 			return;
 		}
 		setMultilineText(textEl, x, lines.map(function (t) { return [{ text: t }]; }), textLabelFirstDy(lb));
@@ -15626,7 +15587,7 @@ var EngCalcs = EngCalcs || {};
 	function removeCustomerLabelEls(id) {
 		var ce = custLblEls[id];
 		if (!ce) { return; }
-		dropStackHalo(ce.text); ce.text.remove();
+		ce.text.remove();
 		delete custLblEls[id];
 	}
 	// **THE WIDEST VIEW THAT ATTEMPTS A CUSTOMER LABEL**, in metres, or 0 for NEVER. Stated in the
@@ -16774,10 +16735,10 @@ var EngCalcs = EngCalcs || {};
 		if (le.symbolHit) { le.symbolHit.remove(); }
 		le.handles.forEach(function (h) { h.remove(); });
 		le.arrows.forEach(function (a) { a.remove(); });
-		dropStackHalo(le.text); le.text.remove();
+		le.text.remove();
 		if (le.lblHit) { le.lblHit.remove(); }
 		le.leader.remove();
-		(le.repeats || []).forEach(function (r) { dropStackHalo(r.text); r.text.remove(); if (r.lblHit) { r.lblHit.remove(); } });
+		(le.repeats || []).forEach(function (r) { r.text.remove(); if (r.lblHit) { r.lblHit.remove(); } });
 		if (le.symbolG) { le.symbolG.remove(); }
 	}
 	// **TUNNEL VISION, NOT A FULL LABEL PLACEMENT PASS** (Tom, on the stale-snapshot ruling: "we can
@@ -17702,8 +17663,28 @@ var EngCalcs = EngCalcs || {};
 			// Placed inside the BASE margins: the edges the settle reserved for the legend and the
 			// scale bar are what the cap gives up, and centring in them pushed Net2's west end off
 			// the map (a 145 px right reserve on a 358 px map).
+			// **BUT AN EDGE THE SETTLE RESERVED IS KEPT ON ANY AXIS WHERE THE NETWORK STILL FITS
+			// INSIDE IT AT THE CAP'S SCALE** (Task 851: Net1 at 390 x 844 has 8% to spare in height,
+			// and the Labels legend sat over the Tank). There the network is slid to the far side of
+			// the reserve -- lettering clear of the legend, the overhang at the other edge -- and
+			// never so far that a node leaves the map: the network's own window bounds it. An axis
+			// where it does not fit keeps the base margins, as before.
+			var settled = [padLeft, padRight, padTop, padBottom], ink = modelItems.concat(drawnInkItems());
+			function reservedT(key, lo, hi, span, i0) {
+				var pl = settled[i0], ph = settled[i0 + 1], bl = basePads[i0], bh = basePads[i0 + 1], wn, wa, v;
+				if (pl <= bl && ph <= bh) { return null; }
+				if (fitScaleFor(netItems, key, lo, hi, span, pl, ph) < floor) { return null; }
+				wn = fitWindow(netItems, floor, key, lo, hi, span, pl, ph);
+				wa = fitWindow(fittable(ink, lo, hi, span, pl, ph), floor, key, lo, hi, span, pl, ph);
+				v = (ph > bh && pl <= bl) ? wa.room : ((pl > bl && ph <= bh) ? wa.need : (wa.need + wa.room) / 2);
+				return Math.max(wn.need, Math.min(wn.room, v));
+			}
+			var kx = reservedT('x', 'l', 'r', r.width, 0), ky = reservedT('y', 't', 'b', r.height, 2), at;
 			padLeft = basePads[0]; padRight = basePads[1]; padTop = basePads[2]; padBottom = basePads[3];
-			apply(floor, place(floor, netItems));
+			at = place(floor, netItems);
+			if (kx !== null) { at.tx = kx; }
+			if (ky !== null) { at.ty = ky; }
+			apply(floor, at);
 		}
 		s = solve(labelTuning().fitRoom * scnSetting('textSize'));
 		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
@@ -22161,8 +22142,6 @@ var EngCalcs = EngCalcs || {};
 	// whose placement is KEPT while the map is hidden reads as detached, and that includes an older
 	// file saved with the map hidden (Perry's review, 2026-09-22, point 4).
 	function worldMapAttached() { return basemapOn(); }
-	// A grid project with a placement on file, whether or not the map is showing.
-	function worldMapPlacementKept() { return xyMapAttachable() && xyGeorefOk(); }
 	/**
 	 * **ATTACH, WIDENED PAST THE GRID CASE** (Tom, 2026-09-22, on a project he could not see this row
 	 * on at all: *"georeference xy -- I don't see this work merged... The map menu should have
@@ -25527,11 +25506,6 @@ var EngCalcs = EngCalcs || {};
 		return { ok: true, ast: ast };
 	}
 	function findAstIsCond(ast) { return !!ast && ast.t === 'cond'; }
-	function findAstHasConnection(ast) {
-		if (!ast) { return false; }
-		if (ast.t === 'cond') { return findPropIsConnection(ast.prop); }
-		return findAstHasConnection(ast.a) || findAstHasConnection(ast.b);
-	}
 	// Does the typed query ask a question that needs somewhere to walk TO? Only then is the
 	// no-source note true -- a query of nothing but "no links" is answerable on a bare drawing.
 	function findAstNeedsSource(ast) {
@@ -31478,10 +31452,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var cols = paneCols(spec), i;
 		for (i = 0; i < cols.length; i++) { if (cols[i].key === key) { return cols[i]; } }
 		return null;
-	}
-	function paneCellValue(spec, el, key) {
-		var c = paneColByKey(spec, key);
-		return c ? c.get(el) : undefined;
 	}
 	function panePresent(v) {
 		return v !== undefined && v !== null && v !== '' && !(typeof v === 'number' && !isFinite(v));
@@ -40776,7 +40746,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{n}', String(orphaned)));
 		}
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
-		nodeEls[id].circle.remove(); dropStackHalo(nodeEls[id].text); nodeEls[id].text.remove();
+		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
 		if (nodeEls[id].hit) { nodeEls[id].hit.remove(); }
 		if (nodeEls[id].lblHit) { nodeEls[id].lblHit.remove(); }
 		nodeEls[id].leader.remove();
@@ -42351,6 +42321,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var saved = acceptImportedText(text);
 				if (perfFetch0) { perfDebugRows.push('parse ' + (performance.now() - perfParse0).toFixed(1) + 'ms'); }
 				if (!saved) { return; }
+				// **AN EXAMPLE'S SAVED VIEW IS THE ONE ITS AUTHOR FRAMED ON A DESKTOP, and a phone is
+				// not that window** (Task 851; Perry, 2026-10-30, Net1 at 390 x 844: the Labels legend
+				// over the Tank). A view is a centre and a scale in pixels per drawing unit, so
+				// applied to a map a quarter as wide it crops the network and leaves the legend over
+				// lettering; the fit instead frames the network and makes room for the furniture.
+				// Only a gallery example, whose file is ours: a project of the visitor's own keeps
+				// the view it was saved with.
+				if (smallScreen()) { delete saved.view; }
 				var id = importProject(saved);
 				if (!id) { return; }
 				// **WHICH EXAMPLE THIS CAME FROM, so a later Save is not counted as naming.** Set
@@ -42448,7 +42426,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var lb = labelById(id), le = labelEls[id];
 		if (isSelected('label', id)) { deselectOne('label', id); }   // see deleteLink()
 		if (le.leader) { le.leader.remove(); }
-		dropStackHalo(le.text); le.text.remove();
+		le.text.remove();
 		if (le.lblHit) { le.lblHit.remove(); }
 		delete labelEls[id];
 		if (lb.anchorNode && labelsByAnchor[lb.anchorNode]) {
@@ -43130,16 +43108,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function indexEntry(id) {
 		for (var i = 0; i < library.projects.length; i++) { if (library.projects[i].id === id) { return library.projects[i]; } }
 		return null;
-	}
-	// Nodes/links/labels only -- NOT scenarios/settings/backdrop, which every new project inherits
-	// from whichever one was open (see newProject()) and so are never evidence that THIS project was
-	// touched. Reads the live doc for the open project rather than round-tripping through storage,
-	// since that is always current; a background tab is read from its own saved JSON.
-	function projectIsEmpty(id) {
-		var saved = id === library.openId ? doc : readJSON(projectKey(id));
-		return !!saved && !(saved.nodes && saved.nodes.length) && !(saved.links && saved.links.length) &&
-			!(saved.labels && saved.labels.length) && !(saved.customers && saved.customers.length) &&
-			!(saved.shapes && saved.shapes.length);
 	}
 	function saveIndex() { return writeJSON(LPN_INDEX_KEY, library); }
 	// ---- "differs from the file", the only thing the asterisk may mean ----
@@ -50206,13 +50174,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		};
 		reader.onerror = function () { setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
 		reader.readAsArrayBuffer(file);
-	}
-	// **AN UPLOAD, NOT A LIVE FILE HANDLE, in every browser.** What comes out of this is a placed
-	// copy that is no longer the drawing on the disk, so a Save writing back over the original would
-	// be the command doing something other than its name. Save as gives it a home of its own.
-	function pickGeoFile() {
-		var input = document.getElementById('lpn_geo_file');
-		if (input) { input.click(); }
 	}
 	// ---- FILE, CONVERT AS... (ROADMAP Task 696, absorbing Tasks 688 and 693) ----------------------
 	//
@@ -57435,8 +57396,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **COPIED AS LIGHT, WHATEVER THE THEME** (Task 811 round 3): a screenshot leaves the page, and what
 		// leaves the page is the drawing everyone else sees. withLightMap() lends the page Light and Light's
 		// label layout for the length of this synchronous copy.
-		svg.classList.add('lpn-snipping');
-		try { return withLightMap(function () { return snipCloneSvgNow(out); }); } finally { svg.classList.remove('lpn-snipping'); }
+		return withLightMap(function () { return snipCloneSvgNow(out); });
 	}
 	function snipCloneSvgNow(out) {
 		var clone = svg.cloneNode(true), pending = [];
@@ -60755,11 +60715,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			out.push({ c: c, it: it, why: why });
 		});
 		return out;
-	}
-	// The heading of a column, for the notice that names what was not pasted.
-	function matchColName(c) {
-		var pc = EngCalcs.pageConfig || {};
-		return typeof c.label === 'function' ? String(c.label()) : String(pc[c.label] || c.key);
 	}
 	// Writes what differs; counts what it could not. ctx = {changed, skip:{breakdown,valve}, before}.
 	function matchWrite(clip, dst, ctx) {
@@ -68432,18 +68387,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			dockAct(d, act);
 		});
 		return b;
-	}
-	// The box's one `?` (Q5): the JS twin of ecTipLabel() with no label text, so the glyph IS the
-	// whole tip target. EngCalcs.initTips() makes the glyph the tab stop and the one door, as on
-	// every other `?` (Task 759), so the wrapper is not focusable itself: one `?`, one tab stop.
-	function cornerHelp(tip) {
-		var help = document.createElement('span'), glyph = document.createElement('span');
-		help.className = 'ec-help lpn-corner-help';
-		help.title = tip;
-		glyph.className = 'ec-tip';
-		glyph.textContent = '?';
-		help.appendChild(glyph);
-		return help;
 	}
 	// **THE ONE "?" OF EVERY STANDING BOX** (Tom, 2026-10-07; Ida): the last glyph before the X, with
 	// the tip "Help for this box", opening that box's entry in the Guide. F1 inside the box does the
@@ -77650,7 +77593,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// opening or closing) moves the box with the words and keeps it open.
 	// It is not a hydraulic edit, so it works with Recalculate off exactly as Properties does.
 	var textEditor = null;
-	function textEditorOpen() { return !!textEditor; }
 	// **THE LAYOUT'S WIDTH, NOT innerWidth** (R-392). Chrome on a phone reports innerWidth as the
 	// VISIBLE width, so the zoom it makes onto a field typed in at a small size reads as a narrower
 	// window, and the editor closed the moment it opened. Only rotating or resizing the window
@@ -79017,7 +78959,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// is "1" if there is one; otherwise the demand is constant. `doc.defaultPattern` stays only
 	// what the file stated (so an export writes no Pattern line the file did not have); every
 	// RESOLUTION goes through here.
-	// In a scenario the stated pattern is the scenario's own, through scnDefaultPattern().
+	// In a scenario the stated pattern is the scenario's own, through scenarioDefaultPatternFor().
 	function effDefaultPattern() { return scenarioDefaultPatternFor(activeScenario()); }
 	// The same answer for any scenario, open or not: what a rename or a delete of a pattern asks of
 	// every scenario at once.
@@ -79470,19 +79412,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		s.times.text[key] = raw;
 		return true;
 	}
-	// The text a cell shows for one of these on one scenario: its own, or '' when it inherits; for
-	// Base, the project's own value (Base has no other).
-	function scenarioTimeText(s, key) {
-		var pt, v;
-		if (s.isBase && !writeTargetFor(s, 'calculation')) {
-			pt = projectTimes();
-			return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(pt, key, pt[key] || 0) : String(pt[key] || 0);
-		}
-		s = calcTargetOf(s);
-		v = scenarioTimeValue(s, key);
-		if (v === undefined) { return ''; }
-		return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(s.times, key, v) : String(v);
-	}
 	// A file is read, never trusted: a scenario's block keeps only what this page can run, Base
 	// holds none, and an empty block goes. An older project has none anywhere and is untouched.
 	function sanitizeScenarioTimes() {
@@ -79822,12 +79751,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// they belong beside `method` rather than in one engine's argument list.
 		//
 		// **`visc` IS AN ABSOLUTE VISCOSITY AND THE OPTION IS A RELATIVE ONE.** EPANET's
-		// `Viscosity 1.3` means 1.3 times water at 20 degC, which is the 1.007e-6 m2/s that has been
-		// hard-coded here since the solver was written. Multiplying is the whole conversion, and an
-		// absent option leaves the number exactly as it was.
+		// `Viscosity 1.3` means 1.3 times its own 1.1e-5 ft2/s (input1.c adjustdata()), which is
+		// EngCalcs.EPANET_VISCOS, the one default in js/PipeHydraulics.lib.js: the built-in solver
+		// and EPANET run the same fluid. Multiplying is the whole conversion.
 		var hyd = scnSetting('hydraulics') || {};
 		var model = { nodes: nodes, links: links, method: frictionMethod(),
-			visc: 1.007e-6 * (hyd.viscosity || 1),
+			visc: EngCalcs.EPANET_VISCOS * (hyd.viscosity || 1),
 			emitterExponent: scnSetting('emitterExponent'),
 			// Carried whole so js/lpn-epanet.js can write the ones only EPANET acts on -- accuracy,
 			// unbalanced, the head-error limit -- without a second copy of the list.
@@ -86460,7 +86389,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function smSelValid() {
 		return smState.sel !== null && (smIsBaseKey(smState.tree, smState.sel) || !!smRecord(smState.tree, smState.sel));
 	}
-	function smTip(key) { return (EngCalcs.pageConfig || {})[key] || ''; }
 	function smButton(host, text, tip, fn) {
 		var b = document.createElement('button');
 		b.type = 'button';
@@ -88075,12 +88003,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.map(csvField).join(','));
 		});
 		return lines.join('\r\n') + '\r\n';
-	}
-	// **A NAME SAFE ON EVERY FILESYSTEM THIS SUITE'S USERS ACTUALLY WRITE TO** -- Windows refuses
-	// `\ / : * ? " < > |` in a filename outright, so those become a hyphen rather than being handed
-	// to the browser to reject silently.
-	function sanitizeFilename(name) {
-		return String(name || '').replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
 	}
 	function downloadTextFile(filename, text, mime) {
 		var blob = new Blob([text], { type: mime || 'text/plain' }), url = URL.createObjectURL(blob),

@@ -96,9 +96,7 @@ const SKIP = new Set(['children', 'parentNode', 'classList', 'style', '_listener
 function dump(e, depth) {
 	if (!e || depth > 60) { return ''; }
 	if (e.nodeType === 3) { return JSON.stringify(e.textContent || e._text || ''); }
-	// A stack's halo layer (stackHalo()) follows its label, whose own `lpn-stacked` class says whether it is on; its counter id is not compared.
-	if ((e._tag || e.tagName) === 'use') { return ''; }
-	const attrs = Object.keys(e).filter((k) => !SKIP.has(k) && !(k === 'id' && /^lpn-lbl-\d+$/.test(e[k])) && typeof e[k] !== 'function' &&
+	const attrs = Object.keys(e).filter((k) => !SKIP.has(k) && typeof e[k] !== 'function' &&
 		(e[k] === null || typeof e[k] !== 'object')).sort().map((k) => k + '=' + JSON.stringify(e[k]));
 	const st = e.style && e.style._props ? JSON.stringify(Object.keys(e.style).filter((k) => k !== '_props' && typeof e.style[k] !== 'function').sort().map((k) => [k, e.style[k]]).concat(Object.keys(e.style._props).sort().map((k) => [k, e.style._props[k]]))) : '';
 	return '<' + (e._tag || e.tagName) + ' ' + attrs.join(' ') + ' ' + st + '>' +
@@ -246,7 +244,7 @@ if (BLIND && process.env.LPN_SEAM_OVERRIDE === '1') {
 		ok('Presentation: the scenario\'s map differs (text size and a head label)', own.map !== plain.map);
 		ok('...its labels legend names the head field it turned on', own.legends !== plain.legends);
 		ok('Calculation: the scenario solves to its own accuracy', own.accuracy === 1e-4 && plain.accuracy !== 1e-4, own.accuracy + ' vs ' + plain.accuracy);
-		ok('...with its own viscosity in the solver\'s model', JSON.parse(own.model).visc === 1.007e-6 * 2 && JSON.parse(plain.model).visc !== JSON.parse(own.model).visc);
+		ok('...with its own viscosity in the solver\'s model', JSON.parse(own.model).visc === EngCalcs.EPANET_VISCOS * 2 && JSON.parse(plain.model).visc !== JSON.parse(own.model).visc);
 		ok('...under its own friction method, which the solver is handed', JSON.parse(own.model).method === 'dw' && JSON.parse(plain.model).method === 'hw');
 		ok('...and the answer differs', own.solve !== plain.solve);
 		const optLine = (inp, re) => (inp.split('\n').filter((l) => re.test(l))[0] || '').trim();

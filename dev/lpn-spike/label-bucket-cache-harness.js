@@ -76,10 +76,7 @@ const L = loadLoopedNetwork(
 	"\t\t\t\tvar disp = ('display' in sp) ? sp.display : (/display\\s*:\\s*none/.test(sa) ? 'none' : '');\n" +
 	"\t\t\t\tvar vis = ('visibility' in sp) ? sp.visibility : (/visibility\\s*:\\s*hidden/.test(sa) ? 'hidden' : '');\n" +
 	"\t\t\t\tif (disp === 'none' || vis === 'hidden') { return '<' + e._tag + ' hidden>'; }\n" +
-	// A stack's halo layer (stackHalo()) is a <use> that follows its label, made the first time the label is a stack and
-	// hidden after; the label's own `lpn-stacked` class says whether it is on. The layer and its counter id are not compared.
-	"\t\t\t\tif (e._tag === 'use') { return ''; }\n" +
-	"\t\t\t\tvar keys = Object.keys(e).filter(function (k) { return !SKIP[k] && !(k === 'id' && /^(lpn-lbl-\\d+)?$/.test(e[k])) && typeof e[k] !== 'function' && (e[k] === null || typeof e[k] !== 'object'); }).sort();\n" +
+	"\t\t\t\tvar keys = Object.keys(e).filter(function (k) { return !SKIP[k] && typeof e[k] !== 'function' && (e[k] === null || typeof e[k] !== 'object'); }).sort();\n" +
 	// The EFFECTIVE inline style: the attribute's declarations with the object's on top, empty values
 	// dropped -- the same size written at creation or written later is the same size on screen.
 	"\t\t\t\tvar eff = {};\n" +
@@ -91,7 +88,7 @@ const L = loadLoopedNetwork(
 	"\t\t\t}\n" +
 	// ORDER-FREE: a chain's repeat copies are appended as they are grown, so the same picture can
 	// sit in the layer in a different order depending on which zoom grew them first.
-	"\t\t\treturn labelsLayer.children.map(ser).filter(Boolean).sort().join('\\n');\n" +
+	"\t\t\treturn labelsLayer.children.map(ser).sort().join('\\n');\n" +
 	"\t\t},\n" +
 	// Overlapping pairs of DRAWN label boxes, at the size the text is drawn at now: read off the DOM
 	// (position, anchor, rotation, visibility), sized by the banked widths at the current scale.

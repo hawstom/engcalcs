@@ -1534,10 +1534,6 @@ html[lang="zh"] .ec-welcome {
 	paint-order: stroke fill;
 	stroke: var(--ec-map-halo); stroke-width: calc(var(--lpn-halo, 0.4) * 1em); stroke-linejoin: round;
 }
-.lpn-halo-use { --lpn-stack-halo: var(--ec-map-halo); --lpn-stack-ink: 0; pointer-events: none; }
-.lpn-lbl.lpn-stacked { stroke: var(--lpn-stack-halo, none); fill-opacity: var(--lpn-stack-ink, 1); }
-.lpn-snipping .lpn-halo-use { display: none; }
-.lpn-snipping .lpn-lbl.lpn-stacked { stroke: var(--ec-map-halo); fill-opacity: 1; }
 .lpn-text-inplace {
 	position: fixed; z-index: 1200; margin: 0; padding: 0; border: 0; resize: none; overflow: hidden;
 	white-space: pre; box-sizing: content-box; min-width: 0; min-height: 0;
@@ -1597,7 +1593,7 @@ html[lang="zh"] .ec-welcome {
 @media (pointer: coarse) {
 	.lpn-lbl-hit[data-lbl] { stroke: transparent; stroke-width: var(--lpn-lhit, 0); stroke-linejoin: round; pointer-events: visible; }
 }
-.lpn-masks-off .lpn-lbl, .lpn-masks-off .lpn-lbl.lpn-stacked { stroke: none; }
+.lpn-masks-off .lpn-lbl { stroke: none; }
 .lpn-curve-table, .lpn-curve-table tr,
 .lpn-demand-table, .lpn-demand-table tr,
 .lpn-pane-table, .lpn-pane-table tr { border: 0; }

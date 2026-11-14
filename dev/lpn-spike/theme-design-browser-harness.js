@@ -146,7 +146,7 @@ function readDesign() {
 function readMap() {
 	const c = document.getElementById('lpn_canvas'), cs = (e) => getComputedStyle(e);
 	const tok = (n) => { const p = document.createElement('i'); p.style.color = 'var(' + n + ')'; document.body.appendChild(p); const v = cs(p).color; p.remove(); return v; };
-	const link = c.querySelector('.lpn-link'), lbl = c.querySelector('text.lpn-lbl[data-nodelbl]:not(.lpn-stacked)');   // a stack is ink only; its halo is the layer beneath it
+	const link = c.querySelector('.lpn-link'), lbl = c.querySelector('text.lpn-lbl[data-nodelbl]');
 	const parse = (x) => { const m = /rgba?\(([^)]+)\)/.exec(x); return m ? m[1].split(/[\s,/]+/).filter(Boolean).map(parseFloat) : [0, 0, 0]; };
 	const lum = (q) => { const f = q.slice(0, 3).map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2]; };
 	const ratio = (a, b) => { const x = lum(parse(a)), y = lum(parse(b)); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
