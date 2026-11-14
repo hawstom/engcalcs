@@ -43,7 +43,7 @@ lines rather than appending corrections.
   not have built it on box-design. This puts us in a pickle because box-design is a long-term
   project. We will stay the course."*
 - **Words for the visitor:** Check for a checkbox, Click for a button, Press for a key, Select on the
-  map, choose in menus (Tom, 2026-11-01, keeping Click over Use). Brief Wave 0 with them.
+  map, choose in menus (Task 759; Click over Use is his 2026-11-01 call). Brief Wave 0 with them.
 - **Box style:** clip, no ellipsis, no tip on cut text, nothing hover-only (Tom, 2026-11-01: *"On
   phone, there is no hover"*), and a `?` lands on the exact manual entry in the same words.
 - **English he has ruled on stays.** `lpn_field_auto_length_tip` ("slope length"; Tom, 2026-11-01:
