@@ -1855,15 +1855,46 @@
 			return engineRefusal(e, {});
 		});
 	}
-	// **ONE SOLVE AT A TIME THROUGH THE WARM SESSION.** Two solves started together used to share
-	// it: the second, finding a different signature, closed the Project the first was about to
-	// solve in, and both came back refused ("Error 102: no network data available"). Each solve
-	// now waits for the one before it; a solve takes milliseconds, so the queue is never felt.
-	var solveQueue = Promise.resolve();
+	// **ONE EPANET JOB AT A TIME IN THE SHARED WORKSPACE.** Two solves started together used to share
+	// the warm session: the second, finding a different signature, closed the Project the first was
+	// about to solve in, and both came back refused ("Error 102: no network data available"). A run
+	// and a run, or a run and a solve, shared the Workspace's one filesystem: both write temp.out,
+	// and the run-report box refreshing itself (applySolveResult -> lpnTimeReportAsync) started a
+	// run while a visitor's own run was still going. The file read back was truncated. Every job,
+	// steady solve or period run, now waits for the one before it. There is no superseded-job
+	// notion in this file to drop jobs by, so none is dropped; a steady solve takes milliseconds.
+	var jobQueue = Promise.resolve();
+	function queued(job) {
+		var p = jobQueue.then(job);
+		jobQueue = p.then(function () {}, function () {});
+		return p;
+	}
 	EngCalcs.lpnSolveEpanet = function (model, options) {
-		var p = solveQueue.then(function () { return solveEpanetInner(model, options); });
-		solveQueue = p.then(function () {}, function () {});
-		return stageOf(p, 'run');
+		return stageOf(queued(function () { return solveEpanetInner(model, options); }), 'run');
+	};
+
+	/**
+	 * **A RESULTS FILE IS READ ONLY IF IT IS ALL THERE.** The vendored readBinary() trusts the counts
+	 * in the file's own header and allocates by them, so a truncated or overwritten file sends it into
+	 * an allocation without bound and the tab dies of out-of-memory. This checks first and throws a
+	 * plain Error instead: the magic number at both ends, and that the declared periods fit the bytes.
+	 */
+	EngCalcs.lpnCheckOutBytes = function (bytes) {
+		var MAGIC = 516114521, PROLOG_INTS = 15, EPILOG = 28, dv, n, links, periods, per;
+		if (!bytes || typeof bytes.length !== 'number' || bytes.length < PROLOG_INTS * 4 + EPILOG) {
+			throw new Error('EPANET results file is truncated (' + (bytes ? bytes.length : 0) + ' bytes)');
+		}
+		dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+		if (dv.getInt32(0, true) !== MAGIC || dv.getInt32(bytes.length - 4, true) !== MAGIC) {
+			throw new Error('EPANET results file is incomplete (no closing marker)');
+		}
+		n = dv.getInt32(8, true); links = dv.getInt32(16, true);
+		periods = dv.getInt32(bytes.length - 12, true);
+		per = 4 * (4 * n + 8 * links);
+		if (n < 0 || links < 0 || periods < 0 || periods * per > bytes.length) {
+			throw new Error('EPANET results file is inconsistent (' + periods + ' periods do not fit ' + bytes.length + ' bytes)');
+		}
+		return bytes;
 	};
 
 
@@ -2372,7 +2403,7 @@
 							pipeType = mod.LinkType && mod.LinkType.Pipe;
 						if (!rateOn || !outBytes || typeof mod.readBinary !== 'function') { return; }
 						if (typeof pipeType !== 'number') { return; }
-						try { parsed = mod.readBinary(outBytes); } catch (e) { return; }
+						try { parsed = mod.readBinary(EngCalcs.lpnCheckOutBytes(outBytes)); } catch (e) { return; }
 						links = parsed && parsed.results && parsed.results.links;
 						if (!links || !parsed.prolog) { return; }
 						if (parsed.prolog.reportingPeriods !== frames.length) { return; }
@@ -2757,8 +2788,7 @@
 	};
 	EngCalcs.lpnEpanetRun = function (model, options) {
 		var p;
-		try { p = epanetRunInner(model, options); } catch (e) { p = Promise.reject(e); }
-		return stageOf(p, 'run');
+		return stageOf(queued(function () { return epanetRunInner(model, options); }), 'run');
 	};
 
 }(typeof globalThis !== 'undefined' ? globalThis : this));
