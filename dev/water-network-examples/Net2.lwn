@@ -1116,6 +1116,9 @@
 		"emitterExponent": 0.5,
 		"hydraulics": {
 			"specificGravity": 1,
+			"tok": {
+				"viscosity": "1.0"
+			},
 			"viscosity": 1,
 			"trials": 40,
 			"accuracy": 0.001,

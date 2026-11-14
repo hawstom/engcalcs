@@ -38,7 +38,10 @@ const PAIRS = [
 	// The two placed examples are published and audited against the same sources
 	// (examples-audit-harness.js), so a field the importer learns reaches them here too.
 	['Net2-Branford-CT', 'dev/water-network-examples/Net2-Branford-CT.lwn', 'dev/lpn-spike/reference/Net2.inp'],
-	['Net3-Novato-CA-World', 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'dev/lpn-spike/reference/Net3.inp']
+	['Net3-Novato-CA-World', 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'dev/lpn-spike/reference/Net3.inp'],
+	// project_example_crs.js derives the published Novato example from this lat/lon original, so a
+	// field backfilled only into the derived file is erased the next time it runs.
+	['Net3-Novato-CA-World (lat/lon original)', 'dev/water-network-examples/latlon-originals/Net3-Novato-CA-World.lwn', 'dev/lpn-spike/reference/Net3.inp']
 ];
 
 const { byId, setUnitSet, loadLoopedNetwork } = require('../lpn-spike/lpn-dom-stub.js');
@@ -145,6 +148,21 @@ PAIRS.forEach(function (pair) {
 	if (fileMethod && ex.settings && ex.settings.method === undefined) {
 		ex.settings.method = fileMethod;
 		modelAdded.push('settings.method');
+	}
+	// The characters of a carried option (`Viscosity 1.0`), beside the number, as the importer keeps them.
+	var freshHyd = global.EngCalcs.lpnInpParse(fs.readFileSync(inpPath, 'utf8')).hydraulics || {};
+	if (freshHyd.tok && ex.settings && ex.settings.hydraulics) {
+		Object.keys(freshHyd.tok).forEach(function (k) {
+			var tk = ex.settings.hydraulics.tok || (ex.settings.hydraulics.tok = {});
+			if (tk[k] === undefined && parseFloat(freshHyd.tok[k]) === ex.settings.hydraulics[k]) { tk[k] = freshHyd.tok[k]; modelAdded.push('settings.hydraulics.tok.' + k); }
+		});
+	}
+	// The key order of the importer's own record (the audit compares serialised text), `tok` where it puts it.
+	if (freshHyd.tok && ex.settings && ex.settings.hydraulics) {
+		var hOrdered = {}, hOld = ex.settings.hydraulics;
+		Object.keys(freshHyd).forEach(function (k) { if (hOld[k] !== undefined) { hOrdered[k] = hOld[k]; } });
+		Object.keys(hOld).forEach(function (k) { if (hOrdered[k] === undefined) { hOrdered[k] = hOld[k]; } });
+		if (JSON.stringify(hOrdered) !== JSON.stringify(hOld)) { ex.settings.hydraulics = hOrdered; modelAdded.push('settings.hydraulics order'); }
 	}
 	if (modelAdded.length) { clockAdded.push(modelAdded.length + ' model field(s)'); }
 	let added = 0, already = 0, unmatched = 0;
