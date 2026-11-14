@@ -3,7 +3,7 @@
 // shed properties when there is convenient open space to show everything on a leader."*). Run with:
 //   node dev/lpn-spike/label-pipe-fields-browser-harness.js
 //   PIPE_FIELDS_SHOTS=<dir> PIPE_FIELDS_TAG=<suffix>   saves the pictures Tom is shown
-//   PIPE_FIELDS_MASTER=1   also lays the views out with master's js (the pictures' "before"), printed only
+//   PIPE_FIELDS_BEFORE=<sha>   the commit the views are also laid out with (the "before"; default 20550276b, pinned: master holds the change now)
 // Every view is laid out twice from the same files, the rule on and the rule off (LPN_LEVEL_FULL_FIRST),
 // at one fixed scale each: Novato at wheel notches about N163 (1920 x 1000 and a 390 x 844 phone), the
 // 600-junction network at notch 9, Net3 on the phone. Link fields ID, Q, V; node fields ID, Qb, Z, H, P.
@@ -53,13 +53,16 @@ const SCENES = [
 	{ key: 'net3-phone', file: NET3, view: { width: 390, height: 844 }, around: null, notches: [0, 3, 6], named: [], shots: [6] }
 ];
 
+// The "before" is a pinned commit, never the branch name: master now holds the change this harness measures, so a
+// comparison with `master` reads "2010 -> 2010". 20550276b is master as it stood before Task 812 round 5 merged.
+const BEFORE_SHA = process.env.PIPE_FIELDS_BEFORE || '20550276b';
 async function layOut(Session, browser, sc, mode) {
 	const a = await Session.open(browser, NAME, { serviceWorkers: 'block', viewport: sc.view });
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	await a.page.route(/\/js\/(looped-network|lpn-collide)\.js/, async (route) => {
 		const resp = await route.fetch();
 		const file = /lpn-collide\.js/.test(route.request().url()) ? 'lpn-collide.js' : 'looped-network.js';
-		let body = mode === 'master' ? execFileSync('git', ['-C', REPO, 'show', 'master:js/' + file], { encoding: 'utf8', maxBuffer: 64 << 20 }) : await resp.text();
+		let body = mode === 'master' ? execFileSync('git', ['-C', REPO, 'show', BEFORE_SHA + ':js/' + file], { encoding: 'utf8', maxBuffer: 64 << 20 }) : await resp.text();
 		if (file === 'looped-network.js') {
 			if (body.indexOf(MARKER) >= 0) { body = body.replace(MARKER, HOOK + MARKER); }
 			if (mode === 'on' && process.env.PIPE_FIELDS_MUT) { JSON.parse(process.env.PIPE_FIELDS_MUT).forEach((m) => { if (body.indexOf(m[0]) < 0) { throw new Error('no ' + m[0]); } body = body.split(m[0]).join(m[1]); }); }
@@ -145,8 +148,8 @@ async function main() {
 		console.log(`        TOTAL pipe fields shown ${process.env.PIPE_FIELDS_MASTER ? tot.master.rows + ' (master) ' : ''}${tot.off.rows} -> ${tot.on.rows}; shed ${tot.off.shed} -> ${tot.on.shed}; hidden ${tot.off.hidden} -> ${tot.on.hidden}; leaders ${tot.off.leaders} -> ${tot.on.leaders}; strikes ${tot.off.strikes} -> ${tot.on.strikes}; pass ${tot.off.ms} -> ${tot.on.ms} ms`);
 		console.log(`        AGAINST MASTER over all views: pipe labels master shows that are hidden here ${cnt.hvm}; moved to a leader without a gain ${cnt.lng}; pipe fields ${tot.master.rows} -> ${tot.on.rows}`);
 		// Round 4 node labels take ground pipe labels held (the accepted node-for-pipe trade): the count against master is a ceiling (87 measured), not zero.
-		ok('pipe fields shown are more than master shows', tot.on.rows > tot.master.rows, `${tot.master.rows} -> ${tot.on.rows}`);
-		ok('pipe labels hidden against master stay within the measured ceiling', cnt.hvm <= (+process.env.PIPE_FIELDS_HVM_CEILING || 100), String(cnt.hvm));
+		ok('pipe fields shown are more than the pinned before shows', tot.on.rows > tot.master.rows, `${tot.master.rows} -> ${tot.on.rows}`);
+		ok('pipe labels hidden against the pinned before stay within the measured ceiling', cnt.hvm <= (+process.env.PIPE_FIELDS_HVM_CEILING || 100), String(cnt.hvm));
 		ok('over all views, more pipe fields shown', tot.on.rows > tot.off.rows, `${tot.off.rows} -> ${tot.on.rows}`);
 		ok('over all views, fewer pipe labels shed', tot.on.shed < tot.off.shed, `${tot.off.shed} -> ${tot.on.shed}`);
 		ok('the label pass costs at most double the time', tot.on.ms <= 2 * tot.off.ms, `${tot.off.ms} -> ${tot.on.ms} ms`);
