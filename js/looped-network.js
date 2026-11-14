@@ -1490,7 +1490,7 @@ var EngCalcs = EngCalcs || {};
 		if (!le.repeats) { le.repeats = []; }
 		while (le.repeats.length > n) {
 			var gone = le.repeats.pop();
-			gone.text.remove();
+			dropStackHalo(gone.text); gone.text.remove();
 			if (gone.lblHit) { gone.lblHit.remove(); }
 		}
 		while (le.repeats.length < n) {
@@ -4091,6 +4091,37 @@ var EngCalcs = EngCalcs || {};
 				tspan.textContent = seg.text;
 			});
 		});
+		stackHalo(textEl, rows.length > 1);
+	}
+	// **A STACK'S HALOS ARE PAINTED BENEATH ITS INK** (found 2026-11-13). The browser paints `paint-order:
+	// stroke fill` one text piece at a time, and every row is a piece, so a row's white stroke landed on
+	// the last pixel or two of the row above's ink. Inside one tspan the strokes already go down before
+	// the ink (see above); across rows they cannot, so a label of two rows or more is drawn as two
+	// layers: a <use> of the label beneath it that paints the halo only, and the label itself, now
+	// ink only (`.lpn-stacked`, css/engcalcs.css). The <use> is live, so it follows every move, resize
+	// and show/hide of the label with no code of its own; it only has to be made and removed.
+	// A label not yet in the DOM stays one layer, as before.
+	var stackHaloSeq = 0;
+	function stackHalo(textEl, stacked) {
+		var u = textEl.lpnHaloUse, parent = textEl.parentNode;
+		if (!stacked || !parent || !parent.insertBefore) {
+			dropStackHalo(textEl);
+			return;
+		}
+		if (u && u.parentNode === parent) { return; }
+		if (!textEl.getAttribute('id')) { textEl.setAttribute('id', 'lpn-lbl-' + (++stackHaloSeq)); }
+		u = el('use', { 'class': 'lpn-halo-use', href: '#' + textEl.getAttribute('id') });
+		parent.insertBefore(u, textEl);
+		textEl.lpnHaloUse = u;
+		textEl.classList.add('lpn-stacked');
+	}
+	// Call wherever a label's <text> is removed, so its halo layer goes with it.
+	function dropStackHalo(textEl) {
+		var u = textEl && textEl.lpnHaloUse;
+		if (!u) { return; }
+		if (u.parentNode) { u.parentNode.removeChild(u); }
+		textEl.lpnHaloUse = null;
+		textEl.classList.remove('lpn-stacked');
 	}
 	// The width every consumer of a data label's box should use. Just the text -- the POINT of Task
 	// 333's extrema change. A badge hanging off the END of a decorated number sticks out past the
@@ -15588,7 +15619,7 @@ var EngCalcs = EngCalcs || {};
 	function removeCustomerLabelEls(id) {
 		var ce = custLblEls[id];
 		if (!ce) { return; }
-		ce.text.remove();
+		dropStackHalo(ce.text); ce.text.remove();
 		delete custLblEls[id];
 	}
 	// **THE WIDEST VIEW THAT ATTEMPTS A CUSTOMER LABEL**, in metres, or 0 for NEVER. Stated in the
@@ -16736,10 +16767,10 @@ var EngCalcs = EngCalcs || {};
 		if (le.symbolHit) { le.symbolHit.remove(); }
 		le.handles.forEach(function (h) { h.remove(); });
 		le.arrows.forEach(function (a) { a.remove(); });
-		le.text.remove();
+		dropStackHalo(le.text); le.text.remove();
 		if (le.lblHit) { le.lblHit.remove(); }
 		le.leader.remove();
-		(le.repeats || []).forEach(function (r) { r.text.remove(); if (r.lblHit) { r.lblHit.remove(); } });
+		(le.repeats || []).forEach(function (r) { dropStackHalo(r.text); r.text.remove(); if (r.lblHit) { r.lblHit.remove(); } });
 		if (le.symbolG) { le.symbolG.remove(); }
 	}
 	// **TUNNEL VISION, NOT A FULL LABEL PLACEMENT PASS** (Tom, on the stale-snapshot ruling: "we can
@@ -40738,7 +40769,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{n}', String(orphaned)));
 		}
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
-		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
+		nodeEls[id].circle.remove(); dropStackHalo(nodeEls[id].text); nodeEls[id].text.remove();
 		if (nodeEls[id].hit) { nodeEls[id].hit.remove(); }
 		if (nodeEls[id].lblHit) { nodeEls[id].lblHit.remove(); }
 		nodeEls[id].leader.remove();
@@ -42410,7 +42441,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var lb = labelById(id), le = labelEls[id];
 		if (isSelected('label', id)) { deselectOne('label', id); }   // see deleteLink()
 		if (le.leader) { le.leader.remove(); }
-		le.text.remove();
+		dropStackHalo(le.text); le.text.remove();
 		if (le.lblHit) { le.lblHit.remove(); }
 		delete labelEls[id];
 		if (lb.anchorNode && labelsByAnchor[lb.anchorNode]) {
@@ -57397,7 +57428,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **COPIED AS LIGHT, WHATEVER THE THEME** (Task 811 round 3): a screenshot leaves the page, and what
 		// leaves the page is the drawing everyone else sees. withLightMap() lends the page Light and Light's
 		// label layout for the length of this synchronous copy.
-		return withLightMap(function () { return snipCloneSvgNow(out); });
+		svg.classList.add('lpn-snipping');
+		try { return withLightMap(function () { return snipCloneSvgNow(out); }); } finally { svg.classList.remove('lpn-snipping'); }
 	}
 	function snipCloneSvgNow(out) {
 		var clone = svg.cloneNode(true), pending = [];

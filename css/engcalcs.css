@@ -2564,6 +2564,16 @@ html[lang="zh"] .ec-welcome {
 	paint-order: stroke fill;
 	stroke: var(--ec-map-halo); stroke-width: calc(var(--lpn-halo, 0.4) * 1em); stroke-linejoin: round;
 }
+/* A STACK (a label of two rows or more) IS TWO LAYERS, so no row's halo lies on another row's ink: the
+   browser paints stroke and fill one text row at a time. setMultilineText() puts a <use> of the label
+   (.lpn-halo-use) beneath it. The <use> sets the two custom properties, which inherit into the copy it draws:
+   the copy shows the halo only, and the label itself, which sets neither, shows the ink only. */
+.lpn-halo-use { --lpn-stack-halo: var(--ec-map-halo); --lpn-stack-ink: 0; pointer-events: none; }
+.lpn-lbl.lpn-stacked { stroke: var(--lpn-stack-halo, none); fill-opacity: var(--lpn-stack-ink, 1); }
+/* A screenshot's copy inlines each element's own computed style and cannot carry the <use>, so for the
+   length of that copy a stack goes back to one layer (snipCloneSvg()). */
+.lpn-snipping .lpn-halo-use { display: none; }
+.lpn-snipping .lpn-lbl.lpn-stacked { stroke: var(--ec-map-halo); fill-opacity: 1; }
 /* The in-place Text editor (looped-network.js openTextEditor()): laid over the hidden map words at
    their size, angle and alignment, so it must add no box metrics of its own. The outline marks it as
    being edited without moving a glyph. */
@@ -2843,7 +2853,7 @@ html[lang="zh"] .ec-welcome {
    setting -- masking is a property of how the sheet is meant to be read, not of the browser, so per
    Task 263 it is saved with the project like units and ID prefixes. Since Task 376 "off" is
    `stroke: none` on the text itself; there is no longer an element to hide. */
-.lpn-masks-off .lpn-lbl { stroke: none; }
+.lpn-masks-off .lpn-lbl, .lpn-masks-off .lpn-lbl.lpn-stacked { stroke: none; }
 /* Pump curve entry inside the element property popup (Tom, 2026-07-30: "the table needs headings
    for Head and Flow"). Scoped rather than left to the suite's general results-table styling: this
    is a compact input grid inside a floating popup, not a page-width results table, so it must not
