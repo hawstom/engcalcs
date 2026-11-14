@@ -70045,12 +70045,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		n = libOrderCount(sec);
 		if (!LIB_ORDER[sec].byId) { return (s.n === n && s.i >= 0 && s.i < n) ? s.i : -1; }
 		a = LIB_ORDER[sec].read();
-		for (i = 0; i < a.length; i++) { if (String(a[i].id) === s.id) { return i; } }
+		// The item itself first: a rename changes its id, not which item it is. The id second, for a document an Undo has replaced.
+		i = a.indexOf(s.obj);
+		if (i >= 0) { s.id = String(a[i].id); return i; }
+		for (i = 0; i < a.length; i++) { if (String(a[i].id) === s.id) { s.obj = a[i]; return i; } }
 		return -1;
 	}
 	function libOrderSelect(sec, i) {
 		var o = LIB_ORDER[sec], proj = libProjKey();
-		libSel[sec] = o.byId ? { proj: proj, id: String(o.read()[i].id) } : { proj: proj, i: i, n: libOrderCount(sec) };
+		libSel[sec] = o.byId ? { proj: proj, id: String(o.read()[i].id), obj: o.read()[i] } : { proj: proj, i: i, n: libOrderCount(sec) };
 	}
 	// Undo restores the whole document, and an item with no id is selected by its position, which Undo has changed.
 	function libSelForgetIndexed() { delete libSel.controls; delete libSel.rules; }
@@ -70132,7 +70135,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			b.className = 'lpn-lib-move';
 			b.setAttribute('data-move', m.how);
 			m.icon(b, pc[m.key] || m.fallback, tip);
-			b.addEventListener('click', function () { libOrderMove(sec, m.how); });
+			// A press does not take the focus from a field being typed in: the field is committed first (its change handler may rebuild
+			// the box, as a rename does), and only then is the item moved, so the first press after typing acts.
+			b.addEventListener('mousedown', function (e) { if (e.preventDefault) { e.preventDefault(); } });
+			b.addEventListener('click', function () {
+				var f = document.activeElement;
+				if (f && f !== b && f.blur && libBoxEl() && libBoxEl().contains(f)) { f.blur(); }
+				libOrderMove(sec, m.how);
+			});
 			group.appendChild(b);
 		});
 		row.appendChild(group);

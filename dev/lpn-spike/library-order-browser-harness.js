@@ -9,7 +9,8 @@
 //   3. a click on Move up (or Move to top) moves the row, the mark follows it, the disabled states follow;
 //   4. the keyboard does it: Tab to a button, Enter, and the focus is still on a button that can act;
 //   5. one Ctrl+Z puts the row back;
-//   6. Controls and Rules say in the tip that a move can change a run; the other sections do not.
+//   6. Controls and Rules say in the tip that a move can change a run; the other sections do not;
+//   7. the first press after typing in an item (a rename rebuilds the box) acts, and the item stays selected.
 // The moves themselves, saved order and export order: library-order-harness.js.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -173,6 +174,23 @@ async function main() {
 			await a.settle(300);
 			r = await rows();
 			ok(sec + ': one Ctrl+Z puts it one step back', r[0] === start[last] && r.length === start.length, JSON.stringify(r));
+
+			// THE FIRST PRESS AFTER TYPING ACTS (Perry's review): a field edited and not yet left is committed by the press itself, a rename
+			// rebuilds the box under the pointer, and the selection follows the item through it.
+			const cur = await rows(), tl = cur.length - 1, entry = a.page.locator('#lpn_libbox_content .lpn-lib-entry').nth(tl);
+			const field = sec === 'controls' ? entry.locator('input[type=text]').first()
+				: sec === 'rules' ? entry.locator('textarea:not(.lpn-lib-desc)').first() : entry.locator('.lpn-lib-id').first();
+			const was = await field.inputValue();
+			await field.click();
+			await field.fill(sec === 'rules' ? was + '\n' : sec === 'controls' ? was + ' ' : was + 'X');
+			const typed = await rows();
+			await a.page.locator('#lpn_lib_move_top').click();
+			await a.settle(300);
+			const norm = (x) => x.split('|').map((t) => t.trim()).join('|');
+			r = await rows();
+			ok(sec + ': the first press after typing in the item moves it', norm(r[0]) === norm(typed[tl]) && r.length === cur.length, JSON.stringify([typed, r]));
+			s = await state();
+			ok(sec + ': ...and it is still the selected item', s.sel[0] === true && dis(s) === 'top:off up:off down:on bottom:on', dis(s) + JSON.stringify(s.sel));
 		}
 		const alive = await P(() => !!document.getElementById('lpn_library_box'));
 		ok('the page is still alive', alive);

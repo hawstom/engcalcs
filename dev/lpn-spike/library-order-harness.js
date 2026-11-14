@@ -37,6 +37,7 @@ const L = loadLoopedNetwork(
 	"\t\tlibRulesMoved: libRulesMoved, libRuleEntries: libRuleEntries, libReadControl: libReadControl,\n" +
 	"\t\tundoDepth: function () { return undoStack.length; }, undo: undo, redo: redo, clearUndo: clearUndo,\n" +
 	"\t\tsetLibSection: function (s) { libSection = s; }, rebuildLibraryBox: rebuildLibraryBox,\n" +
+	"\t\tlibRenamePattern: libRenamePattern, libRenameCurve: libRenameCurve, libRenamePipeType: libRenamePipeType, libRenameFittingSet: libRenameFittingSet,\n" +
 	"\t\tsetOpenId: function (v) { library.openId = v; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -300,6 +301,18 @@ head('6. what is selected');
 	d.controls.push(d.controls[0]);
 	ok('a position selection is dropped when the list changes length', L.libOrderSelIndex('controls') === -1);
 	L.setOpenId('');
+}
+
+head('6b. the selection follows an item through a rename');
+{
+	const REN = { patterns: 'libRenamePattern', curves: 'libRenameCurve', pipetypes: 'libRenamePipeType', fittings: 'libRenameFittingSet' };
+	Object.keys(REN).forEach((sec) => {
+		const d = freshDoc(), arr = SECTIONS[sec](d), item = arr[1];
+		L.libOrderSelect(sec, 1);
+		ok(sec + ': ' + REN[sec] + ' renames the selected item', L[REN[sec]](item, 'RENAMED') !== false && item.id === 'RENAMED');
+		ok(sec + ': it is still the selected item under its new id', L.libOrderSelIndex(sec) === 1);
+		ok(sec + ': and Move to top moves it', L.libOrderMove(sec, 'top') === true && String(arr[0].id) === 'RENAMED');
+	});
 }
 
 (async function () {
