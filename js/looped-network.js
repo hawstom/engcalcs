@@ -9463,6 +9463,24 @@ var EngCalcs = EngCalcs || {};
 		try { return !!(window.matchMedia && window.matchMedia('(max-width: 640px)').matches); }
 		catch (e) { return false; }
 	}
+	// **NO LEGEND IS SHOWN WHEN A PROJECT OPENS ON A PHONE** (Tom, 2026-11-14: *"On a phone, we should
+	// never have the legends shown by default on any example or for any reason."* -- Task 851, Net1's
+	// legend lay over its Tank label). The map is a quarter as wide and a legend is a fifth of it.
+	// Two legends, so two holds: the Labels legend (`legendPosition`) and the colour key
+	// (`colorLegendPosition`). A hold lasts for one project's time on screen and is SESSION STATE
+	// ONLY: nothing is stored on the device, and the project's own setting is never rewritten, so a
+	// project saved on a phone keeps the corner it had (CLAUDE.md: write back what came in). The
+	// Settings dropdown of a held legend reads None; choosing a corner there releases that legend.
+	// Opening or creating another project holds them again (holdLegendsOnPhone(), called by every
+	// project arrival that is a switch). Read through legendPositionNow(), never scnSetting().
+	var legendsHeld = { legendPosition: smallScreen(), colorLegendPosition: smallScreen() };
+	function holdLegendsOnPhone() {
+		var small = smallScreen();
+		legendsHeld = { legendPosition: small, colorLegendPosition: small };
+	}
+	function legendPositionNow(member) { return legendsHeld[member] ? 'off' : scnSetting(member); }
+	// What a legend's own dropdown shows: None while it is held, whatever the project's setting says.
+	function legendPositionShown(member) { return legendsHeld[member] ? 'off' : settings[member]; }
 
 	// Gear/settings panel -- like labelSettings, a VIEW/preference object, not network content:
 	// persisted to localStorage as a sibling key, deliberately NOT part of the undo-snapshotted
@@ -13400,7 +13418,7 @@ var EngCalcs = EngCalcs || {};
 				box.appendChild(note);
 			}
 		});
-		box.style.display = (any && !galleryIsUp() && !legendIsOff(scnSetting('colorLegendPosition'))) ? '' : 'none';
+		box.style.display = (any && !galleryIsUp() && !legendIsOff(legendPositionNow('colorLegendPosition'))) ? '' : 'none';
 		applyColorLegendPosition();
 	}
 	// Both legends are placed by one function, so neither can be positioned without the other's
@@ -29025,7 +29043,8 @@ var EngCalcs = EngCalcs || {};
 		// acknowledgement is a licence obligation on the catalogue rather than on either picker. So
 		// the two stand under Map appearance, where the sizes and the other legend already are.
 setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
-			positionSelect(settings.colorLegendPosition, function (v) {
+			positionSelect(legendPositionShown('colorLegendPosition'), function (v) {
+				legendsHeld.colorLegendPosition = false;
 				settings.colorLegendPosition = v;
 				// The RENDER, for the same reason the labels legend's dropdown calls its own: only the
 				// render knows whether there is a key to bring back after Off.
@@ -44905,6 +44924,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		applySaved(doc2);
 		propClip = null;   // copied properties belong to the project they were copied from
 		clearUndo();
+		holdLegendsOnPhone();
 		refreshAllFromDocument();
 		return true;
 	}
@@ -44977,6 +44997,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		library.openId = id;
 		clearUndo();
 		saveToStorage();
+		holdLegendsOnPhone();
 		refreshAllFromDocument();
 		// AFTER the refresh, not before: refreshAllFromDocument() schedules a solve, and that solve
 		// calls saveToStorage(), which recomputes `dirty` against the baseline. Stamping first would
@@ -47197,6 +47218,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		library.projects.push({ id: id, name: project.name, updated: Date.now() });
 		clearUndo();
 		saveToStorage();
+		holdLegendsOnPhone();
 		refreshAllFromDocument();
 		// Says where the user landed, the same way discardProject() does: a project appearing on
 		// screen that was not there a moment ago wants narration.
@@ -52823,6 +52845,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var d = readDocument(projectKey(landed.id));
 				if (d) { applySaved(d); }
 				clearUndo();
+				holdLegendsOnPhone();
 				refreshAllFromDocument();
 				setNotice((pc.lpn_status_closed_opened || 'Closed {closed}. Now showing {opened}.')
 					.replace('{closed}', goneName)
@@ -62993,7 +63016,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// chrome the placement never touches. `labelsFullyHidden()`, not `dataLabelsHidden`, is
 		// the read that keeps that exclusion true.
 		box.style.display = (any && !galleryIsUp() && !labelsFullyHidden(state.s) &&
-			!legendIsOff(scnSetting('legendPosition'))) ? '' : 'none';
+			!legendIsOff(legendPositionNow('legendPosition'))) ? '' : 'none';
 		applyLegendPosition();
 	}
 	// There is no toggleLabelsPopup() any more. Labels moved to the Visibility panel (Task 427) and
@@ -63411,8 +63434,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!wrap || !wrap.getBoundingClientRect) { return; }
 		wr = wrap.getBoundingClientRect();
 		boxes = [
-			{ el: document.getElementById('lpn_labels_legend'), pos: scnSetting('legendPosition') },
-			{ el: colorLegendBox, pos: scnSetting('colorLegendPosition') }
+			{ el: document.getElementById('lpn_labels_legend'), pos: legendPositionNow('legendPosition') },
+			{ el: colorLegendBox, pos: legendPositionNow('colorLegendPosition') }
 		];
 		// Before first layout the wrapper has no box, and a dodge computed from a zero-height map
 		// would be arithmetic on nothing. The corners are still applied; only the dodge waits.
@@ -65312,10 +65335,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var legendSelect = document.createElement('select');
 		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');
-			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === settings.legendPosition) { opt.selected = true; }
+			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === legendPositionShown('legendPosition')) { opt.selected = true; }
 			legendSelect.appendChild(opt);
 		});
 		legendSelect.addEventListener('change', function () {
+			legendsHeld.legendPosition = false;
 			settings.legendPosition = legendSelect.value;
 			// The RENDER, not applyLegendPosition(): picking a corner again after Off has to bring the
 			// box back, and only the render knows whether there is anything to bring back.
