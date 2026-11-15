@@ -101,6 +101,35 @@ remove the difference (see S1), so this is one cause, not the whole gap.
 
 Fix: one constant, EPANET's, used by both. Defect (the stated aim is to mirror EPANET).
 
+### Reference: how EPANET reads `Viscosity` and `Diffusivity` (Tom, 2026-11-14: "We need to document such craziness carefully")
+**Source:** EPANET 2.2 `src/input1.c`, `adjustdata()`, lines 280-300 (OpenWaterAnalytics/EPANET), with the
+constants `VISCOS 1.1E-5` (ft2/s) and `DIFFUS 1.3E-8` (ft2/s) in `src/types.h`, and the option reader in
+`src/input3.c` (`optionvalue()`), which stores the number as typed and refuses a value of zero or below
+(error 213). The 2.2 manual describes the option as "kinematic viscosity of the fluid being modeled relative to
+that of water at 20 deg. C (1.0 centistoke)", which is only the relative half of what the code does.
+
+One keyword, two meanings, decided by the size of the number alone:
+
+| Value typed | EPANET reads it as | Result |
+|---|---|---|
+| not stated | EPANET's default | `VISCOS`, 1.1e-5 ft2/s (1.0219e-6 m2/s) |
+| above 0.001 (Diffusivity: above 0.0001) | a RATIO to the default | value x `VISCOS` |
+| 0.001 or less (Diffusivity: 0.0001 or less) | the quantity ITSELF, in the file's own system | ft2/s if the flow unit is a US one, m2/s if SI (divided by `SQR(MperFT)` into ft2/s) |
+| zero or negative | refused, error 213 | no run |
+
+Examples, each held by `dev/lpn-spike/inp-fidelity-harness.js` section 3b against the vendored engine:
+- `Viscosity 2.00` (relative): twice the default, 2.0438e-6 m2/s.
+- `Viscosity 1.0219e-6` in an SI file (absolute): the default itself, so the same as stating nothing.
+- `Viscosity 2.20e-5` in a US file (absolute, ft2/s): twice the default again, the same water as `Viscosity 2.00`.
+- `Viscosity 1.3` (relative) and `Viscosity 1.1e-5` (absolute, US) look alike to a reader and are not.
+
+What the page does: the file's characters ride with the setting and go back out exactly as written (the
+number is never rewritten into the other form). `EngCalcs.lpnFluidOptionRead()` (js/lpn-inp.js) turns either
+form into the relative number for the model, which both engines take; `assembleModel()` calls it for Viscosity
+and the Quality options code for Diffusivity. The Settings row is "Viscosity" and its tip states the rule in
+these terms. The threshold is on the number, not on a unit choice, so a value typed above 0.001 can never
+be an absolute viscosity (water's own is 1e-6 m2/s, so nothing real is lost).
+
 ### F6. Three copies of rules that must change together
 - `lpnDwFriction` (`js/lpn-solver.js:76`) and `bpnDwFriction` (`js/branched-network.js:35`): byte-identical
   bodies today; the comment says "change both together".

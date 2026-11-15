@@ -48,6 +48,11 @@
 //      and fb terms cancel) and at r = 2 gives exactly fa, which is algebraically identical to
 //      Swamee-Jain evaluated at Re = 4000 because 0.86859 * ln(10) = 2.
 //
+//      And the whole factor is held to EPANET's own source (OpenWaterAnalytics/EPANET src/hydcoeffs.c,
+//      frictionFactor()), second-transcribed in epanet-friction-ref.js: the page calls EngCalcs.dwFriction
+//      in js/PipeHydraulics.lib.js, and a copy that evaluated Dunlop's fa and fb at the actual Re instead of
+//      Re = 4000 ran up to 0.6 % off in f between Re 2000 and 4000 (29 checks go red on that mutation).
+//
 //   4. THE DARCY-WEISBACH EQUATION ITSELF, which is the other half of the calculator and is
 //      independent of how f was obtained: h_f = f (L/D) V^2/(2g), h_m = k_m V^2/(2g), and the
 //      EGL/HGL bookkeeping that turns those into a downstream pressure.
@@ -62,6 +67,7 @@
 // Licensed under GNU GPL v3.0 or later
 
 const { loadCalculator, makeReporter } = require('./calc-page.js');
+const { epanetF } = require('./epanet-friction-ref.js');
 
 const r = makeReporter('Darcy-Weisbach (dw_)');
 const page = loadCalculator('Darcy-Weisbach.php');
@@ -244,6 +250,40 @@ r.ok(bandMin > 0.028 && bandMax < 0.043,
 	`${bandMin.toFixed(4)} to ${bandMax.toFixed(4)}`);
 r.ok(/Dunlop|EPANET|Moody/.test(at(3000, 1e-3).method),
 	'and the page names the interpolation it used', at(3000, 1e-3).method);
+
+// ---- 3b. the whole friction factor is EPANET's -----------------------------------------------
+r.section('EPANET parity: the page\'s friction factor against hydcoeffs.c frictionFactor(), written out again');
+
+// The page calls EngCalcs.dwFriction (js/PipeHydraulics.lib.js), the suite's one friction factor, which
+// the looped network also runs on. epanet-friction-ref.js is a second transcription from EPANET's own C
+// source (OpenWaterAnalytics/EPANET src/hydcoeffs.c). Re 2000 to 4000 is where a copy that put the actual
+// Re into Dunlop's fa and fb (instead of Re = 4000) ran up to 0.6 % off in f; the heavy-oil trick above
+// gives f to six digits, so 2e-5 is a real bound and a wrong constant misses it by orders of magnitude.
+const EPANET_TOL = 2e-5;
+let worstEpanet = 0, worstEpanetAt = '';
+for (const relRough of [1e-6, 1e-4, 1e-3, 1e-2]) {
+	for (const re of [2001, 2100, 2500, 3000, 3500, 3900, 3999, 1500, 5000, 1e5, 1e7]) {
+		const got = fPrecise(re, relRough), want = epanetF(re, relRough);
+		const err = Math.abs(got - want) / want;
+		if (err > worstEpanet) { worstEpanet = err; worstEpanetAt = `eps/D=${relRough}, Re=${re}`; }
+		r.close(got, want, EPANET_TOL, `eps/D = ${relRough}, Re = ${re}: f = ${want.toFixed(6)} (EPANET)`);
+	}
+}
+r.ok(worstEpanet < EPANET_TOL, 'worst disagreement with EPANET over the grid',
+	`${worstEpanet.toExponential(2)} at ${worstEpanetAt}`);
+
+// And the head loss the page reports, end to end, at Re = 3000 (squarely transitional): h_f is EPANET's f
+// times (L/D) V^2/2g, on the heavy oil so that h_f is large enough to print to six digits.
+(function () {
+	const re = 3000, rel = 1e-3;
+	const q = re * NU_VISCOUS * Math.PI * D / 4, u = q / AREA;
+	page.units('si').set({
+		q: q * 1000, d: D_MM, l: 100, e: rel * D_MM, v: NU_VISCOUS,
+		km: 0, z_up: 100, p_up: 0, z_down: 100
+	}).run();
+	const want = epanetF(re, rel) * (100 / D) * u * u / (2 * G);
+	r.close(page.si('hf'), want, 1e-4, `Re = 3000: h_f = ${want.toFixed(4)} m, EPANET's friction factor`);
+}());
 
 // ---- 4. the Darcy-Weisbach equation, given f ----------------------------------------------
 // This half is independent of the friction factor: whatever f the page decided on, the head

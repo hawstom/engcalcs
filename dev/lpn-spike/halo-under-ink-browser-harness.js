@@ -124,39 +124,44 @@ async function lostInk(a, rect) {
 	return { ink, lost };
 }
 
-// Every visible pipe label carrying `re` in its words, as client rectangles: the whole label, so a
-// probe sees the separator or unit mark and the characters either side of it.
-function labelRects(a, re) {
-	return a.page.evaluate((src) => {
+// Every visible label whose words match `re`, as client rectangles: the whole label, so a probe sees
+// the separator or unit mark and the characters either side of it. `kind` 'row' is a pipe label of one
+// row (the halo of a piece beside another piece on the same row); 'stack' is a pipe or node label of two
+// rows or more (the halo of a lower row on the ink of the row above).
+function labelRects(a, re, kind) {
+	return a.page.evaluate(([src, kind]) => {
 		const rx = new RegExp(src);
-		return Array.from(document.querySelectorAll('text.lpn-lbl[data-linklbl]'))
-			// ONE ROW ONLY. The defect probed is a halo painted over the run beside it on the same row. A stack's
-			// next row paints its own halo over the row above's edge pixels (a pixel or two in 350, in every stacked
-			// label, node labels included), and that is a different thing: pipe labels set in a stack are not probed.
-			.filter((t) => Array.from(t.children).filter((c) => c.hasAttribute('x')).length <= 1)
+		const rows = (t) => Array.from(t.children).filter((c) => c.hasAttribute('x')).length;
+		return Array.from(document.querySelectorAll(kind === 'stack' ? 'text.lpn-lbl[data-linklbl], text.lpn-lbl[data-nodelbl]' : 'text.lpn-lbl[data-linklbl]'))
+			.filter((t) => kind === 'stack' ? rows(t) >= 2 : rows(t) <= 1)
 			.filter((t) => rx.test(t.textContent || '') && getComputedStyle(t).visibility !== 'hidden')
-			.map((t) => { const r = t.getBoundingClientRect(); return { x: r.left - 2, y: r.top - 2, w: r.width + 4, h: r.height + 4, text: t.textContent }; });
-	}, re);
+			.map((t) => { const r = t.getBoundingClientRect(); return { x: r.left - 2, y: r.top - 2, w: r.width + 4, h: r.height + 4, text: t.textContent, rows: rows(t), node: t.hasAttribute('data-nodelbl') }; });
+	}, [re, kind]);
 }
-async function probeAll(a, re) {
-	// The one-row pipe labels of the opening view and of two views zoomed in about the middle (the placement sets
-	// most of Net1's pipe labels in a stack at the opening scale; closer in, more of them fit on one row).
-	const out = { labels: 0, ink: 0, lost: 0 };
+// The opening view and two views zoomed in about the middle, each label probed once. Closer in, more
+// pipe labels fit on one row and fewer are set in a stack, so every class is looked for in every view.
+// Returns the three probes: a ", " separator and a unit mark in one-row pipe labels, and every stack.
+async function probeAll(a) {
+	const out = { comma: { labels: 0, ink: 0, lost: 0 }, unit: { labels: 0, ink: 0, lost: 0 }, stack: { labels: 0, nodes: 0, ink: 0, lost: 0 } };
 	const c = await a.page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.left + r.width / 2, y: Math.min(r.top + r.height / 2, innerHeight / 2) }; });
 	const seen = {};
+	const vp = a.page.viewportSize();
 	for (let view = 0; view < 3; view++) {
 		if (view > 0) {
 			await a.page.mouse.move(c.x, c.y);
 			for (let i = 0; i < 3; i++) { await a.page.mouse.wheel(0, -240); await a.settle(60); }
 			await a.settle(800);
 		}
-		for (const r of await labelRects(a, re)) {
-			const vp = a.page.viewportSize();
-			if (seen[r.text] || r.x < 0 || r.y < 0 || r.x + r.w > vp.width || r.y + r.h > vp.height) { continue; }
-			seen[r.text] = true;
-			const p = await lostInk(a, r);
-			out.labels++; out.ink += p.ink; out.lost += p.lost;
-			if (process.env.HALO_DEBUG) { console.log('    view ' + view + ': ' + p.lost + ' of ' + p.ink + ' ' + r.text); }
+		for (const [cls, re, kind] of [['comma', ', ', 'row'], ['unit', '\\d[\'"]', 'row'], ['stack', '.', 'stack']]) {
+			for (const r of await labelRects(a, re, kind)) {
+				const key = cls + '|' + r.rows + '|' + r.text;
+				if (seen[key] || r.x < 0 || r.y < 0 || r.x + r.w > vp.width || r.y + r.h > vp.height) { continue; }
+				seen[key] = true;
+				const p = await lostInk(a, r);
+				out[cls].labels++; out[cls].ink += p.ink; out[cls].lost += p.lost;
+				if (cls === 'stack' && r.node) { out.stack.nodes++; }
+				if (process.env.HALO_DEBUG) { console.log('    view ' + view + ' ' + cls + ': ' + p.lost + ' of ' + p.ink + ' (' + r.rows + ' rows) ' + r.text); }
+			}
 		}
 	}
 	return out;
@@ -248,12 +253,23 @@ async function main() {
 		ok('no two pieces of a row sit in separate tspans', s.labels > 20 && s.splitPlain === 0, s.splitPlain + ' split, ' + s.tspans + ' tspans in ' + s.labels + ' labels');
 		ok('the halo is still the white stroke painted under the ink', /^stroke/.test(s.paint) && /255, 255, 255/.test(s.stroke) && Math.abs(s.sw - 0.4) < 0.01, s.paint + ' ' + s.stroke + ' ' + s.sw);
 
-		const comma = await probeAll(a, ', ');
+		const probes = await probeAll(a);
+		const comma = probes.comma, unit = probes.unit, stack = probes.stack;
 		console.log('  separator probe:        ' + JSON.stringify(comma));
 		ok('in every pipe label with a ", " separator, no ink is lost to a halo', comma.labels > 3 && comma.ink > 200 && comma.lost === 0, JSON.stringify(comma));
-		const unit = await probeAll(a, '\\d[\'"]');
 		console.log('  unit-mark probe:        ' + JSON.stringify(unit));
 		ok('in every pipe label with a unit mark (5280\', 12"), no ink is lost to a halo', unit.labels > 3 && unit.ink > 200 && unit.lost === 0, JSON.stringify(unit));
+
+		console.log('  stack probe:            ' + JSON.stringify(stack));
+		// KNOWN DEFECT, found 2026-11-13: the browser paints stroke and fill one text row at a time, so a lower row's
+		// halo lies on a pixel or two of the row above's ink (the tail of a Q). Coverage is asserted; the loss is reported
+		// and held under 1% of the ink, so the harness fails if it gets worse and not for the nibble that is known.
+		// Every cure tried adds a second layer per stacked label and costs 40% or more of label settle time on the
+		// 600-junction fixture (a <use> of the label beneath it, ink only above), or fails: one <text> with a tspan
+		// per row already is the case, and neither Chromium nor Firefox lays the whole element's halo first;
+		// painting the bottom row first loses as much. Task 539 sets the price a label change may cost.
+		ok('stacked pipe and node labels are probed (coverage)', stack.labels > 5 && stack.nodes > 0 && stack.ink > 500, JSON.stringify(stack));
+		ok('KNOWN DEFECT, reported not failed: a stack\'s lower row halo nibbles the row above (' + stack.lost + ' of ' + stack.ink + ' ink pixels); held under 1%', stack.lost * 100 < stack.ink, JSON.stringify(stack));
 
 		const snip = await snipHaloDiff(a);
 		console.log('  snip: ' + JSON.stringify(snip));
@@ -267,11 +283,10 @@ async function main() {
 		console.log('=== the same probes on the page as it was: a tspan per segment (the defect Tom saw) ===');
 		const b = await open(Session, browser, NET1, false);
 		ok('the reference run really served the page without the merge (both loads)', b.rewritten === 2, b.rewritten);
-		const refComma = await probeAll(b, ', ');
-		const refUnit = await probeAll(b, '\\d[\'"]');
-		console.log('  separator probe:        ' + JSON.stringify(refComma));
-		console.log('  unit-mark probe:        ' + JSON.stringify(refUnit));
-		ok('as it was, the probes DO find ink lost in pipe labels, so they can see the defect', refComma.lost + refUnit.lost > 0, (refComma.lost + refUnit.lost) + ' pixels');
+		const ref = await probeAll(b);
+		console.log('  separator probe:        ' + JSON.stringify(ref.comma));
+		console.log('  unit-mark probe:        ' + JSON.stringify(ref.unit));
+		ok('as it was, the probes DO find ink lost in pipe labels, so they can see the defect', ref.comma.lost + ref.unit.lost > 0, (ref.comma.lost + ref.unit.lost) + ' pixels');
 		await b.close();
 
 		if (TIMING) { await timing(Session, browser); }

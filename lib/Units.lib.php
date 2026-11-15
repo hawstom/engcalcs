@@ -51,6 +51,10 @@
 // offered (dev/unit-families.md).
 $u_distance_small  = Array('mm', 'm', 'ft', 'in');
 $u_distance_medium = Array('m', 'mm', 'ft', 'in');
+// Roughness is the one family that offers a fifth length: millifeet, the unit EPANET reads a
+// Darcy-Weisbach roughness in for a US file (EPANET 2.2 manual, Network Data). It has no selection
+// data, so it goes last; a file's numbers are then carried in the unit they were written in.
+$u_roughness     = Array('mm', 'm', 'ft', 'in', 'millifeet');
 $u_head_pressure = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi');
 $u_water_column  = Array('mh2o', 'mmh2o', 'fth2o', 'inh2o');
 $u_flow          = Array('lps', 'gpm', 'm3ps', 'mgd', 'ft3ps', 'mld');
@@ -68,8 +72,8 @@ $ec_unit_families = Array(
     // Absolute roughness height is conventionally quoted in FEET in US practice
     // (0.0005 ft commercial steel), not inches -- hence its own family rather than
     // distance_small. Same option list; different default. That is the rule at work.
-    // No selection data of its own (2 rows), so it follows its sibling's order.
-    'roughness'        => $u_distance_small,
+    // No selection data of its own (2 rows), so it follows its sibling's order, with millifeet last.
+    'roughness'        => $u_roughness,
 
     // --- Head and pressure. ---
     // total_head deliberately offers water-column units ONLY: an EGL or HGL is an
@@ -332,6 +336,7 @@ $ec_units['m']=1;
 $ec_units['mm']=1000;
 $ec_units['ft']=3.280839895013123;              // 1/0.3048
 $ec_units['in']=39.370078740157480;             // 1/0.0254
+$ec_units['millifeet']=3280.839895013123;       // 1000/0.3048 -- EPANET's unit for a US Darcy-Weisbach roughness
 
 $ec_units['mps']=1;
 $ec_units['ftps']=3.280839895013123;            // 1/0.3048

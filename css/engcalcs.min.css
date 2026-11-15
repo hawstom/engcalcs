@@ -1986,7 +1986,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-examples-legal a { margin: 0 .5em; }
 .lpn-color-legend {
 	position: absolute;
-	z-index: 3;
+	z-index: 7;
 	font-size: 0.9em;
 	line-height: 1.4;
 	background: var(--ec-a-255-255-255-85);

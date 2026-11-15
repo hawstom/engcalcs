@@ -17,26 +17,26 @@
 //      (8766) and not a leap year (8784). Which of the three is used is a policy choice rather
 //      than a physical fact, so the test states the one this page makes rather than assuming it.
 //
-//   3. THE FRICTION FACTOR, WHICH IS A SECOND COPY. js/micro-hydro-power.js carries its own
-//      transcription of the three-regime friction-factor code from js/darcy-weisbach.js -- the
-//      same 64/Re, the same Dunlop cubic, the same Swamee-Jain, written out again. That
-//      duplication is the defect risk on this page: the two can drift and nothing would say so.
-//      dw-harness.js anchors one copy against Colebrook-White; this file requires the OTHER copy
-//      to agree with it, across all three regimes, by driving both pages to the same Reynolds
-//      number and relative roughness. Neither harness alone would notice a one-sided edit.
+//   3. THE FRICTION FACTOR, WHICH IS EPANET'S. The page calls EngCalcs.dwFriction in
+//      js/PipeHydraulics.lib.js, the suite's one friction factor (64/Re, Dunlop's cubic between Re 2000
+//      and 4000, Swamee-Jain above). dw-harness.js anchors that factor against Colebrook-White and
+//      against EPANET; this file requires THIS page to deliver it: h_f read off the page, in all three
+//      regimes and squarely at Re 3000, against a second transcription of EPANET's hydcoeffs.c
+//      frictionFactor() in epanet-friction-ref.js.
 //
 //   4. THE NET HEAD BOOKKEEPING: H_net = H_gross - h_f - h_m, floored at zero, and the head-loss
 //      percentage banding (10% and 20%) the page uses to grade a penstock design.
 //
-// PROVED TO BITE. Four mutations were made on purpose and all four went red: g dropped from the
-// power equation (3 checks), 8760 -> 8766 (2), 5.74 -> 5.75 in this page's copy of Swamee-Jain
-// (1, out of 32 -- f prints to 4 decimals and the two copies must match to the last of them),
-// and H_net computed as H_gross - h_f with the minor loss forgotten (1).
+// PROVED TO BITE. Mutations were made on purpose and all went red: g dropped from the power equation
+// (3 checks), 8760 -> 8766 (2), H_net computed as H_gross - h_f with the minor loss forgotten (1), and
+// Dunlop's fa and fb evaluated at the actual Re instead of Re = 4000 in js/PipeHydraulics.lib.js (the
+// transitional rows of the EPANET section).
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 
 const { loadCalculator, makeReporter } = require('./calc-page.js');
+const { epanetF } = require('./epanet-friction-ref.js');
 
 const r = makeReporter('Microhydropower (mhp_)');
 const page = loadCalculator('Micro-Hydro-Power.php');
@@ -145,42 +145,34 @@ for (const hours of [8766, 8784]) {
 		`${(gap * 100).toFixed(3)}% apart`);
 }
 
-// ---- 3. the duplicated friction factor must not drift from Darcy-Weisbach --------------------
-r.section('the friction factor here agrees with the Darcy-Weisbach page, in all three regimes');
+// ---- 3. the friction factor is EPANET's ---------------------------------------------------------
+r.section('the friction factor is EPANET\'s (OpenWaterAnalytics/EPANET src/hydcoeffs.c), in all three regimes');
 
-// js/micro-hydro-power.js transcribes the whole three-regime friction-factor block from
-// js/darcy-weisbach.js. dw-harness.js anchors THAT copy against an independent Colebrook-White
-// solve; this section anchors THIS copy against that one. Both pages are driven to the same
-// Reynolds number and the same relative roughness, with the same kinematic viscosity, so any
-// difference at all is a divergence between the two transcriptions.
-const dw = loadCalculator('Darcy-Weisbach.php');
-const NU = 1e-6;
+// f prints to 4 decimals, far too coarse to hold a 0.5 % transitional difference to a bound, so h_f is
+// read instead: h_f = f (L/D) V^2/2g, on a heavy oil (nu = 1e-3 m2/s, so V is metres per second at Re in the
+// thousands) over 10 km, which makes h_f thousands of metres and its three decimals worth seven digits.
+const NU = 1e-3;
 const D = 0.300;
+const L = 10000;
 const AREA = Math.PI * D * D / 4;
 
-function fFromDW(re, rel) {
+function hfFromMHP(re, rel) {
 	const q = re * NU * Math.PI * D / 4;
-	dw.units('si').set({
-		q: q * 1000, d: D * 1000, l: 100, e: rel * D * 1000, v: NU,
-		km: 0, z_up: 100, p_up: 0, z_down: 100
-	}).run();
-	return dw.num('f');
-}
-function fFromMHP(re, rel) {
-	const q = re * NU * Math.PI * D / 4;
-	return runSI({ q: q, hgross: 100, d: D, l: 100, e: rel * D, km: 0, nu: NU, eta: 0.75 }).f;
+	return runSI({ q: q, hgross: 100, d: D, l: L, e: rel * D, km: 0, nu: NU, eta: 0.75 }).hf;
 }
 
-// f prints to 4 decimals on both pages, so equal printed values is as tight a statement as can
-// be made -- and it is a strict equality, not a tolerance, because both are the same string of
-// arithmetic on the same inputs. Any divergence at all in a constant would move the fourth
-// decimal at some point on this grid.
+let worst = 0, worstAt = '';
 for (const rel of [1e-5, 1e-4, 1e-3, 1e-2]) {
-	for (const re of [500, 1500, 2500, 3500, 5000, 1e5, 1e6, 1e7]) {
-		r.eq(fFromMHP(re, rel), fFromDW(re, rel),
-			`eps/D = ${rel}, Re = ${re}: the two copies of the friction factor agree`);
+	for (const re of [500, 1500, 2001, 2100, 2500, 3000, 3500, 3900, 3999, 5000, 1e5, 1e6, 1e7]) {
+		const u = re * NU * Math.PI * D / 4 / AREA;
+		const want = epanetF(re, rel) * (L / D) * u * u / (2 * G);
+		const got = hfFromMHP(re, rel);
+		const err = Math.abs(got - want) / want;
+		if (err > worst) { worst = err; worstAt = `eps/D=${rel}, Re=${re}`; }
+		r.close(got, want, 2e-5, `eps/D = ${rel}, Re = ${re}: h_f = ${want.toFixed(3)} m (EPANET's f)`);
 	}
 }
+r.ok(worst < 2e-5, 'worst disagreement with EPANET over the grid', `${worst.toExponential(2)} at ${worstAt}`);
 
 // ---- 4. the head-loss banding -----------------------------------------------------------------
 r.section('the head-loss check bands a penstock at 10% and 20% of gross head');
