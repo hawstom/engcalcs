@@ -77,6 +77,7 @@ EngCalcs.pageConfig = {
 	hw_pressure_neg:       <?=json_encode($ec_lang['hw_pressure_neg'])?>
 };
 </script>
+<script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
 <script src="/engcalcs/js/darcy-weisbach.js?v=<?=filemtime(__DIR__.'/js/darcy-weisbach.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

@@ -22,32 +22,22 @@ EngCalcs.pageCalculator = function(objForm) {
 		this.var.regime = 0;
 		this.var.regime_label = EngCalcs.pageConfig.regime_laminar;
 		this.var.f_method = '<a href="https://en.wikipedia.org/wiki/Darcy%E2%80%93Weisbach_equation#Laminar_regime">Hagen-Pouseuille</a>';
-		this.var.f = 0;
 	} else if (this.var.re < 2000) {
 		this.var.regime = 0;
 		this.var.regime_label = EngCalcs.pageConfig.regime_laminar;
 		this.var.f_method = '<a href="https://en.wikipedia.org/wiki/Darcy%E2%80%93Weisbach_equation#Laminar_regime">Hagen-Pouseuille</a>';
-		this.var.f = 64 / this.var.re;
 	} else if (this.var.re < 4000) {
 		this.var.regime = 1;
 		this.var.regime_label = EngCalcs.pageConfig.regime_transitional;
 		this.var.f_method = 'Moody Dunlop EPANET';
-		this.var.r = this.var.re/2000;
-		this.var.y2 = this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(this.var.re, 0.9);
-		this.var.y3 = -0.86859 * Math.log(this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(4000,0.9));
-		this.var.fa = Math.pow(this.var.y3,-2);
-		this.var.fb =  this.var.fa * (2 - 0.00514215 / (this.var.y2 * this.var.y3));
-		this.var.x1 =  7 * this.var.fa - this.var.fb;
-		this.var.x2 =  0.128 - 17 * this.var.fa + 2.5 * this.var.fb;
-		this.var.x3 =  -0.128 + 13 * this.var.fa - 2 * this.var.fb;
-		this.var.x4 =  this.var.r * (0.032 - 3 * this.var.fa + 0.5 * this.var.fb);
-		this.var.f =  this.var.x1 + this.var.r * (this.var.x2 + this.var.r * (this.var.x3 + this.var.x4));
 	} else {
 		this.var.regime = 2;
 		this.var.regime_label = EngCalcs.pageConfig.regime_turbulent;
 		this.var.f_method = '<a href="https://en.wikipedia.org/wiki/Darcy_friction_factor_formulae#Swamee%E2%80%93Jain_equation">Swamee Jain</a>';
-		this.var.f = 0.25 / Math.pow(Math.log10(this.var.e / (3.7 * this.var.d) + 5.74 / Math.pow(this.var.re, 0.9)), 2);
 	}
+	// The one friction factor, EPANET's, in js/PipeHydraulics.lib.js: 64/Re, Dunlop's cubic, Swamee-Jain.
+	// q m3/s, d and e metres, v m2/s (this page's viscosity input is already in m2/s).
+	this.var.f = EngCalcs.dwFriction(this.var.q, this.var.d, this.var.e, this.var.v);
 	this.var.sf = this.var.f * Math.pow(this.var.u, 2) / (2 * this.var.d * this.var.g);
 	this.var.tau = this.var.rh * this.var.sf;
 	this.var.hv = Math.pow(this.var.u,2) / (2 * this.var.g);
