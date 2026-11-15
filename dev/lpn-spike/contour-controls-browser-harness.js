@@ -218,6 +218,10 @@ async function main2(Session, browser) {
 		await setNode(a, 'pressure'); await a.settle(600);
 		f = await facts(a.page);
 		ok('choosing Pressure brings the plot back', f.fill && /Pressure/.test(f.legend));
+		// A picture of the box with the note, Settings put away.
+		await setNode(a, ''); await a.settle(500);
+		await a.page.evaluate(() => { const x = document.querySelector('#lpn_settings_box .lpn-popover-x'); if (x) { x.click(); } }); await a.settle(500);
+		await shot(a.page, 'contour-box-no-color-note-r4');
 		noErrors(a);
 	} finally { await a.close(); }
 }
