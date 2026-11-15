@@ -24,6 +24,7 @@ const { ROOT, byId, setUnitSet, loadLoopedNetwork, warmEpanet } = require('./lpn
 
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
+require(ROOT + 'js/lpn-native-run.js');
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-net.js');
 
@@ -316,7 +317,11 @@ head('6b. the selection follows an item through a rename');
 }
 
 (async function () {
-	head('7. whether a move changes a run (EPANET, Net1 with two conflicting controls and then two conflicting rules)');
+	head('7. whether a move changes a run: EPANET and the built-in solver, Net1 with two conflicting controls and then conflicting rules');
+	// EPANET 2.2 src/hydraul.c controls(): each control is examined in list order, so of two that act on one link at one
+	// time the LAST in the list takes effect. src/rules.c checkrules() with updateactionlist()/onactionlist(): rules are examined
+	// in list order and a link already on the action list keeps its action unless the later rule's priority is strictly
+	// higher, so of two equal-priority rules the FIRST in the list takes effect.
 	await warmEpanet();
 	const NET1 = path.join(ROOT, 'dev', 'water-network-examples', 'Net1.lwn');
 	function open(mutate) {
@@ -327,53 +332,97 @@ head('6b. the selection follows an item through a rename');
 		return L.getDoc();
 	}
 	const pumpFlow = (run) => (run.frames || []).map((f) => f.flows['9']);
-	const runIt = async () => pumpFlow(await EngCalcs.lpnEpanetRun(L.assembleModel(), {}));
-	const differs = (a, b) => a.some((q, i) => Math.abs(q - b[i]) > 1e-6);
+	// Both engines on the document as it stands; the pump's flow at every hour.
+	async function runBoth() {
+		const m = L.assembleModel();
+		return {
+			epanet: pumpFlow(await EngCalcs.lpnEpanetRun(JSON.parse(JSON.stringify(m)), {})),
+			native: pumpFlow(EngCalcs.lpnNativeRun(JSON.parse(JSON.stringify(m)), { quality: true }))
+		};
+	}
+	const differs = (a, b) => a.length !== b.length || a.some((q, i) => Math.abs(q - b[i]) > 1e-6);
+	// Every scenario gives the pump back at 8 o'clock, so the tank never runs dry (a pump shut all day leaves nothing to supply the
+	// system, a case no order question is about). The conflict is at 5 o'clock; hours 6 and 7 show which action won.
+	const REOPEN = 'LINK 9 OPEN AT TIME 8';
+	const shut = (a) => a.length === 25 && a.slice(6, 8).every((q) => Math.abs(q) < 1e-6);
+	const running = (a) => a.length === 25 && a.slice(6, 8).every((q) => q > 1e-3);
+	function verdict(name, r, want) {
+		ok(name + ': EPANET ' + (want ? 'shuts' : 'runs') + ' the pump', (want ? shut : running)(r.epanet), JSON.stringify(r.epanet.slice(4, 8)));
+		ok(name + ': the built-in solver agrees with EPANET, hour by hour', !differs(r.epanet, r.native), JSON.stringify(r.epanet.map((q, i) => +(q - r.native[i]).toExponential(2))));
+	}
 	// Controls: the same link, the same moment, opposite actions. The later in the list wins.
 	{
-		const d = open((s) => {
+		open((s) => {
 			s.rules = [];
-			s.controls = [L.libReadControl('LINK 9 CLOSED AT TIME 5').rec, L.libReadControl('LINK 9 OPEN AT TIME 5').rec];
+			s.controls = [L.libReadControl('LINK 9 CLOSED AT TIME 5').rec, L.libReadControl('LINK 9 OPEN AT TIME 5').rec, L.libReadControl(REOPEN).rec];
 		});
-		const first = await runIt();
+		const first = await runBoth();
+		verdict('controls, CLOSED listed first (the later, OPEN, wins)', first, false);
 		L.libOrderSelect('controls', 0);
 		L.libOrderMove('controls', 'bottom');
-		const second = await runIt();
-		ok('controls: the order of two controls that act on one link at one time changes the run', first.length === 25 && differs(first, second),
-			JSON.stringify([first.slice(4, 8), second.slice(4, 8)]));
+		const second = await runBoth();
+		verdict('controls, CLOSED moved last (the later, CLOSED, wins)', second, true);
+		ok('controls: the order changes the run', differs(first.epanet, second.epanet) && differs(first.native, second.native));
 		L.libOrderMove('controls', 'top');
-		ok('...and moving it back restores the run', !differs(first, await runIt()));
-		void d;
+		const back = await runBoth();
+		ok('...and moving it back restores the run, in both engines', !differs(first.epanet, back.epanet) && !differs(first.native, back.native));
+		// two controls on one link at DIFFERENT times: the order is no part of it
+		open((s) => {
+			s.rules = [];
+			s.controls = [L.libReadControl('LINK 9 CLOSED AT TIME 5').rec, L.libReadControl('LINK 9 OPEN AT TIME 7').rec, L.libReadControl(REOPEN).rec];
+		});
+		const a = await runBoth();
+		L.libOrderSelect('controls', 0);
+		L.libOrderMove('controls', 'bottom');
+		const b = await runBoth();
+		ok('controls at different times: the order changes nothing, in either engine', !differs(a.epanet, b.epanet) && !differs(a.native, b.native));
+		ok('...and the two engines agree', !differs(a.epanet, a.native));
 	}
 	// Rules: equal priority, opposite actions. The earlier in the list wins.
+	const RULE = (name, act, pri) => ['RULE ' + name, 'IF SYSTEM CLOCKTIME >= 5 AM', 'AND SYSTEM CLOCKTIME < 8 AM', 'THEN PUMP 9 STATUS IS ' + act, 'PRIORITY ' + pri];
+	const control8 = (s) => { s.controls = [L.libReadControl(REOPEN).rec]; };
 	{
-		const lines = ['RULE A', 'IF SYSTEM CLOCKTIME >= 5 AM', 'THEN PUMP 9 STATUS IS CLOSED', 'PRIORITY 1', '',
-			'RULE B', 'IF SYSTEM CLOCKTIME >= 5 AM', 'THEN PUMP 9 STATUS IS OPEN', 'PRIORITY 1'];
-		open((s) => { s.controls = []; s.rules = lines; });
-		const first = await runIt();
+		const lines = RULE('A', 'CLOSED', 1).concat([''], RULE('B', 'OPEN', 1));
+		open((s) => { control8(s); s.rules = lines; });
+		const first = await runBoth();
+		verdict('rules at equal priority, CLOSED listed first (the earlier, CLOSED, wins)', first, true);
 		L.libOrderSelect('rules', 0);
 		L.libOrderMove('rules', 'bottom');
-		const second = await runIt();
-		ok('rules: the order of two equal-priority rules that call for opposite actions changes the run', first.length === 25 && differs(first, second),
-			JSON.stringify([first.slice(4, 8), second.slice(4, 8)]));
-		// and a higher priority makes the order irrelevant
-		const hi = lines.slice();
-		hi[3] = 'PRIORITY 5';
-		open((s) => { s.controls = []; s.rules = hi; });
-		const a = await runIt();
+		const second = await runBoth();
+		verdict('rules at equal priority, OPEN now first (the earlier, OPEN, wins)', second, false);
+		ok('rules: the order changes the run', differs(first.epanet, second.epanet) && differs(first.native, second.native));
+		// a strictly higher priority wins in either order
+		for (const [pa, pb] of [[1, 5], [5, 1]]) {
+			const hi = RULE('A', 'CLOSED', pa).concat([''], RULE('B', 'OPEN', pb));
+			open((s) => { control8(s); s.rules = hi; });
+			// A closes the pump, B opens it: the higher priority wins, listed first or last
+			const x = await runBoth();
+			verdict('rules, priorities ' + pa + ' (closes) and ' + pb + ' (opens), listed in that order', x, pa > pb);
+			L.libOrderSelect('rules', 0);
+			L.libOrderMove('rules', 'bottom');
+			const y = await runBoth();
+			ok('...moved: the same rule still wins, in both engines', !differs(x.epanet, y.epanet) && !differs(x.native, y.native));
+		}
+		// a rule's ELSE side is judged the same way: two equal-priority rules whose premises are false
+		const els = ['RULE A', 'IF SYSTEM CLOCKTIME < 5 AM', 'OR SYSTEM CLOCKTIME >= 8 AM', 'THEN PUMP 9 STATUS IS OPEN', 'ELSE PUMP 9 STATUS IS CLOSED', 'PRIORITY 1', '',
+			'RULE B', 'IF SYSTEM CLOCKTIME < 5 AM', 'OR SYSTEM CLOCKTIME >= 8 AM', 'THEN PUMP 9 STATUS IS OPEN', 'ELSE PUMP 9 STATUS IS OPEN', 'PRIORITY 1'];
+		open((s) => { s.controls = []; s.rules = els; });
+		const e1 = await runBoth();
+		verdict('rules, ELSE actions at equal priority (A first: its CLOSED wins)', e1, true);
 		L.libOrderSelect('rules', 0);
 		L.libOrderMove('rules', 'bottom');
-		ok('...but not when one of them has the higher priority', !differs(a, await runIt()));
+		verdict('rules, ELSE actions at equal priority (B first: its OPEN wins)', await runBoth(), false);
 	}
 	// Patterns: looked up by id, so their order is no part of a run.
 	{
 		open((s) => { s.rules = []; });
-		const a = await runIt();
+		const a = await runBoth();
 		const d = L.getDoc();
 		d.patterns.push({ id: 'ZZ', multipliers: [1] });
 		L.libOrderSelect('patterns', d.patterns.length - 1);
 		L.libOrderMove('patterns', 'top');
-		ok('patterns: moving one changes nothing in the run', !differs(a, await runIt()));
+		const z = await runBoth();
+		ok('patterns: moving one changes nothing in the run, in either engine', !differs(a.epanet, z.epanet) && !differs(a.native, z.native));
 	}
 	console.log('\n' + checks + ' checks, ' + fails + ' failed');
 	console.log(fails === 0 ? 'library order harness: all checks passed' : 'library order harness: ' + fails + ' FAILED');
