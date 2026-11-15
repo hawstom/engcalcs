@@ -70290,11 +70290,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		{ id: 'rules', label: 'lpn_library_rules', tip: 'lpn_library_rules_tip' }
 	];
 	// **A SECTION'S LONG EXPLANATION IS AN ENTRY IN THE USER MANUAL, AND THE HEADING'S `?` OPENS IT** (Tom, round 12: *"send the user to the user manual for long explanations. But we have to land them in the right place."*). Curves, Pipe types and Fittings carry the `?`; its words live once, in the Libraries chapter (lib/GuideChapters.lib.php, ecGuideDefKeys()).
-	var LIB_INTRO = { curves: true, pipetypes: true, fittings: true };
+	// Controls and Rules carry it too (Task 859): both land on the chapter's one entry for them, "Controls and rules in a run", which
+	// says how the order of the list decides a conflict in the same words as the Move tips.
+	var LIB_INTRO = { curves: true, pipetypes: true, fittings: true, controls: true, rules: true };
+	var LIB_TERM = { curves: 'curves', pipetypes: 'pipetypes', fittings: 'fittings', controls: 'ctl', rules: 'ctl' };
 	function libSectionHead(cur) {
 		var pc = EngCalcs.pageConfig || {}, intro = LIB_INTRO[cur.id], head, btn, label = pc[cur.label] || cur.id;
 		if (!intro) {
-			// Patterns, Controls and Rules: the plain heading they always had, its tip on the heading.
+			// Patterns: the plain heading it always had, its tip on the heading.
 			head = libEl('h3', 'ec-help', label);
 			if (pc[cur.tip]) { head.title = pc[cur.tip]; }
 			return head;
@@ -70308,7 +70311,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		btn.className = 'lpn-lib-manual';
 		btn.setAttribute('aria-label', (pc.lpn_help_manual || 'User manual') + ': ' + label);
 		btn.textContent = '?';
-		btn.addEventListener('click', function (e) { e.stopPropagation(); openGuideForBox('lpn_library_box', 'term-lpn_guide_lib_' + cur.id); });
+		btn.addEventListener('click', function (e) { e.stopPropagation(); openGuideForBox('lpn_library_box', 'term-lpn_guide_lib_' + LIB_TERM[cur.id]); });
 		head.appendChild(btn);
 		return head;
 	}
@@ -70337,10 +70340,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// list reads and the one the `.inp` export writes (patterns, curves, controls and rules go out in list order; pipe types and
 	// fittings lists are not in an `.inp` and keep the order in the project file). One move is one Undo step.
 	//
-	// **WHETHER A MOVE CHANGES A RUN** (checked in js/lpn-native-run.js, which follows EPANET's hydraul.c and rules.c):
-	// controls fire in list order and the LAST one to act on a link wins; a rule's action stands over an earlier rule's
-	// only when its PRIORITY is strictly higher, so the FIRST of two equal-priority rules wins. Patterns, curves, pipe types and
-	// fittings lists are looked up by id, so their order never changes a result.
+	// **WHETHER A MOVE CHANGES A RUN** (EPANET 2.2 src/hydraul.c controls() and src/rules.c checkrules(), updateactionlist(),
+	// onactionlist(); js/lpn-native-run.js follows both, and dev/lpn-spike/library-order-harness.js runs both engines on it):
+	// controls are examined in list order and the LAST one to act on a link takes effect; a rule's action stands over an earlier
+	// rule's only when its PRIORITY is strictly higher, so the FIRST of two equal-priority rules takes effect. Patterns, curves,
+	// pipe types and fittings lists are looked up by id, so their order never changes a result. The Libraries chapter of the User
+	// Manual says this in the same words as the tips (lpn_guide_lib_ctl_def), and the `?` of Controls and Rules lands on it.
 	//
 	// **A RULE IS A RUN OF LINES IN ONE FLAT TEXT**, so it is moved as its block (its description comments and its
 	// lines) and every blank line and heading between the blocks stays where it was (libRulesMoved()).
@@ -70454,9 +70459,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			add = Array.prototype.filter.call(secEl.children, function (c) { return c.tagName === 'BUTTON'; })[0],
 			row, group, tip;
 		if (n < 2 || entries.length !== n) { return; }
-		tip = (pc.lpn_library_move_tip || 'Moves the selected item. Click an item to select it. The order is saved with the project.') +
-			(sec === 'controls' ? ' ' + (pc.lpn_library_move_tip_controls || 'When two controls act on one link at the same time, the later one in the list wins, so moving a control can change a run.')
-				: sec === 'rules' ? ' ' + (pc.lpn_library_move_tip_rules || 'When two rules call for conflicting actions on one link at equal priority, the earlier rule in the list wins, so moving a rule can change a run.') : '');
+		tip = (pc.lpn_library_move_tip || 'Moves the selected item. Click an item to select it. The order is saved with the project.') + ' ' +
+			(sec === 'controls' ? (pc.lpn_library_move_tip_controls || 'When two controls change the same link at the same time, the control lower in the list takes effect.')
+				: sec === 'rules' ? (pc.lpn_library_move_tip_rules || 'When two rules call for conflicting actions on the same link, the rule with the higher PRIORITY takes effect, and at equal priority the rule higher in the list takes effect.')
+				: (pc.lpn_library_move_tip_none || 'The order does not change a run.'));
 		// The shared box style's own row for a box's buttons: sticky, so the four stay in reach down a long list.
 		row = libEl('div', 'lpn-box-tools lpn-lib-toolrow');
 		secEl.insertBefore(row, add || entries[0]);

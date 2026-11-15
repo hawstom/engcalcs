@@ -9,7 +9,8 @@
 //   3. a click on Move up (or Move to top) moves the row, the mark follows it, the disabled states follow;
 //   4. the keyboard does it: Tab to a button, Enter, and the focus is still on a button that can act;
 //   5. one Ctrl+Z puts the row back;
-//   6. Controls and Rules say in the tip that a move can change a run; the other sections do not;
+//   6. Controls and Rules say in the tip how the order decides a conflict, the other four say it never changes a run, and the `?` on
+//      Controls and on Rules opens the User Manual at the one entry that says the same words;
 //   7. the first press after typing in an item (a rename rebuilds the box) acts, and the item stays selected.
 // The moves themselves, saved order and export order: library-order-harness.js.
 //
@@ -108,6 +109,7 @@ async function main() {
 		const names = { top: await a.lang('lpn_library_move_top'), up: await a.lang('lpn_pane_manage_cols_up'),
 			down: await a.lang('lpn_pane_manage_cols_down'), bottom: await a.lang('lpn_library_move_bottom') };
 		const runTip = { controls: await a.lang('lpn_library_move_tip_controls'), rules: await a.lang('lpn_library_move_tip_rules') };
+		const noneTip = await a.lang('lpn_library_move_tip_none');
 
 		for (const sec of ['patterns', 'curves', 'pipetypes', 'fittings', 'controls', 'rules']) {
 			console.log('\n--- ' + sec + ' ---');
@@ -125,8 +127,26 @@ async function main() {
 			ok(sec + ': each is an icon with its name as its accessible name', s.moves.every((m) => m.icon && m.text === '' && m.label === names[m.how]),
 				JSON.stringify(s.moves.map((m) => [m.how, m.icon, m.label])));
 			ok(sec + ': each carries a tip that begins with its name', s.moves.every((m) => m.title.indexOf(names[m.how]) === 0), JSON.stringify(s.moves.map((m) => m.title)));
-			if (runTip[sec]) { ok(sec + ': the tip says a move can change a run', s.moves.every((m) => m.title.indexOf(runTip[sec]) > 0)); }
-			else { ok(sec + ': the tip does not claim a move changes a run', s.moves.every((m) => !/change a run/.test(m.title))); }
+			if (runTip[sec]) { ok(sec + ': the tip says how the order decides a conflict', s.moves.every((m) => m.title.indexOf(runTip[sec]) > 0) && s.moves.every((m) => m.title.indexOf(noneTip) < 0)); }
+			else { ok(sec + ': the tip says the order never changes a run', s.moves.every((m) => m.title.indexOf(noneTip) > 0) && s.moves.every((m) => m.title.indexOf(runTip.controls) < 0 && m.title.indexOf(runTip.rules) < 0)); }
+			if (runTip[sec]) {
+				// the `?` beside the heading opens the manual at the entry that says it in the same words
+				const q = a.page.locator('#lpn_libbox_content .lpn-lib-sec > h3 button.lpn-lib-manual');
+				ok(sec + ': the heading carries one `?`, with no title (a tap cannot hover)', (await q.count()) === 1 && (await q.getAttribute('title')) === null);
+				await q.click();
+				await a.settle(900);
+				const g = await P(() => {
+					const b = document.getElementById('lpn_hotkeys_popup'), c = document.getElementById('lpn_guide_content'), dt = c.querySelector('#guide-term-lpn_guide_lib_ctl');
+					if (!dt || !b) { return { found: false }; }
+					const cr = c.getBoundingClientRect(), r = dt.getBoundingClientRect();
+					return { found: true, open: getComputedStyle(b).display !== 'none', top: Math.round(r.top - cr.top), paneH: Math.round(cr.height), term: dt.textContent.trim(), text: dt.nextElementSibling.textContent };
+				});
+				ok(sec + ': the `?` opens the manual at "Controls and rules in a run", in view', g.found && g.open && g.top >= -2 && g.top < g.paneH && g.term === 'Controls and rules in a run', JSON.stringify(g));
+				ok(sec + ': that entry says the tip\'s sentence word for word', g.found && g.text.indexOf(runTip[sec]) >= 0, g.text);
+				if (SHOTS) { await a.page.screenshot({ path: path.join(SHOTS, sec + '-manual-r2.png') }); }
+				await P(() => { const x = document.querySelector('#lpn_hotkeys_popup .lpn-popover-x'); if (x) { x.click(); } });
+				await a.settle(300);
+			}
 			ok(sec + ': with nothing selected, all four are disabled', s.moves.every((m) => m.disabled) && !s.sel.some(Boolean), dis(s));
 
 			// select the LAST entry by clicking in it

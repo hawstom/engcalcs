@@ -2844,6 +2844,7 @@ EngCalcs.pageConfig = {
 	lpn_library_move_tip: <?=json_encode($ec_lang['lpn_library_move_tip'])?>,
 	lpn_library_move_tip_controls: <?=json_encode($ec_lang['lpn_library_move_tip_controls'])?>,
 	lpn_library_move_tip_rules: <?=json_encode($ec_lang['lpn_library_move_tip_rules'])?>,
+	lpn_library_move_tip_none: <?=json_encode($ec_lang['lpn_library_move_tip_none'])?>,
 	lpn_field_base_demand: <?=json_encode($ec_lang['lpn_field_base_demand'])?>,
 	lpn_result_demand_tip: <?=json_encode($ec_lang['lpn_result_demand_tip'])?>,
 	lpn_field_demand_pattern: <?=json_encode($ec_lang['lpn_field_demand_pattern'])?>,
