@@ -313,10 +313,16 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 
 - **THE RULE, NO EXCEPTIONS: every member element of every assembly form (Pump+, Valve+, Well, Well with tank) is listed in the group's Properties under its own ID** (Tom, 2026-11-14: *"I like that we are transparent in that we list every model element in Properties. Let's ensure that we make that a rule with no exceptions."*); `assembly-ids-harness.js` builds each form and asserts it, so a new member owes a section in `renderWellFields()`/`renderAssemblyFields()`.
 - **IDs (Tom's list):** W1 the Well; W1R aquifer reservoir (node); W1DV virtual valve for well drawdown (link); W1D node that shows drawdown; W1P physical pump
-  (link); W1 the node at the outlet. The group's ID is its bearer's (`assemblyBearer()`): the outlet node's for a Well made since this round, the pump's for
-  an older one, the device's for a Pump+ or Valve+. It follows a rename of its bearer only, and never of another member. The group is not in the node or the
-  link namespace, so a group and a node may be one text; `;ASSEMBLY:` carries `ID=W1` when the group's ID is the outlet node's (a line without it reads as the
-  pump's). The Well prefix's Apply to all renames the bearers; no other prefix's batch takes a Well's member.
+  (link); W1 the node at the outlet. The group's ID is its bearer's: the outlet node's for a Well made since this round, the pump's for an older one, the
+  device's for a Pump+ or Valve+. **The bearer is stored** (`idBy: 'node'` on a new Well's grouping; absent means the device link, which is how every older
+  file reads), never inferred from the texts. The ID follows a rename of its bearer only. The group is not in the node or the link namespace, so a group and
+  a node may be one text; **group IDs are unique across every group** (`assemblyIdClash()`): a rename of a bearer onto another group's ID is refused in the
+  ID-taken words (`validateNewId()`), the prefix batch skips such a rename, the mint passes the whole number over, and a file that names two groups one ID
+  (`EngCalcs.lpnGroupIdFix()`, shared by the `.inp` reader and the project file) keeps the first, lets a later Well fall back to its pump's ID, and does not
+  group the rest (`assembly-id-clash` in the import report, a status-bar sentence for a project file). `;ASSEMBLY:` carries `ID=W1` for a bearer that is the
+  outlet node (a line without it reads as the pump's). The Well prefix's Apply to all renames bearers; no other prefix's batch takes a Well's member.
+  `renameInAssemblies()` rewrites only the kind that was renamed, since a node and a link may share a text. The member-to-group map (`assemblyIndex()`)
+  serves every lookup and is rebuilt when the list changes or a member is renamed.
 - **The label block:** `W1 Z=, Q=, P=` (Z ground elevation, Q the pump's flow, P the pressure at the outlet node W1), then `W1R H=`, then `W1D H=`; the outlet has
   no row of its own and the drawdown valve none. Always rows.
 - **Why the block showed two rows where it should have four (`well-block-rows-browser-harness.js`):** not a setting and not a row that was never built. A node
@@ -328,8 +334,13 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **Symbol:** the water-level line across the narrow hole at the drawdown, `lib/Icons.lib.php`. The upper hole's tint is the reservoir's and the tank's: one
   class (`lpn-node-symbol-backdrop`, 18 % of the symbol's ink over paper).
 - **Well with tank elevations:** a tee and a tank the Well's own placing made follow the Well's elevation until the user types one of their own into either
-  (`teeFollow`, `tankFollow` on the grouping, true only while following); an existing junction or tank pressed as the tee or tank, a tee on a pipe, a file from
-  before this round and an `.inp` import never follow. The DEM fill of the tee's or tank's own point does not end it.
+  (`teeFollow`, `tankFollow` on the grouping, true only while following). An existing junction or tank pressed as the tee or tank, a tee on a pipe, a file from
+  before this round and an `.inp` import never follow. **Under the DEM elevation source a tee or tank on open ground takes its own ground and does not
+  follow** (follow is for a value carried from the Well or typed, never one the DEM reads); the value written otherwise is the Well's Base elevation, the one a
+  node is born with in Base. **The DEM fill never moves or ends a follower**, and each node takes its own reading, so one batch gives one answer in any order.
+  **Following is per scenario:** typing on the tee or tank in Base ends it in Base and so everywhere; typing in a scenario ends it for that scenario only
+  (`followOff`: scenario id to `{tee, tank}`), the typing there being an override. A follower is written through `setProp()`, so in a scenario it is an override
+  too, and clearing the Well's override there clears the followers' (`wellTankFollowClear()`). A blank typed on the Well is not followed.
 - **A tank far below the tee (Tom: 700 ft lower gives unreasonable flow and velocity "even after the tank is at max level"):** EPANET 2.2 `tankstatus()`
   (src/hydstatus.c) closes (TEMPCLOSED) any link whose flow would enter a tank whose head is at or above its maximum, however far below the tee it stands; both
   engines do the same and agree with EPANET to 1e-6 m3/s. Below the maximum the pipe carries the head difference's flow: 213 m through the default 4-inch

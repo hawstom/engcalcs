@@ -2485,6 +2485,7 @@ $ec_lang['lpn_inp_drop_patterns']='This page did not read the demand patterns, b
 $ec_lang['lpn_inp_drop_demand_pattern']='These junctions have demands that vary over the run. Their patterns were imported in full, and the demand shown is the value at the time on the clock.';
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept, it is being solved, and each of them shows it in the Emitter coefficient box in its properties.';
 $ec_lang['lpn_inp_drop_assembly']='The file groups these pumps with nodes it does not contain, so the group was not restored. The nodes and pumps that are there came in as plain elements.';
+$ec_lang['lpn_inp_drop_assembly_id']='These groups share an ID with another group, so they were not restored. Their nodes and links came in as plain elements.';
 $ec_lang['lpn_inp_drop_well_tank']='These are one-point wells with a tank, a form this page no longer draws. Their reservoir, drawdown valve, pump, tee, virtual pipe, and tank are kept as ordinary elements, and their pump controls as ordinary controls.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
 $ec_lang['lpn_inp_drop_curve_missing']='This pump refers to a curve that is not in the file. The pump was imported without a curve, so it adds no head.';

@@ -147,7 +147,7 @@ console.log('\n--- 1. place ---');
 		doc.links[0].id === 'W1DV' && doc.links[0].type === 'valve' && doc.links[0].valveType === 'GPV' && doc.links[0].from === 'W1R' && doc.links[0].to === 'W1D' &&
 		doc.links[1].id === 'W1P' && doc.links[1].type === 'pump' && doc.links[1].from === 'W1D' && doc.links[1].to === 'W1', doc.links.map((l) => l.id + ' ' + l.from + '>' + l.to).join('; '));
 	ok('no tank, no tee, no virtual pipe', !doc.nodes.some((n) => n.type === 'tank') && !doc.links.some((l) => l.virtual));
-	ok('one grouping, three nodes and two links, no tank', JSON.stringify(doc.assemblies) === JSON.stringify([{ id: 'W1', kind: 'well', nodes: ['W1R', 'W1D', 'W1'], links: ['W1DV', 'W1P'] }]), JSON.stringify(doc.assemblies));
+	ok('one grouping, three nodes and two links, no tank', JSON.stringify(doc.assemblies) === JSON.stringify([{ id: 'W1', kind: 'well', idBy: 'node', nodes: ['W1R', 'W1D', 'W1'], links: ['W1DV', 'W1P'] }]), JSON.stringify(doc.assemblies));
 	ok('one undo step; the tool stays armed', L.undoDepth() === d0 + 1 && L.getMode() === 'add-well');
 	const R = L.nodeById('W1R'), D = L.nodeById('W1');
 	ok('the static level opens a round 30 m below the ground when there is one', typeof D.elev !== 'number' || R.elev === +(D.elev - 30).toFixed(4), R.elev + ' / ' + D.elev);

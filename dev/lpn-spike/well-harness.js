@@ -117,7 +117,7 @@ console.log('\n--- 1. place on open ground ---');
 	ok('all three nodes are on one point', doc.nodes.every((n) => n.x === 200 && n.y === 150));
 	const w = doc.assemblies[0];
 	ok('one grouping, kind well, id W1 (the outlet node\'s), nodes W1R W1D W1, links W1DV W1P', doc.assemblies.length === 1 && JSON.stringify(w) ===
-		JSON.stringify({ id: 'W1', kind: 'well', nodes: ['W1R', 'W1D', 'W1'], links: ['W1DV', 'W1P'] }), JSON.stringify(w));
+		JSON.stringify({ id: 'W1', kind: 'well', idBy: 'node', nodes: ['W1R', 'W1D', 'W1'], links: ['W1DV', 'W1P'] }), JSON.stringify(w));
 	const R = L.nodeById('W1R'), S = L.nodeById('W1D'), T = L.nodeById('W1');
 	ok('the static elevation is the same at R and S, and below the ground', R.elev === S.elev && R.elev < T.elev, R.elev + ' ' + S.elev + ' ' + T.elev);
 	ok('in SI the static elevation opens a round 30 m below the ground', R.elev === +(T.elev - 30).toFixed(4), R.elev + ' vs ground ' + T.elev);

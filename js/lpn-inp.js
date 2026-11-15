@@ -377,6 +377,20 @@
 	 * `ok` true with a non-empty `dropped` means it WAS imported, and the caller owes the user
 	 * the list.
 	 */
+	// **GROUP IDS ARE UNIQUE ACROSS EVERY GROUP** (Task 822, Round 8). A Well's ID is its outlet NODE's and a Pump+'s or Valve+'s its device's LINK's, and nodes
+	// and links are separate namespaces, so two groups can arrive with one ID (a Well W1 and a Pump+ W1). The group is found by that ID everywhere (the box, the
+	// graph's remembered member, the controls it wrote), so a clash is resolved here, once, for the `.inp` reader and the project file alike: the first group in
+	// the file keeps the ID; a later Well that took its ID from its outlet falls back to its pump's ID (the form a file before Round 8 has) if that is free; any
+	// other is not grouped (its elements stay, as for every unresolved group) and its ID is returned in `clashed` for the caller to say so.
+	EngCalcs.lpnGroupIdFix = function (list) {
+		var seen = {}, kept = [], clashed = [];
+		(list || []).forEach(function (a) {
+			if (seen[a.id] && a.kind === 'well' && a.idBy === 'node' && a.links && !seen[a.links[1]]) { a.id = a.links[1]; delete a.idBy; }
+			if (seen[a.id]) { clashed.push(a.id); return; }
+			seen[a.id] = 1; kept.push(a);
+		});
+		return { kept: kept, clashed: clashed };
+	};
 	EngCalcs.lpnInpParse = function (text) {
 		var lines = String(text == null ? '' : text).split(/\r\n|\r|\n/),
 			section = '',
@@ -1400,6 +1414,7 @@
 					opt = a.opt || {};
 					// The group's id is the outlet node's when the file says so (`ID=`), else the pump's, as a file written before Round 8 has it.
 					w = { id: opt.id === a.nodes[2] ? a.nodes[2] : a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: true, _opt: opt };
+					if (opt.id === a.nodes[2]) { w.idBy = 'node'; }
 					pipes = String(opt.pipes || '').split(',');
 					if (nodeIndex[opt.tee] && nodeIndex[opt.tee].type === 'junction' && nodeIndex[opt.tank] && nodeIndex[opt.tank].type === 'tank' && pipes.length === 2 &&
 						pipes.every(function (id) { return !!linkIndex[id]; })) {
@@ -1414,6 +1429,9 @@
 			if (good) { assemblies.push({ id: a.links[0], kind: a.kind, up: a.up, down: a.down, links: a.links.slice() }); }
 			else { assemblyBad.push(a.links[0]); }
 		});
+		var idFix = EngCalcs.lpnGroupIdFix(assemblies);
+		assemblies = idFix.kept;
+		if (idFix.clashed.length) { drop('assembly-id-clash', idFix.clashed, null, 'link'); }
 		if (assemblyBad.length) { drop('assembly-unresolved', assemblyBad, null, 'link'); }
 		if (wellTankOld.length) { drop('assembly-well-tank', wellTankOld, null, 'link'); }
 
@@ -3776,7 +3794,7 @@
 				if (!a || !ends || !ends.every(Boolean) || !a.links || !a.links.length) { return; }
 				if (ends.concat(tail.slice(0, 2)).some(function (id) { return omitted[id]; }) || !a.links.concat(tail.slice(2)).every(function (id) { return live[id]; })) { return; }
 				out += ';ASSEMBLY: ' + [a.kind || 'pump'].concat(ends, a.links).join(' ') +
-					(a.kind === 'well' && a.id === a.nodes[2] ? ' ID=' + a.id : '') + (a.kind === 'well' && wellOwns(a, 'open') ? ' ON=' + a.pumpOn : '') + (a.kind === 'well' && wellOwns(a, 'closed') ? ' OFF=' + a.pumpOff : '') +
+					(a.kind === 'well' && a.idBy === 'node' ? ' ID=' + a.id : '') + (a.kind === 'well' && wellOwns(a, 'open') ? ' ON=' + a.pumpOn : '') + (a.kind === 'well' && wellOwns(a, 'closed') ? ' OFF=' + a.pumpOff : '') +
 					(tail.length ? ' TEE=' + tail[0] + ' TANK=' + tail[1] + ' PIPES=' + tail[2] + ',' + tail[3] : '') + '\n';
 			});
 			return out ? out + '\n' : '';

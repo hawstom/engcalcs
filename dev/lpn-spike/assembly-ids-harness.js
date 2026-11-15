@@ -10,7 +10,12 @@
 //      at the outlet. The group and the outlet node share a text; every lookup, rename, Find-by-ID path, export, Explode and Undo still answers;
 //   3. a file saved before this round keeps its IDs (pump W1, outlet W1P) and still renames and explodes;
 //   4. a Well with tank's tee and tank follow the Well's elevation until the user types one of their own, and the diverged state survives a save, a
-//      reopen and Undo.
+//      reopen and Undo;
+//   5. group IDs are unique across every group (a Well's is a node's, a Pump+'s a link's): a rename, an `.inp` line, a project file, the mint and
+//      the prefix batch each refuse or resolve a clash, and the box, the graph's remembered member and the controls find the right group;
+//   6. the bearer is stored, so renaming an older Well's outlet to its pump's ID does not flip it;
+//   7. following under the DEM source, in one batch in either order, in a scenario (typing there ends it there only; clearing the outlet's override clears
+//      the followers'), and with a blank typed.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -39,6 +44,9 @@ const L = loadLoopedNetwork(
 	"\t\tidsTaken: function (id, group) { return validateNewId(id, '', group) !== true; },\n" +
 	"\t\tapplyPrefix: function (key) { return elementsForIdKey(key).map(function (x) { return x.id; }); },\n" +
 	"\t\texplode: explodeAssembly, snap: saveUndoSnapshot, syncWellControls: syncWellControls,\n" +
+	"\t\tvalidate: validateNewId, applyPrefixAll: applyIdPrefixToAll, getSettings: function () { return settings; }, lastNotice: function () { return lastNoticeText; },\n" +
+	"\t\tforceDem: function (on) { elevSourceIsDem = function () { return !!on; }; }, terrainFill: terrainFillElevations, clearOverride: clearOverride,\n" +
+	"\t\tcreateScenario: createScenario, switchScenario: switchScenario, bearerOf: assemblyBearer, renameBearer: renameAssemblyBearer,\n" +
 	"\t\tresetIds: function () { nextId = newNextId(); },\n" +
 	"\t\tsetScale: function (s) { state.s = s; state.tx = 0; state.ty = 0; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -232,6 +240,112 @@ console.log('\n--- 4. a Well with tank: the tee and the tank follow the Well\'s 
 	const b = doc2.assemblies[0];
 	L.setProp(L.nodeById('W1'), 'elev', 90);
 	ok('an existing junction and an existing tank pressed as the tee and the tank are not followers', !b.teeFollow && !b.tankFollow && jx.elev === 33 && tk.elev === 44, [jx.elev, tk.elev].join());
+}
+
+console.log('\n--- 5. group IDs are unique across every group ---');
+{
+	const doc = fresh();
+	curves(doc);
+	L.setMode('add-pumpplus'); press(100, 100);
+	L.setMode('add-well'); press(300, 100);
+	L.setMode('select');
+	const pp = doc.assemblies[0], w = doc.assemblies[1];
+	ok('a Pump+ P1 (a link\'s ID) and a Well W1 (a node\'s ID)', pp.id === 'P1' && w.id === 'W1');
+	ok('renaming the Well\'s outlet to P1, the Pump+\'s ID, is refused in the ID-taken words', L.validate('P1', 'W1', 'node') === (EC.pageConfig.lpn_id_taken || 'That ID is already in use.'), String(L.validate('P1', 'W1', 'node')));
+	ok('and the Pump+\'s pump to W1, the Well\'s ID, likewise', L.validate('W1', 'P1', 'link') !== true, String(L.validate('W1', 'P1', 'link')));
+	ok('a member that bears no group ID may take either text (W1D to P1 is a node, not a group)', L.validate('P1', 'W1D', 'node') === true);
+	ok('a Well\'s ID is found by its ID, the Pump+\'s by its own: each opens its own box', (() => { L.openPopup('P1U', 1, 1); const a1 = L.getPopup().id; L.openPopup('W1', 1, 1); return a1 === 'P1' && L.getPopup().id === 'W1' && L.assemblyById('P1') === pp && L.assemblyById('W1') === w; })());
+	// The prefix: Well prefix set to the Pump+'s, so the Apply to all target is the Pump+'s ID.
+	L.getSettings().idPrefixes.W = 'P';
+	L.applyPrefixAll('W');
+	ok('Apply to all with the Well prefix P would make the Well P1: it is skipped, nothing is renamed', w.id === 'W1' && !!L.nodeById('W1'), w.id + ' / ' + L.lastNotice());
+	L.getSettings().idPrefixes.W = 'W';
+	// Minting: a Well placed while the Well prefix equals the Pump+'s skips the whole number.
+	L.getSettings().idPrefixes.W = 'P';
+	L.resetIds();
+	L.setMode('add-well'); press(500, 100); L.setMode('select');
+	const ids = doc.assemblies.map((x) => x.id);
+	ok('a Well minted under the prefix P takes a whole number no group holds (P2), so every group ID is its own', new Set(ids).size === ids.length && ids.indexOf('P2') >= 0, ids.join());
+	L.getSettings().idPrefixes.W = 'W';
+	// The .inp: a Well whose outlet node is named P1 and a Pump+ whose pump is P1.
+	const text = EC.lpnExportInp(L.serializeProject(), {}).inp;
+	const clash = text.replace(/\bW1\b/g, 'P1');
+	const parsed = EC.lpnInpParse(clash);
+	const gids = parsed.assemblies.map((x) => x.id);
+	ok('an .inp whose Well outlet is the Pump+\'s ID reads with unique group IDs: the Well falls back to its pump\'s (W1P)', parsed.ok && new Set(gids).size === gids.length && gids.indexOf('W1P') >= 0 && gids.indexOf('P1') >= 0, gids.join());
+	const fix = EC.lpnGroupIdFix([{ id: 'A', kind: 'pump', links: ['A'] }, { id: 'A', kind: 'valve', links: ['A'] }, { id: 'A', kind: 'well', idBy: 'node', links: ['G', 'A'] }]);
+	ok('and a clash with no fallback is not grouped and is named: the first keeps the ID, the well falls back only to a free pump ID', fix.kept.length === 1 && fix.clashed.join() === 'A,A', JSON.stringify(fix));
+	// A project file with the same clash.
+	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
+	const sw = saved.assemblies.filter((x) => x.kind === 'well')[0];
+	sw.id = 'P1'; delete sw.idBy;
+	L.applySaved(L.migrateSaved(saved)); L.buildDom();
+	const after = L.getDoc().assemblies.map((x) => x.id);
+	ok('a project file naming a Well P1 beside the Pump+ P1 opens with unique group IDs, the later group not grouped, and says so', new Set(after).size === after.length && after.filter((x) => x === 'P1').length === 1 && L.lastNotice().indexOf('share an ID') >= 0, after.join() + ' / ' + L.lastNotice());
+}
+
+console.log('\n--- 6. the bearer is stored, not read from the texts ---');
+{
+	fresh();
+	const old = JSON.parse(fs.readFileSync(ROOT + 'dev/lpn-spike/assembly-before-round8.lwn', 'utf8'));
+	L.applySaved(L.migrateSaved(old)); L.buildDom();
+	const a = L.assemblyById('W1');
+	ok('an older Well\'s bearer is its pump (W1), and its outlet is W1P', L.bearerOf(a).group === 'link' && L.bearerOf(a).id === 'W1' && a.nodes[2] === 'W1P');
+	L.snap(); L.applyNodeRename('W1P', 'W1');
+	ok('renaming its outlet W1P to W1 (the pump\'s ID) leaves the bearer the pump and the group W1', L.bearerOf(a).group === 'link' && L.bearerOf(a).id === 'W1' && a.id === 'W1' && a.nodes[2] === 'W1');
+	L.snap(); L.renameBearer(a, 'PUMPQ');
+	ok('and one rename of the bearer renames the pump and the group, not the outlet', a.id === 'PUMPQ' && a.links[1] === 'PUMPQ' && a.nodes[2] === 'W1');
+}
+
+console.log('\n--- 7. following: the DEM source, a batch in either order, a scenario, a blank ---');
+{
+	L.forceDem(true);
+	const doc = fresh();
+	L.setMode('add-welltank'); press(200, 150); press(400, 150); press(400, 400); L.setMode('select');
+	let a = doc.assemblies[0];
+	ok('under the DEM source a tee and a tank on open ground take their own ground and do not follow', !a.teeFollow && !a.tankFollow, JSON.stringify([a.teeFollow, a.tankFollow]));
+	const readings = { W1: 100, tee: 250, tank: 300 };
+	const run = (order) => {
+		['W1', a.tee, a.tank].forEach((id) => { delete L.nodeById(id).elev; });
+		L.terrainFill(order.map((k) => ({ id: k === 'W1' ? 'W1' : a[k], meters: readings[k] })));
+		return [L.nodeById('W1').elev, L.nodeById(a.tee).elev, L.nodeById(a.tank).elev].join();
+	};
+	const r1 = run(['W1', 'tee', 'tank']), r2 = run(['tee', 'tank', 'W1']), r3 = run(['tank', 'W1', 'tee']);
+	ok('one DEM batch gives the same elevations in any order: each reads its own ground', r1 === r2 && r2 === r3 && r1 !== '' , [r1, r2, r3].join(' | '));
+	L.forceDem(false);
+	// A follower and a DEM fill of the outlet: the fill moves nobody.
+	const doc2 = fresh();
+	L.setMode('add-welltank'); press(200, 150); press(400, 150); press(400, 400); L.setMode('select');
+	a = doc2.assemblies[0];
+	L.setProp(L.nodeById('W1'), 'elev', 50);
+	const tee0 = L.nodeById(a.tee).elev;
+	delete L.nodeById('W1').elev;
+	L.forceDem(true);
+	L.terrainFill([{ id: 'W1', meters: 777 }]);
+	L.forceDem(false);
+	ok('a DEM fill of the outlet does not carry a following tee to its reading (and does not end its following)', L.nodeById(a.tee).elev === tee0 && a.teeFollow === true, [L.nodeById(a.tee).elev, tee0, a.teeFollow].join());
+	// A blank typed on the outlet is not an elevation to follow.
+	L.setProp(L.nodeById('W1'), 'elev', 120);
+	L.setProp(L.nodeById('W1'), 'elev', '');
+	ok('a blank typed on the Well leaves the followers where they were', L.nodeById(a.tee).elev === 120 && L.nodeById(a.tank).elev === 120, [L.nodeById(a.tee).elev, L.nodeById(a.tank).elev].join());
+	L.setProp(L.nodeById('W1'), 'elev', 120);
+	// Scenarios.
+	const scn = L.createScenario('Dry year');
+	L.setProp(L.nodeById('W1'), 'elev', 900);
+	ok('in a scenario the Well\'s elevation reaches the followers as overrides: Base is untouched', L.effective(L.nodeById(a.tee), 'elev') === 900 && L.effective(L.nodeById(a.tank), 'elev') === 900 && L.nodeById(a.tee).elev === 120 && L.nodeById(a.tank).elev === 120);
+	L.clearOverride(L.nodeById('W1'), 'elev');
+	ok('clearing the Well\'s override in the scenario clears the followers\' too: no stale 900', L.effective(L.nodeById('W1'), 'elev') === 120 && L.effective(L.nodeById(a.tee), 'elev') === 120 && L.effective(L.nodeById(a.tank), 'elev') === 120, [L.effective(L.nodeById(a.tee), 'elev'), L.effective(L.nodeById(a.tank), 'elev')].join());
+	L.setProp(L.nodeById(a.tee), 'elev', 500);
+	ok('an elevation typed on the tee in the scenario ends its following there only: Base still follows', a.teeFollow === true && a.followOff && Object.keys(a.followOff).length === 1 && a.tankFollow === true);
+	L.setProp(L.nodeById('W1'), 'elev', 950);
+	ok('in that scenario the next Well elevation moves the tank and not the tee', L.effective(L.nodeById(a.tee), 'elev') === 500 && L.effective(L.nodeById(a.tank), 'elev') === 950, [L.effective(L.nodeById(a.tee), 'elev'), L.effective(L.nodeById(a.tank), 'elev')].join());
+	L.switchScenario('base');
+	L.setProp(L.nodeById('W1'), 'elev', 130);
+	ok('back in Base the tee still follows (typing in the scenario did not end it here)', L.nodeById(a.tee).elev === 130 && L.nodeById(a.tank).elev === 130, [L.nodeById(a.tee).elev, L.nodeById(a.tank).elev].join());
+	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
+	L.applySaved(L.migrateSaved(saved)); L.buildDom();
+	const b = L.getDoc().assemblies[0];
+	ok('the per-scenario state survives save and reopen', b.teeFollow === true && b.followOff && Object.keys(b.followOff).length === 1, JSON.stringify(b.followOff));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

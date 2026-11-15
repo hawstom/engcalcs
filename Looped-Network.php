@@ -3920,6 +3920,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_drop_demand_pattern: <?=json_encode($ec_lang['lpn_inp_drop_demand_pattern'])?>,
 	lpn_inp_drop_emitters: <?=json_encode($ec_lang['lpn_inp_drop_emitters'])?>,
 	lpn_inp_drop_assembly: <?=json_encode($ec_lang['lpn_inp_drop_assembly'])?>,
+	lpn_inp_drop_assembly_id: <?=json_encode($ec_lang['lpn_inp_drop_assembly_id'])?>,
 	lpn_inp_drop_well_tank: <?=json_encode($ec_lang['lpn_inp_drop_well_tank'])?>,
 	lpn_inp_drop_curve_long: <?=json_encode($ec_lang['lpn_inp_drop_curve_long'])?>,
 	lpn_inp_drop_curve_missing: <?=json_encode($ec_lang['lpn_inp_drop_curve_missing'])?>,

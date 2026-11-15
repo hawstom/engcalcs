@@ -4414,6 +4414,8 @@ var EngCalcs = EngCalcs || {};
 	function mintGroupBase(key, suffixes) {
 		var prefix = (scnSetting('idPrefixes') || {})[key] || key, used = {}, base;
 		allIds().forEach(function (x) { used[x] = 1; });
+		// A group's own ID is unique across every group too (a Well's is a node ID, a Pump+'s a link ID, namespaces that allIds() keeps apart).
+		assemblyList().forEach(function (a) { used[a.id] = 1; });
 		if (nextId[key] === undefined) { nextId[key] = 1; }
 		do { base = prefix + (nextId[key]++); } while ([''].concat(suffixes).some(function (sfx) { return used[base + sfx]; }));
 		return base;
@@ -5951,6 +5953,7 @@ var EngCalcs = EngCalcs || {};
 		if (t && t.kind === 'alt' && !Object.keys(map).length) { delete t.obj.values; }
 		touchTreeKey('clearOverride', (t && t.kind === 'alt' ? 'alt' : 'scn') + '\u0000' + (t ? t.obj.id : scn.id), map, key);
 		if (LPN_MORPH_PROP[prop]) { touchTree('clearOverride'); }
+		if (prop === 'elev' && elGroup(el) === 'node') { wellTankFollowClear(el); }
 	}
 	// THE ONE WRITE SEAM every property editor goes through. In Base it writes the element (which
 	// IS the propagation -- there is no push upward in the delta model); in a scenario it records
@@ -5978,17 +5981,45 @@ var EngCalcs = EngCalcs || {};
 	// it stays as typed. Only a tee or tank the Well's own placing made follows: one opened on an existing junction or tank, or on a point of a pipe, was already
 	// the user's, and so is any in a file written before the flags, or imported from an `.inp`. The program's own write (`wellTankAuto`: the follow itself,
 	// and the DEM fill of the tee's or tank's own point) neither ends it nor follows.
+	// **FOLLOWING IS PER SCENARIO** (reviewer, 2026-11-14): a value typed in Base ends it in Base and so everywhere (a scenario inherits Base's decision); one typed
+	// in a scenario ends it for that scenario only (`followOff` on the grouping: scenario id -> { tee, tank }), because the same typing there is an override, which
+	// is that scenario's and not Base's. A follower is written through setProp(), so inside a scenario it is an override too, and clearing the outlet's override
+	// there clears the followers' (wellTankFollowClear()).
 	var wellTankAuto = false;
+	function wellFollowing(asm, key) {
+		var off = (asm.followOff || {})[activeScenario().id];
+		return !!asm[key + 'Follow'] && !(off && off[key]);
+	}
+	function wellFollowEnd(asm, key) {
+		if (inBaseFor(categoryOf('elev', 'node'))) { delete asm[key + 'Follow']; return; }
+		if (!asm.followOff) { asm.followOff = {}; }
+		if (!asm.followOff[activeScenario().id]) { asm.followOff[activeScenario().id] = {}; }
+		asm.followOff[activeScenario().id][key] = true;
+	}
 	function wellTankFollow(asm, el, value) {
 		if (wellTankAuto || !asm || !asm.tank) { return; }
-		if (el.id === asm.tee) { delete asm.teeFollow; return; }
-		if (el.id === asm.tank) { delete asm.tankFollow; return; }
+		if (el.id === asm.tee) { wellFollowEnd(asm, 'tee'); return; }
+		if (el.id === asm.tank) { wellFollowEnd(asm, 'tank'); return; }
 		if (el.id !== asm.nodes[2]) { return; }
-		[['tee', 'teeFollow'], ['tank', 'tankFollow']].forEach(function (k) {
-			var n = nodeById(asm[k[0]]);
-			if (!n || !asm[k[1]]) { return; }
+		// A blank or unreadable value is not an elevation to follow (as wellStaticFollow() guards).
+		if (value === '' || value === null || value === undefined || !isFinite(+value)) { return; }
+		['tee', 'tank'].forEach(function (key) {
+			var n = nodeById(asm[key]);
+			if (!n || !wellFollowing(asm, key)) { return; }
 			wellTankAuto = true;
 			try { setProp(n, 'elev', value); updateNode(n.id, true); } finally { wellTankAuto = false; }
+		});
+	}
+	// Clearing the outlet's elevation override in a scenario (the override marker's clear goes to clearOverride(), not setProp()) clears the overrides its
+	// still-following tee and tank hold there, so they do not keep a stale value.
+	function wellTankFollowClear(el) {
+		var asm = assemblyOfAnyMember('node', el.id);
+		if (wellTankAuto || !asm || !asm.tank || el.id !== asm.nodes[2]) { return; }
+		['tee', 'tank'].forEach(function (key) {
+			var n = nodeById(asm[key]);
+			if (!n || !wellFollowing(asm, key)) { return; }
+			wellTankAuto = true;
+			try { clearOverride(n, 'elev'); updateNode(n.id, true); } finally { wellTankAuto = false; }
 		});
 	}
 	function setProp(el, prop, value) {
@@ -21215,10 +21246,12 @@ var EngCalcs = EngCalcs || {};
 		// said. Returning early without this left the button looking like it had done nothing.
 		if (!pending.length) { refreshPopupIfOpen(); return []; }
 		saveUndoSnapshot();
+		// **THE FILL NEVER MOVES A FOLLOWER AND NEVER ENDS ONE** (reviewer, 2026-11-14: the tee's final elevation depended on whether it came before or after the Well's
+		// outlet in the list): each node takes its own reading, the outlet's included, and a tee or tank that follows is not carried to the outlet's reading, so the
+		// batch's order cannot change an answer.
 		pending.forEach(function (p) {
-			var a = assemblyOfNode(p.n.id), a0 = assemblyOfAnyMember('node', p.n.id), r;
-			// A tee's or a tank's own point reads its own ground: the program's write, which neither marks it as typed nor follows the well.
-			wellTankAuto = !!(a0 && a0.tank && (a0.tee === p.n.id || a0.tank === p.n.id));
+			var a = assemblyOfNode(p.n.id), r;
+			wellTankAuto = true;
 			try { setProp(p.n, 'elev', p.v); } finally { wellTankAuto = false; }
 			// A Well born where the ground was not yet known has no static level yet: it takes the ground less the round depth.
 			r = a && a.kind === 'well' && a.nodes.indexOf(p.n.id) >= 2 ? nodeById(a.nodes[0]) : null;
@@ -40630,25 +40663,49 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// id is one of its members' ids and follows that member's rename: a pump's or a valve's is its device's, a Well's is its outlet node's, except
 	// a Well saved before Round 8, whose id is its pump's (W1; its outlet W1P). `a.id` says which; a group id and a node id may be the same text
 	// because the group is not in the node or the link namespace (allIds() never lists it).
+	// **STORED, NOT INFERRED** (reviewer, 2026-11-14: comparing texts flipped the bearer when an older Well's outlet was renamed to its pump's ID): `idBy: 'node'`
+	// on the grouping says the ID is the outlet node's; anything else, every file before Round 8 included, is the device link's.
 	function assemblyBearer(a) {
-		return a.kind === 'well' && a.id === a.nodes[2] ? { group: 'node', id: a.nodes[2] } : { group: 'link', id: a.links[a.kind === 'well' ? 1 : 0] };
+		return a.kind === 'well' && a.idBy === 'node' ? { group: 'node', id: a.nodes[2] } : { group: 'link', id: a.links[a.kind === 'well' ? 1 : 0] };
+	}
+	// One rename of the element that bears a group's ID; the group follows (renameInAssemblies()). The Well's and the Pump+'s Properties boxes share it.
+	function renameAssemblyBearer(a, newId) {
+		var b = assemblyBearer(a);
+		if (b.group === 'node') { applyNodeRename(b.id, newId); } else { applyLinkRename(b.id, newId); }
+		return assemblyById(newId);
 	}
 	function assemblyBearerEl(a) { var b = assemblyBearer(a); return b.group === 'node' ? nodeById(b.id) : linkById(b.id); }
-	function assemblyOfNode(id) {
-		var list = assemblyList(), i;
-		for (i = 0; i < list.length; i++) { if (assemblyNodeIds(list[i]).indexOf(id) >= 0) { return list[i]; } }
-		return null;
+	// **ONE MEMBER-TO-GROUP MAP, REBUILT WHEN THE LIST OR A MEMBER CHANGES** (reviewer, 2026-11-14: these three were scans of every group, run on every elevation
+	// write and for every blocker in the label shed). The map is for the array it was built from and its length, which covers the list being replaced (open,
+	// Undo, Explode, delete) or grown (a group made); a change IN PLACE (a rename, the wizard giving a Well its tee and tank) calls assemblyIndexDirty(), as
+	// invalidateIdMaps() is called for an element's id. Group IDs are unique (assemblyIdClash()), so a group is found by its ID alone.
+	var assemblyIdx = null, assemblyIdxList = null, assemblyIdxN = -1;
+	function assemblyIndexDirty() { assemblyIdx = null; }
+	function assemblyIndex() {
+		var list = doc.assemblies || null;
+		if (assemblyIdx && assemblyIdxList === list && assemblyIdxN === (list ? list.length : 0)) { return assemblyIdx; }
+		var ix = { node: {}, link: {}, anyNode: {}, anyLink: {}, byId: {} };
+		(list || []).forEach(function (a) {
+			var tank = assemblyTankIds(a);
+			assemblyNodeIds(a).forEach(function (id) { if (!ix.node[id]) { ix.node[id] = a; } if (!ix.anyNode[id]) { ix.anyNode[id] = a; } });
+			a.links.forEach(function (id) { if (!ix.link[id]) { ix.link[id] = a; } if (!ix.anyLink[id]) { ix.anyLink[id] = a; } });
+			tank.nodes.forEach(function (id) { if (!ix.anyNode[id]) { ix.anyNode[id] = a; } });
+			tank.links.forEach(function (id) { if (!ix.anyLink[id]) { ix.anyLink[id] = a; } });
+			if (!ix.byId[a.id]) { ix.byId[a.id] = a; }
+		});
+		assemblyIdx = ix; assemblyIdxList = list; assemblyIdxN = list ? list.length : 0;
+		return ix;
 	}
-	function assemblyOfLink(id) {
-		var list = assemblyList(), i;
-		for (i = 0; i < list.length; i++) { if (list[i].links.indexOf(id) >= 0) { return list[i]; } }
-		return null;
+	function assemblyOfNode(id) { return assemblyIndex().node[id] || null; }
+	function assemblyOfLink(id) { return assemblyIndex().link[id] || null; }
+	function assemblyById(id) { return assemblyIndex().byId[id] || null; }
+	// Is this ID another group's? `except` is the group that may hold it (the one being renamed).
+	// The group whose ID the element (group, id) bears, if any.
+	function assemblyBearerOf(group, id) {
+		var a = (group === 'node' ? assemblyIndex().node : group === 'link' ? assemblyIndex().link : {})[id];
+		return a && assemblyBearer(a).group === group && assemblyBearer(a).id === id ? a : null;
 	}
-	function assemblyById(id) {
-		var list = assemblyList(), i;
-		for (i = 0; i < list.length; i++) { if (list[i].id === id) { return list[i]; } }
-		return null;
-	}
+	function assemblyIdClash(id, except) { var a = assemblyIndex().byId[id]; return !!a && a !== except; }
 	// The saved list, kept only where every element it names is in the file as a node or a link. **A ONE-POINT WELL WITH A TANK** (nodes R, U, T, D;
 	// links G, P, B), the form before Round 7, is not a form any more: its elements are all kept as the ordinary elements they always were, the
 	// grouping is not, and any control it wrote becomes an ordinary control. The ids are collected in `oldWellTanks` so the caller can say so.
@@ -40670,13 +40727,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 				wellOk = Array.isArray(a.nodes) && a.nodes.length === 3 && a.links.length === 2 && a.nodes.every(function (id) { return nodeIds[id]; });
 				if (wellOk) {
-					w = { id: a.id !== undefined ? a.id : a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: a.staticTyped ? true : undefined,
+					w = { id: a.id !== undefined ? a.id : a.links[1], kind: 'well', idBy: a.idBy === 'node' && a.id === a.nodes[2] ? 'node' : undefined, nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: a.staticTyped ? true : undefined,
 						pumpOn: typeof a.pumpOn === 'number' ? a.pumpOn : undefined, pumpOff: typeof a.pumpOff === 'number' ? a.pumpOff : undefined };
 					// A Well with tank: its tee, tank and the two pipes, all present, else it is the simple Well it was before the tank went in.
 					if (a.tee && a.tank && Array.isArray(a.branch) && a.branch.length === 2 && nodeIds[a.tee] && nodeIds[a.tank] && a.branch.every(function (id) { return linkIds[id]; })) {
 						w.tee = a.tee; w.tank = a.tank; w.branch = a.branch.slice();
 						if (a.teeFollow) { w.teeFollow = true; }
 						if (a.tankFollow) { w.tankFollow = true; }
+						if (a.followOff && typeof a.followOff === 'object') { w.followOff = JSON.parse(JSON.stringify(a.followOff)); }
 					} else { w.pumpOn = undefined; w.pumpOff = undefined; }
 					out.push(w);
 				}
@@ -40685,8 +40743,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!nodeIds[a.up] || !nodeIds[a.down]) { return; }
 			out.push({ id: a.id !== undefined ? a.id : a.links[0], kind: a.kind || 'pump', up: a.up, down: a.down, links: a.links.slice() });
 		});
-		return out;
+		// Group IDs are unique across every group (EngCalcs.lpnGroupIdFix(), shared with the .inp reader); a clash is not grouped and is said out loud by the caller.
+		var fix = EngCalcs.lpnGroupIdFix(out);
+		groupIdClashed = fix.clashed;
+		return fix.kept;
 	}
+	var groupIdClashed = [];
 	// The elements an assembly is made of, as selection refs, with `lastRef` last so it stays the subject.
 	// **A DRAG OF ONE NODE OF AN ASSEMBLY MOVES THE OTHER TOO** (Task 822): equal x and y, in Base and in
 	// a scenario alike, because the position is read back through the same door a typed one uses.
@@ -40904,7 +40966,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		g = addLink('valve', r.id, s.id, [], base + 'DV');
 		g.valveType = 'GPV'; g._setting = defaultValveSetting('GPV');   // base-write: construction
 		p = addLink('pump', s.id, d.id, [], base + 'P');
-		a = { id: d.id, kind: 'well', nodes: [r.id, s.id, d.id], links: [g.id, p.id] };
+		a = { id: d.id, kind: 'well', idBy: 'node', nodes: [r.id, s.id, d.id], links: [g.id, p.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
 		syncAssemblyGlyphs();
@@ -40945,14 +41007,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wellOut = nodeById(a.nodes[2]);
 		hit = wellTankHitNode(e, t);
 		if (wellTankPending.stage === 'tee') {
-			if (hit && assemblyOfNode(hit.id) === a) { tee = addNode('junction', wellOut.x, wellOut.y); if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } teeFollows = true; }   // base-write: construction: the tee stands where the well does, at its elevation, and follows it
+			if (hit && assemblyOfNode(hit.id) === a) { tee = addNode('junction', wellOut.x, wellOut.y); if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } teeFollows = true; }   // base-write: construction: the tee stands where the well does, at its elevation, and follows it (the same ground, so the DEM rule below does not apply)
 			else if (hit && hit.type === 'junction' && !assemblyOfNode(hit.id) && wellTankNotOurs(a, hit.id)) { tee = hit; }
 			else if (hit) { wellTankPrompt('lpn_welltank_tee_refused', 'The tee must be a junction that is not part of another assembly. Specify the tee again.'); return true; }
 			else {
 				pid = tapLinkId(t); pipe = pid ? linkById(pid) : null;
 				if (pipe && pipe.type === 'pipe' && inBaseScenario() && wellTankNotOurs(a, pipe.id) && nodeById(pipe.from) && nodeById(pipe.to)) {
 					r = breakPipeAtPoint(pipe, 'junction', w.x, w.y, null); tee = r.node;
-				} else { tee = addNode('junction', w.x, w.y); if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } teeFollows = true; }   // base-write: construction: open ground takes the well's elevation and follows it
+				} else {
+					tee = addNode('junction', w.x, w.y);
+					// **OPEN GROUND TAKES THE WELL'S ELEVATION AND FOLLOWS IT, UNLESS THE ELEVATION SOURCE IS THE DEM** (reviewer, 2026-11-14): then its ground is its own, the
+					// fill reads it, and it does not follow (follow applies only to a value typed or carried from the Well, never to one the DEM reads). The value written is
+					// the Well's BASE elevation, the one a node is born with in Base; a scenario's override of it is that scenario's and reaches the followers through setProp().
+					if (!elevSourceIsDem()) { if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } teeFollows = true; }   // base-write: construction
+				}
 			}
 			wellTankPending.tee = tee.id; wellTankPending.stage = 'tank'; wellTankPending.teeFollow = teeFollows;
 			wellTankPending.pipe1 = wellTankPipe(wellOut.id, tee.id).id;
@@ -40962,11 +41030,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (hit && hit.type === 'tank' && !assemblyOfNode(hit.id) && wellTankNotOurs(a, hit.id)) { tank = hit; }
 		else if (hit) { wellTankPrompt('lpn_welltank_tank_refused', 'The tank must be a tank that is not part of another assembly. Specify the tank again.'); return true; }
-		else { tank = addNode('tank', w.x, w.y); if (typeof wellOut.elev === 'number') { tank.elev = wellOut.elev; } tankFollows = true; }   // base-write: construction: a new tank takes the well's elevation and follows it
+		else {
+			tank = addNode('tank', w.x, w.y);
+			if (!elevSourceIsDem()) { if (typeof wellOut.elev === 'number') { tank.elev = wellOut.elev; } tankFollows = true; }   // base-write: construction: a new tank takes the well's elevation and follows it (not under the DEM: see the tee)
+		}
 		p2 = wellTankPipe(wellTankPending.tee, tank.id);
 		a.tee = wellTankPending.tee; a.tank = tank.id; a.branch = [wellTankPending.pipe1, p2.id];
 		if (wellTankPending.teeFollow) { a.teeFollow = true; }
 		if (tankFollows) { a.tankFollow = true; }
+		assemblyIndexDirty();
 		wellTankPending = null;
 		setNotice('');
 		updateModeHint();
@@ -41062,16 +41134,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 	}
 	function renameInAssemblies(oldId, newId, group) {
+		assemblyIndexDirty();
 		assemblyList().forEach(function (a) {
 			var bearer = assemblyBearer(a);
-			if (a.up === oldId) { a.up = newId; }
-			if (a.down === oldId) { a.down = newId; }
-			if (a.nodes) { a.nodes = a.nodes.map(function (x) { return x === oldId ? newId : x; }); }
-			a.links = a.links.map(function (x) { return x === oldId ? newId : x; });
-			// A Well with tank also follows its tee, its tank and the two pipes between them.
-			if (a.tee === oldId) { a.tee = newId; }
-			if (a.tank === oldId) { a.tank = newId; }
-			if (a.branch) { a.branch = a.branch.map(function (x) { return x === oldId ? newId : x; }); }
+			// Nodes and links are separate namespaces (a node and a link may share a text, and a group's ID is one of them): only the kind that was renamed is rewritten.
+			if (group === 'node') {
+				if (a.up === oldId) { a.up = newId; }
+				if (a.down === oldId) { a.down = newId; }
+				if (a.nodes) { a.nodes = a.nodes.map(function (x) { return x === oldId ? newId : x; }); }
+				// A Well with tank also follows its tee and its tank.
+				if (a.tee === oldId) { a.tee = newId; }
+				if (a.tank === oldId) { a.tank = newId; }
+			} else {
+				a.links = a.links.map(function (x) { return x === oldId ? newId : x; });
+				if (a.branch) { a.branch = a.branch.map(function (x) { return x === oldId ? newId : x; }); }
+			}
 			// The group's own id follows its bearer only (a node and a link may share a text), and is read before the lists above changed it.
 			if (a.id === oldId && bearer.group === group && bearer.id === oldId) {
 				a.id = newId;
@@ -41081,6 +41158,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (pgAsmPick[oldId] !== undefined) { pgAsmPick[newId] = pgAsmPick[oldId]; delete pgAsmPick[oldId]; }
 			}
 		});
+		assemblyIndexDirty();
 	}
 	// **A WELL'S PUMP CONTROLS** (Task 822; Tom, 2026-11-09: "controls connecting the pump and the tank"). The well holds two depths on its
 	// grouping (`pumpOn`, `pumpOff`, in the displayed Elevation/Head unit as a tank's depths are) and writes two ordinary simple controls
@@ -41131,9 +41209,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (a.kind === 'well') { renderWellFields(a); return; }
 		up = nodeById(a.up); dn = nodeById(a.down); pump = linkById(a.links[0]);
 		idField(pump.id, function (newId) {
-			applyLinkRename(pump.id, newId);
-			currentPopup = { kind: 'assembly', id: newId };
-			renderAssemblyFields(newId);
+			currentPopup = { kind: 'assembly', id: renameAssemblyBearer(a, newId).id };
+			renderAssemblyFields(currentPopup.id);
 			scheduleSolve();
 		}, 'link');
 		clearFields(fields);
@@ -41216,8 +41293,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			g = linkById(a.links[0]), pump = linkById(a.links[1]), bearer = assemblyBearer(a), bearerEl = assemblyBearerEl(a);
 		// The Well's ID is its outlet node's (a Well saved before Round 8: its pump's); renaming it renames that one element and the group follows.
 		idField(bearer.id, function (newId) {
-			if (bearer.group === 'node') { applyNodeRename(bearer.id, newId); } else { applyLinkRename(bearer.id, newId); }
-			currentPopup = { kind: 'assembly', id: (bearer.group === 'node' ? assemblyOfNode(newId) : assemblyOfLink(newId)).id };
+			currentPopup = { kind: 'assembly', id: renameAssemblyBearer(a, newId).id };
 			renderAssemblyFields(currentPopup.id);
 			scheduleSolve();
 		}, bearer.group);
@@ -45447,6 +45523,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the question is unanswerable in the abstract and obvious next to the drawing.
 		openDocVersion = (typeof saved.v === 'number') ? saved.v : LPN_STORAGE_VERSION;
 		pendingV2Restore = openDocVersion < LPN_DECLARATIVE_VERSION;
+		if (groupIdClashed.length && !oldWellTanks.length) {
+			setNotice(String((EngCalcs.pageConfig || {}).lpn_inp_drop_assembly_id || 'These groups share an ID with another group, so they were not restored. Their nodes and links came in as plain elements.'));
+		}
 		if (oldWellTanks.length) {
 			setNotice(String((EngCalcs.pageConfig || {}).lpn_inp_drop_well_tank || 'These are one-point wells with a tank, a form this page no longer draws. Their reservoir, drawdown valve, pump, tee, virtual pipe, and tank are kept as ordinary elements, and their pump controls as ordinary controls.') + ' ' + oldWellTanks.join(', '));
 		}
@@ -48929,6 +49008,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// sentence names the Text and never the other word.
 			case 'label-anchor-missing': return pc.lpn_inp_drop_anchor_missing || 'This text was attached to a junction, reservoir, or tank that is not in the file. It was imported as free text at the location stated in the file and is not attached to any asset.';
 			case 'assembly-well-tank': return pc.lpn_inp_drop_well_tank || 'These are one-point wells with a tank, a form this page no longer draws. Their reservoir, drawdown valve, pump, tee, virtual pipe, and tank are kept as ordinary elements, and their pump controls as ordinary controls.';
+			case 'assembly-id-clash': return pc.lpn_inp_drop_assembly_id || 'These groups share an ID with another group, so they were not restored. Their nodes and links came in as plain elements.';
 			case 'assembly-unresolved': return pc.lpn_inp_drop_assembly || 'The file groups these pumps with nodes it does not contain, so the group was not restored. The nodes and pumps that are there came in as plain elements.';
 			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every value before using the results.';
 			default: return code;
@@ -76248,6 +76328,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (newId === oldId) { return true; }
 		if (!newId || /[\s'"]/.test(newId)) { return pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'; }
 		if (allIds(group).indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
+		// **A GROUP'S ID IS ITS BEARER'S, AND IS UNIQUE ACROSS EVERY GROUP** (reviewer, 2026-11-14): a Well's is a node's and a Pump+'s a link's, and those namespaces are
+		// apart, so the node/link check above cannot see that W1 the Well and W1 the Pump+ would be one group ID. Renaming a bearer onto another group's ID is
+		// refused in the same words; renaming any other element never moves a group's ID.
+		var own = assemblyBearerOf(group, oldId);
+		if (own && assemblyIdClash(newId, own)) { return pc.lpn_id_taken || 'That ID is already in use.'; }
 		return true;
 	}
 	// **THE BOX TITLE NAMES THE ASSET** (Tom, 2026-11-06: "Properties" is the important word, so the
@@ -76555,6 +76640,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, prefix = settings.idPrefixes[key] || key,
 			batch = elementsForIdKey(key), moving = [], skipped = 0, taken = {}, highest = 0;
 		// One key is one element type, so one namespace (allIds()); taken is that pool.
+		// A bearer renamed onto another group's ID would make one ID of two groups (the namespaces of nodes and links are apart), so for a bearer a group's ID is taken too.
+		var groupTaken = {};
+		assemblyList().forEach(function (g) { groupTaken[g.id] = true; });
 		// (A Well's batch can hold an outlet node and, in a project with an older Well, a pump: then the pool is both groups'.)
 		allIds(batch.length && batch.every(function (x) { return elGroup(x) === elGroup(batch[0]); }) ? elGroup(batch[0]) : undefined).forEach(function (id) { taken[id] = true; });
 		batch.forEach(function (x) {
@@ -76564,7 +76652,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var want = prefix + m[2];
 			// **ITS GROUP, NOT A LOOKUP BY ID**: junction 10 and pipe 10 may both exist, so "is there
 			// a node called 10" does not say which one this is.
-			if (want !== x.id) { moving.push({ id: x.id, want: want, isNode: elGroup(x) === 'node' }); }
+			if (want !== x.id) { moving.push({ id: x.id, want: want, isNode: elGroup(x) === 'node', bearer: !!assemblyBearerOf(elGroup(x), x.id) }); }
 		});
 		// WHICH TARGETS ARE ACTUALLY FREE, settled by iterating to a FIXED POINT rather than in one
 		// pass. An id is free if nothing holds it, or if the thing holding it is itself moving away
@@ -76578,7 +76666,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var vacating = {}, claimed = {};
 			plan.forEach(function (st) { vacating[st.id] = true; });
 			plan = plan.filter(function (st) {
-				var blocked = (taken[st.want] && !vacating[st.want]) || claimed[st.want];
+				var blocked = (taken[st.want] && !vacating[st.want]) || (st.bearer && groupTaken[st.want] && !vacating[st.want]) || claimed[st.want];
 				if (blocked) { skipped++; dropped = true; return false; }
 				claimed[st.want] = true;
 				return true;
