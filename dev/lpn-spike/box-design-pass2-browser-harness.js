@@ -124,10 +124,8 @@ async function main() {
 		const namesC = await page.evaluate(() => ({ g: EngCalcs.pageConfig.lpn_graphs_menu, c: EngCalcs.pageConfig.lpn_contour_menu }));
 		await a.menuClickSub(namesC.g, namesC.c, 'project');
 		await a.settle(1200);
-		const cSel = await sty('#lpn_contour_field');
-		ok('P7 the Contour plot pull-downs look like the sheet\'s', !!cSel && JSON.stringify(cSel) === JSON.stringify(sheetSel), JSON.stringify({ sheetSel, cSel }));
-		const ramp = await page.evaluate(() => { const b = document.querySelector('#lpn_contour_body .lpn-ramp-btn'); const c = getComputedStyle(b); const s = document.getElementById('lpn_contour_fill'); return { bg: c.backgroundColor, border: c.borderTopWidth, h: Math.round(b.getBoundingClientRect().height), selH: Math.round(s.getBoundingClientRect().height) }; });
-		ok('P7 the Colour scheme bar is a flat cell too (no border, same row height as the pull-down)', ramp.border === '0px' && Math.abs(ramp.h - ramp.selH) <= 2, JSON.stringify(ramp));
+		const cSel = await sty('#lpn_contour_fill');
+		ok('P7 the Contour plot pull-down looks like the sheet\'s', !!cSel && JSON.stringify(cSel) === JSON.stringify(sheetSel), JSON.stringify({ sheetSel, cSel }));
 		await shot('contour');
 		await page.evaluate(() => { const x = document.querySelector('#lpn_contour_box .lpn-popover-x, #lpn_contour_box [aria-label="Close"]'); if (x) { x.click(); } });
 		await a.settle(300);

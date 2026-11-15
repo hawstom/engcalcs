@@ -588,7 +588,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	q('lpn_contour_buffer').value = '1.5'; fireEl(q('lpn_contour_buffer'), 'change');
 	check(d.settings.contourBuffer === 1.5 && L.contourStats().k === 1.5, 'the buffer box sets the reach');
 	q('lpn_contour_buffer').value = '2.5'; fireEl(q('lpn_contour_buffer'), 'change');
-	check(q('lpn_set_ramp_node_contour') !== null, 'the colour scheme picker is the node colouring\'s own, with ids of its own');
+	check(q('lpn_contour_field') === null && q('lpn_contour_node_colors') === null && q('lpn_set_ramp_node_contour') === null, 'the box holds no property, scheme or node-color control of its own: the plot follows Settings');
 
 	head('8. RECALCULATE OFF IS A SNAPSHOT');
 	const before = allD();

@@ -6637,7 +6637,8 @@ var EngCalcs = EngCalcs || {};
 					if (r.settings !== undefined && !plainObject(r.settings)) { delete r.settings; }
 					settingLeaves(r.settings).forEach(function (leaf) {
 						var cat = categoryOfSetting(leaf.path);
-						if (cat === null || (cat !== undefined && cat !== r.category) || settingHasOtherHome(leaf.path)) { settingDelete(r, leaf.path); }
+						// `settings.contourField` is a retired round-3 field (Task 858): the plot follows Color nodes by, so a file that holds one drops it.
+						if (cat === null || (cat !== undefined && cat !== r.category) || settingHasOtherHome(leaf.path) || settingPath(leaf.path).join('.') === 'settings.contourField') { settingDelete(r, leaf.path); }
 					});
 					tsbCleanHeld(r);
 				} else {
@@ -8020,7 +8021,7 @@ var EngCalcs = EngCalcs || {};
 		'colorNodeField', 'colorLinkField', 'colorRampNode', 'colorRampLink', 'colorClassesNode',
 		'colorClassesLink', 'colorReverseNode', 'colorReverseLink', 'colorBreaks', 'colorModes',
 		'colorLegendPosition', 'contourFill', 'contourLines', 'contourLabels', 'contourOpacity',
-		'contourInterval', 'contourBuffer', 'contourTerrain', 'contourField']],
+		'contourInterval', 'contourBuffer', 'contourTerrain']],
 	// Calculation: Bentley's Calculation Options. **FRICTION METHOD INCLUDED** (Tom, 2026-10-06:
 	// *"I see it indefensible to require somebody to have to save a project for something like
 	// friction method."*). A pipe still holds one roughness number; a scenario's method
@@ -9716,9 +9717,6 @@ var EngCalcs = EngCalcs || {};
 			// for the new unit rather than reading 5 psi as 5 kPa. `contourBuffer` is the corridor's
 			// reach as a multiple of the median pipe length. `contourTerrain` asks for the ground
 			// between nodes from Mapbox DEM, used only for pressure and only once the gate says yes.
-			// The plot's own property. '' = not stated: it follows Color nodes by, else pressure, so a
-			// project (or a scenario) written before the plot had one draws what it always drew.
-			contourField: '',
 			contourFill: '',
 			contourLines: false,
 			contourLabels: true,
@@ -12842,14 +12840,11 @@ var EngCalcs = EngCalcs || {};
 		return undefined;
 	}
 	function colorFieldOf(group) { return scnSetting(group === 'node' ? 'colorNodeField' : 'colorLinkField'); }
-	// THE FIELD A CONTOUR PLOT SPREADS: the node colouring's own field when the user has set one, else pressure. Showing
-	// contours never writes the node colouring (Tom, 2026-10-29: opening the box turned on Settings Colors); the nodes
-	// stay as the user left them, and the colour key shows the plot's field.
-	// **ONE PROPERTY WHILE THE NODES ARE COLORED** (Tom, 2026-11-09/13, Task 858): Color nodes by (Settings) and Property to
-	// plot (Contour box) are one setting, so whenever the dots are colored the plot follows `colorNodeField`, whichever
-	// door wrote it. Only with No color does the plot read its own `contourField` (the property last chosen), else pressure.
-	function contourFieldOf() { return colorFieldOf('node') || scnSetting('contourField') || 'pressure'; }
-	function contourOrNodeField() { return contourIsOn() ? contourFieldOf() : colorFieldOf('node'); }
+	// **THE FIELD A CONTOUR PLOT SPREADS IS COLOR NODES BY** (Tom, 2026-11-14, Task 858: "remove everything that's
+	// redundant with the project settings"). The plot has no property, scheme or node-color switch of its own; it follows
+	// Settings, Symbology, Node colors. With No color there is no property to plot, so '' and the plot draws nothing;
+	// Show plot is untouched, and the plot returns when a property is chosen again.
+	function contourFieldOf() { return colorFieldOf('node'); }
 	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, read by every control that offers a
 	// colour field, so the same question is never asked two different ways in two places.
 	//
@@ -12960,7 +12955,7 @@ var EngCalcs = EngCalcs || {};
 	function criterionClassCount(group) {
 		var R = ramps(), field, def;
 		if (!R) { return 0; }
-		field = group === 'node' ? contourOrNodeField() : colorFieldOf(group);
+		field = colorFieldOf(group);
 		def = field ? colorModeDef(colorModeOf(group, field)) : null;
 		return (def && def.criterion) ? R.criterionClasses(def.criterion) : 0;
 	}
@@ -13355,7 +13350,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, any = false;
 		box.innerHTML = '';
 		['node', 'link'].forEach(function (group) {
-			var field = group === 'node' ? contourOrNodeField() : colorFieldOf(group); if (!field) { return; }
+			var field = colorFieldOf(group); if (!field) { return; }
 			var breaks = effectiveBreaks(group, field);
 			if (!breaks.length && colorValues(group, field).length === 0) { return; }
 			any = true;
@@ -14035,23 +14030,9 @@ var EngCalcs = EngCalcs || {};
 			}
 			contourChanged();
 		}), pc.lpn_contour_show_tip);
-		var field = contourFieldOf();
-		// **TOM'S ORDER, 2026-11-09/11 (Task 858)**: Show plot, Property to plot, Color scheme, Show node colors,
-		// Fill, opacity, buffer, Contour lines, interval, labels, Ground. The property is the plot's own, so it
-		// never reads "No color" over a plot that is drawn in color; Show node colors is the node colouring
-		// (`colorNodeField` not empty), and while it is ticked the dots follow the plot's property.
-		row(pc.lpn_contour_field || 'Property to plot',
-			select('lpn_contour_field', colorFieldOptions('node'), field, function (v) {
-				settings.contourField = v;
-				if (colorFieldOf('node')) { settings.colorNodeField = v; }
-				contourChanged();
-			}), pc.lpn_contour_field_tip);
-		row(pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, 'node', '_contour'), pc.lpn_contour_scheme_tip);
-		row(pc.lpn_contour_node_colors || 'Show node colors', check('lpn_contour_node_colors', !!colorFieldOf('node'), function (on) {
-			// State the property first: an unstated one follows the node colors, which this is about to clear.
-			settings.contourField = contourFieldOf();
-			settings.colorNodeField = on ? settings.contourField : ''; contourChanged();
-		}), pc.lpn_contour_node_colors_tip);
+		// **NO PROPERTY, SCHEME OR NODE-COLOR SWITCH HERE** (Tom, 2026-11-14, Task 858): the plot follows Color nodes by and
+		// Color scheme in Settings, Symbology, Node colors. Tom's order: Show plot, Fill, opacity, buffer, Show contour
+		// lines, interval, labels, Ground.
 		row(pc.lpn_contour_fill || 'Fill', select('lpn_contour_fill', [
 			['', pc.lpn_settings_legend_off || 'None'],
 			['smooth', pc.lpn_contour_fill_smooth || 'Smooth'],
@@ -14067,7 +14048,7 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_contour_lines || 'Show contour lines', check('lpn_contour_lines', settings.contourLines, function (on) {
 			settings.contourLines = on; contourChanged();
 		}));
-		var cf = contourField, lo = cf ? cf.lo : 0, hi = cf ? cf.hi : 1;
+		var field = contourFieldOf(), cf = contourField, lo = cf ? cf.lo : 0, hi = cf ? cf.hi : 1;
 		row(pc.lpn_contour_interval || 'Interval', number('lpn_contour_interval', field ? contourIntervalOf(field, lo, hi) : 5, 0, 'any', function (v) {
 			if (!field) { return; }
 			settings.contourInterval = settings.contourInterval || {};
@@ -28649,22 +28630,21 @@ var EngCalcs = EngCalcs || {};
 	 * Keyboard: the button opens on Enter, Space or Down; inside the list Up/Down/Home/End move,
 	 * Enter or Space chooses, Escape closes and gives the button back the focus.
 	 */
-	// `idSuffix` lets a second view of the same picker (the contour box, Task 600) carry ids of its own.
-	function buildRampPicker(pc, group, idSuffix) {
+	function buildRampPicker(pc, group) {
 		var R = ramps(), wrap = document.createElement('div'), btn = document.createElement('button'),
 			pop = document.createElement('div'), opts = [], open = false, active = 0, name,
 			cur = colorRampKey(group), n = colorClassCount(group);
 		wrap.className = 'lpn-ramp-picker';
 		name = ((R && R.RAMPS[cur]) || { name: cur }).name;
 		btn.type = 'button';
-		btn.id = 'lpn_set_ramp_' + group + (idSuffix || '');
+		btn.id = 'lpn_set_ramp_' + group;
 		btn.className = 'lpn-ramp-btn';
 		btn.setAttribute('aria-haspopup', 'listbox');
 		btn.setAttribute('aria-expanded', 'false');
 		btn.setAttribute('aria-label', (pc.lpn_settings_color_ramp || 'Color scheme') + ': ' + name);
 		btn.title = name;
 		btn.appendChild(swatchBarEl(group, cur, n));
-		pop.id = 'lpn_set_ramp_list_' + group + (idSuffix || '');
+		pop.id = 'lpn_set_ramp_list_' + group;
 		pop.className = 'lpn-ramp-pop';
 		pop.setAttribute('role', 'listbox');
 		pop.setAttribute('aria-label', pc.lpn_settings_color_ramp || 'Color scheme');
@@ -28821,12 +28801,7 @@ var EngCalcs = EngCalcs || {};
 				sel.appendChild(opt);
 			});
 			sel.addEventListener('change', function () {
-				if (group === 'node') {
-					// **ONE PROPERTY WHILE NODE COLORS ARE ON** (Task 858): a property chosen here is the plot's too;
-					// No color clears only the dots, so the plot's property is stated first and kept.
-					settings.contourField = sel.value || contourFieldOf();
-					settings.colorNodeField = sel.value;
-				}
+				if (group === 'node') { settings.colorNodeField = sel.value; }
 				else { settings.colorLinkField = sel.value; }
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			});
@@ -31943,7 +31918,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		colorClassesLink: 'lpn_settings_color_classes', colorReverseNode: 'lpn_settings_color_reverse',
 		colorReverseLink: 'lpn_settings_color_reverse', colorBreaks: 'lpn_settings_color_breaks',
 		colorModes: 'lpn_color_mode', colorLegendPosition: 'lpn_settings_color_key_position',
-		contourField: 'lpn_contour_field', contourFill: 'lpn_contour_fill', contourLines: 'lpn_contour_lines', contourOpacity: 'lpn_contour_opacity',
+		contourFill: 'lpn_contour_fill', contourLines: 'lpn_contour_lines', contourOpacity: 'lpn_contour_opacity',
 		contourInterval: 'lpn_contour_interval', contourBuffer: 'lpn_contour_buffer',
 		contourTerrain: 'lpn_contour_dem', method: 'bpn_method', engine: 'lpn_settings_engine_native',
 		autoRun: 'lpn_settings_auto_run', 'hydraulics.accuracy': 'lpn_settings_accuracy',
@@ -31980,7 +31955,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'settings.symbolCapPercentile': 'lpn_settings_row_symbol_cap_percentile',
 		'settings.contourLabels': 'lpn_settings_row_contour_labels',
 		// Contour rows say so: in the Settings box they sit under a Contour heading the table lacks.
-		'settings.contourField': 'lpn_settings_row_contour_field', 'settings.contourFill': 'lpn_settings_row_contour_fill', 'settings.contourOpacity': 'lpn_settings_row_contour_opacity',
+		'settings.contourFill': 'lpn_settings_row_contour_fill', 'settings.contourOpacity': 'lpn_settings_row_contour_opacity',
 		'settings.contourInterval': 'lpn_settings_row_contour_interval', 'settings.contourBuffer': 'lpn_settings_row_contour_buffer',
 		'settings.contourTerrain': 'lpn_settings_row_contour_terrain',
 		'settings.hydraulics.checkFreq': 'lpn_settings_row_check_freq',
@@ -32224,8 +32199,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (s === 'settings.colorNodeField' || s === 'settings.colorLinkField') {
 			return [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions(s === 'settings.colorNodeField' ? 'node' : 'link'));
 		}
-		// The box's own list: no "follow" choice, because following Color nodes by is now the rule, not a choice.
-		if (s === 'settings.contourField') { return colorFieldOptions('node'); }
 		if (s === 'settings.contourFill') {
 			return [['', pc.lpn_settings_legend_off || 'None'], ['smooth', pc.lpn_contour_fill_smooth || 'Smooth'],
 				['bands', pc.lpn_contour_fill_bands || 'Bands']];
@@ -32398,11 +32371,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (v === undefined) { v = (settings.hydraulics || {}).demandMultiplier; }
 			return (typeof v === 'number' && isFinite(v)) ? v : undefined;
 		}
-		// The Contour box's Property to plot, in this scenario: Color nodes by while the nodes are colored, else the
-		// plot's own, else pressure. Never unstated, so a project that stored '' reads what its plot draws.
-		if (row.path.join('.') === 'settings.contourField') {
-			return settingFor(scn, ['settings', 'colorNodeField']) || settingFor(scn, ['settings', 'contourField']) || 'pressure';
-		}
 		v = settingFor(scn, row.path);
 		return v === null ? undefined : v;
 	}
@@ -32547,15 +32515,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// calculation set it names), through setScenarioSetting(); Base writes the project's own object.
 	function settingRowWrite(row, scn, p) {
 		var root, node, i, k = row.path[1], times, d;
-		// **THE BOX'S PROPERTY TO PLOT** (Task 858): while the nodes are colored, a property written here is also
-		// Color nodes by, as it is in the Contour box.
-		if (row.path.join('.') === 'settings.contourField' && p.v && settingFor(scn, ['settings', 'colorNodeField'])) {
-			settingRowWrite(Object.assign({}, row, { path: ['settings', 'colorNodeField'] }), scn, p);
-		}
-		// And clearing Color nodes by here states the plot's property first, as the Settings box does, so the plot keeps it.
-		if (row.path.join('.') === 'settings.colorNodeField' && !p.v && settingFor(scn, ['settings', 'colorNodeField'])) {
-			settingRowWrite(Object.assign({}, row, { path: ['settings', 'contourField'] }), scn, { ok: true, v: settingFor(scn, ['settings', 'colorNodeField']) });
-		}
 		// A custom property's design is the project's in every scenario.
 		if (row.home === 'cp') {
 			d = customPropRowDef(row);
@@ -44429,6 +44388,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// basemapFilter is the pre-release name of the field.
 		if (savedSettings.basemapStyle === undefined) { savedSettings.basemapStyle = savedSettings.basemapFilter || 'normal'; }
 		delete savedSettings.basemapFilter;
+		// A retired round-3 field (Task 858): the contour plot follows Color nodes by.
+		delete savedSettings.contourField;
 		// A file saved without the symbol-cap pair (every shipped example) was drawn under the old
 		// rule, 0.5 x the 20th-percentile pipe; only a NEW project gets 0.25 x the median.
 		if (savedSettings.symbolCapMultiple === undefined) { savedSettings.symbolCapMultiple = 0.5; }

@@ -5,9 +5,8 @@
 //   1. Every interface name the chapter quotes is the language file's own.
 //   2. The entry has the box's paragraph and the chapter's three terms.
 //   3. In a scenario, Water, Graphs, Contour turns the plot on in that scenario only (the settings are
-//      stored in it, and Base has no contour). Then in Base: the plot spreads pressure while the node
-//      colors are left as they were (e1aaca674, Tom 2026-10-29: opening the box must not turn on
-//      Settings Colors), the line under the key is the chapter's (9 nodes, 11 pipes, 2.5, every 5 psi),
+//      stored in it, and Base has no contour). Then in Base, with Color nodes by chosen as Pressure (the plot
+//      follows it; opening the box never writes it, Tom 2026-10-29), the line under the key is the chapter's (9 nodes, 11 pipes, 2.5, every 5 psi),
 //      the box holds the controls the chapter lists with the values it implies, and clearing Show
 //      contours keeps the node colors.
 //   4. A page in another language renders the same terms.
@@ -52,16 +51,23 @@ async function main() {
 		const fills = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas [class*="contour"]')).map((e) => e.tagName + '.' + (e.getAttribute('class') || '')).join(' ').split(' ').filter((x) => x).length);
 		const fillNames = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas [class*="contour"]')).map((e) => e.tagName + '.' + (e.getAttribute('class') || '')));
 		const contour = async () => { await a.menuClickSub(await T('lpn_graphs_menu'), await T('lpn_contour_menu'), 'project'); await settle(1500); };
+		// The plot follows Color nodes by (Tom, 2026-11-14), so the chapter's example begins by choosing Pressure there.
+		const nodeColors = async (v) => {
+			await a.toolbarClick(await T('lpn_tool_settings')); await settle(500);
+			await P.evaluate((x) => { const n = document.getElementById('lpn_set_color_node'); n.value = x; n.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+			await settle(500); await P.keyboard.press('Escape'); await settle(300);
+		};
 		const closeBox = async () => { await P.evaluate(() => document.getElementById('lpn_contour_close').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))); await settle(300); };
 		ok('a project opens with no contour plot', (await fills()) === 0);
 		await a.menuClickSub(await T('lpn_scenario_menu'), await T('lpn_scenario_new'), 'project');
 		await a.waitDialog(3000);
 		await dialogPress(P, await T('lpn_dialog_ok'));
 		await settle(1000);
+		await nodeColors('pressure');
 		await contour();
 		const st = await U.storedProject(ctx);
 		const alt = JSON.stringify(st.alternatives || []);
-		ok('Graphs, Contour in a scenario turns the plot on there: the fill is drawn, and the scenario stores the settings', (await fills()) > 0 && alt.indexOf('contourFill') >= 0 && alt.indexOf('colorNodeField') < 0, alt.slice(0, 220));
+		ok('Graphs, Contour in a scenario turns the plot on there: the fill is drawn, and the scenario stores the settings', (await fills()) > 0 && alt.indexOf('contourFill') >= 0 && alt.indexOf('colorNodeField') >= 0, alt.slice(0, 220));
 		ok('...and the project\'s own settings still have no contour', !st.settings.contourFill && !st.settings.colorNodeField, JSON.stringify([st.settings.contourFill, st.settings.colorNodeField]));
 		await closeBox();
 		await P.click('#lpn_scenario_btn');
@@ -70,6 +76,7 @@ async function main() {
 		await settle(1200);
 		const baseNames = await fillNames();
 		ok('in Base there is no contour plot (only the empty layer)', baseNames.length <= 1, JSON.stringify(baseNames));
+		await nodeColors('pressure');
 		await contour();
 		const ex = plain(enString('lpn_guide_ct_example_def'));
 		const note = await P.evaluate(() => { const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (/^\s*Contour plot:/.test(n.textContent) || n.textContent.indexOf('interpolated along') >= 0) { return n.textContent.replace(/\s+/g, ' ').trim(); } } return ''; });
@@ -79,11 +86,11 @@ async function main() {
 		const ctl = await P.evaluate(() => ({ labels: document.getElementById('lpn_contour_body').innerText.replace(/\s+/g, ' '), vals: Array.from(document.querySelectorAll('#lpn_contour_body input, #lpn_contour_body select')).map((e) => e.type === 'checkbox' ? e.checked : e.value) }));
 		const needs = ['lpn_contour_show', 'lpn_contour_fill', 'lpn_contour_opacity', 'lpn_contour_lines', 'lpn_contour_interval', 'lpn_contour_buffer'].map(enString);
 		ok('the box holds the controls the chapter lists', needs.every((w) => ctl.labels.indexOf(w) >= 0), ctl.labels.slice(0, 200));
-		ok('...opening on Show contours checked, Property to plot pressure, node colors untouched (off), Smooth, 60 percent, buffer 2.5, lines on, every 5', ctl.vals[0] === true && ctl.vals[1] === 'pressure' && ctl.vals[2] === false && ctl.vals[3] === 'smooth' && ctl.vals[4] === '60' && ctl.vals[5] === '2.5' && ctl.vals[6] === true && ctl.vals[7] === '5', JSON.stringify(ctl.vals));
+		ok('...opening on Show contours checked, Smooth, 60 percent, buffer 2.5, lines on, every 5, and no property, scheme or node-color control', ctl.vals[0] === true && ctl.vals[1] === 'smooth' && ctl.vals[2] === '60' && ctl.vals[3] === '2.5' && ctl.vals[4] === true && ctl.vals[5] === '5' && !/Property to plot|Color scheme|Show node colors/.test(ctl.labels), JSON.stringify(ctl.vals));
 		await P.evaluate(() => { const c = document.querySelector('#lpn_contour_body input[type=checkbox]'); c.click(); });
 		await settle(1200);
-		const after = await P.evaluate(() => ({ color: document.getElementById('lpn_contour_node_colors').checked, nodes: Array.from(document.querySelectorAll('#lpn_canvas circle[data-node]')).filter((c) => c.style.fill || c.getAttribute('fill')).length }));
-		ok('clearing Show contours removes the fill and the lines, and the node coloring stays as it was (none)', (await fillNames()).length <= 1 && after.color === false, JSON.stringify(after));
+		const after = { color: (await U.storedProject(ctx)).settings.colorNodeField };
+		ok('clearing Show contours removes the fill and the lines, and the node coloring stays as it was (Pressure)', (await fillNames()).length <= 1 && after.color === 'pressure', JSON.stringify(after));
 		ok('no page errors (English)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.context.close().catch(() => {});
 

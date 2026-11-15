@@ -14,7 +14,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
-- Task 858 — Contour plot controls that say what is plotted.
+- Task 858 — Contour plot follows project Node colors settings.
 
 ## 75 — Soon (14)
 
