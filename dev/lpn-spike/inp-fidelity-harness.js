@@ -192,6 +192,17 @@ function worst(a, b, scale) {
 			ep.ok ? worst(ep.heads, ref, scale).toFixed(4) + ' m' : JSON.stringify(ep.issues));
 	}
 	{
+		// A file that states no Headloss leaves the project's formula UNSTATED (EPANET's default, H-W, and a
+		// Settings row that reads "(default)"), and never inherits the open project's.
+		open(importDoc(SI_DW).doc);
+		const unstated = SI_HW.replace(/ Headloss\s+H-W\n/, "");
+		const { parsed, doc } = importDoc(unstated);
+		ok('a file with no Headloss line is read as not stating one', parsed.headlossStated === false && !/Headloss/i.test(unstated));
+		ok('...and the project it makes states no method, whatever project was open', doc.settings.method === undefined, String(doc.settings.method));
+		ok('...which still solves as Hazen-Williams', (open(doc), L.assembleModel().method === 'hw'));
+		ok('a file that states H-W does state it', importDoc(SI_HW).doc.settings.method === 'hw');
+	}
+	{
 		// US Darcy-Weisbach: EPANET's roughness is in MILLIFEET. The Roughness selector offers that
 		// unit, the file's numbers are carried untouched, and the project solves in both engines.
 		const { parsed, doc } = importDoc(US_DW);
