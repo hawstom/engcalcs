@@ -486,7 +486,8 @@
 				"x": "33.00",
 				"y": "76.00"
 			},
-			"_initQuality": 1
+			"_initQuality": 1,
+			"minVolume": 0
 		}
 	],
 	"links": [
@@ -1115,6 +1116,9 @@
 		"emitterExponent": 0.5,
 		"hydraulics": {
 			"specificGravity": 1,
+			"tok": {
+				"viscosity": "1.0"
+			},
 			"viscosity": 1,
 			"trials": 40,
 			"accuracy": 0.001,

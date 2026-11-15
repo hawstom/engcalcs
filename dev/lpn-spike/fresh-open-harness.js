@@ -18,6 +18,15 @@
 //      the loop, and a tucked box has `content-visibility: hidden`. Measured 1200 ms with docks, 1100
 //      without, map drawn in about 2400 ms; the budget below is 2000 and 5000.
 //
+//   4. NO LEGEND ON A PHONE AT OPEN, AND A LEGEND IS ABOVE EVERYTHING (Task 851; Tom, 2026-11-14: "On a phone, we
+//      should never have the legends shown by default on any example or for any reason. The legends should
+//      have higher zindex than anything on the map."). Net1 and Net3 at 390x844: neither legend is showing,
+//      whatever the file says (Net1 stores the Labels legend at the top right), and the project's own setting
+//      is still what the file said. The Settings dropdown of a held legend reads None; choosing a corner shows
+//      that legend, drawn over the lettering beneath it (elementFromPoint with pointer events switched on, since
+//      a legend takes none), and above every other positioned thing on the map bar the tile credit and the
+//      georeferencing tools. A reload holds both again; a desktop window shows its legend as it always did.
+//
 //   node dev/lpn-spike/fresh-open-harness.js     (takes the browser lock itself)
 'use strict';
 
@@ -52,7 +61,7 @@ function ok(label, cond, detail) {
 	if (!cond) { failures++; }
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
 }
-const { strips } = require('./dock-boxes.js');
+const { strips, openBox } = require('./dock-boxes.js');
 const WANT = JSON.stringify([['lpn_sm_box', 'lpn_hotkeys_popup'], ['lpn_popup', 'lpn_settings_box', 'lpn_library_box']]);
 const LONG_TASK_MAX_MS = 1500, DRAW_MAX_MS = 3000;
 const PHONE = { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 };
@@ -94,6 +103,40 @@ async function judge(a, what, mapSel, t0, phone) {
 	ok(what + ': no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 }
 
+// What a visitor sees: the legends with a box on the screen.
+const shownLegends = (page) => page.evaluate(() => ['lpn_labels_legend', 'lpn_color_legend'].filter((id) => {
+	const e = document.getElementById(id), r = e && e.getBoundingClientRect();
+	return !!e && getComputedStyle(e).display !== 'none' && r.width > 0 && r.height > 0;
+}));
+const projectLegendSettings = (page) => page.evaluate(() => {
+	const st = JSON.parse(EngCalcs.lpnCleanMap.projectText()).settings;
+	return [st.legendPosition, st.colorLegendPosition];
+});
+// Pick a corner in the Settings box's own dropdown, found by its row's label.
+const pickCorner = (page, label, value) => page.evaluate(([label, value]) => {
+	const box = document.getElementById('lpn_settings_box');
+	for (const lab of box.querySelectorAll('label, .ec-label, div, span')) {
+		if ((lab.textContent || '').trim() !== label) { continue; }
+		const sel = (lab.parentNode || lab).querySelector('select');
+		if (!sel) { continue; }
+		const was = sel.value;
+		sel.value = value;
+		sel.dispatchEvent(new Event('change', { bubbles: true }));
+		return was;
+	}
+	return null;
+}, [label, value]);
+const cornerShown = (page, label) => page.evaluate((label) => {
+	const box = document.getElementById('lpn_settings_box');
+	for (const lab of box.querySelectorAll('label, .ec-label, div, span')) {
+		if ((lab.textContent || '').trim() !== label) { continue; }
+		const sel = (lab.parentNode || lab).querySelector('select');
+		if (sel) { return sel.value; }
+	}
+	return null;
+}, label);
+const SHOTS = process.env.EC_LEGEND_PICS || '';
+
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js'));
@@ -126,6 +169,65 @@ async function main() {
 		t0 = Date.now();
 		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 		await judge(a, 'Phone Net3', 'circle.lpn-node', t0, true);
+		ok('Phone Net3: no legend is showing', (await shownLegends(a.page)).length === 0, JSON.stringify(await shownLegends(a.page)));
+		await a.close();
+
+		console.log('\n--- 4. Phone Net1: no legend at open; one shown by the visitor is drawn over the lettering ---');
+		a = await fresh(Session, browser, 'phone-net1', true);
+		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
+		await a.settle(2500);
+		ok('Phone Net1: no legend is showing', (await shownLegends(a.page)).length === 0, JSON.stringify(await shownLegends(a.page)));
+		if (SHOTS) { await a.page.screenshot({ path: path.join(SHOTS, 'net1-phone-after.png') }); }
+		ok('...yet the project still says what its file said (Labels legend top-right, colour key bottom-right)',
+			JSON.stringify(await projectLegendSettings(a.page)) === '["top-right","bottom-right"]', JSON.stringify(await projectLegendSettings(a.page)));
+		await openBox(a, 'lpn_settings_box');
+		const LAB = await a.lang('lpn_settings_legend_position'), KEY = await a.lang('lpn_settings_color_key_position');
+		ok('...and its Settings dropdowns read None while the legends are held', (await cornerShown(a.page, LAB)) === 'off' && (await cornerShown(a.page, KEY)) === 'off',
+			(await cornerShown(a.page, LAB)) + ' / ' + (await cornerShown(a.page, KEY)));
+		await a.page.evaluate(() => { const s = document.getElementById('lpn_set_color_node'); s.value = 'pressure'; s.dispatchEvent(new Event('change', { bubbles: true })); });
+		await a.settle(800);
+		ok('...a colour scheme turned on does not bring the colour key back', (await shownLegends(a.page)).length === 0, JSON.stringify(await shownLegends(a.page)));
+		await pickCorner(a.page, KEY, 'bottom-right');
+		await a.settle(500);
+		ok('choosing a corner for the colour key shows it, and only it', JSON.stringify(await shownLegends(a.page)) === '["lpn_color_legend"]', JSON.stringify(await shownLegends(a.page)));
+		await pickCorner(a.page, LAB, 'top-right');
+		await a.settle(500);
+		ok('choosing a corner for the Labels legend shows it too', JSON.stringify(await shownLegends(a.page)) === '["lpn_labels_legend","lpn_color_legend"]', JSON.stringify(await shownLegends(a.page)));
+		ok('...and the project holds the corners that were chosen', JSON.stringify(await projectLegendSettings(a.page)) === '["top-right","bottom-right"]');
+		await a.page.addStyleTag({ content: '#lpn_labels_legend, .lpn-color-legend { pointer-events: auto !important; }' });   // a legend takes no pointer events, so elementFromPoint would look through it
+		await a.page.evaluate(() => { const b = document.getElementById('lpn_settings_box'); if (b) { b.style.display = 'none'; } });
+		const stack = await a.page.evaluate(() => {
+			const lg = document.getElementById('lpn_labels_legend'), r = lg.getBoundingClientRect(), svg = document.getElementById('lpn_canvas'), over = [];
+			svg.querySelectorAll('text').forEach((t) => {
+				if (!t.textContent.trim() || getComputedStyle(t).display === 'none') { return; }
+				const b = t.getBoundingClientRect(), x0 = Math.max(b.left, r.left), x1 = Math.min(b.right, r.right), y0 = Math.max(b.top, r.top), y1 = Math.min(b.bottom, r.bottom);
+				if (x1 - x0 < 3 || y1 - y0 < 3) { return; }
+				const e = document.elementFromPoint((x0 + x1) / 2, (y0 + y1) / 2);
+				over.push({ text: t.textContent.trim().slice(0, 12), onTop: !!(e && e.closest('#lpn_labels_legend')) });
+			});
+			const wrap = svg.parentNode, zs = {};
+			for (const c of wrap.children) { const z = getComputedStyle(c).zIndex; if (c !== lg && z !== 'auto' && c.id !== 'lpn_color_legend') { zs[c.id] = +z; } }
+			return { over, zs, z: +getComputedStyle(lg).zIndex, zColor: +getComputedStyle(document.getElementById('lpn_color_legend')).zIndex };
+		});
+		ok('a Labels legend over lettering: there is lettering under it (the test means something)', stack.over.length > 0, JSON.stringify(stack.over));
+		ok('...and the legend is what is on top at each such point', stack.over.every((o) => o.onTop), JSON.stringify(stack.over));
+		const above = Object.keys(stack.zs).filter((k) => stack.zs[k] >= stack.z);
+		ok('...above every positioned thing on the map but the tile credit and the georeferencing tools', JSON.stringify(above.sort()) === JSON.stringify(['lpn_basemap_credit', 'lpn_georef_bar', 'lpn_mapgeo_bar', 'lpn_mapgeo_dial']),
+			JSON.stringify(stack.zs) + ' legend ' + stack.z);
+		ok('...and the colour key is at the same height', stack.zColor === stack.z, stack.zColor + ' vs ' + stack.z);
+		if (SHOTS) { await a.page.screenshot({ path: path.join(SHOTS, 'net1-phone-legend-by-hand.png') }); }
+		await a.page.reload();
+		await a.settle(2500);
+		ok('Net1 reopened by a reload: both legends are held again', (await shownLegends(a.page)).length === 0, JSON.stringify(await shownLegends(a.page)));
+		ok('...and a Labels legend shown by hand was not stored on the device', await a.page.evaluate(() => !Object.keys(localStorage).some((k) => /legend/i.test(k))));
+		ok('Phone Net1: no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+		await a.close();
+
+		console.log('\n--- 5. A desktop window shows its legend as it always did ---');
+		a = await fresh(Session, browser, 'desk-net1');
+		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
+		await a.settle(1500);
+		ok('Desktop Net1: the Labels legend is showing', JSON.stringify(await shownLegends(a.page)) === '["lpn_labels_legend"]', JSON.stringify(await shownLegends(a.page)));
 		await a.close();
 	} finally {
 		await browser.close();

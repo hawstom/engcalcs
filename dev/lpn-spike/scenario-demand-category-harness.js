@@ -267,7 +267,7 @@ console.log('\n--- solver, export, pattern rename ---');
 		JSON.stringify(mj3.demands));
 	const out = EngCalcs.lpnExportInp(JSON.parse(JSON.stringify(L.serialize())), L.exportOptions());
 	ok('the export succeeds', out.ok === true, JSON.stringify(out.error));
-	const dem = out.inp.split('[DEMANDS]')[1].split('[')[0];
+	const dem = out.inp.replace(/^\[TITLE\][\s\S]*?\n\n/, '').split('[DEMANDS]')[1].split('[')[0];
 	ok('an export from the scenario writes its J1 list, one row',
 		(dem.match(/^\s*J1\s/mg) || []).length === 1 && /J1\s+20\s+Pat1/.test(dem), dem.trim().split('\n').join(' | '));
 	ok('...and J5\'s untouched rows keep the file\'s own text', /J5\s+0\.750/.test(dem));
@@ -278,7 +278,7 @@ console.log('\n--- solver, export, pattern rename ---');
 	L.libRenamePattern(pat, 'Pat1');
 	L.switchScenario('base');
 	const bout = EngCalcs.lpnExportInp(JSON.parse(JSON.stringify(L.serialize())), L.exportOptions());
-	const bdem = bout.inp.split('[DEMANDS]')[1].split('[')[0];
+	const bdem = bout.inp.replace(/^\[TITLE\][\s\S]*?\n\n/, '').split('[DEMANDS]')[1].split('[')[0];
 	ok('an export from Base writes Base\'s three J1 rows', (bdem.match(/^\s*J1\s/mg) || []).length === 3, bdem.trim().split('\n').join(' | '));
 	L.switchScenario(SCN.id);
 }
