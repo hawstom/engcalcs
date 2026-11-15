@@ -47057,11 +47057,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 */
 	function inpFlatteningLines(differences) {
 		var pc = EngCalcs.pageConfig || {}, types = null, fittings = null, custs = null, coords = null, said = [],
-			offCust = null, offNames = [];
+			offCust = null, offNames = [], semis = null;
 		(differences || []).forEach(function (d) {
 			if (d.code === 'pipe-type-flattened') { types = d; }
 			if (d.code === 'fittings-flattened') { fittings = d; }
 			if (d.code === 'node-coords-scenario') { coords = d; }
+			if (d.code === 'label-semicolon') { semis = d; }
 			// **AND THE CUSTOMERS** (Task 247), which is a THIRD sentence rather than a widening of
 			// either above it, on this function's own rule: a pipe type loses its indirection, a
 			// fittings list loses its itemisation, and a customer loses its PLACE. One sentence
@@ -47089,6 +47090,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (coords) {
 			said.push((pc.lpn_inp_export_flat_coords || 'An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its positions in the project file only.')
 				.replace('{n}', String(coords.ids.length)));
+		}
+		if (semis) {
+			said.push((pc.lpn_inp_export_flat_label_semicolon || 'Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.')
+				.replace('{n}', String(semis.ids.length)));
 		}
 		if (fittings) {
 			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')

@@ -3326,6 +3326,9 @@
 				diff('label-quote-replaced', [lb.id]);
 				text = text.replace(/"/g, "'");
 			}
+			// EPANET cuts a Text at its first `;`, quotes or not (the engine's gettokens, the GUI's
+			// StripComment). It is written whole, as it always was; the receipt says what EPANET will do.
+			if (text.indexOf(';') >= 0) { diff('label-semicolon', [lb.id]); }
 			labelRows.push(row([n(PLAIN, lb, 'x', px), n(PLAIN, lb, 'y', py), '"' + text + '"']
 				.concat(lb.anchorNode && anchor ? [lb.anchorNode] : [])));
 		}

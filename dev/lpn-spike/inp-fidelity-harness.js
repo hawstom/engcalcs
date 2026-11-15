@@ -31,7 +31,7 @@ global.alert = global.window.alert = function () { };
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, migrateSaved: migrateSaved, applySaved: applySaved,\n" +
 	"\t\tserializeProject: serializeProject, assembleModel: assembleModel,\n" +
-	"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections,\n" +
+	"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections, inpFlatteningLines: inpFlatteningLines,\n" +
 	"\t\tapplyUnitSelections: applyUnitSelections, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -383,6 +383,14 @@ ${labels}
 		ok('the label comes back out quoted whole', /"Zone A; north"/.test(out.inp), out.inp.split('[LABELS]')[1].split('[')[0].trim());
 		const back = importDoc(out.inp);
 		ok('and reads back as written', JSON.stringify(labelText(back.doc)) === JSON.stringify(['Zone A; north', 'Plain']));
+		// EPANET will cut that Text at the semicolon, so the export report says so, once, with the count.
+		const semi = out.differences.filter((d) => d.code === 'label-semicolon');
+		ok('the export reports the one Text with a semicolon', semi.length === 1 && semi[0].ids.length === 1, JSON.stringify(semi));
+		const said = L.inpFlatteningLines(out.differences);
+		ok('and the export report says EPANET will cut it at the semicolon',
+			said.length === 1 && said[0] === EC.pageConfig.lpn_inp_export_flat_label_semicolon.replace('{n}', '1') && /cuts a Text at its first semicolon/.test(said[0]), JSON.stringify(said));
+		const plain = exportOf(importDoc(LBL('t', ' 6 6 "Plain" J1')).doc);
+		ok('a project with no semicolon in a Text has no such line', plain.differences.every((d) => d.code !== 'label-semicolon') && L.inpFlatteningLines(plain.differences).length === 0);
 		const titleOf = (t) => t.split('[TITLE]')[1].split(/\n\s*\n/)[0].replace(/^\n/, '');
 		ok('all three title lines come back as the file wrote them, `;` and spacing included',
 			titleOf(out.inp) === 'Smith; phase 2\nsecond line ; with semi\n  third line', JSON.stringify(titleOf(out.inp)));

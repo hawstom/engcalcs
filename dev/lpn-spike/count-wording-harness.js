@@ -34,6 +34,7 @@ const COUNTS = {
 	lpn_customer_detached_count: ['n'],
 	lpn_inp_export_flat_customers: ['n'],
 	lpn_inp_export_flat_fittings: ['n'],
+	lpn_inp_export_flat_label_semicolon: ['n'],
 	lpn_inp_export_flat_types: ['n', 't'],
 	lpn_pane_pasted: ['n', 'skipped'],
 	lpn_pane_pasted_rows: ['n', 'created'],

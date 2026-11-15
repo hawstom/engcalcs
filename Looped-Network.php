@@ -2806,6 +2806,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_export_flat_types: <?=json_encode($ec_lang['lpn_inp_export_flat_types'])?>,
 	lpn_inp_export_flat_fittings: <?=json_encode($ec_lang['lpn_inp_export_flat_fittings'])?>,
 	lpn_inp_export_flat_coords: <?=json_encode($ec_lang['lpn_inp_export_flat_coords'])?>,
+	lpn_inp_export_flat_label_semicolon: <?=json_encode($ec_lang['lpn_inp_export_flat_label_semicolon'])?>,
 	lpn_library_controls: <?=json_encode($ec_lang['lpn_library_controls'])?>,
 	lpn_library_controls_tip: <?=json_encode($ec_lang['lpn_library_controls_tip'])?>,
 	lpn_library_pattern_add: <?=json_encode($ec_lang['lpn_library_pattern_add'])?>,
