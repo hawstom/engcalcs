@@ -66090,8 +66090,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var sc = setboxScroller(), st = sc ? sc.scrollTop : 0, unclamp = function () {
 			if (sc && sc.scrollTop !== st && sc.scrollHeight - sc.clientHeight >= st) { sc.scrollTop = st; }
 		},
-		// The held control's place wins; only a view that is STILL empty after it is given the nearest content.
-		settle = function () { unclamp(); setboxKeepPlace(); keepSomethingInView(sc); };
+		// The room after the content is sized first, so the position being put back is one the new content can hold.
+		settle = function () { setboxSizeRoom(); unclamp(); setboxKeepPlace(); };
 		if (!held.length) { out = rebuild(); settle(); return out; }
 		setboxKeeping = true;
 		try { out = rebuild(); } finally { setboxKeeping = false; settle(); }
@@ -66239,25 +66239,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// put back after every rebuild and mark for a moment afterwards.
 	var setboxPlace = null;
 	function setboxScroller() { return document.getElementById('lpn_setbox_content'); }
-	// **A BOX NEVER SHOWS A VIEW WITH NOTHING IN IT** (Tom, 2026-11-14, Libraries, Patterns: *"we should never return to any view
-	// with nothing visible ... if we are trying to remember the user's scroll position, we may have remembered it wrong, and we
-	// should also check that the view is not empty"*). A box that keeps a scroll position across a rebuild asks this once the new
-	// content is in: when none of the scroller's children is in view (the position was held in the blank room after the content, or
-	// below a list that has since become shorter), the last child that has a height is brought to the top of the view, which is the
-	// nearest content to where the reader was. Returns whether it had to move. Used by the Settings box, the one box that has blank room after its
-	// content (the Libraries box has none, so no position it holds can be past its list; its harness case keeps it that way); dev/lpn-spike/box-view-visible-browser-harness.js.
-	function keepSomethingInView(sc) {
-		var kids, box, i, r;
-		if (!sc || !sc.getBoundingClientRect) { return false; }
+	// **THE SETTINGS BOX NEVER SHOWS A VIEW WITH NOTHING IN IT** (Tom, 2026-11-14, Libraries, Patterns: *"we should never return to any
+	// view with nothing visible ... if we are trying to remember the user's scroll position, we may have remembered it wrong"*). The
+	// blank room after the content (`#lpn_setbox_content::after`) exists so the last section can reach the top (Tom, 2026-09-04), and was
+	// one whole pane high, so the end of the scroll range was a pane of nothing. It is now the pane's height MINUS the last section's
+	// (never below 0): the last section can still reach the top, and the end of the range IS the top of the last section, so a position at
+	// the end, remembered or reached by dragging, always shows part of it. Recomputed on every rebuild and filter, and whenever the pane
+	// changes size (a resize, a phone turning, the box dragged larger). dev/lpn-spike/box-view-visible-browser-harness.js.
+	var setboxRoomWatch = null;
+	function setboxSizeRoom() {
+		var sc = setboxScroller(), kids, last, room, cs;
+		if (!sc) { return; }
+		if (!setboxRoomWatch && typeof ResizeObserver === 'function') { setboxRoomWatch = new ResizeObserver(setboxSizeRoom); setboxRoomWatch.observe(sc); }
+		if (!sc.clientHeight) { return; }
 		kids = Array.prototype.filter.call(sc.children, function (k) { return k.offsetHeight > 0; });
-		if (!kids.length) { return false; }
-		box = sc.getBoundingClientRect();
-		for (i = 0; i < kids.length; i++) {
-			r = kids[i].getBoundingClientRect();
-			if (r.bottom > box.top && r.top < box.bottom) { return false; }
-		}
-		sc.scrollTop += kids[kids.length - 1].getBoundingClientRect().top - box.top;
-		return true;
+		last = kids[kids.length - 1];
+		cs = last ? getComputedStyle(last) : null;
+		room = Math.max(0, sc.clientHeight - (last ? last.getBoundingClientRect().height + (parseFloat(cs.marginBottom) || 0) : 0));
+		sc.style.setProperty('--lpn-setbox-room', Math.round(room) + 'px');
 	}
 	function setboxPin(target) {
 		var sc = setboxScroller(), row, box = setboxEl();
@@ -67116,6 +67115,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			none.textContent = pc.lpn_settings_no_match || 'No setting mentions that word.';
 			none.style.display = (q && !total) ? 'block' : 'none';
 		}
+		setboxSizeRoom();
 	}
 	// **OPEN, NOT TOGGLE**, for a named section -- the same rule the pane and the menus follow: a
 	// row, or a click on the legend, that names a thing SHOWS that thing. `section` is one of
@@ -70312,18 +70312,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		{ id: 'rules', label: 'lpn_library_rules', tip: 'lpn_library_rules_tip' }
 	];
 	// **A SECTION'S LONG EXPLANATION IS AN ENTRY IN THE USER MANUAL, AND THE HEADING'S `?` OPENS IT** (Tom, round 12: *"send the user to the user manual for long explanations. But we have to land them in the right place."*). Curves, Pipe types and Fittings carry the `?`; its words live once, in the Libraries chapter (lib/GuideChapters.lib.php, ecGuideDefKeys()).
-	// Controls and Rules carry it too (Task 859): both land on the chapter's one entry for them, "Controls and rules in a run", which
-	// says how the order of the list decides a conflict in the same words as the Move tips.
-	var LIB_INTRO = { curves: true, pipetypes: true, fittings: true, controls: true, rules: true };
-	var LIB_TERM = { curves: 'curves', pipetypes: 'pipetypes', fittings: 'fittings', controls: 'ctl', rules: 'ctl' };
+	// EVERY section carries it (Task 859): Patterns, Curves, Pipe types and Fittings land on their own entry, which ends with the Move tip's sentence
+	// about the order; Controls and Rules both land on the chapter's one entry for them, "Controls and rules in a run", which says how the
+	// order of the list decides a conflict. Both in the same words as the Move tips, so a tap, which cannot hover, can read them.
+	var LIB_TERM = { patterns: 'patterns', curves: 'curves', pipetypes: 'pipetypes', fittings: 'fittings', controls: 'ctl', rules: 'ctl' };
 	function libSectionHead(cur) {
-		var pc = EngCalcs.pageConfig || {}, intro = LIB_INTRO[cur.id], head, btn, label = pc[cur.label] || cur.id;
-		if (!intro) {
-			// Patterns: the plain heading it always had, its tip on the heading.
-			head = libEl('h3', 'ec-help', label);
-			if (pc[cur.tip]) { head.title = pc[cur.tip]; }
-			return head;
-		}
+		var pc = EngCalcs.pageConfig || {}, head, btn, label = pc[cur.label] || cur.id;
 		// The heading is plain text. The `?` beside it is a button with no tip (a tap cannot hover): a click or a tap opens
 		// the User Manual at this section's own entry in the Libraries chapter (ecGuideDl() writes `guide-term-<stem>`),
 		// which says the section's introduction in the same words this box used to carry (GuideChapters.lib.php).

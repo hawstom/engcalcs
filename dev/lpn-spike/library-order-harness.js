@@ -286,6 +286,37 @@ head('4b. the comments a file keeps at a position stay at it: a section\'s headi
 	});
 }
 
+head('4b2. rules: a heading above the first rule (a blank line between) and what follows the last stay at the section\'s top and end');
+{
+	// [RULES] of Net3 replaced by three rules written as Net3 names its parts, under a heading and above a trailing comment
+	let text = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net3.inp'), 'utf8').replace(/\r\n/g, '\n');
+	const rule = (n, desc) => (desc ? ';' + desc + '\n' : '') + 'RULE ' + n + '\nIF SYSTEM CLOCKTIME >= 5 AM\nTHEN PUMP 10 STATUS IS ' + (n === 'B' ? 'OPEN' : 'CLOSED') + '\nPRIORITY ' + (n === 'C' ? 3 : 1);
+	const block = ';== RULES HEADING ==\n\n' + rule('A', 'A desc') + '\n\n' + rule('B') + '\n\n' + rule('C', 'C desc') + '\n\n;RULES FOOT\n\n';
+	text = text.replace(/\[RULES\][\s\S]*?\n(?=\[)/, '[RULES]\n' + block);
+	const d0 = importNet('rules.inp', text);
+	const lines = (inp) => { const o = []; let on = false; inp.replace(/\r\n/g, '\n').split('\n').forEach((l) => { const m = /^\[(\w+)\]/.exec(l.trim()); if (m) { on = m[1] === 'RULES'; return; } if (on && l.trim()) { o.push(l.trim()); } }); return o; };
+	const base = lines(EngCalcs.lpnExportInp(d0).inp);
+	ok('the export of the unmoved rules has the heading first and the foot last', base[0] === ';== RULES HEADING ==' && base[base.length - 1] === ';RULES FOOT', JSON.stringify(base.slice(0, 2)));
+	let bad = 0, moves = 0;
+	for (let i = 0; i < 3; i++) {
+		['top', 'up', 'down', 'bottom'].forEach((how) => {
+			const d = importNet('rules.inp', text);
+			L.libOrderSelect('rules', i);
+			if (!L.libOrderMove('rules', how)) { return; }
+			moves++;
+			const out = lines(EngCalcs.lpnExportInp(d).inp);
+			const cnt = (t) => out.filter((l) => l === t).length;
+			if (out[0] !== ';== RULES HEADING ==' || out[out.length - 1] !== ';RULES FOOT' || cnt(';== RULES HEADING ==') !== 1 || cnt(';RULES FOOT') !== 1 || out.length !== base.length) { bad++; }
+		});
+	}
+	ok('after ' + moves + ' moves (every rule, every direction) the heading is first and the foot last', moves > 0 && bad === 0, bad + ' exported wrongly');
+	// a comment DIRECTLY above a RULE line, with no blank line, is that rule's description (for a control the same, and Tom's ruling on a
+	// Description: lines and paragraphs), so it goes with the rule; EPANET 2.2 reads no comment on a rule at all (src/rules.c)
+	const rules = ['; at the top', 'RULE A', 'IF SYSTEM CLOCKTIME >= 5 AM', 'THEN PUMP 10 STATUS IS OPEN', '', 'RULE B', 'IF SYSTEM CLOCKTIME >= 6 AM', 'THEN PUMP 10 STATUS IS OPEN'];
+	const moved = L.libRulesMoved(rules, 0, 1);
+	ok('a comment directly above a rule with no blank line is its description and moves with it', moved.indexOf('; at the top') > moved.indexOf('RULE B'), JSON.stringify(moved));
+}
+
 head('4c. an item with no ID is selected by position, and a position that has changed is never kept');
 {
 	const d = freshDoc();

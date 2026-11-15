@@ -19,14 +19,15 @@ function ok(name, cond, extra) { checks++; if (!cond) { fails++; } console.log((
 	await env.startServer();
 	const browser = await chromium.launch({ executablePath: env.findChromium() });
 	try {
-		const KEYS = { curves: ['lpn_library_curves_note', 'lpn_library_curve_values_tip'], pipetypes: ['lpn_library_pipetypes_note', 'lpn_library_pipetype_blank_tip'], fittings: ['lpn_library_fittings_note', 'lpn_library_fittings_source'] };
-		const HEAD = { curves: 'lpn_library_curves', pipetypes: 'lpn_library_pipetypes', fittings: 'lpn_library_fittings' };
+		// Each section's entry ends with the Move tip's own sentence about the order (Task 859), the same words, so a tap can read it.
+		const KEYS = { patterns: ['lpn_library_patterns_tip', 'lpn_library_move_tip_none'], curves: ['lpn_library_curves_note', 'lpn_library_curve_values_tip', 'lpn_library_move_tip_none'], pipetypes: ['lpn_library_pipetypes_note', 'lpn_library_pipetype_blank_tip', 'lpn_library_move_tip_none'], fittings: ['lpn_library_fittings_note', 'lpn_library_fittings_source', 'lpn_library_move_tip_none'] };
+		const HEAD = { patterns: 'lpn_library_patterns', curves: 'lpn_library_curves', pipetypes: 'lpn_library_pipetypes', fittings: 'lpn_library_fittings' };
 		for (const mode of ['click', 'tap']) {
 			const { a, P } = await U.openNet1(browser, 'lit-' + mode, mode === 'tap' ? { context: { hasTouch: true } } : undefined);
 			await openBox(a, 'lpn_library_box'); await a.settle(500);
-			await P.click('#lpn_libbox_link_patterns'); await a.settle(400);
+			await P.click('#lpn_libbox_link_controls'); await a.settle(400);
 			const ref = await P.evaluate(() => { const h = document.querySelector('#lpn_libbox_content .lpn-lib-sec > h3'), cs = getComputedStyle(h); return { color: cs.color, deco: cs.textDecorationLine, weight: cs.fontWeight, link: h.querySelectorAll('a').length }; });
-			ok(mode + ': Patterns heading is not a link', ref.link === 0, JSON.stringify(ref));
+			ok(mode + ': a heading is not a link', ref.link === 0, JSON.stringify(ref));
 			for (const id of Object.keys(KEYS)) {
 				await P.click('#lpn_libbox_link_' + id); await a.settle(400);
 				const want = await Promise.all(KEYS[id].map((k) => a.lang(k)));
@@ -50,7 +51,7 @@ function ok(name, cond, extra) { checks++; if (!cond) { fails++; } console.log((
 				}, id);
 				ok(mode + ' ' + id + ': the `?` opens the manual at that section\'s own entry, in view', g.open && g.found && g.top >= -2 && g.top < g.paneH, JSON.stringify([g.top, g.paneH]));
 				ok(mode + ' ' + id + ': the entry\'s term is the section heading', g.term === (await a.lang(HEAD[id])).trim(), g.term);
-				ok(mode + ' ' + id + ': the entry says the box\'s own two paragraphs, word for word', JSON.stringify(g.paras) === JSON.stringify(want), JSON.stringify(g.paras).slice(0, 90));
+				ok(mode + ' ' + id + ': the entry says the section\'s own paragraphs, word for word', JSON.stringify(g.paras) === JSON.stringify(want), JSON.stringify(g.paras).slice(0, 90));
 				await P.evaluate(() => { const x = document.querySelector('#lpn_hotkeys_popup .lpn-popover-x'); if (x) { x.click(); } }); await a.settle(300);
 			}
 			ok(mode + ': no page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));

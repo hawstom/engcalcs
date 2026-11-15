@@ -131,20 +131,22 @@ async function main() {
 			ok(sec + ': each carries a tip that begins with its name', s.moves.every((m) => m.title.indexOf(names[m.how]) === 0), JSON.stringify(s.moves.map((m) => m.title)));
 			if (runTip[sec]) { ok(sec + ': the tip says how the order decides a conflict', s.moves.every((m) => m.title.indexOf(runTip[sec]) > 0) && s.moves.every((m) => m.title.indexOf(noneTip) < 0)); }
 			else { ok(sec + ': the tip says the order never changes a run', s.moves.every((m) => m.title.indexOf(noneTip) > 0) && s.moves.every((m) => m.title.indexOf(runTip.controls) < 0 && m.title.indexOf(runTip.rules) < 0)); }
-			if (runTip[sec]) {
-				// the `?` beside the heading opens the manual at the entry that says it in the same words
+			{
+				// the `?` beside the heading opens the manual at the entry that says the Move tip's sentence in the same words: a tap on Move
+				// moves the item, so the tip cannot be read by a tap, and the entry can
+				const stem = { controls: 'ctl', rules: 'ctl' }[sec] || sec, sentence = runTip[sec] || noneTip;
 				const q = a.page.locator('#lpn_libbox_content .lpn-lib-sec > h3 button.lpn-lib-manual');
 				ok(sec + ': the heading carries one `?`, with no title (a tap cannot hover)', (await q.count()) === 1 && (await q.getAttribute('title')) === null);
 				await q.click();
 				await a.settle(900);
-				const g = await P(() => {
-					const b = document.getElementById('lpn_hotkeys_popup'), c = document.getElementById('lpn_guide_content'), dt = c.querySelector('#guide-term-lpn_guide_lib_ctl');
+				const g = await P((stem) => {
+					const b = document.getElementById('lpn_hotkeys_popup'), c = document.getElementById('lpn_guide_content'), dt = c.querySelector('#guide-term-lpn_guide_lib_' + stem);
 					if (!dt || !b) { return { found: false }; }
 					const cr = c.getBoundingClientRect(), r = dt.getBoundingClientRect();
 					return { found: true, open: getComputedStyle(b).display !== 'none', top: Math.round(r.top - cr.top), paneH: Math.round(cr.height), term: dt.textContent.trim(), text: dt.nextElementSibling.textContent };
-				});
-				ok(sec + ': the `?` opens the manual at "Controls and rules in a run", in view', g.found && g.open && g.top >= -2 && g.top < g.paneH && g.term === 'Controls and rules in a run', JSON.stringify(g));
-				ok(sec + ': that entry says the tip\'s sentence word for word', g.found && g.text.indexOf(runTip[sec]) >= 0, g.text);
+				}, stem);
+				ok(sec + ': the `?` opens the manual at its own entry, in view', g.found && g.open && g.top >= -2 && g.top < g.paneH, JSON.stringify(g));
+				ok(sec + ': that entry says the Move tip\'s sentence word for word', g.found && g.text.indexOf(sentence) >= 0, g.text);
 				if (SHOTS) { await a.page.screenshot({ path: path.join(SHOTS, sec + '-manual-r2.png') }); }
 				await P(() => { const x = document.querySelector('#lpn_hotkeys_popup .lpn-popover-x'); if (x) { x.click(); } });
 				await a.settle(300);
@@ -232,6 +234,20 @@ async function main() {
 			m = await marked();
 			const st2 = await state();
 			ok(sec + ': after Delete and Add the same count is back and nothing is selected', (await rows()).length === n && !m.some(Boolean) && st2.moves.every((x) => x.disabled), JSON.stringify([m, dis(st2)]));
+		}
+		// ONE TIP AT A TIME (Perry): a control's field keeps its own long tip while it has focus; hovering a Move button must close it
+		{
+			await openLib('controls');
+			const field = a.page.locator('#lpn_libbox_content .lpn-lib-entry').nth(1).locator('input[type=text]').first();
+			await field.click();
+			await a.settle(900);
+			const upBefore = await P(() => document.querySelectorAll('.tooltip.show').length);
+			await a.page.mouse.move(5, 5);
+			await a.page.locator('#lpn_lib_move_up').hover();
+			await a.settle(1500);
+			const tips = await P(() => Array.prototype.map.call(document.querySelectorAll('.tooltip.show'), (t) => t.textContent.trim().slice(0, 40)));
+			ok('the field\'s own tip is up before the pointer goes to Move up (' + upBefore + ')', upBefore >= 1);
+			ok('with the pointer on Move up exactly one tip is up, and it is the Move tip', tips.length === 1 && tips[0].indexOf(names.up) === 0, JSON.stringify(tips));
 		}
 		// a rule's text that comes to hold another rule: the box is built again
 		{

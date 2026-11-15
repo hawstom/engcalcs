@@ -2694,7 +2694,7 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 	background: repeating-linear-gradient(to bottom, var(--ec-accent) 0 2px, transparent 2px 5px);
 }
 #lpn_setbox_content::after {
-	content: ""; display: block; min-height: 100%;
+	content: ""; display: block; min-height: var(--lpn-setbox-room, 0px);
 }
 .lpn-setbox-link {
 	display: block; width: 100%; text-align: left; background: none; border: 0;

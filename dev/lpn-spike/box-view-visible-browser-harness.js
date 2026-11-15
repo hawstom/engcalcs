@@ -9,7 +9,9 @@
 //   1. Libraries: from the very end of every section, every other section opens with something in view, at its top;
 //   2. Libraries: scrolled to the end, closed and reopened, there is something in view;
 //   3. Libraries: there is no blank room to scroll into at all (it is the Settings box's alone), so no position can be past the list;
-//   4. Settings, which keeps its blank room: scrolled into it and then rebuilt by Undo, the box shows something.
+//   4. Settings, which keeps blank room after its content so the last section can reach the top: the room is the pane's height minus the last
+//      section's, so at the end of the scroll range the last section stands at the top of the pane, at several window heights and at phone size,
+//      after a resize while at the end, after a close and reopen, and after a rebuild by Undo.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -116,12 +118,50 @@ async function main() {
 		await section('patterns');
 		if (SHOTS) { await toEnd('lpn_libbox_content'); await P.screenshot({ path: path.join(SHOTS, 'patterns-end-r2.png') }); }
 
-		console.log('\n4. The Settings box keeps its blank room, and is not left in it by a rebuild');
+		console.log('\n4. The Settings box: the end of its scroll range is the top of its last section, at every window height');
 		await closeLib();
 		await a.toolbarClick(await a.lang('lpn_tool_settings'));
 		await P.waitForSelector('#lpn_settings_box', { state: 'visible' });
 		await a.settle(600);
-		// something undoable that is a setting, so the Undo rebuilds the Settings box: the first checkbox in it, then back to the top
+		// where the last section stands against the pane: its top below the pane's top by how much, and how much of it shows
+		const lastSec = () => P.evaluate(() => {
+			const c = document.getElementById('lpn_setbox_content'), b = c.getBoundingClientRect();
+			const kids = Array.prototype.filter.call(c.children, (k) => k.offsetHeight > 0), l = kids[kids.length - 1].getBoundingClientRect();
+			return { top: Math.round(c.scrollTop), range: Math.round(c.scrollHeight - c.clientHeight), paneH: Math.round(b.height), lastH: Math.round(l.height),
+				off: Math.round(l.top - b.top), shows: Math.round(Math.min(l.bottom, b.bottom) - Math.max(l.top, b.top)) };
+		});
+		const atEnd = async (tag) => {
+			await toEnd('lpn_setbox_content');
+			await a.settle(150);
+			const m = await lastSec();
+			// the last section is in view, and when it is shorter than the pane it stands at the pane's top (it can still reach the top)
+			ok(tag + ': at the end of the scroll range the last section is in view', m.shows > 20, JSON.stringify(m));
+			ok(tag + ': ...at the top of the pane when it is shorter than the pane', m.lastH >= m.paneH || Math.abs(m.off) <= 6, JSON.stringify(m));
+		};
+		for (const vp of [{ width: 1400, height: 900 }, { width: 1400, height: 640 }, { width: 1400, height: 480 }, { width: 390, height: 740 }, { width: 1400, height: 900 }]) {
+			await P.setViewportSize(vp);
+			await a.settle(700);
+			await atEnd(vp.width + 'x' + vp.height);
+		}
+		// resized while at the end: the room follows the pane
+		await toEnd('lpn_setbox_content');
+		await P.setViewportSize({ width: 1400, height: 520 });
+		await a.settle(700);
+		let m = await lastSec();
+		ok('resized while scrolled to the end: the last section is still in view', m.shows > 20, JSON.stringify(m));
+		await P.setViewportSize({ width: 1400, height: 900 });
+		await a.settle(700);
+		// closed and reopened at the end (Perry: one line, 174 px from the end)
+		await toEnd('lpn_setbox_content');
+		await P.evaluate(() => document.getElementById('lpn_setbox_close').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })));
+		await a.settle(400);
+		await a.toolbarClick(await a.lang('lpn_tool_settings'));
+		await P.waitForSelector('#lpn_settings_box', { state: 'visible' });
+		await a.settle(700);
+		m = await lastSec();
+		ok('closed at the end and reopened: the last section is in view', m.shows > 20 || m.top === 0, JSON.stringify(m));
+		if (SHOTS) { await toEnd('lpn_setbox_content'); await P.screenshot({ path: path.join(SHOTS, 'settings-end-r2.png') }); }
+		// a rebuild by Undo from the end
 		await P.evaluate(() => { document.getElementById('lpn_setbox_content').scrollTop = 0; });
 		const box0 = P.locator('#lpn_setbox_content input[type=checkbox]:visible').first();
 		const was = await box0.isChecked();
@@ -130,7 +170,7 @@ async function main() {
 		ok('the setting changed', (await box0.isChecked()) !== was);
 		await toEnd('lpn_setbox_content');
 		let v = await view('lpn_setbox_content');
-		ok('Settings scrolled to the end of its blank room is an empty view (the room is its own design)', v.inView === 0 && v.top === v.range, JSON.stringify(v));
+		ok('Settings at the end of its range has something in view', v.inView > 0 && v.top === v.range, JSON.stringify(v));
 		await P.evaluate(() => { if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); } });
 		await P.mouse.move(700, 800);
 		await P.keyboard.press('Control+z');
