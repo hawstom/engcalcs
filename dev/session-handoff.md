@@ -256,7 +256,7 @@ lines rather than appending corrections.
 - **`fix/inp-fidelity` (pushed, not merged), waits his call:** a US D-W `.inp` gives roughness in millifeet, which the page lacks; the branch refuses its solve with a bare code. (a) add millifeet as a Roughness unit (recommended) or (b) approve a refusal sentence. Also his: `;` in a label (kept whole, EPANET cuts it), stale `lpn_inp_drop_headloss` wording, "Relative viscosity" label, MinVol/Overflow as Properties.
 - **`fix/label-halo` (harness only, not merged):** the two-layer fix cost ~40 % label settle and no cheaper way worked; code reverted, the stack probe watches the 17-pixel nibble. Joins the next batch.
 - **`fix/legend-tank-phone` merged, then taken back out of master (Task 851 reopened):** dropping an example's saved view on a phone runs the label-aware fit on open; `fresh-open-harness.js` Phone Net3 longest block 1.5 s -> 2.7 s, over its 2 s limit. Waits his price call.
-- **Audit leftovers, his:** PBV/GPV on a fixed head refused though EPANET solves it (comment says deliberate); single-pipe dw_/ip_/mhp_ keep the old transitional friction factor; valve setting-unit rule in three places (no fix yet). Not audited: msx, wtg-export, geojson/dxf, survey, ramps, contour, criticality, collide, geom, georef, EPS against EPANET.
+- **Audit leftovers, his:** PBV/GPV on a fixed head refused though EPANET solves it (comment says deliberate); valve setting-unit rule in three places (no fix yet). Not audited: msx, wtg-export, geojson/dxf, survey, ramps, contour, criticality, collide, geom, georef, EPS against EPANET.
 - **Flaky under load, green alone:** `contour-harness.js` (three agents met it 11-14).
 
 ## STATE — 2026-11-13/14 (seventy-sixth session, Opus main, Sonnet agents)

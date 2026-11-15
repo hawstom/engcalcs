@@ -164,6 +164,7 @@ EngCalcs.pageConfig = {
 	ip_worst_case_warn: <?=json_encode($ec_lang['ip_worst_case_warn'])?>
 };
 </script>
+<script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
 <script src="/engcalcs/js/irrigation-pressure.js?v=<?=filemtime(__DIR__.'/js/irrigation-pressure.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
