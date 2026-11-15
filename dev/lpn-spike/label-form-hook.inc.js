@@ -157,6 +157,10 @@
 			y2 = +e.getAttribute('y2') * state.s + state.ty;
 			return { row: ne.leaderAttach ? ne.leaderAttach.row : null, lineCount: ne.lineCount, rows: rows, y2: y2, shown: e.style.display !== 'none' };
 		},
+		// Where a node stands in the window, for a real wheel to be turned over it.
+		nodeScreen: function (id) { var r = svg.getBoundingClientRect(), p = nodeAt(nodeById(id)); return { x: r.left + p.x * state.s + state.tx, y: r.top + p.y * state.s + state.ty }; },
+		// A node's elevation edited with Recalculate off: its label rewritten in place, no pass.
+		editElev: function (id, v) { var n = nodeById(id); setProp(n, 'elev', v); refreshOneLabelInPlace(n); },
 		// A zoom frame: the font sizes rewritten at a new scale and nothing laid out (what a wheel notch does before its pass).
 		zoomFrame: function (f) { state.s *= f; setTransform(); refreshFontSizes(true); },
 		// An edit with Recalculate off: this node's label cut to its first `keep` fields and rewritten in place, no pass.
@@ -166,13 +170,17 @@
 			refreshOneLabelInPlace(nodeById(id));
 			was.forEach(function (k) { ls.node[k] = true; });
 		},
-		// attachToNearestRow() on a made-up label: `widths` the row widths (0 for a blank row), the node `anchorRows` row pitches below the first baseline.
-		attachProbe: function (widths, anchorRows) {
-			var lh = effectiveLineHeight(), boxes = [], h = { lineCount: widths.length, leaderStruck: false }, ld, i;
+		// attachToNearestRow() on a made-up label: `widths` the row widths (0 for a blank row), the label's near edge at x = 0 with its first
+		// baseline at y = 0, the node `ax` row pitches left of the edge and `ay` below the first baseline. Returns where its leader ends,
+		// in row pitches below the first baseline, and the leader's angle in degrees (y down); null when the old leader stays.
+		attachProbe: function (widths, ax, ay) {
+			var lh = effectiveLineHeight(), boxes = [], h = { lineCount: widths.length, leaderStruck: false }, ld, A = { x: -ax * lh, y: ay * lh }, t;
 			widths.forEach(function (w, i2) { if (w > 0) { boxes.push(Collide.box(w / 2, i2 * lh, w, lh * 0.9, 0)); } });
-			ld = { id: 'probe', h: h, r: { x: 0, y: 0, boxes: boxes }, g: Collide.segment(-100, anchorRows * lh, 0, 0, 'leader', 'probe') };
+			ld = { id: 'probe', h: h, r: { x: 0, y: 0, boxes: boxes }, g: Collide.segment(A.x, A.y, 0, 0, 'leader', 'probe') };
 			attachToNearestRow(ld, { lines: widths }, [ld], [], { boxes: [], segments: [] }, null);
-			return h.leaderAttach ? h.leaderAttach.row : null;
+			if (!h.leaderAttach) { return null; }
+			t = h.leaderAttach.row;
+			return { t: t, deg: Math.atan2(t * lh - A.y, -A.x) * 180 / Math.PI };
 		},
 		fit: function () { zoomExtent(); },
 		// Pipe labels in the view, counted as drawn: shown, fields shown of fields asked, shed (shown with

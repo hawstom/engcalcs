@@ -1006,13 +1006,13 @@ var EngCalcs = EngCalcs || {};
 	// lost something has had its turn, on strict ground, so a line is taken only where it overprints
 	// nothing and makes no pipe label yield. Measured over 64 views (Net3, Novato, the 600-junction
 	// network): +41 labels and +287 values for about +3% pass time. In Chromium on Novato N164, N166 and
-	// N265 go to lines at 12 to 16 notches. N163 stood east of the neighbours that were still stacks when it was tried; a tie
-	// that finds no place is tried again once they have taken their lines (LPN_TIE_RETRY), and N163 is a line at 12 to 16 notches
-	// (at 11 nothing is free). On the stub the retry changes almost nothing (+3 labels over 64 views, +2% pass time); N163 is
-	// already a line there, so only Chromium shows it.
+	// N265 go to lines at 12 to 16 notches; N163 cannot (the short pipe L181's label stands east of it).
+	// A tie that finds no place is not tried a second time: the same counts, a quarter of the time. (Tried again after its
+	// neighbours have taken their lines, 2026-11-14, a real wheel over N163 on Novato: N163 is a line where master has a stack at
+	// 12-15 and 17-18 notches in a 1920 x 1000 window and at 17-18 in 1366 x 768, but pipe labels master shows lose fields at
+	// 4 of 19 notches (L251 3 to 1 at 1 and 2, L180 3 to 1 at 13, L233 and L317 hidden at 5). Not kept.)
 	var LPN_YIELD = true;
 	var LPN_TIE_LINE = true;
-	var LPN_TIE_RETRY = true;
 	// **A LABEL THAT LOST SOMETHING MAY TAKE GROUND HELD ONLY BY A PIPE LABEL THAT YIELDS** (`takeYield`;
 	// a tie may not). The pipe label is hidden by yieldStationedLabels() and is then tried level beside
 	// its pipe, so it often keeps a place. Over 64 views: +16 labels, +423 values, no view with fewer
@@ -1405,10 +1405,12 @@ var EngCalcs = EngCalcs || {};
 		// The flag is the label's FORM, kept even when a shed leaves it one line, so the sides it is
 		// placed on (nodeFirstFitSpec()) stay those of the form it was tried in.
 		ne.inline = !!inline;
-		ne.leaderAttach = null;   // the rows are rewritten: the row a leader was set to meet may be gone (dropStruckLeaders())
 		if (!ne.inline) { ne.inlineFrom = null; }
 		var rows = composeRows(lines, !ne.inline);
 		setMultilineText(ne.text, nodeLabelBase(n).x, rows);
+		// A leader set to meet the label's near edge (dropStruckLeaders()) keeps its place while the rows are the same number: an edit
+		// of a value rewrites them, and the leader does not jump back to the first row until the next pass. Other rows, other edge.
+		if (ne.leaderAttach && ne.leaderAttach.n !== rows.length) { ne.leaderAttach = null; }
 		ne.lineCount = rows.length;
 		ne.lines = lines;   // the FIELD lines, one per value, whatever shape they were drawn in
 		ne.text.style.fontSize = fsNow;
@@ -2940,9 +2942,7 @@ var EngCalcs = EngCalcs || {};
 		// **A SECOND ROUND, BECAUSE THE FIRST GIVES GROUND BACK ONLY AS IT GOES** (Task 812): a label
 		// tried before its neighbour finds the neighbour's stack still standing on the ground it wants.
 		// Once the neighbour has gone to its line, the ones that found no place are tried again.
-		// A tie that found no place is tried again too (LPN_TIE_RETRY): N163 on Novato, a stack beside neighbours that were
-		// stacks when it was tried, takes its line at 12 to 16 notches (Chromium), where the stub sees no gain.
-		var needing = LPN_TIE_RETRY ? list : list.filter(function (it) { return !it.tie; });
+		var needing = list.filter(function (it) { return !it.tie; });
 		if (LPN_OPEN_SIDE && !(round > 0) && took.length && needing.length && took.length < list.length) {
 			var again = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, needing.filter(function (it) { return !res[it.id]; }), ring, 1);
 			return { placed: again.placed, took: took.concat(again.took) };
@@ -3498,43 +3498,61 @@ var EngCalcs = EngCalcs || {};
 		}
 		return [a, b];
 	}
-	// The row is named by its index among the label's rows, blank ones counted (a blank row has no box, so the boxes are matched to
-	// the rows that have a width), and the leader's end is that many row pitches below the first row's baseline.
+	// **THE LEADER STAYS ON THE 15-DEGREE GRID** (Tom, 2026-08-16: *"constrain leader angles to be at multiples of 15 degrees and not
+	// orthogonal"*, label-placement-goals.md goal 7; Perry's pre-review of the first build, which ended leaders at a row's baseline and
+	// took 42 of 790 Novato node leaders off the grid to 243). The leader still ends on the label's near edge (x of its end), but at the
+	// point where a ray from the node at one of Collide.RING_ANGLES (multiples of 15, never level or plumb) meets that edge inside a
+	// drawn row; the shortest such leader that crosses nothing new is taken, and the old leader (to the first row, on the grid by how
+	// its side was chosen) stays when there is none. The end is kept as a distance down the edge in row pitches, `row` (a fraction),
+	// with the label's row count `n`: the pitch is the label's own font size, so a zoom frame keeps it on the same ray.
 	function attachToNearestRow(ld, sp, leaders, rows, obs, nodeObs) {
-		var r = ld.r, g = ld.g, widths = sp && sp.lines, bx = r.boxes, lh = effectiveLineHeight(), idx = [], k = -1, bd = Infinity, i, d, g2, m, o, c;
-		if (!widths || widths.length < 2 || widths.length !== ld.h.lineCount || !bx) { return; }
-		for (i = 0; i < widths.length; i++) { if (widths[i] > 0) { idx.push(i); } }
-		if (idx.length !== bx.length) { return; }
-		for (m = 0; m < idx.length; m++) {
-			d = Math.abs(g.ay - (r.y + idx[m] * lh));
-			if (d < bd - 1e-9) { bd = d; k = idx[m]; }
+		var r = ld.r, g = ld.g, widths = sp && sp.lines, bx = r.boxes, lh = effectiveLineHeight(), dx = g.bx - g.ax, old = Math.hypot(dx, g.by - g.ay),
+			cands = [], i, m, c, g2, ys, hit, mm, d;
+		if (!widths || widths.length < 2 || widths.length !== ld.h.lineCount || !bx || !(Math.abs(dx) > 1e-9)) { return; }
+		for (m = 0; m < Collide.RING_ANGLES.length; m++) {
+			c = Collide.RING_ANGLES[m] * Math.PI / 180;
+			if (Math.cos(c) * dx <= 0) { continue; }
+			ys = g.ay + dx * Math.tan(c);
+			d = Math.abs(dx / Math.cos(c));
+			if (d >= old - 1e-9) { continue; }
+			// inside the extent of a drawn row (a blank row has no box)
+			hit = false;
+			for (mm = 0; mm < bx.length; mm++) { if (Math.abs(ys - bx[mm].cy) <= bx[mm].h / 2) { hit = true; break; } }
+			if (hit) { cands.push({ y: ys, len: d, deg: Collide.RING_ANGLES[m] }); }
 		}
-		if (k < 1) { return; }
-		g2 = Collide.segment(g.ax, g.ay, g.bx, g.by + k * lh, 'leader', ld.id);
+		cands.sort(function (a, b) { return a.len - b.len; });
+		for (i = 0; i < cands.length; i++) {
+			g2 = Collide.segment(g.ax, g.ay, g.bx, cands[i].y, 'leader', ld.id);
+			if (!attachClear(ld, g2, bx, leaders, rows, obs, nodeObs)) { continue; }
+			ld.h.leaderAttach = { row: (cands[i].y - r.y) / lh, n: widths.length };
+			ld.g = g2;
+			return;
+		}
+	}
+	function attachClear(ld, g2, bx, leaders, rows, obs, nodeObs) {
+		var g = ld.g, i, c, o, list, m;
 		for (i = 0; i < rows.length; i++) {
-			if (rows[i].id !== ld.id && rows[i].b.w > 0 && Collide.segmentInBoxFraction(g2, rows[i].b) > 0) { return; }
+			if (rows[i].id !== ld.id && rows[i].b.w > 0 && Collide.segmentInBoxFraction(g2, rows[i].b) > 0) { return false; }
 		}
-		// its own rows, but the one it ends at: the end stands on that row's edge
-		for (m = 0; m < idx.length; m++) {
-			if (idx[m] !== k && Collide.segmentInBoxFraction(g2, Collide.box(bx[m].cx, bx[m].cy, bx[m].w - 1e-6, bx[m].h, bx[m].a)) > 0) { return; }
+		// its own rows: the end stands on the edge of the one it meets, which the shrunk box leaves alone
+		for (m = 0; m < bx.length; m++) {
+			if (Collide.segmentInBoxFraction(g2, Collide.box(bx[m].cx, bx[m].cy, bx[m].w - 1e-6, bx[m].h, bx[m].a)) > 0 && !(Math.abs(g2.by - bx[m].cy) <= bx[m].h / 2)) { return false; }
 		}
 		// a leader marked struck is not drawn, so it cannot be crossed
-		for (i = 0; i < leaders.length; i++) { if (leaders[i] !== ld && !leaders[i].h.leaderStruck && Collide.segmentsCross(g2, leaders[i].g)) { return; } }
+		for (i = 0; i < leaders.length; i++) { if (leaders[i] !== ld && !leaders[i].h.leaderStruck && Collide.segmentsCross(g2, leaders[i].g)) { return false; } }
 		// everything the first fit kept clear of: the symbols (the one the leader starts in is its own), and every other box on the
 		// drawing, Text objects, pipe labels along their pipes, level labels, dragged and foreign labels, customer boxes included
 		for (c = 0; c < 2; c++) {
-			var list = c ? (nodeObs && nodeObs !== obs ? nodeObs.boxes : []) : obs.boxes;
+			list = c ? (nodeObs && nodeObs !== obs ? nodeObs.boxes : []) : obs.boxes;
 			for (i = 0; i < list.length; i++) {
 				o = list[i];
 				if (!(o.w > 0)) { continue; }
 				if (o.kind === 'symbol' && Math.hypot(o.cx - g.ax, o.cy - g.ay) <= o.w / 2) { continue; }
-				if (Collide.segmentInBoxFraction(g2, o) > 0) { return; }
+				if (Collide.segmentInBoxFraction(g2, o) > 0) { return false; }
 			}
 		}
 		m = pipesCrossed(g, g2, obs.segments);
-		if (m[1] > m[0]) { return; }
-		ld.h.leaderAttach = { row: k, n: widths.length };
-		ld.g = g2;
+		return m[1] <= m[0];
 	}
 	// **EVERYTHING THE LEVEL PASS READS IS TAKEN TO A MILLIONTH OF A DRAWING UNIT**: boxes and segments are measured in
 	// pixels over a scale, and one scale reached by two wheel histories differs in its last bit; a spot that grazes a box then flips
