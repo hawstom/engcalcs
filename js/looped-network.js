@@ -930,8 +930,6 @@ var EngCalcs = EngCalcs || {};
 	// re-placed labels far enough out that the shed cascade stopped running -- 19 labels shedding
 	// where node-shed-harness.js requires 30. Placing labels further from their nodes rather than
 	// shedding a value is a design change nobody asked for.
-	var LPN_LEADER_PIPES = true;
-	function nodeFitOpts(pad) { return LPN_LEADER_PIPES ? { pad: pad, leaderPipes: leaderThreshold() } : { pad: pad }; }
 	function nodeFirstFitSpec(n, ne, fs) {
 		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id), s0 = state.s || 1, f = ne.inlineFrom,
 			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
@@ -1101,7 +1099,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (!specs.length) { return []; }
 		return Collide.placeLabelsFirstFit(rankNodeLabels(specs), withDraggedLabels(obs, fs),
-			nodeFitOpts(fs * LPN_ALIGNED_PAD_FRAC));
+			{ pad: fs * LPN_ALIGNED_PAD_FRAC });
 	}
 	function shedAlignedForConflicts(fsNow, fs) {
 		// **NO PAD HERE.** LPN_ALIGNED_PAD_FRAC is 0.35 of a font size and grows the box on EVERY
@@ -2916,7 +2914,7 @@ var EngCalcs = EngCalcs || {};
 			if (sp) { specs.push(Object.assign({}, sp, it.spec, { release: LPN_OPEN_SIDE })); }
 		});
 		if (!specs.length) { return { placed: placed, took: [] }; }
-		out = Collide.placeLabelsFirstFit(specs, ground, { pad: pad, lastPad: pad, strict: true, leaderMin: min, leaderPipes: LPN_LEADER_PIPES ? min : 0 });
+		out = Collide.placeLabelsFirstFit(specs, ground, { pad: pad, lastPad: pad, strict: true, leaderMin: min });
 		var took = [], res = {};
 		out.forEach(function (r) { if (!r.dropped) { res[r.id] = r; took.push(r.id); } });
 		// The labels that took a line are that line from here on, for the repair and the hides after.
@@ -3067,7 +3065,7 @@ var EngCalcs = EngCalcs || {};
 					rec.lbl.lines = labelRowWidths(rec.ne);
 				});
 			});
-			placed = perfDebugAccum('  ns:refit', function () { return Collide.placeLabelsFirstFit(nodeLabels, obs, nodeFitOpts(pad)); });
+			placed = perfDebugAccum('  ns:refit', function () { return Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad }); });
 			rungs++;
 		}
 		lastNodeShedRungs = rungs;
@@ -3475,7 +3473,7 @@ var EngCalcs = EngCalcs || {};
 	// *"constrain leader angles to be at multiples of 15 degrees and not orthogonal"*), which is why this is a flag.
 	var LPN_LEADER_NEAREST_ROW = true;
 	function attachToNearestRow(ld, leaders, rows, obs) {
-		var bx = ld.r.boxes, g = ld.g, k = 0, bd, i, dy, g2, d, ownRows = [];
+		var bx = ld.r.boxes, g = ld.g, k = 0, bd, i, dy, g2, d;
 		if (!bx || bx.length < 2) { return; }
 		bd = Math.abs(g.ay - ld.r.y);
 		for (i = 1; i < bx.length; i++) {
@@ -3915,7 +3913,7 @@ var EngCalcs = EngCalcs || {};
 		// second, cruder mechanism reaching the same situation by another door, and a reader cannot
 		// tell the two apart. If a node label still cannot fit once link labels have shed, it drops.
 		var pad = fs * LPN_ALIGNED_PAD_FRAC, nodeObs = withDraggedLabels(obs, fs),
-			nodePlaced = perfDebugAccum('  cl:firstFit', function () { return Collide.placeLabelsFirstFit(nodeLabels, nodeObs, nodeFitOpts(pad)); });
+			nodePlaced = perfDebugAccum('  cl:firstFit', function () { return Collide.placeLabelsFirstFit(nodeLabels, nodeObs, { pad: pad }); });
 		// **AND THEN THE ONES THAT DID NOT FIT GIVE UP A PROPERTY AND TRY AGAIN** (Task 469). This
 		// is the graceful rung the node half never had; the drop above is now its terminal one.
 		//

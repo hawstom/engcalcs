@@ -1,8 +1,8 @@
 // LEADERS A PERSON WOULD DRAW, IN A REAL CHROMIUM (ROADMAP Task 812, Tom's lesson "leaders a person would draw"). Two rules,
 // each one flag on the page (the harness lays every view out twice from the same files, the rules on and off):
-//   LPN_LEADER_PIPES       a node label takes a side whose leader crosses no other pipe before one whose leader does
-//                          (Collide's `leaderPipes`);
-//   LPN_LEADER_NEAREST_ROW a stack's leader meets the row nearest its node, not always the first (dropStruckLeaders()).
+//   LPN_LEADER_NEAREST_ROW a stack's leader meets the row nearest its node, not always the first (dropStruckLeaders());
+//   LPN_TIE_RETRY          a stack that shows everything and found no line is tried for its line a second time, after its
+//                          neighbours have taken theirs (N163 on Novato, Tom's "why not one line").
 // Run with:
 //   node dev/lpn-spike/label-leader-shapes-browser-harness.js
 //   LEADER_SHAPES_SHOTS=<dir>   saves the pictures Tom is shown, rules off ("before") and on ("after")
@@ -10,7 +10,7 @@
 // network at notches 3, 6 and 9. Node fields ID, Qb, Z, H, P; link fields ID, Q, V. A leader "crosses a pipe" when it runs across a
 // pipe that is not its own element's (a node's own pipes arrive at the leader's start and do not count). A leader "runs long" when it
 // is more than 8 px longer than the way from its node to the nearest row of its label.
-// ASSERTED: over all views the rules leave fewer drawn leaders across a pipe and fewer running long, show no fewer node labels
+// ASSERTED: N163 on Novato is a one-line label at 12 and 14 notches with the rules on and a stack with them off; over all views the rules leave fewer drawn leaders running long and no more across a pipe, show no fewer node labels
 // and no fewer pipe fields, draw no more leaders through another label; and the label pass costs at most half as much again
 // (a gross guard: the measure of time is label-settle-bench-browser.js).
 //
@@ -85,7 +85,7 @@ async function layOut(Session, browser, sc, mode) {
 		let body = await resp.text();
 		if (body.indexOf(MARKER) >= 0) { body = body.replace(MARKER, HOOK + MARKER); }
 		if (mode === 'off') {
-			['LPN_LEADER_PIPES', 'LPN_LEADER_NEAREST_ROW'].forEach((f) => {
+			['LPN_LEADER_NEAREST_ROW', 'LPN_TIE_RETRY'].forEach((f) => {
 				if (body.indexOf('var ' + f + ' = true') < 0) { throw new Error('no ' + f); }
 				body = body.replace('var ' + f + ' = true', 'var ' + f + ' = false');
 			});
@@ -112,8 +112,9 @@ async function layOut(Session, browser, sc, mode) {
 			const S = await a.page.evaluate(() => window.__lpnForm.leaderShapes());
 			const strikes = await a.page.evaluate(() => window.__lpnForm.leaderStrikes().length);
 			const pf = await a.page.evaluate(() => window.__lpnForm.pipeFields());
+			const n163 = (await a.page.evaluate(() => window.__lpnForm.nodeForms(['163'])))['163'];
 			const ms = await a.page.evaluate(() => window.__lpnForm.timeContent(3));
-			rows.push({ k: k, f: faults(S), nodesShown: S.nodesShown, pipesShown: S.pipesShown, pipeRows: pf.rows, strikes: strikes, ms: ms });
+			rows.push({ k: k, f: faults(S), nodesShown: S.nodesShown, pipesShown: S.pipesShown, pipeRows: pf.rows, n163: n163, strikes: strikes, ms: ms });
 			if (SHOTS && sc.shots.indexOf(k) >= 0) {
 				fs.mkdirSync(SHOTS, { recursive: true });
 				await a.page.screenshot({ path: path.join(SHOTS, sc.key + '-notch' + k + '-' + (mode === 'off' ? 'before' : 'after') + '.png') });
@@ -132,9 +133,11 @@ async function main() {
 	await env.startServer();
 	const browser = await chromium.launch({ executablePath: env.findChromium() });
 	const T = { on: { across: 0, long: 0, leaders: 0, nodes: 0, pipes: 0, rows: 0, strikes: 0, ms: 0 }, off: { across: 0, long: 0, leaders: 0, nodes: 0, pipes: 0, rows: 0, strikes: 0, ms: 0 } };
+	let novato = null;
 	try {
 		for (const sc of SCENES) {
 			const on = await layOut(Session, browser, sc, 'on'), off = await layOut(Session, browser, sc, 'off');
+			if (sc.key === 'novato') { novato = { on: on, off: off }; }
 			ok(sc.key + ': no page errors', !on.errors.length && !off.errors.length, (on.errors[0] || off.errors[0] || '').slice(0, 200));
 			on.rows.forEach((r, i) => {
 				const b = off.rows[i];
@@ -143,7 +146,12 @@ async function main() {
 			});
 		}
 		console.log(`        TOTAL leaders across a pipe ${T.off.across} -> ${T.on.across}; running long ${T.off.long} -> ${T.on.long}; pipe fields ${T.off.rows} -> ${T.on.rows}; leaders ${T.off.leaders} -> ${T.on.leaders}; node labels ${T.off.nodes} -> ${T.on.nodes}; pipe labels ${T.off.pipes} -> ${T.on.pipes}; strikes ${T.off.strikes} -> ${T.on.strikes}; pass ${T.off.ms} -> ${T.on.ms} ms`);
-		ok('over all views, fewer drawn leaders across a pipe', T.on.across < T.off.across, `${T.off.across} -> ${T.on.across}`);
+		const at = (rows, k) => (rows.find((r) => r.k === k) || {}).n163;
+		[12, 14].forEach((k) => {
+			ok('Novato ' + k + ' notches: N163 is a one-line label with the rules on', /^line/.test(at(novato.on.rows, k) || ''), String(at(novato.on.rows, k)));
+			ok('Novato ' + k + ' notches: N163 is a stack with the rules off', /^stack/.test(at(novato.off.rows, k) || ''), String(at(novato.off.rows, k)));
+		});
+		ok('over all views, no more drawn leaders across a pipe', T.on.across <= T.off.across, `${T.off.across} -> ${T.on.across}`);
 		ok('over all views, fewer drawn leaders running long', T.on.long < T.off.long, `${T.off.long} -> ${T.on.long}`);
 		ok('over all views, no fewer pipe fields shown', T.on.rows >= T.off.rows, `${T.off.rows} -> ${T.on.rows}`);
 		ok('over all views, no fewer node labels shown', T.on.nodes >= T.off.nodes, `${T.off.nodes} -> ${T.on.nodes}`);

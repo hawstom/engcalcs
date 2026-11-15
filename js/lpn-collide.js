@@ -1218,10 +1218,6 @@ EngCalcs.lpnCollide = (function () {
 		// 23.9 per 100 shown, leaders through a node 697 -> 407, the page pass about 8% slower.
 		// `opts.clean === false` is the old single sweep, kept for the harness that measures it.
 		var clean = opts.clean !== false, waiting = [], seat = {};
-		// **A LEADER A PERSON WOULD DRAW CROSSES NO PIPE IT NEED NOT** (Task 812, Tom's "leaders a person would draw"):
-		// in the clean sweep a side whose drawn leader (longer than `leaderPipes`) crosses a pipe that is not the
-		// label's own is passed over for a later clean side; the last sweep still takes it where nothing else stands.
-		var leaderPipes = opts.leaderPipes > 0 ? opts.leaderPipes : 0;
 		// **STRICT: A SIDE IS TAKEN ONLY IF IT BREAKS NOTHING** (the level pipe label, dev/label-trials/port-plan.md Step 3). The
 		// labels handed in strictly are ones that would otherwise hide, so there is no fallback that
 		// costs a neighbour: a side held by a yielding label is blocked, the label may not lie on its
@@ -1277,18 +1273,6 @@ EngCalcs.lpnCollide = (function () {
 			}
 			return true;
 		}
-		function leaderOverLink(lbl, c) {
-			if (!(leaderPipes > 0) || Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) <= leaderPipes) { return false; }
-			var g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id), i, o, e = leaderPipes * 1e-6;
-			for (i = 0; i < local.segments.length; i++) {
-				o = local.segments[i];
-				if (o.kind !== 'link' || (lbl.ownLink !== undefined && o.owner === lbl.ownLink)) { continue; }
-				// a pipe arriving at the anchor (a node's own) touches the leader's start, it does not cross it
-				if ((Math.abs(o.ax - lbl.anchor.x) < e && Math.abs(o.ay - lbl.anchor.y) < e) || (Math.abs(o.bx - lbl.anchor.x) < e && Math.abs(o.by - lbl.anchor.y) < e)) { continue; }
-				if (segmentsCross(g, o)) { return true; }
-			}
-			return false;
-		}
 		function sidesOf(lbl) { return lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home]; }
 		function commit(lbl, sides, c, b) {
 			// `release`: a label RE-placed in another form (a node label's one line, in place of its
@@ -1339,7 +1323,7 @@ EngCalcs.lpnCollide = (function () {
 				verdict = boxesClearOf(b, local, pad, lbl.id);
 				if (verdict === 'blocked') { continue; }
 				if (first < 0) { first = i; }
-				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !(lbl.linkMargin > 0 && boxesNearLink(b, local, lbl.id, lbl.linkMargin)) && !leaderThroughSymbol(lbl, c, local) && !leaderOverLink(lbl, c) &&
+				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !(lbl.linkMargin > 0 && boxesNearLink(b, local, lbl.id, lbl.linkMargin)) && !leaderThroughSymbol(lbl, c, local) &&
 						(!strict || strictOk(lbl, c, b, true))) {
 					return commit(lbl, sides, c, b);
 				}
