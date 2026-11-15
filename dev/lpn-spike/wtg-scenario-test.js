@@ -4,7 +4,7 @@
 //   node dev/lpn-spike/wtg-scenario-test.js [--out <dir>]    default ~/tom-files/2026-11-13/wtg-scenario-test
 //
 // Prints EPANET's expected J1 pressure at hour 0 and T1 level at hour 12, for Base and Child A, to the terminal ONLY, so Tom's
-// reading stays blind (the same numbers are in dev/wtg-export.md). Licence line: nobody decompiles or probes Bentley software.
+// reading stays blind (the same numbers are in dev/wtg-export.md). WaterGEMS reproduced the DEFAULT rule step lines (2026-11-13). Licence line: nobody decompiles or probes Bentley software.
 'use strict';
 const fs = require('fs');
 const os = require('os');

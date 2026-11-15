@@ -218,6 +218,12 @@ const GPM = 0.22280092967190634 / 100;
 	{
 		const st = require('./wtg-scenario-test.js');
 		const dir = path.join(process.env.HOME || '', 'tom-files', '2026-11-13', 'wtg-scenario-test');
+		// Tom's WaterGEMS readings (2026-11-13): T1 at hour 12 Base 11.56, Child A 15.49 ft; J1 at hour 0 35.69, 35.76 psi. WaterGEMS
+		// checks rules at EPANET's default rule step (a tenth of the hydraulic step), not hourly; its psi per foot is 0.43353.
+		const eb = await st.expected(st.baseNet(), null), ec = await st.expected(st.childNet(), null), eh = await st.expected(st.baseNet(), '1:00');
+		ok('EPANET at its default rule step gives Tom\'s T1 at hour 12: Base 11.56, Child A 15.49 ft', eb.t1[12].toFixed(2) === '11.56' && ec.t1[12].toFixed(2) === '15.49', eb.t1[12].toFixed(2) + ' / ' + ec.t1[12].toFixed(2));
+		ok('an hourly rule step does not (8.75): that was the wrong expectation', eh.t1[12].toFixed(2) === '8.75');
+		ok('J1 at hour 0 times 0.43353 psi/ft gives Tom\'s 35.69 and 35.76', (eb.j1p0 / 0.4333 * 0.43353).toFixed(2) === '35.69' && (ec.j1p0 / 0.4333 * 0.43353).toFixed(2) === '35.76');
 		const fresh = await st.build(env);
 		ok('Child A is written, integrity ok', fresh.report.integrity === 'ok' && fresh.report.scenarios.length === 1 && fresh.report.scenarios[0].written && fresh.report.scenarios[0].name === 'Child A');
 		const file = path.join(dir, st.NAME + '.wtg.sqlite');

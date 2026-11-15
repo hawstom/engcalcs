@@ -734,7 +734,7 @@ His file's other facts, read so nobody repeats them: his control 2 has the tank 
 
 The chlorine network with Tom's three composite controls (`~/tom-files/2026-11-09/wtg-composite-test/ctl-composite-test`), all three held in one control set. Rule 3 never fires on this network (T1 peaks at 17.6 ft), so its second action is only checked by whether the control reads correctly in step 2; rules 1 and 2 are exercised.
 
-EPANET evaluates rules every rule time step, default 6 minutes, so it switches PU1 inside an hour (Off at 3:06, On at 5:06). WaterGEMS has no such setting we know of and may check once an hour. Both are given:
+EPANET evaluates rules every rule time step, default 6 minutes, so it switches PU1 inside an hour (Off at 3:06, On at 5:06). WaterGEMS has no such setting and checks at EPANET's default (Tom's readings of 2026-11-13 match the 6 minute column; see "Expected for `wtg-scenario-test`"). Both are given:
 
 | Hour | EPANET, rule step 6 min | EPANET, rule step 1 h |
 |---|---|---|
@@ -743,7 +743,7 @@ EPANET evaluates rules every rule time step, default 6 minutes, so it switches P
 | 18 | On, 10.94 | On, 9.02 |
 | 24 | On, 11.69 | On, 10.36 |
 
-The hourly column equals the 2-pressure trajectory (the OR rule 2 does the work of the two pressure controls), and 2-pressure matched WaterGEMS to 0.04 ft; so if WaterGEMS checks once an hour its column is expected to be the right-hand one. A match to the left column means it checks as often as EPANET. A value that is neither means a rule is read differently (an OR taken as AND would leave PU1 On through hour 4; read the step 2 answer first). At a trip instant PU1 may show the state before the trip, as above; hours 6, 12, 18 and 24 are not trip instants in the hourly column.
+The hourly column equals the 2-pressure trajectory (simple pressure controls, which EPANET tests once an hour). Tom's WaterGEMS read the 6 minute column, so rules are tested at the default rule step.
 
 ## Child scenarios: Tom's saves of 2026-10-21 and 2026-11-13
 
@@ -786,4 +786,4 @@ Observed from two saves of Tom's WaterGEMS 26.0.0.532 (schema 1.0.54.0), read as
 | Base | 35.67 | 11.56 | 8.75 |
 | Child A | 35.74 | 15.49 | 14.48 |
 
-WaterGEMS matched the hourly rule step on 2026-11-09, so the 1 h column is the one to expect. A first draft of Child A at 500 gpm drained T1 to empty and ran negative, so the demand is 250. The harness holds the folder's `.sqlite` to what the writer produces now.
+**Tom's WaterGEMS read 2026-11-13: Base T1 11.56, Child A 15.49 ft at hour 12; J1 35.69 and 35.76 psi at hour 0. That is the 6 minute column, not the hourly one**: the "hourly" expectation was an inference from `2-pressure`, whose controls were simple pressure controls (EPANET tests those once per hydraulic step anyway); rules are a different mechanism and WaterGEMS runs them at EPANET's default rule step, a tenth of the hydraulic step (the `.inp` WaterGEMS exports states no Rule Timestep, and the schema has no column for one). Nothing in the file was wrong, and Base (master's export alone) agrees. Only a 6 minute step reproduces both readings (1 h 8.75 / 14.48, 30 min 10.24 / 14.62, 15 min 11.53 / 14.69, 10 min 11.55 / 15.14, 5 min 11.76 / 15.37, 1 min 11.85 / 15.59). The 0.02 psi on J1 is WaterGEMS's psi per foot of head, 0.43353 (water at 4 C, 62.43 lb/ft3) against EPANET's 0.4333: the same head gives 35.69 and 35.76. Tank Level is the depth above the tank's base elevation, as EPANET's. A first draft of Child A at 500 gpm drained T1 to empty and ran negative, so the demand is 250. The harness holds the folder's `.sqlite` to what the writer produces now.
