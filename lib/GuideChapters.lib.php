@@ -205,6 +205,12 @@ function ecGuideTermAnchored($stem) {
 function ecGuideDefHtml($stem) {
     global $ec_lang;
     $keys = ecGuideDefKeys($stem);
+    // Controls and rules in a run: its own paragraphs, then how the order of the list decides a conflict, in the very words of the
+    // Move tips in the Libraries box (the Controls and Rules `?` lands here), and that no other list's order matters.
+    if ($stem === 'lpn_guide_lib_ctl') {
+        return $ec_lang[$stem . '_def'] . '<p>' . htmlspecialchars($ec_lang['lpn_library_move_tip_controls'] . ' '
+            . $ec_lang['lpn_library_move_tip_rules'] . ' ' . $ec_lang['lpn_guide_lib_order_none']) . '</p>';
+    }
     if (!$keys) { return $ec_lang[$stem . '_def']; }
     $html = '';
     foreach ($keys as $k) { $html .= '<p>' . htmlspecialchars($ec_lang[$k]) . '</p>'; }
