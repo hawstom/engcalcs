@@ -75,7 +75,7 @@ $PSI_PA      = $LBF / ($IN * $IN);          // 1 lbf/in^2 in Pa
 $expected = array(
     // length
     'm' => 1.0, 'mm' => 1000.0,
-    'ft' => 1 / $FT, 'in' => 1 / $IN,
+    'ft' => 1 / $FT, 'in' => 1 / $IN, 'millifeet' => 1000 / $FT,
     // velocity
     'mps' => 1.0, 'ftps' => 1 / $FT,
     // volumetric flow
@@ -140,6 +140,7 @@ $exceptions = array();
 $groups = array(
     'the foot (m per ft)' => array(
         'ft'    => function ($v) { return 1 / $v; },
+        'millifeet' => function ($v) { return 1000 / $v; },
         'ftps'  => function ($v) { return 1 / $v; },
         'fth2o' => function ($v) { return 1 / $v; },
         'ft2'   => function ($v) { return sqrt(1 / $v); },

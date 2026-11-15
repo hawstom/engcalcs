@@ -95,7 +95,7 @@
 		opts = opts || {};
 		// The properties a document stores under their own name rather than an underscore (all
 		// overridable since 2026-10-12; LPN_BARE_PROP in js/looped-network.js).
-		var BARE = { elev: 1, bottomElev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, mixingModel: 1, mixingFraction: 1,
+		var BARE = { elev: 1, bottomElev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, minVolume: 1, overflow: 1, mixingModel: 1, mixingFraction: 1,
 				headPattern: 1, speed: 1, speedPattern: 1 },
 			// A caller's resolver written before then reads `_prop` only; a bare one it cannot find
 			// is read off the element, which is what Base holds.
