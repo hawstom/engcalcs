@@ -144,7 +144,36 @@
 			});
 			return out;
 		},
-		attachOf: function (id) { var ne = nodeEls[id]; return ne ? { attach: ne.leaderAttach || null, lines: (ne.lines || []).length, inline: !!ne.inline, struck: !!ne.leaderStruck, x1: ne.leader && ne.leader.getAttribute('x1'), y2: ne.leader && ne.leader.getAttribute('y2'), y1: ne.leader && ne.leader.getAttribute('y1') } : null; },
+		// Leaders set to meet the row nearest their node (dropStruckLeaders()): for one node, where its leader's end stands against the
+		// rows as drawn, in screen pixels; and the ids that hold one. label-leader-shapes-browser-harness.js.
+		attachedIds: function () { return doc.nodes.filter(function (n) { var ne = nodeEls[n.id]; return ne && ne.leaderAttach && ne.leader && ne.leader.style.display !== 'none'; }).map(function (n) { return n.id; }); },
+		attachState: function (id) {
+			var ne = nodeEls[id], c = svg.getBoundingClientRect(), ts = ne.text.querySelectorAll('tspan'), rows = [], i, r, cur, e = ne.leader, y2;
+			for (i = 0; i < ts.length; i++) {
+				r = ts[i].getBoundingClientRect();
+				if (!(r.width > 0)) { continue; }
+				if (ts[i].hasAttribute('x') || !cur) { cur = { t: r.top - c.top, b: r.bottom - c.top }; rows.push(cur); } else { cur.t = Math.min(cur.t, r.top - c.top); cur.b = Math.max(cur.b, r.bottom - c.top); }
+			}
+			y2 = +e.getAttribute('y2') * state.s + state.ty;
+			return { row: ne.leaderAttach ? ne.leaderAttach.row : null, lineCount: ne.lineCount, rows: rows, y2: y2, shown: e.style.display !== 'none' };
+		},
+		// A zoom frame: the font sizes rewritten at a new scale and nothing laid out (what a wheel notch does before its pass).
+		zoomFrame: function (f) { state.s *= f; setTransform(); refreshFontSizes(true); },
+		// An edit with Recalculate off: this node's label cut to its first `keep` fields and rewritten in place, no pass.
+		editInPlace: function (id, keep) {
+			var ls = scnLabels(), on = Object.keys(ls.node).filter(function (k) { return ls.node[k]; }), was = on.slice();
+			on.slice(keep).forEach(function (k) { ls.node[k] = false; });
+			refreshOneLabelInPlace(nodeById(id));
+			was.forEach(function (k) { ls.node[k] = true; });
+		},
+		// attachToNearestRow() on a made-up label: `widths` the row widths (0 for a blank row), the node `anchorRows` row pitches below the first baseline.
+		attachProbe: function (widths, anchorRows) {
+			var lh = effectiveLineHeight(), boxes = [], h = { lineCount: widths.length, leaderStruck: false }, ld, i;
+			widths.forEach(function (w, i2) { if (w > 0) { boxes.push(Collide.box(w / 2, i2 * lh, w, lh * 0.9, 0)); } });
+			ld = { id: 'probe', h: h, r: { x: 0, y: 0, boxes: boxes }, g: Collide.segment(-100, anchorRows * lh, 0, 0, 'leader', 'probe') };
+			attachToNearestRow(ld, { lines: widths }, [ld], [], { boxes: [], segments: [] }, null);
+			return h.leaderAttach ? h.leaderAttach.row : null;
+		},
 		fit: function () { zoomExtent(); },
 		// Pipe labels in the view, counted as drawn: shown, fields shown of fields asked, shed (shown with
 		// fewer fields than asked), hidden, level, leaders. (Task 812, round 5.)
