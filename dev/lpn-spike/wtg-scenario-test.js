@@ -48,7 +48,7 @@ async function expected(inp, ruleStep) {
 async function build(env) {
 	const parsed = env.EngCalcs.lpnInpParse(baseNet());
 	const out = env.lib.writeWtg(env.SQL, env.tplSqlite, parsed, { initial: {}, changes: [] }, { name: NAME, efficiency: 75, candidate: { scenarios: [{ name: 'Child A', inp: childNet() }] } });
-	const wtg = env.lib.patchWtgXml(env.tplWtg, out.report.removedChildScenarios, 1, out.report.removedChildAlternatives, out.report.extentFt, out.report.addedScenarios);
+	const wtg = env.lib.patchWtgXml(env.tplWtg, out.report.removedChildScenarios, out.report.baseScenarioId, out.report.removedChildAlternatives, out.report.extentFt, out.report.addedScenarios);
 	return { sqlite: out.bytes, wtg: wtg, report: out.report };
 }
 

@@ -163,7 +163,6 @@ const GPM = 0.22280092967190634 / 100;
 		ok('a roughness override is named: pipe roughness on pipe 3', r0.reason === 'unsupported' && r0.unsupported.length === 1 && r0.unsupported[0].what === 'pipe roughness' && r0.unsupported[0].ids.join() === '3', JSON.stringify(r0.unsupported));
 		ok('an elevation override is named: junction elev on J0', r1.reason === 'unsupported' && r1.unsupported.some((u) => u.what === 'junction elev' && u.ids.join() === 'J0'), JSON.stringify(r1.unsupported));
 		ok('and each says so in the not-written list of the report', D.report.notCarried.filter((x) => /^scenario (Rougher|Higher ground) not written/.test(x)).length === 2);
-		const E = write([['A', DEMAND_ONLY], ['A', DIAM_ONLY], ['', DIAM_ONLY], ['Nested', DIAM_ONLY]].map((x, i) => x), null);
 		ok('(names) a repeated or empty name is refused, a nested scenario is refused', (() => {
 			const parsed = EC.lpnInpParse(BASE);
 			const w = lib.writeWtg(SQL, env.tplSqlite, parsed, { initial: {}, changes: [] }, { name: 'x', candidate: { scenarios: [{ name: 'A', inp: DEMAND_ONLY }, { name: 'A', inp: DIAM_ONLY }, { name: '', inp: DIAM_ONLY }, { name: 'Child', parent: 'A', inp: DIAM_ONLY }] } });
@@ -237,7 +236,84 @@ const GPM = 0.22280092967190634 / 100;
 		}
 	}
 
-	console.log('\n7. The page path is unchanged');
+	console.log('\n7. Review fixes (2026-11-14)');
+	{
+		const tw = (name, text) => { const o = lib.writeWtg(SQL, env.tplSqlite, EC.lpnInpParse(BASE), { initial: {}, changes: [] }, { name: 'x', candidate: { scenarios: [{ name: name, inp: text }] } }); return o.report; };
+		// (10) names: case-insensitive, and against alternative labels too
+		const w3 = lib.writeWtg(SQL, env.tplSqlite, EC.lpnInpParse(BASE), { initial: {}, changes: [] }, { name: 'x', candidate: { scenarios: [{ name: 'Dry', inp: DEMAND_ONLY }, { name: 'dRY', inp: DIAM_ONLY }, { name: 'base', inp: DIAM_ONLY }, { name: 'Base Physical', inp: DIAM_ONLY }] } });
+		ok('(10) a name that differs only by capitals, "base", and an alternative\'s label ("Base Physical") are all refused, and said so in notCarried',
+			w3.report.scenarios.map((x) => x.written).join() === 'true,false,false,false' && w3.report.notCarried.filter((x) => /^scenario ".*" not written: its name is empty, or already used/.test(x)).length === 3, w3.report.scenarios.map((x) => x.reason || 'ok').join());
+		// (3) demand rows keep Base's order: a junction with three demand rows, all changed
+		const MULTI = (a, b, c) => BASE.replace('[PIPES]', '[DEMANDS]\n J1 ' + a + ' P1\n J1 ' + b + '\n J1 ' + c + '\n\n[PIPES]');
+		const M0 = MULTI(40, 25, 12), M1 = MULTI(55, 7, 33);
+		const pm = EC.lpnInpParse(M0);
+		const mo = lib.writeWtg(SQL, env.tplSqlite, pm, { initial: {}, changes: [] }, { name: 'x', candidate: { scenarios: [{ name: 'M', inp: M1 }] } });
+		const mdb = new SQL.Database(new Uint8Array(mo.bytes));
+		const j1 = one(mdb, "SELECT ElementID AS e FROM HMIModelingElement WHERE Label = 'J1' AND ElementType = 3").e;
+		const sidM = mo.report.scenarios[0].id;
+		const flowsOf = (alt) => rows(mdb, 'SELECT DemandCollection_BaseFlow AS f FROM IdahoDemandNode_Demand_DemandCollection WHERE DomainElementID = ? AND AlternativeID = ? ORDER BY ItemID', [j1, alt]).map((r) => Math.round(r.f / GPM * 1e6) / 1e6);
+		const altOf = (sid) => one(mdb, 'SELECT AlternativeID AS a FROM HMIScenarioAlternative WHERE ScenarioID = ? AND AlternativeTypeID = 20', [sid]).a;
+		const baseId = mo.report.baseScenarioId;
+		ok('(3) three demand rows: Base keeps 40, 25, 12 and the child holds 55, 7, 33, each in its own place', mo.report.scenarios[0].written && flowsOf(altOf(baseId)).join() === '40,25,12' && flowsOf(altOf(sidM)).join() === '55,7,33', flowsOf(altOf(baseId)).join() + ' | ' + flowsOf(altOf(sidM)).join());
+		// (4) no IdahoPipe_Physical_Data row in the template: the scenario is left out by name, nothing throws
+		{
+			const t2 = new SQL.Database(new Uint8Array(env.tplSqlite));
+			t2.run('DELETE FROM IdahoPipe_Physical_Data');
+			let r4 = null, threw = null;
+			try { r4 = lib.writeWtg(SQL, t2.export(), EC.lpnInpParse(BASE), { initial: {}, changes: [] }, { name: 'x', allowUntestedSchema: true, candidate: { scenarios: [{ name: 'A', inp: DIAM_ONLY }] } }).report; } catch (e) { threw = e; }
+			if (threw || !r4) { console.log('   ' + (threw ? threw.message : JSON.stringify(r4 && r4.scenarios))); }
+			ok('(4) a template with no pipe Physical rows: no throw, the scenario is named as not written', !threw && r4 && r4.scenarios[0].written === false && r4.scenarios[0].reason === 'layout' && r4.notCarried.some((x) => /holds no IdahoPipe_Physical_Data rows to copy/.test(x)), threw ? String(threw.message) : '');
+			t2.close();
+		}
+		// (5) many overrides: 400 pipes through the shared per-kind table list, every diameter lands (timing is in dev/wtg-export.md)
+		{
+			const N = 400;
+			let big = '', bigK = '', bj = '', bc = '', bp = '', bpk = '';
+			for (let i = 1; i <= N; i++) { bj += ' K' + i + '\t45\t5\t\t;\n'; bc += ' K' + i + '\t' + i + '.00\t3.00\n'; bp += ' Q' + i + '\t' + (i === 1 ? 'J1' : 'K' + (i - 1)) + '\tK' + i + '\t100\t8\t120\t0\tOpen\t;\n'; bpk += ' Q' + i + '\t' + (i === 1 ? 'J1' : 'K' + (i - 1)) + '\tK' + i + '\t100\t10\t120\t0\tOpen\t;\n'; }
+			const tiny = fs.readFileSync(path.join(__dirname, 'reference', 'wtg-export-tiny.inp'), 'utf8');
+			const mk = (pp) => tiny.replace('[RESERVOIRS]', bj + '\n[RESERVOIRS]').replace(/(\[PIPES\]\n[^\n]*\n)/, '$1' + pp).replace(/(\[COORDINATES\]\n[^\n]*\n)/, '$1' + bc);
+			const bo = lib.writeWtg(SQL, env.tplSqlite, EC.lpnInpParse(mk(bp)), { initial: {}, changes: [] }, { name: 'x', candidate: { scenarios: [{ name: 'Wide', inp: mk(bpk) }] } });
+			const bdb = new SQL.Database(new Uint8Array(bo.bytes));
+			const sidB = bo.report.scenarios[0].id;
+			const pa = one(bdb, 'SELECT AlternativeID AS a FROM HMIScenarioAlternative WHERE ScenarioID = ? AND AlternativeTypeID = 4', [sidB]).a;
+			const d = rows(bdb, 'SELECT Physical_PipeDiameter AS d FROM IdahoPipe_Physical_Data WHERE AlternativeID = ?', [pa]);
+			const bd = rows(bdb, 'SELECT Physical_PipeDiameter AS d FROM IdahoPipe_Physical_Data WHERE AlternativeID = ?', [bo.report.baseScenarioId ? one(bdb, 'SELECT AlternativeID AS a FROM HMIScenarioAlternative WHERE ScenarioID = ? AND AlternativeTypeID = 4', [bo.report.baseScenarioId]).a : 0]);
+			ok('(5) 400 pipes overridden: 400 child rows at 10 in, Base untouched (8 in)', bo.report.scenarios[0].pipeDiameters === N && d.length === N && d.every((r) => near(r.d * 12, 10, 1e-9)) && bd.filter((r) => near(r.d * 12, 8, 1e-9)).length >= N && bo.report.integrity === 'ok');
+		}
+		// (1, 2, 8) the .wtg: Base numbered above 30, the child's rows placed by the real Base id, an unplaceable .wtg is an error
+		{
+			const BIG = 44;
+			const wtg44 = env.tplWtg.replace(/<Node Identifier="1" IsGuid="false" IsInt="true" \/>/, '<Node Identifier="' + BIG + '" IsGuid="false" IsInt="true" />').replace(/<ScenarioSettings ScenarioID="1" /, '<ScenarioSettings ScenarioID="' + BIG + '" ');
+			const G = write([['Wet year', SCEN1]]);
+			const kid = G.report.addedScenarios[0];
+			const w = lib.patchWtgXml(wtg44, G.report.removedChildScenarios, BIG, G.report.removedChildAlternatives, G.report.extentFt, [kid]);
+			const blocks = w.match(/<TreeExpandedStateManager Count="\d+">[\s\S]*?<\/TreeExpandedStateManager>/g) || [];
+			const holder = blocks.filter((b) => b.indexOf('Identifier="' + kid + '"') >= 0);
+			ok('(1) Base numbered 44: the child\'s tree node follows Base\'s, in the one block that holds it, and that block\'s count is right', holder.length === 1 && new RegExp('<Node Identifier="' + BIG + '" IsGuid="false" IsInt="true" />\\s*<Node Identifier="' + kid + '"').test(holder[0]) && /Count="(\d+)"/.exec(holder[0])[1] === String((holder[0].match(/<Node /g) || []).length));
+			let msg = '';
+			try { lib.patchWtgXml(wtg44, G.report.removedChildScenarios, 1, G.report.removedChildAlternatives, G.report.extentFt, [kid]); } catch (e) { msg = e.message; }
+			ok('(1) asked for a Base the .wtg has no tree node for: an error that says so, not a silent skip', /no tree node for the Base scenario \(1\)/.test(msg), msg);
+			msg = '';
+			try { lib.patchWtgXml(env.tplWtg.split('ScenarioAnimationSettingStorageElement').join('Gone'), G.report.removedChildScenarios, 1, G.report.removedChildAlternatives, G.report.extentFt, [kid]); } catch (e) { msg = e.message; }
+			ok('(1) a .wtg with no animation settings block is an error too', /no scenario animation settings block/.test(msg), msg);
+			const ia = w.indexOf('<ScenarioSettings ScenarioID="' + kid + '"'), ib = w.indexOf('<ScenarioSettings ScenarioID="' + BIG + '"');
+			ok('(2) the child\'s animation setting is listed before Base\'s, as TGH-1 (38, 1) and Tom\'s 11-13 save (60, 1) list them', ia > 0 && ib > ia);
+			const cs = /<ComputeStatusIndicator ScenarioCount="(\d+)"/.exec(w)[1];
+			ok('(8) ComputeStatusIndicator counts its Scenario rows (computed scenarios only: the 11-13 save has 1 beside two scenarios, and the child, never computed, has no row)', cs === String((w.match(/<Scenario ScenarioId=/g) || []).length) && cs === '1');
+		}
+		// (7) one place states the conversions: with Demand Multiplier 2 the Base rows and the child's override both carry it
+		{
+			const m2 = (t) => t.replace('[OPTIONS]\n', '[OPTIONS]\n Demand Multiplier \t2\n');
+			const mo2 = lib.writeWtg(SQL, env.tplSqlite, EC.lpnInpParse(m2(BASE)), { initial: {}, changes: [] }, { name: 'x', candidate: { scenarios: [{ name: 'M', inp: m2(DEMAND_ONLY) }] } });
+			const db2 = new SQL.Database(new Uint8Array(mo2.bytes));
+			const j = one(db2, "SELECT ElementID AS e FROM HMIModelingElement WHERE Label = 'J1' AND ElementType = 3").e;
+			const alt = (sid) => one(db2, 'SELECT AlternativeID AS a FROM HMIScenarioAlternative WHERE ScenarioID = ? AND AlternativeTypeID = 20', [sid]).a;
+			const fl = (sid) => Math.round(one(db2, 'SELECT DemandCollection_BaseFlow AS f FROM IdahoDemandNode_Demand_DemandCollection WHERE DomainElementID = ? AND AlternativeID = ?', [j, alt(sid)]).f / GPM * 1e6) / 1e6;
+			ok('(7) Demand Multiplier 2: Base stores 600 gpm for 300, the child 840 for 420, through the one conversion', mo2.report.scenarios[0].written && fl(mo2.report.baseScenarioId) === 600 && fl(mo2.report.scenarios[0].id) === 840, fl(mo2.report.baseScenarioId) + ' / ' + fl(mo2.report.scenarios[0].id));
+		}
+	}
+
+	console.log('\n8. The page path is unchanged');
 	ok('no scenarios asked: the report has no scenario list, no QBAT and the counts of one scenario', !plain.report.scenarios && rows(plain.db, 'SELECT * FROM QBATDefinition').length === 0 && rows(plain.db, 'SELECT * FROM HMIScenario').length === 1);
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall checks passed');
