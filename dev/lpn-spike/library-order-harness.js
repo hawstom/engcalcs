@@ -377,6 +377,17 @@ head('5. rules move as blocks');
 		ok('...and the project file holds the new order', same(L.serialize(true).rules, d.rules));
 		const inp = EngCalcs.lpnExportInp(d).inp, order = [...inp.matchAll(/^RULE (\w+)/gm)].map((m) => m[1]);
 		ok('...and the .inp writes [RULES] in that order', same(order, ['C', 'A', 'B']), JSON.stringify(order));
+		// the flat text is cut into rules once for the action, not once for every question the move asks of it
+		{
+			const split = EngCalcs.lpnRuleSplit;
+			let cuts = 0;
+			EngCalcs.lpnRuleSplit = function () { cuts++; return split.apply(this, arguments); };
+			L.libOrderSelect('rules', 1);
+			L.libOrderMove('rules', 'down');
+			EngCalcs.lpnRuleSplit = split;
+			ok('one Move on a rule cuts the [RULES] text at most twice (' + cuts + ')', cuts > 0 && cuts <= 2, String(cuts));
+		}
+		L.undo();
 		L.undo();
 		ok('one undo gives the text back exactly', same(L.getDoc().rules, RULES));
 		ok('an unmoved rule list exports as it came', same(L.getDoc().rules, RULES) && EngCalcs.lpnExportInp(L.getDoc()).inp.indexOf('RULE A') < EngCalcs.lpnExportInp(L.getDoc()).inp.indexOf('RULE B'));

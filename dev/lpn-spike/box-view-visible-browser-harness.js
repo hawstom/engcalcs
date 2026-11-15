@@ -129,7 +129,7 @@ async function main() {
 		await a.settle(400);
 		ok('the setting changed', (await box0.isChecked()) !== was);
 		await toEnd('lpn_setbox_content');
-		v = await view('lpn_setbox_content');
+		let v = await view('lpn_setbox_content');
 		ok('Settings scrolled to the end of its blank room is an empty view (the room is its own design)', v.inView === 0 && v.top === v.range, JSON.stringify(v));
 		await P.evaluate(() => { if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); } });
 		await P.mouse.move(700, 800);
