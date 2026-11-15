@@ -3062,12 +3062,12 @@ var EngCalcs = EngCalcs || {};
 				if (!rec) { return; }
 				seen[id] = true; recs.push(rec);
 			};
-			// **AN ASSEMBLY'S BLOCK GIVES ROWS UP FOR ITS OWN SAKE ONLY, NEVER AS SOMEBODY ELSE'S BLOCKER** (Round 8; Tom, 2026-11-14: "two labels, where we need
+			// **A WELL'S BLOCK GIVES ROWS UP FOR ITS OWN SAKE ONLY, NEVER AS SOMEBODY ELSE'S BLOCKER** (Round 8; Tom, 2026-11-14: "two labels, where we need
 			// four"). A neighbour that found no side (Net1's N23 at the window's edge) enlists every label overlapping any of its 28 candidate sides, and each of
 			// those gave up its lowest-ranked value per rung: two rungs took both of a Well's member rows, leaving its heading alone, in a view with room all round it.
 			var blocksOnly = function (id) {
-				var n = nodeOf[id], ne = n && nodeEls[n.id];
-				if (!(ne && ne.allLines && assemblyBlockLines(ne.allLines))) { enlist(id); }
+				var n = nodeOf[id], ne = n && nodeEls[n.id], a = n && assemblyOfNode(n.id);
+				if (!(ne && ne.allLines && assemblyBlockLines(ne.allLines) && a && a.kind === 'well')) { enlist(id); }
 			};
 			dropped.forEach(function (lbl) {
 				enlist(lbl.id);

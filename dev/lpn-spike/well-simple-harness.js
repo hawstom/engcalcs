@@ -8,9 +8,9 @@
 //      results only, and every heading shows its rows before a run as well as after (Tom: nothing appeared under most headings);
 //   3. the ground elevation is the discharge node's and the static level the reservoir's and the pump node's, each reaching only its own mates;
 //   4. Explode leaves plain elements; deleting a member dissolves the group; undo restores it;
-//   5. the .inp comment is `;ASSEMBLY: well R U D V P`, read back as a tankless Well, and written back byte-identically;
+//   5. the .inp comment is `;ASSEMBLY: well R D P V W ID=P` (Round 8), read back as a tankless Well, and written back byte-identically;
 //   6. the Explode tips, for both forms, in the words Tom gave;
-//   7. one label block for the assembly, headed by its ID, member rows tagged by their own IDs, every other member's label empty;
+//   7. one label block for the assembly, headed by its ID (Z, Q, P), W1R and W1D rows tagged by their own IDs, every other member's label empty;
 //   8. no valve symbol is drawn at a Well, and the symbol sits on the discharge node.
 //
 // Copyright 2009 Thomas Gail Haws

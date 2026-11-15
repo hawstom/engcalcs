@@ -322,7 +322,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **Why the block showed two rows where it should have four (`well-block-rows-browser-harness.js`):** not a setting and not a row that was never built. A node
   whose label finds no side (Net1's N23, at the window's edge) makes `shedNodeLabelsForCrowding()` enlist every label that overlaps any of its 28 candidate
   sides and take that label's lowest-ranked value, once a rung, for two rungs; a Well's block was among them and lost its member rows in a view with room
-  all round it. A Well's block is now shed for its own sake only (`blocksOnly()`). What remains is honest crowding: in Net1's densest pipes (11, 21, 112)
+  all round it. A Well's block is now shed for its own sake only (`blocksOnly()`; a Pump+ or Valve+ block still sheds as a blocker). What remains is honest crowding: in Net1's densest pipes (11, 21, 112)
   no clear side exists for a block 190 px wide until the view is about twice the fit, and the block is then not drawn at all.
 - **The "box" in the hole was the pump's and the drawdown valve's own symbols** (`well-symbol-browser-harness.js`): choosing a curve rebuilds those links, and a link built after `buildDom()` drew its solid symbol over the Well's (only `syncAssemblyGlyphs()` hid them, once, at the build); `buildLinkEls()` now hides a well link's symbol where it makes it.
 - **Symbol:** the water-level line across the narrow hole at the drawdown, `lib/Icons.lib.php`. The upper hole's tint is the reservoir's and the tank's: one
