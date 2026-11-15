@@ -65836,7 +65836,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		hydNumberRow('specificGravity', 'lpn_settings_specific_gravity', 'Specific gravity',
 			'', 1);
-		hydNumberRow('viscosity', 'lpn_settings_viscosity', 'Relative viscosity',
+		hydNumberRow('viscosity', 'lpn_settings_viscosity', 'Viscosity',
 			'lpn_settings_viscosity_tip', 1);
 		hydNumberRow('emitterExponent', 'lpn_settings_emitter_exponent', 'Emitter exponent',
 			'lpn_settings_emitter_exponent_tip', 0.5);
