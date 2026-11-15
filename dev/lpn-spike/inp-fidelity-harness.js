@@ -192,17 +192,36 @@ function worst(a, b, scale) {
 			ep.ok ? worst(ep.heads, ref, scale).toFixed(4) + ' m' : JSON.stringify(ep.issues));
 	}
 	{
-		// US Darcy-Weisbach: EPANET's roughness is in millifeet, a unit this page's Roughness
-		// selector does not offer. Carried as written, and the project refuses to solve.
-		const { doc } = importDoc(US_DW);
+		// US Darcy-Weisbach: EPANET's roughness is in MILLIFEET. The Roughness selector offers that
+		// unit, the file's numbers are carried untouched, and the project solves in both engines.
+		const { parsed, doc } = importDoc(US_DW);
 		ok('D-W, US: the imported project says dw', doc.settings.method === 'dw');
+		ok('D-W, US: the Roughness unit is millifeet', doc.units.lpn_u_roughness === 'millifeet', String(doc.units.lpn_u_roughness));
 		const out = exportOf(doc);
 		ok('D-W, US: re-export states Headloss D-W', rowsOf(out.inp, 'OPTIONS').indexOf('Headloss D-W') >= 0);
 		ok('D-W, US: every pipe row comes back as the file wrote it',
 			JSON.stringify(rowsOf(out.inp, 'PIPES')) === JSON.stringify(rowsOf(US_DW, 'PIPES')), JSON.stringify(rowsOf(out.inp, 'PIPES')));
+		ok('D-W, US: the export reports no roughness difference',
+			!out.differences.some((d) => d.code === 'roughness-method' || d.code === 'unit-converted'), JSON.stringify(out.differences));
 		open(doc);
-		const issues = EC.lpnDiagnose(L.assembleModel());
-		ok('D-W, US: the solve is refused by name (roughness in millifeet)', issues.some((d) => d.code === 'roughness-unit'), JSON.stringify(issues));
+		const model = L.assembleModel();
+		const issues = EC.lpnDiagnose(model);
+		ok('D-W, US: nothing refuses the solve', issues.length === 0, JSON.stringify(issues));
+		const ref = await rawHeads(US_DW), scale = parsed.scale.head;
+		const nat = EC.lpnSolve(model, { tol: 1e-9 });
+		ok('D-W, US: built-in solver is within ' + HEAD_TOL + ' m of EPANET on the file', nat.ok && worst(nat.heads, ref, scale) < HEAD_TOL,
+			nat.ok ? worst(nat.heads, ref, scale).toFixed(4) + ' m' : JSON.stringify(nat.issues));
+		const ep = await EC.lpnSolveEpanet(L.assembleModel(), {});
+		ok('D-W, US: EPANET through the page is within ' + HEAD_TOL + ' m of EPANET on the file', ep.ok && worst(ep.heads, ref, scale) < HEAD_TOL,
+			ep.ok ? worst(ep.heads, ref, scale).toFixed(4) + ' m' : JSON.stringify(ep.issues));
+		// The probe can fail: the same pipes read as FEET would give a visibly different answer.
+		const asFeet = rowsOf(US_DW, 'PIPES').length && US_DW.replace(/ 0\.85 /, ' 850 ');
+		ok('the probe can fail: a roughness of 850 millifeet is not 0.85', ref.J1 !== (await rawHeads(asFeet)).J1);
+		// A typed value in feet converts into millifeet on the way out, said once.
+		const ft = JSON.parse(JSON.stringify(doc)); ft.units.lpn_u_roughness = 'ft';
+		const fOut = exportOf(ft);
+		ok('D-W, US: a roughness typed in ft is written in millifeet and the export says so',
+			fOut.differences.some((d) => d.code === 'unit-converted' && /roughness: ft -> millifeet/.test(d.detail)), JSON.stringify(fOut.differences));
 	}
 
 	// =============================================================================================

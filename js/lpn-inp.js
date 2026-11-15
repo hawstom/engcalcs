@@ -2905,26 +2905,14 @@
 			return { same: false, mul: ff / fp };
 		}
 		// **D-W ROUGHNESS IS A LENGTH IN EPANET'S OWN UNIT** (EPANET 2.2 manual, Network Data):
-		// millimetres in an SI file, MILLIFEET in a US one. Millimetres is a unit this page offers,
-		// so an SI project whose Roughness selector shows millimetres passes its characters through
-		// and any other unit converts, said once. Millifeet is not offered: a project that carries a
-		// US file's own roughness (`settings.roughnessFileUnit`) writes it back untouched, and one
-		// typed on this page in feet or inches is converted into it, said once. H-W's C and C-M's n
-		// are dimensionless and pass through.
-		var cRough = { same: true, mul: 1 };
-		// A document saved before the Roughness selector existed has no unit to convert from; it is
+		// millimetres in an SI file, MILLIFEET in a US one. Both are units the Roughness selector
+		// offers, so a project whose selector shows the file's unit passes its characters through
+		// and any other unit converts, said once. H-W's C and C-M's n are dimensionless and pass
+		// through. A document saved before the selector existed has no unit to convert from; it is
 		// written as stored, as it always was.
+		var cRough = { same: true, mul: 1 };
 		if ((doc.settings || {}).method === 'dw' && units.lpn_u_roughness) {
-			if (sys === 'si') {
-				cRough = converter(units.lpn_u_roughness, 'mm', 'roughness');
-			} else if ((doc.settings || {}).roughnessFileUnit !== 'millifeet') {
-				var rtab = EngCalcs.unitFactors || {},
-					rfp = Object.prototype.hasOwnProperty.call(rtab, units.lpn_u_roughness) ? rtab[units.lpn_u_roughness] : undefined;
-				if (rfp !== undefined) {
-					cRough = { same: false, mul: rtab.ft * 1000 / rfp };
-					diff('unit-converted', [], 'roughness: ' + units.lpn_u_roughness + ' -> millifeet');
-				}
-			}
+			cRough = converter(units.lpn_u_roughness, sys === 'si' ? 'mm' : 'millifeet', 'roughness');
 		}
 		var cLen = converter(units.lpn_u_length, fileU.len, 'length'),
 			cDia = converter(units.lpn_u_diameter, fileU.dia, 'diameter'),

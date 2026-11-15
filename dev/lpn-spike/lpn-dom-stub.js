@@ -694,10 +694,10 @@ function setUnitSet(which) {
   // here and that is not an omission.
   mkUnitSelect('lpn_u_age', 'elapsed_time', familyUnits('elapsed_time'), 'hr');
   // Darcy-Weisbach roughness height e (ROADMAP Task 271) -- family `roughness`, which lib/Units.lib.php
-  // aliases to $u_distance (m/mm/ft/in), us => ft, si => mm. Conditional in the PAGE (shown only
+  // lists m/mm/ft/in and millifeet (EPANET's US D-W unit), us => ft, si => mm. Conditional in the PAGE (shown only
   // under Darcy-Weisbach) but unconditional here: applyMethodUI() hides the row, and a stub that
   // withheld the select would make that hiding untestable.
-  mkUnitSelect('lpn_u_roughness', 'roughness', [u('m'), u('mm'), u('ft'), u('in')], us ? 'ft' : 'mm');
+  mkUnitSelect('lpn_u_roughness', 'roughness', [u('m'), u('mm'), u('ft'), u('in'), u('millifeet')], us ? 'ft' : 'mm');
   // The wrapper applyMethodUI() shows and hides. Created here so every harness has it, since it is
   // part of the units strip's markup rather than of any one test.
   ensure('lpn_u_roughness_row');

@@ -18,6 +18,7 @@ $ec_lang['u_grade']='rise/run';
 $ec_lang['u_in2']='sq. in.';
 $ec_lang['u_inh2o']='in H2O';
 $ec_lang['u_in']='in';
+$ec_lang['u_millifeet']='millifeet';
 $ec_lang['u_knpcm2']='kN/cm^2';
 $ec_lang['u_knpm2']='kN/m^2';
 $ec_lang['u_kpa']='kPa';
@@ -2431,7 +2432,7 @@ $ec_lang['lpn_inp_backdrop_attach_tip']='A web page cannot automatically open an
 $ec_lang['lpn_inp_backdrop_attached']='Attached {file}, placed where the file says it belongs.';
 $ec_lang['lpn_inp_backdrop_attached_other']='Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.';
 $ec_lang['lpn_inp_report_lead']='This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:';
-$ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.';
+$ec_lang['lpn_inp_drop_headloss']='This file names a head loss formula EPANET does not accept, so the pipe roughness numbers were kept as written and read as Hazen-Williams.';
 $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a volume curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation uses it to compute the level as the tank fills and drains. A single-period analysis is unaffected, because the water surface is at the level stated in the file. The diameter in the file is kept beside the curve and is used to draw and solve a tank with no curve.';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know what became of a valve
