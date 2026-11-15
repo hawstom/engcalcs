@@ -330,6 +330,12 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   sides and take that label's lowest-ranked value, once a rung, for two rungs; a Well's block was among them and lost its member rows in a view with room
   all round it. A Well's block is now shed for its own sake only (`blocksOnly()`; a Pump+ or Valve+ block still sheds as a blocker). What remains is honest crowding: in Net1's densest pipes (11, 21, 112)
   no clear side exists for a block 190 px wide until the view is about twice the fit, and the block is then not drawn at all.
+- **The opening view showed two lines, the third only after a wheel notch (Perry; `well-block-rows-browser-harness.js`):** a second cause, in the obstacle list. A
+  Well stands on three coincident nodes and two links, four drawn as nothing, yet each registered a symbol box in `staticObstacles()` on the very ground its block's
+  sides are tried on, and the Well's own symbol (3 units across at that scale) reached 0.3 into the nearest side; at some scales no side was clear for three
+  rows and the shed took the rows, until a notch changed the margins. A Well's hidden members (reservoir, drawdown node, pump and valve symbol) are no longer
+  obstacles, and the Well's own symbol is not an obstacle to its own label. A Well of a file whose labels do not tick Head shows its heading alone, rightly: the
+  member rows are Head.
 - **The "box" in the hole was the pump's and the drawdown valve's own symbols** (`well-symbol-browser-harness.js`): choosing a curve rebuilds those links, and a link built after `buildDom()` drew its solid symbol over the Well's (only `syncAssemblyGlyphs()` hid them, once, at the build); `buildLinkEls()` now hides a well link's symbol where it makes it.
 - **Symbol:** the water-level line across the narrow hole at the drawdown, `lib/Icons.lib.php`. The upper hole's tint is the reservoir's and the tank's: one
   class (`lpn-node-symbol-backdrop`, 18 % of the symbol's ink over paper).

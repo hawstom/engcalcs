@@ -7,6 +7,10 @@
 // A Well's block is now shed for its own sake only. Covered, on Net1 (the test project) at 1920 x 1080 with a Well spliced into pipe 22 (the cause's
 // case) and into pipe 11 (the densest pipe, whose block honestly stands hidden until the view is zoomed in): at every zoom the block is either all three
 // lines (the heading, W1R and W1D) or not drawn at all, and on pipe 22 it is drawn whole at the fit.
+// Round 8, Perry: "at the opening view the label is two lines; the W1R line is missing until the first wheel notch." The Well's own hidden members (a
+// reservoir, a drawdown node, a pump and a valve drawn as nothing) and its own symbol stood as obstacles on the sides its block is tried on, so none was
+// clear for three rows until a notch changed the margins. Covered with no wheel at all: a Well placed on open ground close below-right of Net1 and given both
+// curves, and the Wells of a file saved before this round, right after File, Open (its labels do not show Head, so the heading is the whole block).
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -78,6 +82,52 @@ async function walk(browser, env, pipe, notches) {
 	return { seen, errors };
 }
 
+// A Well placed on open ground just below and to the right of Net1 (the spot nearest the network), curves chosen, and its label at the opening view: no wheel.
+async function openGround(browser) {
+	const a = await Session.open(browser, NAME + '-ground', { viewport: { width: 1400, height: 1000 } });
+	const P = a.page;
+	await P.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (r) => r.abort());
+	await a.goto('Looped-Network.php?ec_nolog=1');
+	await P.evaluate(() => { localStorage.clear(); localStorage.setItem('lpn_hovercard', 'off'); });
+	await a.reload(); await a.answerTrainingPanel().catch(() => {});
+	await P.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+	await a.settle(1000);
+	await P.setInputFiles('#lpn_project_file', FILE);
+	await a.settle(2200);
+	const nodeC = (id) => P.evaluate((i) => { const e = Array.from(document.querySelectorAll('#lpn_canvas [data-node="' + i + '"]')).filter((x) => x.getBoundingClientRect().width > 0)[0]; if (!e) { return null; } const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, id);
+	const b = await nodeC('32'), d = await nodeC('23');
+	await a.menuClickSub('Insert', 'Well', 'project');
+	await P.mouse.click(Math.max(d.x, b.x) + 100, b.y + 20); await a.settle(900);
+	await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(500);
+	const c = await nodeC('W1');
+	await P.mouse.click(c.x, c.y); await a.settle(900);
+	const setSel = async (idx, text) => { await P.evaluate(([i, t]) => { const s = document.querySelectorAll('#lpn_popup_fields select')[i]; const o = Array.from(s.options).find((x) => x.textContent.indexOf(t) >= 0); s.value = o.value; s.dispatchEvent(new Event('change', { bubbles: true })); }, [idx, text]); await a.settle(500); };
+	await setSel(0, 'Drawdown'); await setSel(1, 'WellPump');
+	await P.keyboard.press('Escape'); await a.settle(2500);
+	const lb = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas text[data-nodelbl]')).filter((t) => /^W\d/.test(t.textContent)).map((t) => ({ text: t.textContent, rows: t.querySelectorAll('tspan').length, hidden: t.style.visibility === 'hidden' })));
+	const errors = a.errors.slice(0, 2);
+	await a.close();
+	return { lb, errors };
+}
+
+// The Wells of a file saved before this round, right after File, Open, no wheel.
+async function oldFile(browser) {
+	const a = await Session.open(browser, NAME + '-old', { viewport: { width: 1400, height: 1000 } });
+	const P = a.page;
+	await P.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (r) => r.abort());
+	await a.goto('Looped-Network.php?ec_nolog=1');
+	await P.evaluate(() => { localStorage.clear(); localStorage.setItem('lpn_hovercard', 'off'); });
+	await a.reload(); await a.answerTrainingPanel().catch(() => {});
+	await P.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+	await a.settle(1000);
+	await P.setInputFiles('#lpn_project_file', path.join(REPO, 'dev', 'lpn-spike', 'assembly-before-round8.lwn'));
+	await a.settle(3000);
+	const lb = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas text[data-nodelbl]')).filter((t) => /^W\d/.test(t.textContent)).map((t) => ({ text: t.textContent, rows: t.querySelectorAll('tspan').length, hidden: t.style.visibility === 'hidden' })));
+	const errors = a.errors.slice(0, 2);
+	await a.close();
+	return { lb, errors };
+}
+
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	({ Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js')));
@@ -97,6 +147,17 @@ async function main() {
 			else { ok('on the densest pipe it is drawn whole once zoomed in', r.seen.some((s) => s && !s.hidden && s.rows === 3), JSON.stringify(r.seen.map((s) => s && s.hidden))); }
 			ok('no uncaught page errors', r.errors.length === 0, r.errors.join(' | '));
 		}
+		console.log('\n--- a Well on open ground next to Net1, at the opening view (no wheel) ---');
+		const g = await openGround(browser);
+		console.log('        ' + JSON.stringify(g.lb.map((x) => x.rows + ' lines' + (x.hidden ? ' hidden' : ''))));
+		ok('the Well\'s block is drawn, all three lines, before any wheel notch', g.lb.length === 1 && !g.lb[0].hidden && g.lb[0].rows === 3 && /W1R H=/.test(g.lb[0].text) && /W1D H=/.test(g.lb[0].text), JSON.stringify(g.lb));
+		ok('no uncaught page errors', g.errors.length === 0, g.errors.join(' | '));
+		console.log('\n--- the Wells of a file saved before this round, right after File, Open ---');
+		const o = await oldFile(browser);
+		console.log('        ' + JSON.stringify(o.lb.map((x) => x.text.slice(0, 12) + ' ' + x.rows + ' lines' + (x.hidden ? ' hidden' : ''))));
+		// That file's label settings do not tick Head, so W1R and W1D have no number to show: the heading alone is the whole block, and is right.
+		ok('both are drawn at the opening view with their Z, Q and P (the file shows no Head, so no member rows are owed)', o.lb.length === 2 && o.lb.every((x) => !x.hidden && /^W\d Z=\S+ Q=\S+ P=\S+$/.test(x.text)), JSON.stringify(o.lb));
+		ok('no uncaught page errors', o.errors.length === 0, o.errors.join(' | '));
 	} finally {
 		await browser.close();
 		env.stopServer();

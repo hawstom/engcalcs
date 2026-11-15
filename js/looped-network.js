@@ -2025,9 +2025,16 @@ var EngCalcs = EngCalcs || {};
 	function staticObstacles() {
 		var out = { boxes: [], segments: [] };
 		doc.nodes.forEach(function (n) {
-			var r = nodeRadius(n);
+			var r = nodeRadius(n), role = wellRoleOf(n.id);
+			// **A WELL'S HIDDEN MEMBERS ARE NOT OBSTACLES, AND ITS OWN SYMBOL IS NOT AN OBSTACLE TO ITS OWN LABEL** (Round 8, Perry: "two lines at the opening view, the
+			// third after a wheel notch"). The Well stands on three coincident nodes and two links, four of them drawn as nothing; their boxes (a reservoir's, a
+			// pump's, a valve's) lay on the very sides the Well's block is tried on, and the Well's own symbol, 3 units wide, reached 0.3 into the nearest of them,
+			// so no side was clear for three rows at that scale and the shed took the rows. A drawn nothing blocks nothing; the Well's symbol blocks every other label
+			// but its own (an ordinary node's label never starts inside its own symbol either).
+			if (role === 'R' || role === 'S') { return; }
 			var sb = Collide.box(nodeDrawX(n), nodeDrawY(n), r * 2, r * 2, 0);
 			sb.kind = 'symbol'; sb.round = true;   // a node symbol is a circle (hideCoveringMovedLabels())
+			if (role === 'T') { sb.owner = nodeLabelKey(n.id); }
 			out.boxes.push(sb);
 		});
 		// A TEXT LABEL IS AN OBSTACLE, NEVER A PARTICIPANT: the user typed those words and chose
@@ -2067,7 +2074,7 @@ var EngCalcs = EngCalcs || {};
 			// never on it. Left out, labels were written over valves (the label bench, round 6:
 			// 51 at five zooms on one bent-and-valved network). The box is positionPumpSymbol()'s:
 			// linkSymbolPlace()'s point and angle, pumpSymbolSize() square.
-			if (le && le.symbolG) {
+			if (le && le.symbolG && !le.symbolG.classList.contains('lpn-asm-hid')) {
 				sz = pumpSymbolSize(l.type); a = linkSymbolPlace(l);
 				if (a) {
 					vb = Collide.box(a.x, a.y, sz, sz, a.angle);
