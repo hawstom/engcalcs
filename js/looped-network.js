@@ -47949,7 +47949,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function inpDropText(code) {
 		var pc = EngCalcs.pageConfig || {};
 		switch (code) {
-			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.';
+			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file names a head loss formula EPANET does not accept, so the pipe roughness numbers were kept as written and read as Hazen-Williams.';
 			// 'tanks' and 'links-on-tanks' are gone (Task 248): tanks are imported now, so neither
 			// case can be reported. The lang keys are retired with them.
 			// The fallback is kept in step with the key on purpose: it is what a page whose
