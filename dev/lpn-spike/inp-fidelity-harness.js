@@ -357,6 +357,63 @@ overflow ${word}
 	}
 
 	// =============================================================================================
+	console.log('\n2b. A PBV OR A GPV RIGHT AT A TANK, IN AN EXTENDED RUN (EPANET refuses only a PRV, PSV or FCV there)');
+	// The tank is wide enough not to fill in six hours. A PBV that keeps forcing water into a FULL tank
+	// has no steady answer in EPANET itself (its tank status closes the link, the next trial re-opens
+	// it, and the run ends on whichever state the last trial left), so that corner is not held here.
+	for (const [vt, setting, extra] of [['PBV', '5', ''], ['GPV', 'HL1', '\n[CURVES]\n;HEADLOSS: valve\n HL1 10 2\n HL1 25 6\n HL1 40 14\n']]) {
+		const eps = `[TITLE]
+${vt} at a tank
+
+[JUNCTIONS]
+ J1 20 8
+
+[RESERVOIRS]
+ R1 100
+
+[TANKS]
+ T1 60 20 5 30 40 0
+
+[VALVES]
+ V1 T1 J1 200 ${vt} ${setting} 0
+
+[PIPES]
+ P1 R1 J1 1000 300 100 0 Open
+${extra}
+[COORDINATES]
+ J1 0 0
+ R1 -100 0
+ T1 100 0
+
+[TIMES]
+ Duration 6:00
+ Hydraulic Timestep 1:00
+
+[OPTIONS]
+ Units LPS
+ Headloss H-W
+
+[END]
+`;
+		const { doc } = importDoc(eps);
+		open(doc);
+		const ref = await rawSeries(eps);
+		ok(vt + ' at a tank: nothing refuses the run', EC.lpnDiagnose(L.assembleModel()).length === 0, JSON.stringify(EC.lpnDiagnose(L.assembleModel())));
+		const run = await EC.lpnEpanetRun(L.assembleModel(), {});
+		const nrun = EC.lpnNativeRun(L.assembleModel());
+		for (const [label, r] of [['EPANET through the page', run], ['built-in run', nrun]]) {
+			let w = 0, frames = 0;
+			(r.frames || []).forEach((f) => {
+				const rr = ref[f.t];
+				if (!rr) { return; }
+				frames++;
+				for (const id in rr) { if (f.heads[id] !== undefined) { w = Math.max(w, Math.abs(f.heads[id] - rr[id])); } }
+			});
+			ok(vt + ' at a tank: the ' + label + ' matches EPANET on the file at every hour', r.ok && frames >= 6 && w < 0.005, frames + ' hours, worst ' + w.toFixed(4) + ' m');
+		}
+	}
+
+	// =============================================================================================
 	console.log('\n3. SEMICOLONS IN LABELS AND TITLES; ALL TITLE LINES');
 	const LBL = (title, labels) => `[TITLE]
 ${title}
