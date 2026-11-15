@@ -3,7 +3,9 @@
 //
 // Task 822, round 8 (Tom, 2026-11-14: "There should be no box. But I think there should be a water level horizontal line in the hole." and "Equal to
 // reservoir and tank, I hope?"): the Well's map symbol has a short horizontal line across the narrow hole at the drawdown level and no box; the tint
-// inside its holes is the same fill, at the same strength, as the reservoir's and the tank's symbols.
+// inside its holes is the same fill, at the same strength, as the reservoir's and the tank's symbols. The "box" Tom saw was the pump's and the drawdown
+// valve's own solid symbols: choosing a curve rebuilds those links, and a link built after buildDom() drew its symbol over the Well (found in this page,
+// round 8). So the walk here chooses both curves and asks again what is drawn on the Well.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -58,10 +60,24 @@ async function main() {
 		await a.reload(); await a.answerTrainingPanel().catch(() => {});
 		await P.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		await a.settle(1200);
-		const place = async (item, x, y) => { await a.menuClickSub('Insert', item, 'project'); await P.mouse.click(x, y); await a.settle(500); await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(300); };
-		await place('Reservoir', 500, 400);
-		await place('Tank', 700, 400);
-		await place('Well', 900, 400);
+		await P.setInputFiles('#lpn_project_file', path.join(REPO, 'dev', 'lpn-spike', 'well-test-net1.lwn'));
+		await a.settle(2500);
+		// Net1 already draws a reservoir (9) and a tank (2) as symbols; the Well goes on open ground below it.
+		await a.menuClickSub('Insert', 'Well', 'project');
+		const free = await P.evaluate(() => { for (let r = 0; r < 700; r += 30) { for (let k = 0; k < 24; k++) { const x = 1100 + r * Math.cos(k * Math.PI / 12), y = 800 + r * Math.sin(k * Math.PI / 12), e = document.elementFromPoint(x, y); if (e && e.closest && e.closest('#lpn_canvas') && !e.closest('[data-node],[data-link],.lpn-node-symbol-box,.lpn-link-symbol,text') && x > 300 && y > 250 && x < 1300 && y < 900) { return { x: x, y: y }; } } } return null; });
+		await P.mouse.click(free.x, free.y); await a.settle(900);
+		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(500);
+		const wc = () => P.evaluate(() => { const e = Array.from(document.querySelectorAll('#lpn_canvas [data-node="W1"]')).filter((x) => x.getBoundingClientRect().width > 0)[0]; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+		// What is drawn within 30 px of the Well's centre: the pump's and the drawdown valve's own symbols must not be.
+		const drawnLinkSymbols = async () => { const c = await wc(); return P.evaluate((c) => Array.from(document.querySelectorAll('#lpn_canvas .lpn-link-symbol')).filter((g) => { const b = g.getBoundingClientRect(); return getComputedStyle(g).display !== 'none' && b.width > 0 && Math.abs(b.left + b.width / 2 - c.x) < 30 && Math.abs(b.top + b.height / 2 - c.y) < 30; }).map((g) => g.getAttribute('class')), c); };
+		ok('a new Well draws no pump or valve symbol of its own', (await drawnLinkSymbols()).length === 0, JSON.stringify(await drawnLinkSymbols()));
+		// Choosing the two curves rebuilds the pump and the valve; a solve follows. That is when the pump's solid symbol used to appear over the Well.
+		const c0 = await wc();
+		await P.mouse.click(c0.x, c0.y); await a.settle(900);
+		const setSel = async (idx, text) => { await P.evaluate(([i, t]) => { const s = document.querySelectorAll('#lpn_popup_fields select')[i]; const o = Array.from(s.options).find((x) => x.textContent.indexOf(t) >= 0); s.value = o.value; s.dispatchEvent(new Event('change', { bubbles: true })); }, [idx, text]); await a.settle(500); };
+		await setSel(0, 'Drawdown'); await setSel(1, 'WellPump');
+		await P.keyboard.press('Escape'); await a.settle(2500);
+		ok('with both curves chosen and a solve done, still no pump or valve symbol is drawn over the Well (Tom: "no box")', (await drawnLinkSymbols()).length === 0, JSON.stringify(await drawnLinkSymbols()));
 		const symbols = await P.evaluate(() => {
 			const fill = (sel) => { const e = document.querySelector(sel); if (!e) { return null; } const cs = getComputedStyle(e); return { fill: cs.fill, op: cs.fillOpacity, cls: e.getAttribute('class') }; };
 			const well = document.querySelector('#lpn_canvas .lpn-node-symbol-well');

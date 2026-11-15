@@ -311,9 +311,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 
 ### Round 8 (Tom, 2026-11-14, from his round 7 pass; `assembly-ids-harness.js`, `well-label-rows-harness.js`, `well-tee-harness.js`)
 
-- **THE TRANSPARENCY RULE, NO EXCEPTIONS:** every member element of every assembly form (Pump+, Valve+, Well, Well with tank) is listed in the group's Properties under
-  its own ID (*"I like that we are transparent in that we list every model element in Properties. Let's ensure that we make that a rule with no exceptions."*).
-  A Well with tank therefore also lists its pipe, tee, pipe and tank, results only. `assembly-ids-harness.js` builds each form and asserts it.
+- **THE RULE, NO EXCEPTIONS: every member element of every assembly form (Pump+, Valve+, Well, Well with tank) is listed in the group's Properties under its own ID** (Tom, 2026-11-14: *"I like that we are transparent in that we list every model element in Properties. Let's ensure that we make that a rule with no exceptions."*); `assembly-ids-harness.js` builds each form and asserts it, so a new member owes a section in `renderWellFields()`/`renderAssemblyFields()`.
 - **IDs (Tom's list):** W1 the Well; W1R aquifer reservoir (node); W1DV virtual valve for well drawdown (link); W1D node that shows drawdown; W1P physical pump
   (link); W1 the node at the outlet. The group's ID is its bearer's (`assemblyBearer()`): the outlet node's for a Well made since this round, the pump's for
   an older one, the device's for a Pump+ or Valve+. It follows a rename of its bearer only, and never of another member. The group is not in the node or the
@@ -321,6 +319,12 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   pump's). The Well prefix's Apply to all renames the bearers; no other prefix's batch takes a Well's member.
 - **The label block:** `W1 Z=, Q=, P=` (Z ground elevation, Q the pump's flow, P the pressure at the outlet node W1), then `W1R H=`, then `W1D H=`; the outlet has
   no row of its own and the drawdown valve none. Always rows.
+- **Why the block showed two rows where it should have four (`well-block-rows-browser-harness.js`):** not a setting and not a row that was never built. A node
+  whose label finds no side (Net1's N23, at the window's edge) makes `shedNodeLabelsForCrowding()` enlist every label that overlaps any of its 28 candidate
+  sides and take that label's lowest-ranked value, once a rung, for two rungs; a Well's block was among them and lost its member rows in a view with room
+  all round it. A Well's block is now shed for its own sake only (`blocksOnly()`). What remains is honest crowding: in Net1's densest pipes (11, 21, 112)
+  no clear side exists for a block 190 px wide until the view is about twice the fit, and the block is then not drawn at all.
+- **The "box" in the hole was the pump's and the drawdown valve's own symbols** (`well-symbol-browser-harness.js`): choosing a curve rebuilds those links, and a link built after `buildDom()` drew its solid symbol over the Well's (only `syncAssemblyGlyphs()` hid them, once, at the build); `buildLinkEls()` now hides a well link's symbol where it makes it.
 - **Symbol:** the water-level line across the narrow hole at the drawdown, `lib/Icons.lib.php`. The upper hole's tint is the reservoir's and the tank's: one
   class (`lpn-node-symbol-backdrop`, 18 % of the symbol's ink over paper).
 - **Well with tank elevations:** a tee and a tank the Well's own placing made follow the Well's elevation until the user types one of their own into either

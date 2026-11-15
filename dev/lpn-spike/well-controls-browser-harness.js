@@ -88,7 +88,7 @@ async function main() {
 		await typeIn(/^Pump off above/, '2.5');
 		ok('they keep what was typed', (await val(/^Pump on below/)) === '1' && (await val(/^Pump off above/)) === '2.5');
 		const nHeads = await P.evaluate(() => document.querySelectorAll("#lpn_popup_fields .lpn-asm-head").length);
-		ok('the box still has its five section headings', nHeads === 5, String(nHeads));
+		ok('the box still has all its section headings: the Well\'s five and the tank branch\'s four (every member, Round 8)', nHeads === 9, String(nHeads));
 		await P.keyboard.press('Escape');
 		await clickAt('W2');
 		ok('and they are still there when the box is opened again', (await val(/^Pump on below/)) === '1' && (await val(/^Pump off above/)) === '2.5');

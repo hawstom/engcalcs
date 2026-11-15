@@ -14355,6 +14355,10 @@ var EngCalcs = EngCalcs || {};
 			// precedence must drive buildDom() rather than hand-rolling layers -- symbol-backdrop
 			// and valve-arrow both do.
 			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-' + l.type }, linkSymbolLayer || nodesLayer);
+			// **A WELL'S PUMP AND DRAWDOWN VALVE DRAW NOTHING, WHENEVER THEY ARE BUILT** (Round 8; Tom, 2026-11-14: "You misinterpreted the drawn down water level in the
+			// hole as a box"). syncAssemblyGlyphs() hid them after buildDom() only, so a link built later (choosing a curve rebuilds it) drew a solid pump and valve over the
+			// Well's symbol, which read as a box in the hole. Hidden here, where the group is already known, so no later path can forget it.
+			if ((assemblyOfLink(l.id) || {}).kind === 'well') { symbolG.classList.add('lpn-asm-hid'); }
 			// **ONE DRAWING FOR MENU AND MAP AGAIN** (Tom, 2026-09-03, correcting his own earlier
 			// steer: *"I steered you wrong about the volute. Its snout length is only about 0.6-0.7
 			// * the width of the body, not 1.0, more like the menu icon than I knew."*). A second
