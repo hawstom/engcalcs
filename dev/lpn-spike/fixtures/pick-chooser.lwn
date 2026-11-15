@@ -130,6 +130,32 @@
 				"y": "40.00"
 			},
 			"_initQuality": 0.5
+		},
+		{
+			"id": "J4",
+			"type": "junction",
+			"x": 20,
+			"y": -40,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "20.00",
+				"y": "-40.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "J5",
+			"type": "junction",
+			"x": 20,
+			"y": -40,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "20.00",
+				"y": "-40.00"
+			},
+			"_initQuality": 0.5
 		}
 	],
 	"links": [
@@ -246,15 +272,24 @@
 			"_k": 0
 		}
 	],
-	"labels": [],
+	"labels": [
+		{
+			"id": "X1",
+			"text": "Booster",
+			"x": 15,
+			"y": -39,
+			"anchorNode": null,
+			"sizeMult": 2
+		}
+	],
 	"nextId": {
-		"J": 4,
+		"J": 6,
 		"R": 2,
 		"T": 1,
 		"L": 1,
 		"P": 5,
 		"V": 1,
-		"X": 1
+		"X": 2
 	},
 	"labelSettings": {
 		"node": {

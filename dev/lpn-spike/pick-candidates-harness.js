@@ -1,4 +1,4 @@
-// Task 861 -- headless check of Geom.pickCandidates(), the rule for when one click could mean
+// Headless check of Geom.pickCandidates(), the rule for when one click could mean
 // more than one element (js/lpn-geom.js). Pure: nodes and links in, an ordered list out.
 //
 //   node dev/lpn-spike/pick-candidates-harness.js

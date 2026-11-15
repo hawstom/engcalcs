@@ -906,7 +906,7 @@ EngCalcs.lpnGeom = (function () {
 	function mercY(latDeg) { return mercRadY(latDeg) * 180 / Math.PI; }
 	function mercLat(yDeg) { return mercLatFromRad(yDeg * Math.PI / 180); }
 
-	// ---- WHICH ELEMENTS A SINGLE CLICK COULD EQUALLY MEAN (Task 861) ---------------------------
+	// ---- WHICH ELEMENTS A SINGLE CLICK COULD EQUALLY MEAN ---------------------------
 	//
 	// Pure: the caller hands in the document's nodes and links and says how to read a position, so
 	// nothing here touches the DOM or the editor's closure. Returns the ordered candidate list for

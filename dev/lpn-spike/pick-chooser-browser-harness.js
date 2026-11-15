@@ -1,4 +1,4 @@
-// **THE PICK CHOOSER** (Task 861; Tom, 2026-11-14: "a disambiguating chooser when there are
+// **THE PICK CHOOSER** (Tom, 2026-11-14: "a disambiguating chooser when there are
 // multiple elements in one click such as when any assembly is exploded"). Real Chromium, real
 // presses, on dev/lpn-spike/fixtures/pick-chooser.lwn: junction M lying on pipe P1; an exploded pump
 // assembly (junctions J1, J2, J3 at one point, a zero-length pump PU9 and a zero-length pipe P2
@@ -11,7 +11,8 @@
 //      the arrow keys and Enter choose; a Shift-held click adds the chosen element to the selection;
 //      a drag from the assembly still moves what it grabbed (and selects it); hovering a row marks
 //      that element on the map.
-//   C. Two pipes drawn over each other offer both.
+//   C. Two pipes drawn over each other offer both; two coincident junctions with a Text over them offer
+//      the Text as one more row.
 //   D. A phone (390 x 844, touch): a tap on the assembly opens the box, its rows are finger-sized
 //      (at least 44 px), a tap on a row chooses it; a tap on the junction on the pipe opens no box.
 // EC_SHOTS=<dir> saves pick-chooser-desktop.png and pick-chooser-phone.png there.
@@ -201,6 +202,21 @@ async function main() {
 		await (await rowBtn('Pipe Q2')).click();
 		await S.settle(500);
 		ok('...and choosing Pipe Q2 selects Q2 and opens it', J(await selected()) === J(['link:Q2']) && (await popupTitle()) === 'Q2', J(await selected()));
+
+		console.log('\nC2. A Text over coincident junctions is one more row');
+		await click({ x: 700, y: 820 });
+		const pile2 = await centre('#lpn_canvas [data-node="J4"]');
+		await click(pile2);
+		ok('a click on two coincident junctions with a Text over them opens the box', await chooserOpen(), J(await rows()));
+		ok('...listing the two junctions and the Text by its words', J(await rows()) === J(['Junction J4', 'Junction J5', 'Text Booster']), J(await rows()));
+		await (await rowBtn('Text Booster')).click();
+		await S.settle(500);
+		ok('...choosing the Text selects it and opens its Properties', (await page.evaluate(() => !!document.querySelector('#lpn_canvas text.lpn-lbl.lpn-selected'))) && J(await selected()) === J(['other']), J(await selected()));
+		await closeProps();
+		await click({ x: 700, y: 820 });
+		const tx = await page.evaluate(() => { const r = document.querySelector('#lpn_canvas text.lpn-lbl[data-lbl="X1"]').getBoundingClientRect(); return { x: r.right - 6, y: r.top + r.height / 2 }; });
+		await click(tx);
+		ok('a click on the Text away from the junctions selects the Text with no box', !(await chooserOpen()) && J(await selected()) === J(['other']), J([tx, pile2, await rows(), await selected()]));
 		await S.page.close();
 
 		// =========================================================== a phone, a finger

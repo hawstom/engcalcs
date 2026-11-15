@@ -59778,7 +59778,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			// A Shape is found by distance, under every asset; a selected Shape's grip over them all.
 			t = shapeHitOver(e.clientX, e.clientY, t, reachPx(e));
-			// **A PRESS THAT COULD EQUALLY MEAN SEVERAL ELEMENTS SELECTS NONE OF THEM YET** (Task 861):
+			// **A PRESS THAT COULD EQUALLY MEAN SEVERAL ELEMENTS SELECTS NONE OF THEM YET**:
 			// the tap that ends it opens the chooser (pointerup, below), and a drag from it moves what
 			// the press landed on as it always did, selecting that at the first frame of the drag
 			// (`drag.deferSel`). So a dismissed chooser has changed nothing.
@@ -60090,7 +60090,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// noteMapTap().
 			noteMapTap(downPt.touch);
 			downPt = null;
-			// A tap that could equally mean several elements asks which (Task 861); see pickPressAt().
+			// A tap that could equally mean several elements asks which; see pickPressAt().
 			if (mode === 'select' && pickPress && pickPress.id === e.pointerId) {
 				var pickAsk = pickPress;
 				pickPress = null;
@@ -60816,7 +60816,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		paneClampMenu(menu, x, y);
 		if (first) { first.focus(); }
 	}
-	// ---- THE PICK CHOOSER (Task 861) --------------------------------------------------------------
+	// ---- THE PICK CHOOSER --------------------------------------------------------------
 	//
 	// **WHEN ONE CLICK HITS MORE THAN ONE ELEMENT, ASK WHICH.** Tom, 2026-11-14: *"a disambiguating
 	// chooser when there are multiple elements in one click such as when any assembly is exploded
@@ -60866,12 +60866,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return reportTypeNoun(c.kind, c.type) + ' ' + c.id;
 	}
 	var pickPress = null;
-	// The press that may become a chooser: Select mode, the main button, on bare map, a junction or
-	// a pipe (never a label, a handle, a meter or a Shape: those were pressed on purpose).
+	// The press that may become a chooser: Select mode, the main button, on bare map, a junction, a
+	// pipe or a Text (never a data label, a handle, a meter or a Shape: those were pressed on purpose).
 	function pickPressAt(e, t) {
 		var list;
 		if (mode !== 'select' || (e.button !== undefined && e.button !== 0)) { return null; }
-		if (!t || (t !== svg && t.dataset.node === undefined &&
+		// A Text over a pile is one more thing the press could mean, so it may start a chooser too.
+		if (!t || (t !== svg && t.dataset.node === undefined && t.dataset.lbl === undefined &&
 			!(t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')))) { return null; }
 		list = pickCandidatesAt(e.clientX, e.clientY, e.pointerType === 'touch');
 		return list.length >= 2 ? { id: e.pointerId, x: e.clientX, y: e.clientY, shift: !!e.shiftKey,
