@@ -933,20 +933,23 @@ EngCalcs.lpnGeom = (function () {
 	// ORDER: nodes, then links, each by distance from the press and then by id in natural order
 	// (so J2 comes before J10). Text objects are the caller's to append after these.
 	//
-	// opts: nodeReach (6), linkReach (3), same (1.5), zero (2), all screen px; nodeX(n), nodeY(n),
+	// opts: nodeReach (6), linkReach (1.5: half the drawn stroke, floored at 3 px across, the reach the
+	// browser's own hit test gives a pipe; the caller passes the live stroke), same (1.5), zero (2), all screen px; nodeX(n), nodeY(n),
 	// linkPts(l) -> [{x, y}] and nodeOk(n), linkOk(l) read the document the way the caller draws
 	// it (default: n.x, n.y, [], always true). Each candidate is {kind: 'node'|'link', id, type,
 	// distPx}. A caller that groups elements (an assembly) maps this list afterwards; nothing here
 	// knows about groups.
 	function pickCandidates(nodes, links, wx, wy, s, opts) {
 		var o = opts || {}, nodeReach = o.nodeReach === undefined ? 6 : o.nodeReach,
-			linkReach = o.linkReach === undefined ? 3 : o.linkReach,
+			linkReach = o.linkReach === undefined ? 1.5 : o.linkReach,
 			same = o.same === undefined ? 1.5 : o.same, zero = o.zero === undefined ? 2 : o.zero,
 			nx = o.nodeX || function (n) { return n.x; }, ny = o.nodeY || function (n) { return n.y; },
 			lp = o.linkPts || function () { return []; },
 			nOk = o.nodeOk || function () { return true; }, lOk = o.linkOk || function () { return true; },
-			byId = {}, near = [], list = [], seen = {}, i, j, n, l, pts, d, nearest = null, buried = [],
-			cands = [], first, hit, group;
+			byId = {}, near = [], find, list = [], seen = {}, i, j, n, l, pts, d, nearest = null, buried = [],
+			cands = [], first, hit, group, margin, fa, fb, x0, x1, y0, y1;
+		// nodeById(id), when the caller already holds one, saves indexing every node on every press.
+		find = o.nodeById || function (id) { return byId[id]; };
 		function natural(a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); }
 		function addNode(m, dPx) {
 			if (seen['n' + m.id]) { return; }
@@ -955,8 +958,9 @@ EngCalcs.lpnGeom = (function () {
 		}
 		for (i = 0; i < nodes.length; i++) {
 			n = nodes[i];
-			if (!nOk(n)) { continue; }
-			byId[n.id] = n;
+			if (!o.nodeById) { byId[n.id] = n; }
+			// A box test before the square root; every press walks every node.
+			if (Math.abs(nx(n) - wx) * s > nodeReach || Math.abs(ny(n) - wy) * s > nodeReach || !nOk(n)) { continue; }
 			d = Math.hypot(nx(n) - wx, ny(n) - wy) * s;
 			if (d > nodeReach) { continue; }
 			near.push({ n: n, d: d });
@@ -968,9 +972,23 @@ EngCalcs.lpnGeom = (function () {
 			});
 			if (list.length < 2) { list = []; seen = {}; }
 		}
+		margin = Math.max(nodeReach, linkReach) / s;
 		for (i = 0; i < links.length; i++) {
 			l = links[i];
 			if (!lOk(l)) { continue; }
+			// **A BOX FIRST, BECAUSE THIS RUNS ON EVERY SELECT PRESS** and most links are nowhere near it.
+			// The link's end nodes and its own bends bound the polyline, so a press farther than the reach
+			// from that box is farther than the reach from the line, and the line is never built.
+			fa = find(l.from); fb = find(l.to);
+			if (fa && fb) {
+				x0 = Math.min(nx(fa), nx(fb)); x1 = Math.max(nx(fa), nx(fb));
+				y0 = Math.min(ny(fa), ny(fb)); y1 = Math.max(ny(fa), ny(fb));
+				for (j = 0; l.verts && j < l.verts.length; j++) {
+					if (l.verts[j].x < x0) { x0 = l.verts[j].x; } if (l.verts[j].x > x1) { x1 = l.verts[j].x; }
+					if (l.verts[j].y < y0) { y0 = l.verts[j].y; } if (l.verts[j].y > y1) { y1 = l.verts[j].y; }
+				}
+				if (wx < x0 - margin || wx > x1 + margin || wy < y0 - margin || wy > y1 + margin) { continue; }
+			}
 			pts = lp(l);
 			if (!pts || pts.length < 2) { continue; }
 			if (polylineLength(pts) * s <= zero) {
@@ -984,8 +1002,8 @@ EngCalcs.lpnGeom = (function () {
 		if (buried.length) {
 			buried.forEach(function (b) {
 				for (j = 0; j < 2; j++) {
-					n = byId[j ? b.l.to : b.l.from];
-					if (n) { addNode(n, Math.hypot(nx(n) - wx, ny(n) - wy) * s); }
+					n = find(j ? b.l.to : b.l.from);
+					if (n && nOk(n)) { addNode(n, Math.hypot(nx(n) - wx, ny(n) - wy) * s); }
 				}
 			});
 		}

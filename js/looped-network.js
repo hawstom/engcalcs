@@ -59773,6 +59773,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Touch only, so no pointer gesture changes at all; and ABOVE selectFromHit(), so the
 			// promoted node is what gets selected -- the pointerdown-selects rule of Task 415 stays
 			// true of a near-miss drag exactly as it is of a direct one.
+			var rawHit = t;
 			if (e.pointerType === 'touch') {
 				t = touchNodeOver(e.clientX, e.clientY, t);
 			}
@@ -59782,12 +59783,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// the tap that ends it opens the chooser (pointerup, below), and a drag from it moves what
 			// the press landed on as it always did, selecting that at the first frame of the drag
 			// (`drag.deferSel`). So a dismissed chooser has changed nothing.
-			pickPress = pickPressAt(e, t);
+			pickPress = pickPressAt(e, t, rawHit);
 			// **SHIFT ADDS, AND ADDS BY TOGGLING** (Task 266). It is how a marquee that caught one
 			// thing too many is corrected, and how a selection of three unrelated pipes is built at
 			// all -- neither of which any ring can do.
-			if (pickPress) { void 0; }
-			else if (e.shiftKey) { toggleFromHit(t); } else { selectFromHit(t); }
+			if (!pickPress) { if (e.shiftKey) { toggleFromHit(t); } else { selectFromHit(t); } }
 			if (t.dataset.shape !== undefined || t.dataset.shapept !== undefined) {
 				// A Shape moves whole; its grip moves one point (Task 779).
 				drag = shapeDragStart(t, e, common) || Object.assign({ type: 'pan', tx0: state.tx, ty0: state.ty }, common);
@@ -59875,7 +59875,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			} else {
 				drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; Object.assign(drag, common);
 			}
-			if (pickPress && drag && t !== svg) { drag.deferSel = t; drag.deferShift = !!e.shiftKey; }
+			if (pickPress && drag) { drag.deferSel = t; drag.deferShift = !!e.shiftKey; }
 		});
 		svg.addEventListener('pointermove', function (e) {
 			if (!pointers.has(e.pointerId)) { return; }
@@ -60077,7 +60077,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// still not a tap. Both, because neither alone is the whole question. See TAP_MOVE_PX
 			// for why the number is now the gesture's own rather than a flat 4.
 			if (!downPt || gestureMoved ||
-				Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) >= tapMovePx(e)) { downPt = null; return; }
+				Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) >= tapMovePx(e)) { downPt = null; pickPress = null; return; }
 			// WHAT KIND OF PRESS THIS WAS, decided here because this is where both halves of it
 			// are known. A pointer is always a plain 'click'; a finger is a 'tap' or, past the
 			// long-press threshold, a 'hold'. Nothing but the profile chooser reads it today.
@@ -60782,7 +60782,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE MAP'S RIGHT-CLICK MENU, AS A ROW LIST** -- [{label, enabled, tip, run}] -- so a later command
 	// (Task 784's Time series graph) is one more entry. A row that does not apply is greyed, never hidden.
 	// `opts` (optional): cls, an extra class; onClose(), run when it closes by any door; ghostMs, a
-	// window after a finger's tap in which the lift's compatibility mousedown does not close it. A
+	// window after a finger's tap in which the lift's compatibility mousedown does not close it; place(menu), placing it itself instead of the edge clamp. A
 	// row may carry hover(on), called when the pointer or the keyboard is on it and when it leaves.
 	function openMapContextMenu(x, y, rows, opts) {
 		var menu = document.createElement('div'), first = null;
@@ -60813,7 +60813,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
-		paneClampMenu(menu, x, y);
+		if (opts && opts.place) { opts.place(menu); } else { paneClampMenu(menu, x, y); }
 		if (first) { first.focus(); }
 	}
 	// ---- THE PICK CHOOSER --------------------------------------------------------------
@@ -60840,8 +60840,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var w = screenToWorld(cx, cy), list, seenLbl = {};
 		list = Geom.pickCandidates(doc.nodes, doc.links, w.x, w.y, state.s, {
 			nodeReach: touch ? TOUCH_REACH_PX : LPN_NODE_HIT_PX / 2,
-			linkReach: touch ? LPN_LINK_HIT_PX / 2 : LPN_LINK_HIT_FLOOR_PX,
-			nodeX: nodeDrawX, nodeY: nodeDrawY, linkPts: linkPointList,
+			// The reach the browser's own hit test gives a pipe, so a press the page takes as ON a pipe
+			// is one the rule sees (a thick stroke is hit farther from its centreline).
+			linkReach: touch ? LPN_LINK_HIT_PX / 2 : Math.max(scnSetting('linkWidth'), LPN_LINK_HIT_FLOOR_PX) / 2,
+			nodeX: nodeDrawX, nodeY: nodeDrawY, linkPts: linkPointList, nodeById: nodeById,
 			nodeOk: function (n) { return !!nodeEls[n.id]; },
 			linkOk: function (l) { return !!linkEls[l.id] && !!nodeById(l.from) && !!nodeById(l.to); }
 		});
@@ -60868,18 +60870,35 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var pickPress = null;
 	// The press that may become a chooser: Select mode, the main button, on bare map, a junction, a
 	// pipe or a Text (never a data label, a handle, a meter or a Shape: those were pressed on purpose).
-	function pickPressAt(e, t) {
+	// `raw` is what the browser's hit test answered before a finger's node precedence replaced it.
+	function pickPressAt(e, t, raw) {
 		var list;
 		if (mode !== 'select' || (e.button !== undefined && e.button !== 0)) { return null; }
 		// A Text over a pile is one more thing the press could mean, so it may start a chooser too.
 		if (!t || (t !== svg && t.dataset.node === undefined && t.dataset.lbl === undefined &&
 			!(t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')))) { return null; }
 		list = pickCandidatesAt(e.clientX, e.clientY, e.pointerType === 'touch');
+		// **THE ELEMENT THE BROWSER ACTUALLY HIT IS ALWAYS ONE OF THE ROWS** once there is a choice
+		// (a finger's pipe within reach of a pile was the pile's nodes and could never be selected
+		// there). A box is for "the map cannot tell", and here it cannot: the hit test says the pipe,
+		// the node precedence says the pile.
+		if (list.length >= 2) { [t, raw].forEach(function (h) { pickAddHit(list, h); }); }
 		return list.length >= 2 ? { id: e.pointerId, x: e.clientX, y: e.clientY, shift: !!e.shiftKey,
 			touch: e.pointerType === 'touch', list: list } : null;
 	}
+	function pickAddHit(list, h) {
+		var d = (h && h.dataset) || {}, kind, id, el;
+		if (d.node !== undefined) { kind = 'node'; id = d.node; }
+		else if (d.link !== undefined && !h.classList.contains('lpn-vhandle')) { kind = 'link'; id = d.link; }
+		else if (d.lbl !== undefined) { kind = 'label'; id = d.lbl; }
+		if (!kind || list.some(function (c) { return c.kind === kind && c.id === id; })) { return; }
+		el = kind === 'node' ? nodeById(id) : (kind === 'link' ? linkById(id) : labelById(id));
+		if (el) { list.push({ kind: kind, id: id, type: el.type }); }
+	}
+	// The row's element wears the hover mark through setHoverPreview(), the one write site, so the
+	// page's record of what is marked cannot go stale; viaLabel lights it and opens no hover card.
 	function pickHover(c, on) {
-		paintHoverPreview({ kind: c.kind, id: c.id }, on);
+		setHoverPreview(on ? { kind: c.kind, id: c.id, viaLabel: true } : null);
 	}
 	function pickChoose(c, p) {
 		var open = { node: openPopup, link: openLinkPopup, label: openLabelPopup }[c.kind];
@@ -60892,21 +60911,47 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setSelection(c.kind, c.id);
 		open(c.id, p.x, p.y);
 	}
+	// **NO ROW SITS UNDER THE PRESS POINT.** The box goes to the lower right of the point (a finger
+	// covers more, so a bigger gap), else lower left, upper right, upper left: the first that lies
+	// wholly in the window. A box taller than the window is pinned to its top and scrolls.
+	function pickPlace(menu, p) {
+		var r = menu.getBoundingClientRect(), vw = window.innerWidth || 0, vh = window.innerHeight || 0,
+			gap = p.touch ? 28 : 8, pad = 4, xs = [p.x + gap, p.x - gap - r.width], ys = [p.y + gap, p.y - gap - r.height], i, j, x, y;
+		for (j = 0; j < 2; j++) {
+			for (i = 0; i < 2; i++) {
+				x = xs[i]; y = ys[j];
+				if (x >= pad && y >= pad && x + r.width <= vw - pad && y + r.height <= vh - pad) {
+					menu.style.left = x + 'px'; menu.style.top = y + 'px';
+					return;
+				}
+			}
+		}
+		x = Math.max(pad, Math.min(xs[0], vw - pad - r.width));
+		if (x < p.x && x + r.width > p.x) { x = Math.max(pad, xs[1]); }
+		menu.style.left = x + 'px'; menu.style.top = pad + 'px';
+	}
 	function openPickChooser(p) {
 		var pc = EngCalcs.pageConfig || {};
 		openMapContextMenu(p.x, p.y, p.list.map(function (c) {
 			return { label: pickRowLabel(c), enabled: true, hover: function (on) { pickHover(c, on); },
 				run: function () { pickChoose(c, p); } };
 		}), { cls: 'lpn-pick-chooser', ghostMs: p.touch ? GHOST_CLICK_MS : 0,
-			onClose: function () { p.list.forEach(function (c) { pickHover(c, false); }); } });
-		if (paneCtxMenuEl) { paneCtxMenuEl.setAttribute('aria-label', pc.lpn_pick_chooser_label || 'Select one of the elements here'); }
+			place: function (menu) { pickPlace(menu, p); },
+			onClose: function () { pickHover(null, false); } });
+		if (paneCtxMenuEl) {
+			paneCtxMenuEl.setAttribute('aria-label', pc.lpn_pick_chooser_label || 'Select one of the elements here');
+			// A finger's lift sends a compatibility click to the point it pressed: no row answers it.
+			ghostClickShield(paneCtxMenuEl);
+		}
 	}
 	// A press elsewhere on the map while the chooser is open only closes it.
 	document.addEventListener('pointerdown', function (e) {
 		if (!paneCtxMenuEl || !paneCtxMenuEl.classList.contains('lpn-pick-chooser')) { return; }
 		if (paneCtxMenuContains(e.target) || !ctxOnCanvas(e)) { return; }
 		paneCloseContextMenu();
-		e.stopPropagation();
+		// Immediate, and registered ahead of the right-click and long-press listeners below on this same
+		// node: a press that dismisses the box must not also open a context menu or start a long press.
+		e.stopImmediatePropagation();
 	}, true);
 	// **ONLY A NODE, A LINK OR A TEXT IS INTERCEPTED** (a node's or link's own label counts as that
 	// asset, marked `onLabel`). Captured on the document ahead of the map's press handlers, so the

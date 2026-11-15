@@ -156,6 +156,45 @@
 				"y": "-40.00"
 			},
 			"_initQuality": 0.5
+		},
+		{
+			"id": "J6",
+			"type": "junction",
+			"x": 88,
+			"y": -40,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "88.00",
+				"y": "-40.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "J7",
+			"type": "junction",
+			"x": 88,
+			"y": -40,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "88.00",
+				"y": "-40.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "K2",
+			"type": "junction",
+			"x": 88,
+			"y": -75,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "88.00",
+				"y": "-75.00"
+			},
+			"_initQuality": 0.5
 		}
 	],
 	"links": [
@@ -270,6 +309,19 @@
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
+		},
+		{
+			"id": "P6",
+			"type": "pipe",
+			"from": "J6",
+			"to": "K2",
+			"verts": [],
+			"_diameter": 18,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
 		}
 	],
 	"labels": [
@@ -287,7 +339,7 @@
 		"R": 2,
 		"T": 1,
 		"L": 1,
-		"P": 5,
+		"P": 7,
 		"V": 1,
 		"X": 2
 	},

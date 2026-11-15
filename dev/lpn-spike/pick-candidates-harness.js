@@ -78,6 +78,12 @@ console.log('\n--- coincident links (no node near) ---');
 	same('crossing pipes 40 px along from the crossing: no choice',
 		run([J('A', 0, 0), J('B', 100, 100), J('C', 0, 100), J('D', 100, 0)], [L('X1', 'A', 'B'), L('X2', 'C', 'D')], 10, 10),
 		[]);
+	same('two thick pipes (reach 5 px) pressed 4 px off their centreline: both',
+		run(nodes, [L('P1', 'A', 'B'), L('P2', 'A', 'B', 'pump')], 50, 4, 1, { linkReach: 5 }), ['link:P1', 'link:P2']);
+	same('...and 6 px off is out of the stroke: no choice',
+		run(nodes, [L('P1', 'A', 'B'), L('P2', 'A', 'B', 'pump')], 50, 6, 1, { linkReach: 5 }), []);
+	same('a thin default reach (1.5 px) 4 px off: no choice',
+		run(nodes, [L('P1', 'A', 'B'), L('P2', 'A', 'B', 'pump')], 50, 4), []);
 	same('near the shared end node the node outranks both pipes: no choice',
 		run([J('A', 0, 0), J('B', 100, 0), J('C', 100, 5)], [L('P1', 'A', 'B'), L('P2', 'A', 'C')], 3, 0), []);
 }
@@ -88,6 +94,23 @@ console.log('\n--- reading the document the way the caller draws it ---');
 	same('nodeX/nodeY override (a scenario moved J2 away)', run(nodes, [], 0, 0, 1, { nodeX: (n) => (n.id === 'J2' ? 50 : n.x) }), []);
 	same('nodeOk drops a node the map does not draw', run(nodes, [], 0, 0, 1, { nodeOk: (n) => n.id !== 'J2' }), []);
 	same('linkOk drops a link', run([J('A', 0, 0), J('B', 0, 0)], [L('Z', 'A', 'B')], 0, 0, 1, { linkOk: () => false }), ['node:A', 'node:B']);
+}
+
+console.log('\n--- the box prefilter and the caller\'s own node lookup change nothing but time ---');
+{
+	const nodes = [], links = [];
+	for (let i = 0; i < 400; i++) { nodes.push(J('N' + i, (i % 20) * 10, Math.floor(i / 20) * 10)); }
+	nodes.push(J('Z1', 55, 55), J('Z2', 55, 55));
+	for (let i = 0; i < 399; i++) { links.push(L('L' + i, 'N' + i, 'N' + (i + 1))); }
+	links.push(Object.assign(L('B1', 'N0', 'N399'), { verts: [{ x: 100, y: 3 }] }));
+	const byId = {}; nodes.forEach((n) => { byId[n.id] = n; });
+	const pts = (l) => [byId[l.from]].concat(l.verts || [], [byId[l.to]]);
+	for (const p of [[55, 55], [100, 3.5], [100, 3.4], [47, 21], [5, 5]]) {
+		const a = Geom.pickCandidates(nodes, links, p[0], p[1], 1, { linkPts: pts });
+		const b = Geom.pickCandidates(nodes, links, p[0], p[1], 1, { linkPts: pts, nodeById: (id) => byId[id] });
+		ok('press at ' + p + ': same answer with the caller\'s lookup (' + a.length + ' candidate(s))', JSON.stringify(a) === JSON.stringify(b));
+	}
+	ok('the pile Z1/Z2 is found among 400 nodes', Geom.pickCandidates(nodes, links, 55, 55, 1, { linkPts: pts }).length === 2);
 }
 
 console.log(fails ? '\nFAILED: ' + fails : '\nALL PASS');
