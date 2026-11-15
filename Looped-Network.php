@@ -2568,6 +2568,7 @@ EngCalcs.pageConfig = {
 	lpn_contour_menu: <?=json_encode($ec_lang['lpn_contour_menu'])?>,
 	lpn_contour_tip: <?=json_encode($ec_lang['lpn_contour_tip'])?>,
 	lpn_contour_plot: <?=json_encode($ec_lang['lpn_contour_plot'])?>,
+	lpn_contour_none_note: <?=json_encode($ec_lang['lpn_contour_none_note'])?>,
 	lpn_contour_show: <?=json_encode($ec_lang['lpn_contour_show'])?>,
 	lpn_contour_show_tip: <?=json_encode($ec_lang['lpn_contour_show_tip'])?>,
 	lpn_contour_fill: <?=json_encode($ec_lang['lpn_contour_fill'])?>,

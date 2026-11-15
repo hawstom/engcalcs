@@ -4,9 +4,11 @@
 //   1. the box has Show plot, Fill, Fill opacity, Buffer, Show contour lines, Interval, Labels, in that order,
 //      and no Property to plot, Color scheme or Show node colors; the Show plot tip is Tom's sentence.
 //   2. the plot follows Color nodes by and Color scheme in Settings, Symbology, Node colors, and the key follows.
-//   3. with No color the plot draws nothing, Show plot keeps its tick, and the plot returns on choosing a property.
-//   4. a project saved in round 3 (it holds a `contourField`) opens, draws by Color nodes by, and saves without it.
-//   5. in a child scenario the plot follows the scenario's Color nodes by; the open box and Tables pane follow Settings.
+//   3. with No color the plot draws nothing, Show plot keeps its tick, the box says so in one line (nothing else
+//      changes; the Interval box is empty and disabled), and the plot returns on choosing a property.
+//   4. in a child scenario the plot follows the scenario's Color nodes by; the Tables pane follows too.
+//   5. in a child scenario time steps leave an open pull-down alone (no rebuild); a re-solve that changes the
+//      default interval shows in the box.
 //   6. a 390-wide phone: the box fits.
 // CONTOUR_SHOT=<dir> also writes a picture of each view there.
 
@@ -194,10 +196,19 @@ async function main2(Session, browser) {
 		let f = await facts(a.page);
 		ok('No color: no fill, no lines, no colored dots, no node key', !f.fill && f.lines === 0 && f.coloured === 0 && !/Pressure|Head/.test(f.legend), JSON.stringify({ fill: f.fill, lines: f.lines, c: f.coloured, key: f.legend.slice(0, 20) }));
 		ok('...and Show plot keeps its tick', f.show === true);
+		const note = () => a.page.evaluate(() => {
+			const body = document.getElementById('lpn_contour_body'), n = document.getElementById('lpn_contour_none_note'), iv = document.getElementById('lpn_contour_interval');
+			return { text: n ? n.textContent : null, first: !!n && body.firstChild === n, want: EngCalcs.pageConfig.lpn_contour_none_note, iv: iv.value, ivOff: iv.disabled, ctrls: body.querySelectorAll('input, select').length };
+		});
+		let nt = await note();
+		ok('No color: the box shows one plain line at the top, in the sentence the language file gives', nt.first && nt.text === nt.want && nt.want === 'Nothing to plot: choose a property under Color nodes by in Settings, Symbology, Node colors.', JSON.stringify(nt));
+		ok('...the controls stay as they are, and the Interval box is empty and disabled', nt.ctrls === f.ctrls.length && nt.iv === '' && nt.ivOff === true, JSON.stringify(nt));
 		await shot(a.page, 'contour-no-color-r4');
 		await setNode(a, 'head'); await a.settle(700);
 		f = await facts(a.page);
 		ok('choosing Head again brings the plot back, the box unchanged', f.fill && f.lines > 0 && f.show === true && /Head/.test(f.legend), JSON.stringify({ fill: f.fill, lines: f.lines, show: f.show }));
+		nt = await note();
+		ok('the line goes when a property is chosen, and the Interval box has a number again', nt.text === null && nt.iv !== '' && nt.ivOff === false, JSON.stringify(nt));
 		// Show plot cleared and ticked while No color: the tick is the user's, whatever the property.
 		await setNode(a, ''); await a.settle(500);
 		await setBox(a, 'lpn_contour_show', false);
@@ -211,41 +222,8 @@ async function main2(Session, browser) {
 	} finally { await a.close(); }
 }
 
-// A project saved in round 3 holds `contourField` in its settings (and a scenario may hold one).
-async function main3(Session, browser) {
-	console.log('\n--- 4. a round-3 project, with a retired contourField, still opens ---');
-	const a = await openNet3(Session, browser, { width: 1440, height: 900 });
-	try {
-		const key = await a.page.evaluate(() => {
-			for (let i = 0; i < localStorage.length; i++) {
-				const k = localStorage.key(i);
-				try { const d = JSON.parse(localStorage.getItem(k)); if (d && d.settings && Array.isArray(d.nodes) && d.nodes.length > 5) { return k; } } catch (e) { /* not a project */ }
-			}
-			return null;
-		});
-		ok('the open project is in storage', !!key, String(key));
-		await a.page.evaluate((k) => {
-			const d = JSON.parse(localStorage.getItem(k));
-			d.settings.contourField = 'head'; d.settings.colorNodeField = 'pressure'; d.settings.contourFill = 'smooth';
-			localStorage.setItem(k, JSON.stringify(d));
-		}, key);
-		await a.page.reload();
-		await a.answerTrainingPanel().catch(() => {});
-		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		await a.settle(2000);
-		await contourFromMenu(a);
-		const f = await facts(a.page);
-		ok('it opens and draws by Color nodes by (Pressure), ignoring the old property', f.fill && /Pressure/.test(f.legend) && f.coloured > 0, JSON.stringify({ fill: f.fill, key: f.legend.slice(0, 20) }));
-		await setBox(a, 'lpn_contour_opacity', 40);   // any edit saves the project again
-		await a.settle(600);
-		const kept = await a.page.evaluate((k) => { const d = JSON.parse(localStorage.getItem(k)); return { has: 'contourField' in d.settings, opacity: d.settings.contourOpacity }; }, key);
-		ok('saved again, the old field is gone and the new edit is kept', kept.has === false && kept.opacity === 0.4, JSON.stringify(kept));
-		noErrors(a);
-	} finally { await a.close(); }
-}
-
 async function main4(Session, browser) {
-	console.log('\n--- 5. a child scenario; the open box and the Tables pane follow Settings ---');
+	console.log('\n--- 4. a child scenario; the open box and the Tables pane follow Settings ---');
 	const a = await openNet3(Session, browser, { width: 1440, height: 900 });
 	try {
 		await newScenario(a);
@@ -310,6 +288,55 @@ async function main4(Session, browser) {
 	} finally { await b.close(); }
 }
 
+// The box is looked at on every time step; it must be rebuilt only when what it shows has changed (a child scenario's view is not `settings`).
+async function main5(Session, browser) {
+	console.log('\n--- 5. time steps in a child scenario leave an open pull-down alone ---');
+	const a = await openNet3(Session, browser, { width: 1440, height: 900 });
+	try {
+		await newScenario(a);
+		await contourFromMenu(a);
+		const mark = () => a.page.evaluate(() => { document.getElementById('lpn_contour_fill').__mark = 1; const i = document.getElementById('lpn_contour_interval'); i.__mark = 1; i.focus(); return true; });
+		const kept = () => a.page.evaluate(() => ({ fill: document.getElementById('lpn_contour_fill').__mark === 1, interval: document.getElementById('lpn_contour_interval').__mark === 1, focus: document.activeElement && document.activeElement.id }));
+		await a.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+		await a.waitFor(() => a.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'frames', 120000);
+		await a.settle(800);
+		await mark();
+		for (const h of [1, 2, 3, 6]) {
+			await a.page.evaluate((s) => EngCalcs.lpnTimeGoTo(s), h * 3600);
+			await a.settle(500);
+		}
+		const k = await kept();
+		ok('after four time steps in the child scenario the box was not rebuilt: the same pull-down, the same Interval box, the cursor still in it', k.fill && k.interval && k.focus === 'lpn_contour_interval', JSON.stringify(k));
+		noErrors(a);
+	} finally { await a.close(); }
+
+	console.log('\n--- 5b. a re-solve that changes the default interval shows in the box ---');
+	const b = await openNet3(Session, browser, { width: 1440, height: 900 });
+	try {
+		await contourFromMenu(b);
+		await openSettings(b);
+		await setNode(b, 'demandActual'); await b.settle(800);
+		const shown = () => b.page.evaluate(() => {
+			const lv = Array.from(document.querySelectorAll('#lpn_canvas path.lpn-contour-line')).map((p) => +p.getAttribute('data-level')).filter((x) => isFinite(x)).sort((x, y) => x - y);
+			const gaps = lv.slice(1).map((x, i) => +(x - lv[i]).toFixed(6)).filter((g) => g > 0);
+			return { box: parseFloat(document.getElementById('lpn_contour_interval').value), step: gaps.length ? Math.min.apply(null, gaps) : null };
+		});
+		const s1 = await shown();
+		const set = await b.page.evaluate((t) => {
+			const rows = Array.from(document.querySelectorAll('label, .lpn-setrow, tr, div')).filter((e) => e.textContent.trim().indexOf(t) === 0 && e.querySelector('input'));
+			const box = rows.length ? rows[rows.length - 1].querySelector('input') : null;
+			if (!box) { return false; }
+			box.value = '40'; box.dispatchEvent(new Event('input', { bubbles: true })); box.dispatchEvent(new Event('change', { bubbles: true })); return true;
+		}, await b.lang('bpn_demand_mult'));
+		ok('the demand multiplier box is there and was set', set);
+		await b.settle(5000);
+		const s2 = await shown();
+		ok('the plot\'s interval changed with the new range (else this check proves nothing)', s1.step !== null && s2.step !== null && s1.step !== s2.step, JSON.stringify([s1, s2]));
+		ok('and the box shows the interval the plot is drawn with, before and after', s1.box === s1.step && s2.box === s2.step, JSON.stringify([s1, s2]));
+		noErrors(b);
+	} finally { await b.close(); }
+}
+
 async function sectionPhone(Session, browser) {
 	console.log('\n--- 6. a 390-wide phone ---');
 	const a = await openNet3(Session, browser, { width: 390, height: 844 });
@@ -334,12 +361,14 @@ async function main() {
 	}
 	const browser = await chromium.launch({ executablePath });
 	try {
-		await main0(Session, browser);
-		await main1(Session, browser);
-		await main2(Session, browser);
-		await main3(Session, browser);
-		await main4(Session, browser);
-		await sectionPhone(Session, browser);
+		const only = process.env.CONTOUR_ONLY ? process.env.CONTOUR_ONLY.split(',') : null;
+		const run = (k, f) => (!only || only.indexOf(k) >= 0) ? f(Session, browser) : null;
+		await run('1', main0);
+		await run('2', main1);
+		await run('3', main2);
+		await run('4', main4);
+		await run('5', main5);
+		await run('6', sectionPhone);
 	} finally {
 		await browser.close();
 		env.stopServer();

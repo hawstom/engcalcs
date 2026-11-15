@@ -27,7 +27,7 @@ async function main() {
 	const { chromium } = require(path.join(L.REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));
 	console.log('\n1. Every interface name the chapter quotes is the language file\'s');
 	checkQuotes({
-		lpn_guide_ct_what_def: ['lpn_menu_project', 'lpn_graphs_menu', 'lpn_contour_menu'],
+		lpn_guide_ct_what_def: ['lpn_menu_project', 'lpn_graphs_menu', 'lpn_contour_menu', 'lpn_color_node_field', 'lpn_color_none', 'lpn_settings_sec_symbology', 'lpn_settings_sym_node_colors'],
 		lpn_guide_ct_box_def: ['lpn_contour_show', 'lpn_settings_sec_symbology', 'lpn_settings_sym_node_colors', 'lpn_contour_fill_smooth', 'lpn_contour_fill_bands', 'lpn_contour_opacity', 'lpn_contour_lines', 'lpn_contour_interval', 'lpn_contour_buffer'],
 		lpn_guide_ct_example_def: ['lpn_contour_show']
 	});

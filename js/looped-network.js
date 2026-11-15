@@ -6637,8 +6637,7 @@ var EngCalcs = EngCalcs || {};
 					if (r.settings !== undefined && !plainObject(r.settings)) { delete r.settings; }
 					settingLeaves(r.settings).forEach(function (leaf) {
 						var cat = categoryOfSetting(leaf.path);
-						// `settings.contourField` is a retired round-3 field (Task 858): the plot follows Color nodes by, so a file that holds one drops it.
-						if (cat === null || (cat !== undefined && cat !== r.category) || settingHasOtherHome(leaf.path) || settingPath(leaf.path).join('.') === 'settings.contourField') { settingDelete(r, leaf.path); }
+						if (cat === null || (cat !== undefined && cat !== r.category) || settingHasOtherHome(leaf.path)) { settingDelete(r, leaf.path); }
 					});
 					tsbCleanHeld(r);
 				} else {
@@ -12879,10 +12878,13 @@ var EngCalcs = EngCalcs || {};
 	function syncColorControls() {
 		// Through the keeper: the select that changed is one of the controls this rebuilds (Task 653).
 		keepSetboxControl(buildColoringSection);
-		// ...and the contour box, the second view of the node colouring (Task 600).
-		refreshContourBoxIfOpen();
-		// ...and the Tables pane, whose Settings tab holds the same values as rows.
-		refreshPaneIfOpen();
+		// ...and the Settings table, whose rows hold the same values; no other table is redrawn for a color change.
+		refreshSettingsTableIfShown();
+	}
+	function refreshSettingsTableIfShown() {
+		var t = paneTabById('settings');
+		if (paneRenderHeld || !t || !t.refresh || !paneTabOnShow('settings')) { return; }
+		t.refresh();
 	}
 	function colorValueOf(group, elem, field) {
 		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
@@ -13906,15 +13908,16 @@ var EngCalcs = EngCalcs || {};
 	// and contour controls."* A small non-modal box on the standing-box shell (drag band, resize
 	// grip, remembered corner), labels only. Everything it sets is the PROJECT's (it rides in
 	// serializeProject()); only where the box sits and whether it is open is the browser's, as
-	// `lpn_contourbox`. The value and the colour scheme are the node colouring's own two settings,
-	// so the Settings box and this one can never disagree with each other or with the dots.
+	// `lpn_contourbox`. The box holds neither the value nor the colour scheme: the plot follows the node colouring's own
+	// two settings, so the Settings box and the plot can never disagree with each other or with the dots.
 	function contourBoxEl() { return document.getElementById('lpn_contour_box'); }
 	function contourBoxIsOpen() {
 		var box = contourBoxEl();
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
-	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines; of pressure
-	// if the nodes are not coloured, and the node colouring is never touched), then opens the box where it is tuned or turned off.
+	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines), then opens the box where it is tuned
+	// or turned off. The plot spreads Color nodes by, which this never writes (Tom, 2026-10-29); with No color the box says
+	// there is nothing to plot.
 	// Graphs > Contour turns the contour on in the open scenario: through the Settings box's seam.
 	function showContour() {
 		throughSettingSeam(function () {
@@ -13958,14 +13961,17 @@ var EngCalcs = EngCalcs || {};
 	// being typed in is never rebuilt under the cursor; it is looked at again after the event, because a child scenario's
 	// write-back lands after the handler that started it.
 	var contourBoxSig = '';
+	// What the box shows, read the way the box reads it: through the scenario's view, so the signature stored at a build
+	// and the one compared on a step are the same question (a child scenario's `settings` is not the view's).
 	function contourBoxSigNow() {
-		return JSON.stringify([contourIsOn(), contourFieldOf(), !!colorFieldOf('node'), colorRampKey('node'), colorClassCount('node'),
-			contourFillMode(), contourOpacityOf(), contourBufferOf(), !!settings.contourLines, settings.contourLabels !== false,
-			settings.contourInterval || null, !!scnSetting('contourTerrain')]);
+		var field = contourFieldOf(), cf = contourField;
+		return JSON.stringify([contourIsOn(), field, colorRampKey('node'), colorClassCount('node'),
+			contourFillMode(), contourOpacityOf(), contourBufferOf(), !!scnSetting('contourLines'), scnSetting('contourLabels') !== false,
+			field ? contourIntervalOf(field, cf ? cf.lo : 0, cf ? cf.hi : 1) : null, !!scnSetting('contourTerrain')]);
 	}
 	function contourBoxFollow() {
 		if (!contourBoxIsOpen()) { return; }
-		if (contourBoxSig !== contourBoxSigNow()) { buildContourBox(); }
+		if (contourBoxSig !== withSetboxView(contourBoxSigNow)) { buildContourBox(); }
 	}
 	function contourBoxFollowSoon() {
 		if (!contourBoxIsOpen()) { return; }
@@ -13973,12 +13979,9 @@ var EngCalcs = EngCalcs || {};
 		setTimeout(contourBoxFollow, 0);
 	}
 	var contourShownBefore = null;   // fill and lines as they were when Show contours was last cleared
-	// The box is rebuilt again once the edit has landed: in a child scenario the write-back to the scenario
-	// comes after this handler, and a rebuild before it reads the old value (Perry, 2026-11-11).
-	function contourChanged() {
-		refreshValueColors(); saveToStorage(); syncColorControls();
-		setTimeout(refreshContourBoxIfOpen, 0);
-	}
+	// refreshValueColors() looks at the box now and again after the event (contourBoxFollowSoon), which is how a
+	// child scenario's write-back, landing after this handler, is seen (Perry, 2026-11-11).
+	function contourChanged() { refreshValueColors(); saveToStorage(); syncColorControls(); }
 	function buildContourBox() { return withSetboxView(buildContourBoxNow); }
 	function buildContourBoxNow() {
 		var pc = EngCalcs.pageConfig || {}, body = document.getElementById('lpn_contour_body');
@@ -14020,6 +14023,14 @@ var EngCalcs = EngCalcs || {};
 		// controls, Fill None AND Contour lines cleared, and the box's x, which looks like the off
 		// switch, only closes the box. Clearing it remembers fill and lines for this visit, so a tick
 		// brings back the plot as it was; the node colouring is the dots' and is left alone.
+		// With No color there is no property to plot. Say so, once, and change nothing: the controls stay as they are and
+		// nothing turns colors on (Tom, 2026-10-29).
+		if (!contourFieldOf()) {
+			var none = document.createElement('div');
+			none.className = 'lpn-contour-box-note'; none.id = 'lpn_contour_none_note';
+			none.textContent = pc.lpn_contour_none_note || 'Nothing to plot: choose a property under Color nodes by in Settings, Symbology, Node colors.';
+			body.appendChild(none);
+		}
 		row(pc.lpn_contour_show || 'Show plot', check('lpn_contour_show', contourIsOn(), function (on) {
 			if (on) {
 				var was = contourShownBefore || { fill: 'smooth', lines: true };
@@ -14049,11 +14060,13 @@ var EngCalcs = EngCalcs || {};
 			settings.contourLines = on; contourChanged();
 		}));
 		var field = contourFieldOf(), cf = contourField, lo = cf ? cf.lo : 0, hi = cf ? cf.hi : 1;
-		row(pc.lpn_contour_interval || 'Interval', number('lpn_contour_interval', field ? contourIntervalOf(field, lo, hi) : 5, 0, 'any', function (v) {
-			if (!field) { return; }
+		// The interval is kept per property, so with No color there is none to show: the box is empty and disabled.
+		var intervalBox = number('lpn_contour_interval', field ? contourIntervalOf(field, lo, hi) : '', 0, 'any', function (v) {
 			settings.contourInterval = settings.contourInterval || {};
 			settings.contourInterval[contourIntervalKey(field)] = v; contourChanged();
-		}), null, field ? colorFieldUnitText('node', field) : '', 6);
+		});
+		if (!field) { intervalBox.disabled = true; }
+		row(pc.lpn_contour_interval || 'Interval', intervalBox, null, field ? colorFieldUnitText('node', field) : '', 6);
 		row(pc.lpn_tool_labels || 'Labels', check('lpn_contour_labels', settings.contourLabels !== false, function (on) {
 			settings.contourLabels = on; contourChanged();
 		}));
@@ -44388,8 +44401,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// basemapFilter is the pre-release name of the field.
 		if (savedSettings.basemapStyle === undefined) { savedSettings.basemapStyle = savedSettings.basemapFilter || 'normal'; }
 		delete savedSettings.basemapFilter;
-		// A retired round-3 field (Task 858): the contour plot follows Color nodes by.
-		delete savedSettings.contourField;
 		// A file saved without the symbol-cap pair (every shipped example) was drawn under the old
 		// rule, 0.5 x the 20th-percentile pipe; only a NEW project gets 0.25 x the median.
 		if (savedSettings.symbolCapMultiple === undefined) { savedSettings.symbolCapMultiple = 0.5; }
@@ -57828,8 +57839,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 							fn: function () { closeMenu(); openPane('profile'); }
 						},
 						// THE CONTOUR PLOT IS A MAP LAYER, so this row SHOWS it rather than opening a
-						// tab: a smooth fill of the node colouring with labelled lines (pressure, if
-						// nodes are not coloured yet), then its own box, where it is tuned and turned
+						// tab: a smooth fill of the node colouring with labelled lines (nothing, with
+						// No color), then its own box, where it is tuned and turned
 						// off. See refreshContour() and showContour().
 						{
 							label: pc.lpn_contour_menu || 'Contour', tip: pc.lpn_contour_tip,
