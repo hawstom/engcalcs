@@ -8,11 +8,8 @@
 // another. Scrolled to the end of Patterns and then shown Controls, the position stood, below all of Controls: a blank box.
 //   1. Libraries: from the very end of every section, every other section opens with something in view, at its top;
 //   2. Libraries: scrolled to the end, closed and reopened, there is something in view;
-//   3. Libraries: nothing is in the blank room to scroll into at all (the blank room is the Settings box's alone);
-//   4. the guard itself, with the blank room put back by hand (what a stylesheet regression would do): a rebuild from a position
-//      held in the blank room brings the list into view, and a position that shows something is left alone;
-//   5. Settings, which keeps its blank room: scrolled into it and then rebuilt by Undo, the box shows something, and a position
-//      with content in view is left alone.
+//   3. Libraries: there is no blank room to scroll into at all (it is the Settings box's alone), so no position can be past the list;
+//   4. Settings, which keeps its blank room: scrolled into it and then rebuilt by Undo, the box shows something.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -119,28 +116,7 @@ async function main() {
 		await section('patterns');
 		if (SHOTS) { await toEnd('lpn_libbox_content'); await P.screenshot({ path: path.join(SHOTS, 'patterns-end-r2.png') }); }
 
-		console.log('\n4. The guard, with the blank room put back by hand');
-		await P.evaluate(() => {
-			const st = document.createElement('style');
-			st.id = 'boxview_room';
-			st.textContent = '#lpn_libbox_content::after { content: ""; display: block; min-height: 100%; }';
-			document.head.appendChild(st);
-		});
-		await section('patterns');
-		await toEnd('lpn_libbox_content');
-		let v = await view('lpn_libbox_content');
-		ok('with the room back, the end of Patterns is a blank view (the defect, reproduced)', v.inView === 0, JSON.stringify(v));
-		await section('patterns');   // the same section again: a rebuild that keeps the position
-		v = await view('lpn_libbox_content');
-		ok('a rebuild from that position brings the list into view', v.inView > 0, JSON.stringify(v));
-		// a position that shows content is left where it is
-		await P.evaluate(() => { document.getElementById('lpn_libbox_content').scrollTop = 40; });
-		await section('patterns');
-		v = await view('lpn_libbox_content');
-		ok('a position that shows something is left alone by a rebuild', v.top === 40, JSON.stringify(v));
-		await P.evaluate(() => { const s = document.getElementById('boxview_room'); if (s) { s.remove(); } });
-
-		console.log('\n5. The Settings box keeps its blank room, and is not left in it by a rebuild');
+		console.log('\n4. The Settings box keeps its blank room, and is not left in it by a rebuild');
 		await closeLib();
 		await a.toolbarClick(await a.lang('lpn_tool_settings'));
 		await P.waitForSelector('#lpn_settings_box', { state: 'visible' });

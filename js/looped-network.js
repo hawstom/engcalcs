@@ -66089,11 +66089,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// control in the hand is put back under the pointer (setboxKeepPlace()).
 		var sc = setboxScroller(), st = sc ? sc.scrollTop : 0, unclamp = function () {
 			if (sc && sc.scrollTop !== st && sc.scrollHeight - sc.clientHeight >= st) { sc.scrollTop = st; }
-			keepSomethingInView(sc);
-		};
-		if (!held.length) { out = rebuild(); unclamp(); setboxKeepPlace(); return out; }
+		},
+		// The held control's place wins; only a view that is STILL empty after it is given the nearest content.
+		settle = function () { unclamp(); setboxKeepPlace(); keepSomethingInView(sc); };
+		if (!held.length) { out = rebuild(); settle(); return out; }
 		setboxKeeping = true;
-		try { out = rebuild(); } finally { setboxKeeping = false; unclamp(); setboxKeepPlace(); }
+		try { out = rebuild(); } finally { setboxKeeping = false; settle(); }
 		held.forEach(function (h) {
 			var el = h.el, twin;
 			if (!box.contains(el)) {
@@ -66243,8 +66244,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// should also check that the view is not empty"*). A box that keeps a scroll position across a rebuild asks this once the new
 	// content is in: when none of the scroller's children is in view (the position was held in the blank room after the content, or
 	// below a list that has since become shorter), the last child that has a height is brought to the top of the view, which is the
-	// nearest content to where the reader was. Returns whether it had to move. Used by the Settings and Libraries boxes, whose shell
-	// (.lpn-setbox-content) is where the blank room comes from; dev/lpn-spike/box-view-visible-browser-harness.js.
+	// nearest content to where the reader was. Returns whether it had to move. Used by the Settings box, the one box that has blank room after its
+	// content (the Libraries box has none, so no position it holds can be past its list; its harness case keeps it that way); dev/lpn-spike/box-view-visible-browser-harness.js.
 	function keepSomethingInView(sc) {
 		var kids, box, i, r;
 		if (!sc || !sc.getBoundingClientRect) { return false; }
@@ -70378,11 +70379,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// (and the Curves section another branch is changing) are untouched.
 	var libSel = {};
 	var LIB_ORDER = {
-		patterns: { read: libPatternsRead, write: libPatterns, byId: true },
+		patterns: { read: libPatternsRead, write: libPatterns, byId: true, slotted: true },
 		curves: { read: libCurvesRead, write: libCurves, byId: true },
 		pipetypes: { read: libPipeTypesRead, write: libPipeTypes, byId: true },
 		fittings: { read: libFittingSetsRead, write: libFittingSets, byId: true },
-		controls: { read: libControlsRead, write: libControls, byId: false },
+		controls: { read: libControlsRead, write: libControls, byId: false, slotted: true },
 		rules: { byId: false }
 	};
 	var LIB_MOVES = [
@@ -70393,21 +70394,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	];
 	// Which project the selection was made in: the same id in another project is not the same item.
 	function libProjKey() { return String((library && library.openId) || ''); }
-	function libOrderCount(sec) {
-		return sec === 'rules' ? libRuleEntries(libRulesRead()).length : LIB_ORDER[sec].read().length;
+	// What a section's order needs to know, worked out ONCE for an action: how many items there are, the first index an item may take, and
+	// for the rules the entries of the flat `[RULES]` text (cutting that text is the costly part, so nothing re-cuts it per question).
+	// A `[RULES]` text can open with lines that are not a rule (no RULE line above them); that block cannot be moved and nothing may be moved
+	// above it, or its lines would become part of the rule that landed there.
+	function libOrderInfo(sec) {
+		var es;
+		if (sec !== 'rules') { return { n: LIB_ORDER[sec].read().length, first: 0 }; }
+		es = libRuleEntries(libRulesRead());
+		return { n: es.length, first: es[0] && !es[0].name ? 1 : 0, es: es };
 	}
-	// The first index an item may take. A `[RULES]` text can open with lines that are not a rule (no RULE line above them); that
-	// block cannot be moved and nothing may be moved above it, or its lines would become part of the rule that landed there.
-	function libOrderFirst(sec) {
-		var e;
-		if (sec !== 'rules') { return 0; }
-		e = libRuleEntries(libRulesRead())[0];
-		return e && !e.name ? 1 : 0;
-	}
-	function libOrderSelIndex(sec) {
+	function libOrderSelIndex(sec, info) {
 		var s = libSel[sec], n, a, i;
 		if (!s || s.proj !== libProjKey()) { return -1; }
-		n = libOrderCount(sec);
+		n = (info || libOrderInfo(sec)).n;
 		if (!LIB_ORDER[sec].byId) { return (s.n === n && s.i >= 0 && s.i < n) ? s.i : -1; }
 		a = LIB_ORDER[sec].read();
 		// The item itself first: a rename changes its id, not which item it is. The id second, for a document an Undo has replaced.
@@ -70416,21 +70416,32 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		for (i = 0; i < a.length; i++) { if (String(a[i].id) === s.id) { s.obj = a[i]; return i; } }
 		return -1;
 	}
-	function libOrderSelect(sec, i) {
+	function libOrderSelect(sec, i, info) {
 		var o = LIB_ORDER[sec], proj = libProjKey();
-		libSel[sec] = o.byId ? { proj: proj, id: String(o.read()[i].id), obj: o.read()[i] } : { proj: proj, i: i, n: libOrderCount(sec) };
+		libSel[sec] = o.byId ? { proj: proj, id: String(o.read()[i].id), obj: o.read()[i] } : { proj: proj, i: i, n: (info || libOrderInfo(sec)).n };
 	}
-	// Undo restores the whole document, and an item with no id is selected by its position, which Undo has changed.
+	// An item with no id (a control, a rule) is selected by its position, which an Undo, an Add, a Delete or an edit that changes how many
+	// rules a text holds has changed: the selection is dropped rather than left on an item the user did not choose.
 	function libSelForgetIndexed() { delete libSel.controls; delete libSel.rules; }
 	function libOrderTarget(how, i, n, first) {
 		return how === 'top' ? first : how === 'bottom' ? n - 1 : how === 'up' ? Math.max(first, i - 1) : Math.min(n - 1, i + 1);
 	}
-	function libArrayMove(arr, from, to) { arr.splice(to, 0, arr.splice(from, 1)[0]); }
+	// **THE COMMENTS THE FILE KEPT AT A POSITION STAY AT IT** (patterns and controls: `head`, a heading above an item, and `foot`, what follows the
+	// last one). Only an item's own description goes with it, as a rule's block does and its gaps do not (libRulesMoved()). Were they to
+	// travel, a section's trailing comments would be written mid-section after a move and read back as the next item's description.
+	function libArrayMove(arr, from, to, slotted) {
+		var slots = slotted ? arr.map(function (x) { return { head: x.head, foot: x.foot }; }) : null;
+		arr.splice(to, 0, arr.splice(from, 1)[0]);
+		if (!slots) { return; }
+		arr.forEach(function (x, k) {
+			['head', 'foot'].forEach(function (f) { if (slots[k][f] === undefined) { delete x[f]; } else { x[f] = slots[k][f]; } });
+		});
+	}
 	// The `[RULES]` lines with rule `from` moved to position `to`. The text is cut into the rules' blocks (a rule's own description
 	// comments through its last line) and the gaps around them (blank lines, headings, trailing comments); the blocks are
 	// permuted and the gaps stay put, so no line is added, dropped or changed.
-	function libRulesMoved(lines, from, to) {
-		var es = libRuleEntries(lines), gaps = [], blocks = [], out = [], at = 0, order;
+	function libRulesMoved(lines, from, to, entries) {
+		var es = entries || libRuleEntries(lines), gaps = [], blocks = [], out = [], at = 0, order;
 		if (from === to || !es[from] || !es[to]) { return lines.slice(); }
 		es.forEach(function (e) {
 			var s = Math.max(e.descStart, at);
@@ -70446,14 +70457,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// One move of the selected item of `sec`; false when nothing could move (no selection, or already at that end).
 	function libOrderMove(sec, how) {
-		var i = libOrderSelIndex(sec), n = libOrderCount(sec), first = libOrderFirst(sec), to, b, sel;
-		if (i < first) { return false; }
-		to = libOrderTarget(how, i, n, first);
+		var info = libOrderInfo(sec), i = libOrderSelIndex(sec, info), to, b, sel;
+		if (i < info.first) { return false; }
+		to = libOrderTarget(how, i, info.n, info.first);
 		if (to === i) { return false; }
 		saveUndoSnapshot();
-		if (sec === 'rules') { doc.rules = libRulesMoved(libRulesRead(), i, to); }
-		else { libArrayMove(LIB_ORDER[sec].write(), i, to); }
-		libOrderSelect(sec, to);
+		if (sec === 'rules') { doc.rules = libRulesMoved(libRulesRead(), i, to, info.es); }
+		else { libArrayMove(LIB_ORDER[sec].write(), i, to, LIB_ORDER[sec].slotted); }
+		libOrderSelect(sec, to, info);
 		libCommit();
 		rebuildLibraryBox();
 		// The buttons were rebuilt, so the one that was pressed is a new element. Focus returns to it, or to the first one that can
@@ -70466,8 +70477,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return true;
 	}
 	// The four buttons' enabled state and the selected entry's mark, from the selection, without rebuilding anything.
-	function libOrderRefresh(secEl, sec) {
-		var i = libOrderSelIndex(sec), n = libOrderCount(sec), first = libOrderFirst(sec), can = i >= first;
+	function libOrderRefresh(secEl, sec, info) {
+		var i, n, first, can;
+		info = info || libOrderInfo(sec);
+		i = libOrderSelIndex(sec, info); n = info.n; first = info.first; can = i >= first;
 		Array.prototype.forEach.call(secEl.querySelectorAll('.lpn-lib-entry'), function (en, k) {
 			var on = k === i;
 			en.classList.toggle('lpn-lib-entry-sel', on);
@@ -70479,7 +70492,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 	}
 	function libOrderWire(secEl, sec) {
-		var pc = EngCalcs.pageConfig || {}, n = libOrderCount(sec), entries = secEl.querySelectorAll('.lpn-lib-entry'),
+		var pc = EngCalcs.pageConfig || {}, info = libOrderInfo(sec), n = info.n, entries = secEl.querySelectorAll('.lpn-lib-entry'),
 			add = Array.prototype.filter.call(secEl.children, function (c) { return c.tagName === 'BUTTON'; })[0],
 			row, group, tip;
 		if (n < 2 || entries.length !== n) { return; }
@@ -70514,11 +70527,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		row.appendChild(group);
 		// An entry is selected by pressing or tabbing into anything in it, so the keyboard reaches it as the pointer does.
 		Array.prototype.forEach.call(entries, function (en, k) {
-			function pick() { if (libOrderSelIndex(sec) !== k) { libOrderSelect(sec, k); libOrderRefresh(secEl, sec); } }
+			function pick() {
+				var now = libOrderInfo(sec);
+				if (libOrderSelIndex(sec, now) !== k) { libOrderSelect(sec, k, now); libOrderRefresh(secEl, sec, now); }
+			}
 			en.addEventListener('mousedown', pick);
 			en.addEventListener('focusin', pick);
 		});
-		libOrderRefresh(secEl, sec);
+		libOrderRefresh(secEl, sec, info);
 	}
 	// Rebuilt whole on every open and after every structural change (an add, a delete, a rename),
 	// for the same reason the Settings box is: a box built once and repainted by the paths that
@@ -70543,8 +70559,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		libSheetFields(sec);
 		libOrderWire(sec, cur.id);
 		initTipsIn(content);
-		// The position held across this rebuild may be one that shows none of the new list.
-		keepSomethingInView(content);
 	}
 	// **THE LIBRARY'S ENTRY FIELDS ARE SHEET ROWS** (round 10b, the sheet-style audit, A7). Each entry builder makes its ID, Description, Curve type and
 	// the like as label-above-input stacks in a flex row; this pass, run once the section is built, turns each stack into a Label | Value row of the
@@ -72460,6 +72474,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// to reach the engine.
 			libControls().push(read.ok ? read.rec
 				: { link: '', raw: text, action: {}, condition: null, text: {} });
+			libSelForgetIndexed();
 			libCommit();
 			rebuildLibraryBox();
 		}));
@@ -72545,6 +72560,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					else if (next) { next.head = gone.foot.concat(next.head || []); }
 				}
 				doc.controls = all.filter(function (c, k) { return k !== i; });
+				libSelForgetIndexed();
 				libCommit();
 				rebuildLibraryBox();
 			});
@@ -72668,6 +72684,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				'THEN ' + (pump && pump.type === 'pump' ? 'PUMP' : 'LINK') + ' ' +
 					(pump ? pump.id : '1') + ' STATUS IS CLOSED'
 			]);
+			libSelForgetIndexed();
 			libCommit();
 			rebuildLibraryBox();
 		}));
@@ -72732,6 +72749,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				saveUndoSnapshot();
 				doc.rules = libRulesSplice(cur.start, cur.end, String(box.value).split(/\r?\n/));
 				libCommit();
+				// A text that now holds more or fewer rules than this box has entries (a RULE line typed in, or the text emptied): the entries
+				// here are stale, so the box is built again, and the selection by position with them.
+				if (libRuleEntries(libRulesRead()).length !== entries.length) { libSelForgetIndexed(); rebuildLibraryBox(); }
 			});
 			entry.appendChild(box);
 			entry.appendChild(verdict);
@@ -72740,6 +72760,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (!libRuleEntries(libRulesRead())[i]) { return; }
 				saveUndoSnapshot();
 				doc.rules = libRulesWithout(i);
+				libSelForgetIndexed();
 				libCommit();
 				rebuildLibraryBox();
 			});

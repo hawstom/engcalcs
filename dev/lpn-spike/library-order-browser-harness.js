@@ -11,7 +11,9 @@
 //   5. one Ctrl+Z puts the row back;
 //   6. Controls and Rules say in the tip how the order decides a conflict, the other four say it never changes a run, and the `?` on
 //      Controls and on Rules opens the User Manual at the one entry that says the same words;
-//   7. the first press after typing in an item (a rename rebuilds the box) acts, and the item stays selected.
+//   7. the first press after typing in an item (a rename rebuilds the box) acts, and the item stays selected;
+//   8. a control or rule has no ID, so it is selected by position: Delete then Add leaves nothing selected (no item the user never chose),
+//      and typing a second RULE into a rule's text rebuilds the box, so the entries and the buttons are not stale.
 // The moves themselves, saved order and export order: library-order-harness.js.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -211,6 +213,44 @@ async function main() {
 			ok(sec + ': the first press after typing in the item moves it', norm(r[0]) === norm(typed[tl]) && r.length === cur.length, JSON.stringify([typed, r]));
 			s = await state();
 			ok(sec + ': ...and it is still the selected item', s.sel[0] === true && dis(s) === 'top:off up:off down:on bottom:on', dis(s) + JSON.stringify(s.sel));
+		}
+		console.log('\n--- selection by position ---');
+		const marked = () => P(() => Array.prototype.map.call(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry'), (e) => e.classList.contains('lpn-lib-entry-sel')));
+		const addBtn = () => a.page.locator('#lpn_libbox_content > section > .lpn-lib-toolrow > button, #lpn_libbox_content > section > button').first();
+		for (const sec of ['controls', 'rules']) {
+			await openLib(sec);
+			for (let k = 0; k < 4 && (await rows()).length < 3; k++) { await addBtn().click(); await a.settle(300); }
+			let n = (await rows()).length;
+			await a.page.locator('#lpn_libbox_content .lpn-lib-entry').nth(n - 1).click({ position: { x: 4, y: 4 } });
+			let m = await marked();
+			ok(sec + ': the last item is selected', m[n - 1] === true && m.filter(Boolean).length === 1, JSON.stringify(m));
+			// Delete the first, Add one: the count is the same again, and the old position must not be selected
+			await a.page.locator('#lpn_libbox_content .lpn-lib-entry').nth(0).locator('.lpn-lib-del').click();
+			await a.settle(300);
+			await addBtn().click();
+			await a.settle(300);
+			m = await marked();
+			const st2 = await state();
+			ok(sec + ': after Delete and Add the same count is back and nothing is selected', (await rows()).length === n && !m.some(Boolean) && st2.moves.every((x) => x.disabled), JSON.stringify([m, dis(st2)]));
+		}
+		// a rule's text that comes to hold another rule: the box is built again
+		{
+			await openLib('rules');
+			const before = (await rows()).length;
+			const f = a.page.locator('#lpn_libbox_content .lpn-lib-entry').nth(0).locator('textarea:not(.lpn-lib-desc)').first();
+			await f.click();
+			const v = await f.inputValue();
+			await f.fill(v + '\n\nRULE ZZ9\nIF SYSTEM CLOCKTIME >= 3 AM\nTHEN PUMP 10 STATUS IS OPEN');
+			await a.page.locator('#lpn_libbox_content .lpn-lib-entry').nth(1).click({ position: { x: 4, y: 4 } });
+			await a.settle(500);
+			const now = await rows();
+			ok('typing a second RULE into a rule makes the box show one more entry', now.length === before + 1, before + ' -> ' + now.length);
+			// the entries are the document's: pressing Move top on the new last one puts it first, and the text of that rule is the one typed
+			await a.page.locator('#lpn_libbox_content .lpn-lib-entry').nth(now.length - 1).click({ position: { x: 4, y: 4 } });
+			await a.page.locator('#lpn_lib_move_top').click();
+			await a.settle(300);
+			const r2 = await rows();
+			ok('...and Move to top then acts on the rule that was selected', r2.length === now.length && r2[0] === now[now.length - 1], JSON.stringify([now.slice(-1), r2.slice(0, 1)]));
 		}
 		const alive = await P(() => !!document.getElementById('lpn_library_box'));
 		ok('the page is still alive', alive);

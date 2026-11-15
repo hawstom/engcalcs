@@ -35,7 +35,7 @@ const L = loadLoopedNetwork(
 	"\t\tserialize: serializeProject, migrateSaved: migrateSaved, applySaved: applySaved,\n" +
 	"\t\tassembleModel: assembleModel,\n" +
 	"\t\tlibOrderSelect: libOrderSelect, libOrderSelIndex: libOrderSelIndex, libOrderMove: libOrderMove,\n" +
-	"\t\tlibRulesMoved: libRulesMoved, libRuleEntries: libRuleEntries, libReadControl: libReadControl,\n" +
+	"\t\tlibSelForgetIndexed: libSelForgetIndexed, libRulesMoved: libRulesMoved, libRuleEntries: libRuleEntries, libReadControl: libReadControl,\n" +
 	"\t\tundoDepth: function () { return undoStack.length; }, undo: undo, redo: redo, clearUndo: clearUndo,\n" +
 	"\t\tsetLibSection: function (s) { libSection = s; }, rebuildLibraryBox: rebuildLibraryBox,\n" +
 	"\t\tlibRenamePattern: libRenamePattern, libRenameCurve: libRenameCurve, libRenamePipeType: libRenamePipeType, libRenameFittingSet: libRenameFittingSet,\n" +
@@ -62,8 +62,8 @@ function ok(name, cond, extra) {
 function head(t) { console.log('\n' + t); }
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-function importNet(file) {
-	const text = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', file), 'utf8');
+function importNet(file, textIn) {
+	const text = textIn !== undefined ? textIn : fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', file), 'utf8');
 	const parsed = EngCalcs.lpnInpParse(text);
 	L.applyUnitSelections(L.inpUnitSelections(parsed));
 	const d = L.docFromInp(parsed, file);
@@ -223,6 +223,103 @@ head('4. the .inp export writes the stored order, and an unmoved project exports
 		const c1 = ctl(EngCalcs.lpnExportInp(d).inp);
 		ok('Net3: [CONTROLS] follows the stored order', c1[0] === c0[1] && c1[1] === c0[2], JSON.stringify([c0, c1]));
 	}
+}
+
+head('4b. the comments a file keeps at a position stay at it: a section\'s heading above its first item and what follows its last');
+{
+	// Net3 with a heading at the top and two comment lines at the end of both [PATTERNS] and [CONTROLS]
+	let text = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net3.inp'), 'utf8').replace(/\r\n/g, '\n');
+	const HEAD = { PATTERNS: ';== PATTERNS HEADING ==', CONTROLS: ';== CONTROLS HEADING ==' };
+	const FOOT = { PATTERNS: [';PATTERNS FOOT ONE', ';PATTERNS FOOT TWO'], CONTROLS: [';CONTROLS FOOT ONE', ';CONTROLS FOOT TWO'] };
+	text = text.replace('[PATTERNS]\n', '[PATTERNS]\n' + HEAD.PATTERNS + '\n\n').replace('[CONTROLS]\n', '[CONTROLS]\n' + HEAD.CONTROLS + '\n\n')
+		.replace('\n[CURVES]', '\n' + FOOT.PATTERNS.join('\n') + '\n\n[CURVES]').replace('\n[RULES]', '\n' + FOOT.CONTROLS.join('\n') + '\n\n[RULES]');
+	// the lines of one section, header and trailing blank lines left off
+	function sectionLines(inp, name) {
+		const out = [];
+		let on = false;
+		inp.replace(/\r\n/g, '\n').split('\n').forEach((l) => {
+			const m = /^\[(\w+)\]/.exec(l.trim());
+			if (m) { on = m[1].toUpperCase() === name; return; }
+			if (on) { out.push(l); }
+		});
+		while (out.length && !out[out.length - 1].trim()) { out.pop(); }
+		return out;
+	}
+	const firstNonBlank = (ls) => ls.filter((l) => l.trim())[0];
+	const lastTwo = (ls) => ls.filter((l) => l.trim()).slice(-2).map((l) => l.trim());
+	const itemLine = (name) => (l) => name === 'PATTERNS' ? /^\s*\w+\s+[\d.]/.test(l) : /^\s*link\s/i.test(l);
+	const d0 = importNet('mod.inp', text), base = EngCalcs.lpnExportInp(d0).inp;
+	['PATTERNS', 'CONTROLS'].forEach((name) => {
+		const ls = sectionLines(base, name);
+		ok(name + ': the import keeps the heading above the first item, and the export writes it back', ls.some((l) => l.trim() === HEAD[name]) && ls.findIndex((l) => l.trim() === HEAD[name]) < ls.findIndex(itemLine(name)));
+		ok(name + ': ...and the two lines after the last item', same(lastTwo(ls), FOOT[name]));
+	});
+	const sec = { patterns: 'PATTERNS', controls: 'CONTROLS' };
+	['patterns', 'controls'].forEach((key) => {
+		const n = SECTIONS[key](d0).length;
+		let bad = 0, moves = 0, badReimport = 0;
+		for (let i = 0; i < n; i++) {
+			['top', 'up', 'down', 'bottom'].forEach((how) => {
+				const d = importNet('mod.inp', text), before = SECTIONS[key](d).map((x) => label(key, x));
+				L.libOrderSelect(key, i);
+				if (!L.libOrderMove(key, how)) { return; }
+				moves++;
+				const out = EngCalcs.lpnExportInp(d).inp, ls = sectionLines(out, sec[key]), nb = ls.filter((l) => l.trim());
+				// the heading still opens the section, the two foot lines still close it, and neither appears anywhere else
+				const count = (t) => ls.filter((l) => l.trim() === t).length;
+				if (nb[0].trim() !== HEAD[sec[key]] || !same(lastTwo(ls), FOOT[sec[key]]) || count(HEAD[sec[key]]) !== 1 || FOOT[sec[key]].some((f) => count(f) !== 1)) { bad++; }
+				// read back, no comment has become a description of an item
+				const back = importNet('mod2.inp', out), notes = (x) => (x.note || '') + '|' + (x.head ? x.head.join('/') : '') + '|' + (x.foot ? x.foot.join('/') : '');
+				const was = SECTIONS[key](d).map((x) => (x.note || '')).slice().sort(), now = SECTIONS[key](back).map((x) => (x.note || '')).slice().sort();
+				if (!same(was, now) || SECTIONS[key](back).length !== before.length) { badReimport++; }
+				void notes;
+			});
+		}
+		ok(key + ': after ' + moves + ' moves (every item, every direction) the heading and the foot comments are where they were', moves > 0 && bad === 0, bad + ' exported wrongly');
+		ok(key + ': ...and read back, every description is the one it was', badReimport === 0, badReimport + ' differ');
+		// a move to the bottom and back to the top changes nothing: the document and the file
+		const d = importNet('mod.inp', text);
+		L.libOrderSelect(key, 0);
+		L.libOrderMove(key, 'bottom');
+		L.libOrderMove(key, 'top');
+		ok(key + ': to the bottom and back, the export is byte for byte the one before', EngCalcs.lpnExportInp(d).inp === base);
+	});
+}
+
+head('4c. an item with no ID is selected by position, and a position that has changed is never kept');
+{
+	const d = freshDoc();
+	L.setOpenId('proj-c');
+	L.libOrderSelect('controls', 1);
+	ok('a control is selected', L.libOrderSelIndex('controls') === 1);
+	// delete one and add one: the count is the same again, and the old selection must not come back
+	L.libSelForgetIndexed();
+	ok('Add and Delete drop the selection (libSelForgetIndexed), so one never comes back on a different control', L.libOrderSelIndex('controls') === -1);
+	void d;
+	L.setOpenId('');
+}
+
+head('4d. no list of IDs holds the same ID twice, so "the order of these lists never changes a run" holds for every project the page makes');
+{
+	// EPANET's own reader merges rows of one ID into one pattern or curve even when they are not together (src/input2.c addpattern()
+	// and addcurve() return at once when findpattern()/findcurve() already knows the ID, and patterndata()/curvedata() in src/input3.c
+	// append to that first one); this page's reader does the same, and the Libraries box refuses a second item with an ID in use.
+	// Two items with one ID can therefore come only from a project file edited by hand, and there the two engines already disagree
+	// with no move at all (EPANET and the built-in solver pick different ones), so it is no order effect.
+	const text = [
+		'[JUNCTIONS]', ' J1 0 10 P1', '[RESERVOIRS]', ' R1 100', '[PIPES]', ' PI1 R1 J1 1000 12 100 0 Open',
+		'[PATTERNS]', ' P1 1 2 3', ' P2 1 1 1', ' P1 4 5 6', '',
+		'[CURVES]', ' C1 1 10', ' C2 2 20', ' C1 3 30', '',
+		'[COORDINATES]', ' J1 1 1', ' R1 0 0', '[END]', ''].join('\n');
+	const d = importNet('dup.inp', text);
+	ok('an .inp that gives one pattern ID in two runs is read as one pattern with all its multipliers', ids(d.patterns).join() === 'P1,P2' && d.patterns[0].multipliers.join() === '1,2,3,4,5,6', JSON.stringify(d.patterns.map((p) => [p.id, p.multipliers])));
+	ok('...and one curve ID in two runs as one curve with all its points', ids(d.curves).join() === 'C1,C2' && d.curves[0].points.length === 2, JSON.stringify(d.curves.map((c) => [c.id, c.points])));
+	const f = freshDoc();
+	const REN = { patterns: 'libRenamePattern', curves: 'libRenameCurve', pipetypes: 'libRenamePipeType', fittings: 'libRenameFittingSet' };
+	Object.keys(REN).forEach((sec) => {
+		const arr = SECTIONS[sec](f), first = String(arr[0].id);
+		ok(sec + ': renaming an item to an ID already in the list is refused', L[REN[sec]](arr[1], first) === false && String(arr[1].id) !== first);
+	});
 }
 
 head('5. rules move as blocks');
