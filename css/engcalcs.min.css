@@ -2693,7 +2693,7 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 .lpn-setbox-divider:hover::before, .lpn-setbox-divider:focus::before {
 	background: repeating-linear-gradient(to bottom, var(--ec-accent) 0 2px, transparent 2px 5px);
 }
-.lpn-setbox-content::after {
+#lpn_setbox_content::after {
 	content: ""; display: block; min-height: 100%;
 }
 .lpn-setbox-link {

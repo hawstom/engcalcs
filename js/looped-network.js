@@ -66089,6 +66089,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// control in the hand is put back under the pointer (setboxKeepPlace()).
 		var sc = setboxScroller(), st = sc ? sc.scrollTop : 0, unclamp = function () {
 			if (sc && sc.scrollTop !== st && sc.scrollHeight - sc.clientHeight >= st) { sc.scrollTop = st; }
+			keepSomethingInView(sc);
 		};
 		if (!held.length) { out = rebuild(); unclamp(); setboxKeepPlace(); return out; }
 		setboxKeeping = true;
@@ -66237,6 +66238,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// put back after every rebuild and mark for a moment afterwards.
 	var setboxPlace = null;
 	function setboxScroller() { return document.getElementById('lpn_setbox_content'); }
+	// **A BOX NEVER SHOWS A VIEW WITH NOTHING IN IT** (Tom, 2026-11-14, Libraries, Patterns: *"we should never return to any view
+	// with nothing visible ... if we are trying to remember the user's scroll position, we may have remembered it wrong, and we
+	// should also check that the view is not empty"*). A box that keeps a scroll position across a rebuild asks this once the new
+	// content is in: when none of the scroller's children is in view (the position was held in the blank room after the content, or
+	// below a list that has since become shorter), the last child that has a height is brought to the top of the view, which is the
+	// nearest content to where the reader was. Returns whether it had to move. Used by the Settings and Libraries boxes, whose shell
+	// (.lpn-setbox-content) is where the blank room comes from; dev/lpn-spike/box-view-visible-browser-harness.js.
+	function keepSomethingInView(sc) {
+		var kids, box, i, r;
+		if (!sc || !sc.getBoundingClientRect) { return false; }
+		kids = Array.prototype.filter.call(sc.children, function (k) { return k.offsetHeight > 0; });
+		if (!kids.length) { return false; }
+		box = sc.getBoundingClientRect();
+		for (i = 0; i < kids.length; i++) {
+			r = kids[i].getBoundingClientRect();
+			if (r.bottom > box.top && r.top < box.bottom) { return false; }
+		}
+		sc.scrollTop += kids[kids.length - 1].getBoundingClientRect().top - box.top;
+		return true;
+	}
 	function setboxPin(target) {
 		var sc = setboxScroller(), row, box = setboxEl();
 		if (!sc || !target || !target.getBoundingClientRect || !sc.contains || !sc.contains(target)) { return; }
@@ -70328,6 +70349,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 	}
 	function setLibrarySection(id) {
+		var content = document.getElementById('lpn_libbox_content');
+		// A different list starts at its top. The position of the one before is no position in this one.
+		if (id !== libSection && content) { content.scrollTop = 0; }
 		libSection = id;
 		rebuildLibraryBox();
 	}
@@ -70519,6 +70543,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		libSheetFields(sec);
 		libOrderWire(sec, cur.id);
 		initTipsIn(content);
+		// The position held across this rebuild may be one that shows none of the new list.
+		keepSomethingInView(content);
 	}
 	// **THE LIBRARY'S ENTRY FIELDS ARE SHEET ROWS** (round 10b, the sheet-style audit, A7). Each entry builder makes its ID, Description, Curve type and
 	// the like as label-above-input stacks in a flex row; this pass, run once the section is built, turns each stack into a Label | Value row of the

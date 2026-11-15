@@ -5450,8 +5450,14 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
    One viewport of the scrollport itself, not a fixed number of pixels: the box is resizable and on
    a phone it fills the screen, so any constant would be too much on one and too little on the
    other. `100%` of a flex scrollport resolves against its own height, which is exactly the measure
-   wanted -- scroll the last heading to the top and the blank space is what sits below it. */
-.lpn-setbox-content::after {
+   wanted -- scroll the last heading to the top and the blank space is what sits below it.
+
+   **THE SETTINGS BOX ALONE HAS IT** (Tom, 2026-11-14, Libraries: *"When visiting a Library ... the Library is not
+   scrolled to the top, or at least so that something is visible. I think that we should never return to any view with
+   nothing visible."*). The Libraries box borrows this shell but is a list of separate sections, none of which needs to reach
+   the top, and the browser keeps the scroll position while one list is swapped for another: scrolled to the end of Patterns
+   and then shown Controls, the room let the position stand, below all of Controls. */
+#lpn_setbox_content::after {
 	content: ""; display: block; min-height: 100%;
 }
 /* An index row is flat text, like a menu row: it is a destination, not a command. The SUB rows are
