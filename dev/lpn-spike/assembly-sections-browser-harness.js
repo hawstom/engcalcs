@@ -78,7 +78,7 @@ async function main() {
 
 		console.log('\n--- the Well ---');
 		await P.keyboard.press('Escape');
-		await clickAt('W1P');
+		await clickAt('W1');
 		let hs = await heads();
 		ok('the Well\'s box shows five headings', hs.length === 5, hs.map((h) => h.t).join(' | '));
 		ok('they stand in order down the box', hs.every((h, i) => i === 0 || h.top > hs[i - 1].top), JSON.stringify(hs.map((h) => Math.round(h.top))));
@@ -87,24 +87,24 @@ async function main() {
 		ok('the rows under each heading are laid in the box\'s own grid', rowsOk);
 		const noOverflow = await P.evaluate(() => { const f = document.getElementById('lpn_popup_fields'); return f.scrollWidth <= f.clientWidth + 1; });
 		ok('nothing runs past the box horizontally', noOverflow);
-		const outRows = await P.evaluate(() => { const s = document.querySelector('[data-asm-member="W1P"]'); return Array.from(s.querySelectorAll('label')).map((l) => l.textContent.replace(/\s+/g, ' ').trim()); });
+		const outRows = await P.evaluate(() => { const s = document.querySelector('[data-asm-member="W1"]'); return Array.from(s.querySelectorAll('label')).map((l) => l.textContent.replace(/\s+/g, ' ').trim()); });
 		const dRows = await P.evaluate(() => { const s = document.querySelector('[data-asm-member="W1D"]'); return Array.from(s.querySelectorAll('label')).map((l) => l.textContent.replace(/\s+/g, ' ').trim()); });
-		ok('the outlet W1P shows Head and Pressure; the drawdown node W1D shows Head alone (pressure only at the outlet)', outRows.some((x) => /^Pressure/.test(x)) && dRows.some((x) => /^Head/.test(x)) && !dRows.some((x) => /^Pressure/.test(x)), outRows.join(' | ') + ' / ' + dRows.join(' | '));
+		ok('the outlet W1 shows Head and Pressure; the drawdown node W1D shows Head alone (pressure only at the outlet)', outRows.some((x) => /^Pressure/.test(x)) && dRows.some((x) => /^Head/.test(x)) && !dRows.some((x) => /^Pressure/.test(x)), outRows.join(' | ') + ' / ' + dRows.join(' | '));
 		const flows = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((l) => /^Flow/.test(l.textContent.trim())).length);
 		ok('Flow appears once in the Well\'s box, above the headings', flows === 1, String(flows));
 		const chooser = await P.evaluate(() => { const s = document.getElementById('lpn_pgraph_member'), f = document.getElementById('lpn_pgraph_field'); return s && f ? { val: s.value, below: s.getBoundingClientRect().top < f.getBoundingClientRect().top, n: s.options.length } : null; });
-		ok('the graph at the foot has the "Graph which sub-asset?" chooser above its quantity chooser', !!chooser && chooser.n === 5 && chooser.val === 'link:W1' && chooser.below, JSON.stringify(chooser));
+		ok('the graph at the foot has the "Graph which sub-asset?" chooser above its quantity chooser', !!chooser && chooser.n === 5 && chooser.val === 'link:W1P' && chooser.below, JSON.stringify(chooser));
 		if (PICS) { await P.screenshot({ path: path.join(PICS, 'well-selected-properties-v10.png') }); }
 
 		console.log('\n--- the right-click menu ---');
 		await P.keyboard.press('Escape');
-		const wc = await centreOf('W1P');
+		const wc = await centreOf('W1');
 		await P.mouse.click(wc.x, wc.y, { button: 'right' });
 		await a.settle(500);
 		const rows = await P.evaluate(() => Array.from(document.querySelectorAll('.lpn-ctx-menu button, .lpn-ctxmenu button, [role="menu"] [role="menuitem"], #lpn_ctx_menu button')).map((b) => b.textContent.trim()));
 		const tsRows = rows.filter((r) => /^Time series graph/.test(r));
-		ok('right-click on the Well lists a Time series graph row for each sub-asset, upstream to downstream', tsRows.length === 5 && tsRows[3] === 'Time series graph: Pump W1' && tsRows[4] === 'Time series graph: Junction W1P', JSON.stringify(tsRows));
-		const clicked = await P.evaluate(() => { const b = Array.from(document.querySelectorAll('.lpn-ctx-menu button, .lpn-ctxmenu button, [role="menu"] [role="menuitem"], #lpn_ctx_menu button')).find((x) => /Pump W1$/.test(x.textContent.trim())); if (b) { b.click(); return true; } return false; });
+		ok('right-click on the Well lists a Time series graph row for each sub-asset, upstream to downstream', tsRows.length === 5 && tsRows[3] === 'Time series graph: Pump W1P' && tsRows[4] === 'Time series graph: Junction W1', JSON.stringify(tsRows));
+		const clicked = await P.evaluate(() => { const b = Array.from(document.querySelectorAll('.lpn-ctx-menu button, .lpn-ctxmenu button, [role="menu"] [role="menuitem"], #lpn_ctx_menu button')).find((x) => /Pump W1P$/.test(x.textContent.trim())); if (b) { b.click(); return true; } return false; });
 		await a.settle(900);
 		const bubbles = await P.evaluate(() => document.querySelectorAll('.lpn-tsb, .lpn-ts-bubble, [data-tsb]').length);
 		ok('choosing the pump\'s row opens a graph bubble', clicked && bubbles >= 1, String(bubbles));

@@ -126,12 +126,12 @@ function wellNet(withPipe) {
 	L.setMode('add-well'); press(200, 150);
 	if (withPipe) {
 		const j = L.addNode('junction', 600, 150); j._demand = 10;
-		L.addLink('pipe', 'W1P', j.id, []);
+		L.addLink('pipe', 'W1', j.id, []);
 	}
 	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) });
 	doc.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
 	L.setProp(doc.links[0], 'curveId', 'DD1'); L.setProp(doc.links[1], 'curveId', 'PC1');
-	L.setProp(L.nodeById('W1P'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
+	L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
 	return doc;
 }
 (async function () {
@@ -142,14 +142,14 @@ console.log('\n--- 1. place ---');
 	const d0 = L.undoDepth();
 	press(200, 150);
 	const types = doc.nodes.map((n) => n.id + ':' + n.type).sort().join(',');
-	ok('three nodes: reservoir W1R, drawdown node W1D, pump outlet W1P (Tom: W1, W1R, W1D, W1P)', types === 'W1D:junction,W1P:junction,W1R:reservoir', types);
-	ok('two links: the drawdown valve W1V (a GPV, R to D) and the pump W1 (D to P)', doc.links.length === 2 &&
-		doc.links[0].id === 'W1V' && doc.links[0].type === 'valve' && doc.links[0].valveType === 'GPV' && doc.links[0].from === 'W1R' && doc.links[0].to === 'W1D' &&
-		doc.links[1].id === 'W1' && doc.links[1].type === 'pump' && doc.links[1].from === 'W1D' && doc.links[1].to === 'W1P', doc.links.map((l) => l.id + ' ' + l.from + '>' + l.to).join('; '));
+	ok('three nodes: reservoir W1R, drawdown node W1D, pump outlet W1 (Tom, 2026-11-14: the outlet takes the Well own ID)', types === 'W1:junction,W1D:junction,W1R:reservoir', types);
+	ok('two links: the drawdown valve W1DV (a GPV, R to D) and the pump W1P (D to P)', doc.links.length === 2 &&
+		doc.links[0].id === 'W1DV' && doc.links[0].type === 'valve' && doc.links[0].valveType === 'GPV' && doc.links[0].from === 'W1R' && doc.links[0].to === 'W1D' &&
+		doc.links[1].id === 'W1P' && doc.links[1].type === 'pump' && doc.links[1].from === 'W1D' && doc.links[1].to === 'W1', doc.links.map((l) => l.id + ' ' + l.from + '>' + l.to).join('; '));
 	ok('no tank, no tee, no virtual pipe', !doc.nodes.some((n) => n.type === 'tank') && !doc.links.some((l) => l.virtual));
-	ok('one grouping, three nodes and two links, no tank', JSON.stringify(doc.assemblies) === JSON.stringify([{ id: 'W1', kind: 'well', nodes: ['W1R', 'W1D', 'W1P'], links: ['W1V', 'W1'] }]), JSON.stringify(doc.assemblies));
+	ok('one grouping, three nodes and two links, no tank', JSON.stringify(doc.assemblies) === JSON.stringify([{ id: 'W1', kind: 'well', nodes: ['W1R', 'W1D', 'W1'], links: ['W1DV', 'W1P'] }]), JSON.stringify(doc.assemblies));
 	ok('one undo step; the tool stays armed', L.undoDepth() === d0 + 1 && L.getMode() === 'add-well');
-	const R = L.nodeById('W1R'), D = L.nodeById('W1P');
+	const R = L.nodeById('W1R'), D = L.nodeById('W1');
 	ok('the static level opens a round 30 m below the ground when there is one', typeof D.elev !== 'number' || R.elev === +(D.elev - 30).toFixed(4), R.elev + ' / ' + D.elev);
 }
 {
@@ -167,26 +167,26 @@ console.log('\n--- 2. the box ---');
 {
 	const doc = wellNet(true);
 	L.setMode('select');
-	L.openPopup('W1P', 10, 10);
+	L.openPopup('W1', 10, 10);
 	const entry = entryLabels();
 	console.log('        entry area: ' + entry.join(' | '));
 	ok('the entry area holds the description and tag, the ground, the static level, the two curves, Closed and Active', ['Description', 'Tag', 'Elevation', 'Static water level elevation', 'Drawdown curve', 'Pump head curve', 'Closed', 'Active'].every((n) => entry.some((x) => x.indexOf(n) === 0)), entry.join(' | '));
 	ok('and none of the tank\'s inputs or the pump levels', !entry.some((x) => /Initial depth|Minimum depth|Maximum depth|Tank diameter|Base elevation|Pump on below|Pump off above/.test(x)));
 	const t = () => sections().map((s) => s.title);
-	ok('five headings, upstream to downstream', JSON.stringify(t()) === JSON.stringify(['Reservoir W1R', 'Drawdown valve W1V', 'Junction W1D', 'Pump W1', 'Junction W1P']), JSON.stringify(t()));
+	ok('five headings, upstream to downstream', JSON.stringify(t()) === JSON.stringify(['Reservoir W1R', 'Drawdown valve W1DV', 'Junction W1D', 'Pump W1P', 'Junction W1']), JSON.stringify(t()));
 	const noRun = sections();
 	console.log('        before a run: ' + noRun.map((s) => s.title + ' [' + s.labels.join('; ') + ']').join('\n                      '));
 	ok('before any run every heading still shows a row or more, blank (Tom: nothing under most headings)', noRun.every((s) => s.labels.length >= 1), noRun.map((s) => s.title + ':' + s.labels.length).join(' '));
 	const sec = (n) => noRun.find((s) => s.title === n).labels;
 	const flowsAll = []; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL' && /^Flow/.test((e.textContent || '').replace(/\s+/g, ' ').trim())) { flowsAll.push(1); } });
 	ok('FLOW IS STATED ONCE, above the headings, and no heading repeats it (Tom, round 6: "flow only once")', entryLabels().filter((x) => /^Flow/.test(x)).length === 1 && flowsAll.length === 1 && noRun.every((s) => !s.labels.some((x) => /^Flow/.test(x))), entryLabels().join(' | '));
-	ok('PRESSURE IS AT THE OUTLET ONLY: W1P shows Head and Pressure; W1R and W1D show Head alone', sec('Junction W1P').some((x) => /^Pressure/.test(x)) && sec('Junction W1P').some((x) => /^Head/.test(x)) &&
-		noRun.filter((s) => s.title !== 'Junction W1P').every((s) => !s.labels.some((x) => /^Pressure/.test(x))) && sec('Junction W1D').some((x) => /^Head/.test(x)) && sec('Reservoir W1R').some((x) => /^Head/.test(x)));
-	ok('the pump shows Head and Status, the valve Head loss and Status', sec('Pump W1').some((x) => /^Head/.test(x)) && sec('Drawdown valve W1V').some((x) => /^Head loss/.test(x)));
+	ok('PRESSURE IS AT THE OUTLET ONLY: W1 shows Head and Pressure; W1R and W1D show Head alone', sec('Junction W1').some((x) => /^Pressure/.test(x)) && sec('Junction W1').some((x) => /^Head/.test(x)) &&
+		noRun.filter((s) => s.title !== 'Junction W1').every((s) => !s.labels.some((x) => /^Pressure/.test(x))) && sec('Junction W1D').some((x) => /^Head/.test(x)) && sec('Reservoir W1R').some((x) => /^Head/.test(x)));
+	ok('the pump shows Head and Status, the valve Head loss and Status', sec('Pump W1P').some((x) => /^Head/.test(x)) && sec('Drawdown valve W1DV').some((x) => /^Head loss/.test(x)));
 	ok('no section holds an input', noRun.every((s) => !s.labels.some((x) => /depth|diameter|elevation|curve/i.test(x))));
 	L.runSolve();
 	await until(() => false, 1500);
-	L.openPopup('W1P', 10, 10);
+	L.openPopup('W1', 10, 10);
 	const run = sections();
 	console.log('        after a run: ' + run.map((s) => s.title + ' [' + s.labels.join('; ') + ']').join('\n                     '));
 	ok('after a run the same rows are there, now with numbers', run.map((s) => s.labels.map((x) => x.replace(/\s.*$/, '')).join()).join('|') !== '' && run.every((s) => s.labels.length >= noRun.find((q) => q.title === s.title).labels.length - 1));
@@ -195,11 +195,11 @@ console.log('\n--- 2. the box ---');
 console.log('\n--- 3. which node holds which elevation ---');
 {
 	const doc = wellNet(false);
-	L.setProp(L.nodeById('W1P'), 'elev', 200);
+	L.setProp(L.nodeById('W1'), 'elev', 200);
 	ok('the ground typed on the discharge node reaches no other node', L.nodeById('W1R').elev === 120 && L.nodeById('W1D').elev === 120);
 	L.setProp(L.nodeById('W1D'), 'elev', 110);
-	ok('the static level typed on the pump node reaches the reservoir and not the ground', L.nodeById('W1R').elev === 110 && L.nodeById('W1P').elev === 200);
-	L.setProp(L.nodeById('W1P'), 'x', 321);
+	ok('the static level typed on the pump node reaches the reservoir and not the ground', L.nodeById('W1R').elev === 110 && L.nodeById('W1').elev === 200);
+	L.setProp(L.nodeById('W1'), 'x', 321);
 	ok('position reaches all three', doc.nodes.every((n) => n.x === 321));
 }
 
@@ -213,7 +213,7 @@ console.log('\n--- 4. explode, delete, undo ---');
 }
 {
 	const doc = wellNet(false);
-	L.deleteLink('W1V');
+	L.deleteLink('W1DV');
 	ok('deleting a member dissolves the group', L.getDoc().assemblies.length === 0);
 }
 
@@ -222,9 +222,9 @@ console.log('\n--- 5. the .inp ---');
 	const doc = wellNet(true);
 	const out = EC.lpnExportInp(L.serializeProject(), {});
 	ok('the export succeeds', out.ok, JSON.stringify(out.error));
-	ok('it carries `;ASSEMBLY: well W1R W1D W1P W1V W1`', /^;ASSEMBLY: well W1R W1D W1P W1V W1$/m.test(out.inp), (out.inp.match(/^;ASSEMBLY.*$/m) || [''])[0]);
+	ok('it carries `;ASSEMBLY: well W1R W1D W1 W1DV W1P ID=W1`', /^;ASSEMBLY: well W1R W1D W1 W1DV W1P ID=W1$/m.test(out.inp), (out.inp.match(/^;ASSEMBLY.*$/m) || [''])[0]);
 	const parsed = EC.lpnInpParse(out.inp);
-	ok('read back, a tankless Well is restored with nothing reported', parsed.ok && parsed.assemblies.length === 1 && parsed.assemblies[0].nodes.join() === 'W1R,W1D,W1P' && !(parsed.dropped || []).some((d) => d.code === 'assembly-unresolved'), JSON.stringify(parsed.assemblies));
+	ok('read back, a tankless Well is restored with nothing reported', parsed.ok && parsed.assemblies.length === 1 && parsed.assemblies[0].nodes.join() === 'W1R,W1D,W1' && !(parsed.dropped || []).some((d) => d.code === 'assembly-unresolved'), JSON.stringify(parsed.assemblies));
 	L.applyUnitSelections(L.inpUnitSelections(parsed));
 	L.applySaved(L.migrateSaved(L.docFromInp(parsed, ''))); L.buildDom();
 	const out2 = EC.lpnExportInp(L.serializeProject(), { title: '' });
@@ -256,19 +256,20 @@ console.log('\n--- 7. one label block ---');
 	const ls = L.scnLabels();
 	ls.node.head = true;   // Tom's example block shows H on the rows; the default labels show P and Z
 	const lines = (id) => L.nodeLines(L.nodeById(id), ls, null).map((x) => x.text);
-	const block = lines('W1P');
+	const block = lines('W1');
 	console.log('        the block: ' + JSON.stringify(block));
-	ok('the outlet carries the block; its heading is the assembly ID with Z (the ground) and Q (the pump flow), in that order', block.length >= 2 && /^W1 /.test(block[0]) && /Q=/.test(block[0]) && /Z=/.test(block[0]) && block[0].indexOf('Z=') < block[0].indexOf('Q='), JSON.stringify(block));
-	ok('no other number is in the heading', block[0].replace(/^W1/, '').split(/[ ,]+/).filter((x) => /[=:]/.test(x) || /^[0-9.-]+$/.test(x)).length <= 3, block[0]);
-	ok('rows: W1R and W1D give H and no P; W1P gives H and P; the drawdown valve W1V has no row', block.length === 4 && /^W1R /.test(block[1]) && /^W1D /.test(block[2]) && /^W1P /.test(block[3]) &&
-		/H=/.test(block[1]) && !/P=/.test(block[1]) && /H=/.test(block[2]) && !/P=/.test(block[2]) && /H=/.test(block[3]) && /P=/.test(block[3]) && !block.some((r) => /^W1V /.test(r)), JSON.stringify(block));
+	ok('the outlet carries the block; its heading is the assembly ID with Z (the ground), Q (the pump flow) and P (the outlet pressure), in that order', block.length >= 2 && /^W1 /.test(block[0]) && /Q=/.test(block[0]) && /Z=/.test(block[0]) && /P=/.test(block[0]) &&
+		block[0].indexOf('Z=') < block[0].indexOf('Q=') && block[0].indexOf('Q=') < block[0].indexOf('P='), JSON.stringify(block));
+	ok('no head is in the heading', !/H=/.test(block[0]), block[0]);
+	ok('rows (Tom, 2026-11-14): W1R and W1D give H and no P; the outlet has no row of its own and the drawdown valve W1DV none', block.length === 3 && /^W1R /.test(block[1]) && /^W1D /.test(block[2]) &&
+		/H=/.test(block[1]) && !/P=/.test(block[1]) && /H=/.test(block[2]) && !/P=/.test(block[2]) && !block.some((r) => /^W1DV /.test(r)) && block.filter((r) => /^W1 /.test(r)).length === 1, JSON.stringify(block));
 	ok('Q appears once in the block, in the heading', block.filter((r) => /Q=/.test(r)).length === 1);
 	ok('every other node of the Well has an empty label', lines('W1R').length === 0 && lines('W1D').length === 0);
-	ok('every link of the Well has an empty label', L.linkLines(L.linkById('W1'), ls, null).length === 0 && L.linkLines(L.linkById('W1V'), ls, null).length === 0);
+	ok('every link of the Well has an empty label', L.linkLines(L.linkById('W1P'), ls, null).length === 0 && L.linkLines(L.linkById('W1DV'), ls, null).length === 0);
 	const plain = L.nodeLines(L.nodeById('J1'), ls, null);
 	ok('an ordinary node is untouched', plain.length > 0 && plain[0].text === 'J1');
 	ls.node.id = false; ls.link.id = false;
-	const ls2 = L.nodeLines(L.nodeById('W1P'), ls, null);
+	const ls2 = L.nodeLines(L.nodeById('W1'), ls, null);
 	ok('the heading stays even with IDs off (it is the tag)', ls2.length > 0 && /^W1 /.test(ls2[0].text));
 }
 
@@ -276,13 +277,13 @@ console.log('\n--- 8. the drawing ---');
 {
 	const doc = wellNet(true);
 	const ne = L.nodeEls();
-	ok('the discharge node is the one drawn as the Well, with its own grab shape', L.nodeHitSilhouette(L.nodeById('W1P')) !== null && String(ne.W1P.hit.tagName).toLowerCase() === 'path');
+	ok('the discharge node is the one drawn as the Well, with its own grab shape', L.nodeHitSilhouette(L.nodeById('W1')) !== null && String(ne.W1.hit.tagName).toLowerCase() === 'path');
 	ok('the reservoir and the pump node draw nothing', /lpn-asm-hid/.test(ne.W1R.circle.className || (ne.W1R.circle.getAttribute && ne.W1R.circle.getAttribute('class')) || '') || (ne.W1R.circle.classList && ne.W1R.circle.classList.contains && ne.W1R.circle.classList.contains('lpn-asm-hid')));
 	const les = L.linkEls();
 	const hidden = (e) => e && e.symbolG && ((e.symbolG.classList && e.symbolG.classList.contains && e.symbolG.classList.contains('lpn-asm-hid')) || /lpn-asm-hid/.test(e.symbolG.className || ''));
-	ok('no valve symbol and no pump symbol is drawn at a Well', hidden(les.W1V) !== false && hidden(les.W1) !== false);
+	ok('no valve symbol and no pump symbol is drawn at a Well', hidden(les.W1DV) !== false && hidden(les.W1P) !== false);
 	L.explode('W1');
-	ok('after Explode the discharge node is a plain junction again, with a disc for a grab shape', String(ne.W1P.hit.tagName).toLowerCase() !== 'path');
+	ok('after Explode the discharge node is a plain junction again, with a disc for a grab shape', String(ne.W1.hit.tagName).toLowerCase() !== 'path');
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

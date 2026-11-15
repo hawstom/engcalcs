@@ -1,7 +1,7 @@
 // THE SIMPLE WELL AND ITS LABELS, ON THE PAGE, in a real Chrome. Run with:
 //   EC_PICS=<pictureDir> node dev/lpn-spike/well-round6-browser-harness.js
 //
-// Task 822, round 6 (Tom, 2026-11-11), updated for round 7 ( W1R, W1D, W1P; Well with tank is three presses). Net1 gets a Well (the
+// Task 822, round 6 (Tom, 2026-11-11), updated for round 7 ( W1R, W1D, W1; Well with tank is three presses). Net1 gets a Well (the
 // Pump button's third form) spliced into a pipe, and then a Well with tank (the fourth form) by its three presses. Asserted: (1) no valve, pump or reservoir symbol is drawn at a Well, through placing, selecting, clicking away,
 // zooming and undo, and the Well's own drawing is one symbol; (2) a Well draws ONE label block, headed by its ID, every row tagged by the
 // member's own ID; (3) pressing the block, or the symbol, opens the box without covering the block, and the block is still drawn (Tom: "if I
@@ -80,13 +80,13 @@ async function main() {
 		ok('pressing Pump three times arms the simple Well', (await armed()) === 'add-well');
 		await P.mouse.click(at.x, at.y); await a.settle(500);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(900);
-		const wellEls = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas [data-node]')).filter((e) => /^W1[RDP]$/.test(e.getAttribute('data-node'))).map((e) => e.getAttribute('data-node')));
-		ok('it is three nodes: W1R, W1D, W1P, and no tank', JSON.stringify((await wellEls()).filter((v, i, x) => x.indexOf(v) === i).sort()) === JSON.stringify(['W1D', 'W1P', 'W1R']) && !(await P.evaluate(() => !!document.querySelector('#lpn_canvas [data-node="W1T"]'))));
-		const centre = () => P.evaluate(() => { const e = Array.from(document.querySelectorAll('#lpn_canvas [data-node="W1P"]')).filter((x) => x.getBoundingClientRect().width > 0)[0]; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+		const wellEls = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas [data-node]')).filter((e) => /^W1[RD]?$/.test(e.getAttribute('data-node'))).map((e) => e.getAttribute('data-node')));
+		ok('it is three nodes: W1R, W1D, W1, and no tank', JSON.stringify((await wellEls()).filter((v, i, x) => x.indexOf(v) === i).sort()) === JSON.stringify(['W1D', 'W1', 'W1R']) && !(await P.evaluate(() => !!document.querySelector('#lpn_canvas [data-node="W1T"]'))));
+		const centre = () => P.evaluate(() => { const e = Array.from(document.querySelectorAll('#lpn_canvas [data-node="W1"]')).filter((x) => x.getBoundingClientRect().width > 0)[0]; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
 		await P.mouse.move(at.x, at.y); for (let i = 0; i < 6; i++) { await P.mouse.wheel(0, -300); await a.settle(150); } await a.settle(900);
 		// What is drawn within 40 px of the Well: its own symbol and nothing else.
 		const symbols = (tag) => P.evaluate(async () => {
-			const e = Array.from(document.querySelectorAll('#lpn_canvas [data-node="W1P"]')).filter((x) => x.getBoundingClientRect().width > 0)[0]; const wr = e.getBoundingClientRect(); const c = { x: wr.left + wr.width / 2, y: wr.top + wr.height / 2 };
+			const e = Array.from(document.querySelectorAll('#lpn_canvas [data-node="W1"]')).filter((x) => x.getBoundingClientRect().width > 0)[0]; const wr = e.getBoundingClientRect(); const c = { x: wr.left + wr.width / 2, y: wr.top + wr.height / 2 };
 			const out = { well: 0, other: [] };
 			Array.from(document.querySelectorAll('#lpn_canvas .lpn-link-symbol, #lpn_canvas .lpn-node-symbol')).forEach((s) => {
 				const r = s.getBoundingClientRect();
@@ -107,10 +107,10 @@ async function main() {
 		c = await centre();
 
 		console.log('\n--- the label block ---');
-		const blocks = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas text[data-nodelbl], #lpn_canvas text[data-linklbl]')).filter((t) => t.textContent.trim() && /^W1/.test(t.textContent)).map((t) => { const r = t.getBoundingClientRect(); return { id: t.getAttribute('data-nodelbl') || t.getAttribute('data-linklbl'), text: t.textContent, hidden: t.style.visibility === 'hidden', l: r.left, r: r.right, t: r.top, b: r.bottom, rows: t.querySelectorAll('tspan[x], tspan').length }; }));
+		const blocks = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas text[data-nodelbl], #lpn_canvas text[data-linklbl]')).filter((t) => t.textContent.trim() && /^W1 /.test(t.textContent)).map((t) => { const r = t.getBoundingClientRect(); return { id: t.getAttribute('data-nodelbl') || t.getAttribute('data-linklbl'), text: t.textContent, hidden: t.style.visibility === 'hidden', l: r.left, r: r.right, t: r.top, b: r.bottom, rows: t.querySelectorAll('tspan[x], tspan').length }; }));
 		let bl = await blocks();
-		ok('exactly one label of the Well is drawn, on its outlet node W1P, headed by W1', bl.length === 1 && bl[0].id === 'W1P' && !bl[0].hidden && /^W1/.test(bl[0].text), JSON.stringify(bl.map((b) => b.id + ':' + b.text)));
-		ok('the heading carries Z, the ground elevation, and the drawdown valve has no row (rows of H and P appear after a run: well-label-rows-harness.js)', /^W1 Z=/.test(bl[0].text) && !/W1V/.test(bl[0].text), bl[0].text);
+		ok('exactly one label of the Well is drawn, on its outlet node W1, headed by W1', bl.length === 1 && bl[0].id === 'W1' && !bl[0].hidden && /^W1 /.test(bl[0].text), JSON.stringify(bl.map((b) => b.id + ':' + b.text)));
+		ok('the heading carries Z, the ground elevation, and the drawdown valve has no row (rows of H and P appear after a run: well-label-rows-harness.js)', /^W1 Z=/.test(bl[0].text) && !/W1DV/.test(bl[0].text), bl[0].text);
 		const bc = { x: (bl[0].l + bl[0].r) / 2, y: (bl[0].t + bl[0].b) / 2 };
 		ok('it stands close to the symbol, within 160 px', Math.hypot(bc.x - c.x, bc.y - c.y) <= 160, Math.round(Math.hypot(bc.x - c.x, bc.y - c.y)) + ' px');
 		if (PICS) { await P.screenshot({ path: path.join(PICS, 'well-labels-closeup-v10.png'), clip: { x: Math.max(0, c.x - 300), y: Math.max(0, c.y - 160), width: 600, height: 320 } }); }
@@ -132,7 +132,7 @@ async function main() {
 		const ls = await labs();
 		ok('the top holds the elevations and the two curves and no tank input and no pump level', ['Elevation', 'Static water level elevation', 'Drawdown curve', 'Pump head curve'].every((n) => ls.some((x) => x.indexOf(n) === 0)) && !ls.some((x) => /Initial depth|Tank diameter|Pump on below|Base elevation/.test(x)), ls.join(' | '));
 		let hs = await heads();
-		ok('five headings, upstream to downstream', JSON.stringify(hs.map((h) => h.t)) === JSON.stringify(['Reservoir W1R', 'Drawdown valve W1V', 'Junction W1D', 'Pump W1', 'Junction W1P']), JSON.stringify(hs.map((h) => h.t)));
+		ok('five headings, upstream to downstream', JSON.stringify(hs.map((h) => h.t)) === JSON.stringify(['Reservoir W1R', 'Drawdown valve W1DV', 'Junction W1D', 'Pump W1P', 'Junction W1']), JSON.stringify(hs.map((h) => h.t)));
 		ok('every heading shows its rows with no run yet', hs.every((h) => h.rows.length >= 1), hs.map((h) => h.t + ':' + h.rows.length).join(' '));
 		if (PICS) { await P.screenshot({ path: path.join(PICS, 'well-properties-simple-v10.png') }); }
 		await a.close();
@@ -167,7 +167,7 @@ async function main() {
 		ok('three symbols: one Well drawing, the tee as an ordinary junction, a tank as an ordinary tank', info.wellSyms === 1 && info.tankSyms >= 1 && info.nodes.some((n) => /^T\d/.test(n)), JSON.stringify(info));
 		await Q.keyboard.press('Escape');
 		await Q.evaluate(() => { const bt = document.querySelector('#lpn_toolbar button[data-tool="select"]'); if (bt) { bt.click(); } });
-		const wc = await Q.evaluate(() => { const e = Array.from(document.querySelectorAll('#lpn_canvas [data-node="W1P"]')).filter((x) => x.getBoundingClientRect().width > 0)[0]; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+		const wc = await Q.evaluate(() => { const e = Array.from(document.querySelectorAll('#lpn_canvas [data-node="W1"]')).filter((x) => x.getBoundingClientRect().width > 0)[0]; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
 		await Q.mouse.click(wc.x, wc.y); await b.settle(900);
 		const l2 = await Q.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields > label')).map((l) => l.textContent.replace(/\s+/g, ' ').trim()));
 		ok('the Well with tank\'s box asks Pump on below and Pump off above once, at the top, and holds no tank input', ['Pump on below', 'Pump off above'].every((n) => l2.filter((x) => x.indexOf(n) === 0).length === 1) && !l2.some((x) => /Initial depth|Tank diameter|Maximum depth/.test(x)), l2.join(' | '));

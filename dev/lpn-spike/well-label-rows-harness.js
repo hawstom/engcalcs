@@ -1,14 +1,13 @@
-// A WELL'S LABEL BLOCK: THE HEADING, THEN ONE ROW PER MEMBER NODE. Run with:
+// A WELL'S LABEL BLOCK: THE HEADING, THEN ONE ROW PER UPSTREAM MEMBER NODE. Run with:
 //   node dev/lpn-spike/well-label-rows-harness.js
 //
-// Task 822, round 7 (Tom, round 6 pass, his example block):
-//   W1 Z = 999', Q=99 gpm
+// Task 822, round 8 (Tom, 2026-11-14: "We need W1 Z, Q, and P (for outlet node); W1R Res H; and W1D Drawdown H."):
+//   W1 Z=999', Q=99 gpm, P=40 psi
 //   W1R H=899'
-//   W1D H= 799'
-//   W1P H=1099', P=40 psi
-// The heading is the well's ID with Z (the ground elevation, the outlet node's) and Q (the pump's flow), and nothing else; the groundwater
-// reservoir W1R and the drawdown node W1D give H only ("P suppressed because it makes no sense"); the pump outlet W1P gives H and P; the drawdown
-// valve W1V has no row, its flow being the pump's. Every number is the ordinary field's, so the label settings' toggles and affixes govern it.
+//   W1D H=799'
+// The heading is the well's ID (it is also the outlet node's) with Z (the ground elevation, the outlet node's), Q (the pump's flow) and P (the outlet's
+// pressure); the groundwater reservoir W1R and the drawdown node W1D give H only ("P suppressed because it makes no sense"); the outlet has no row
+// of its own and the drawdown valve W1DV none, its flow being the pump's. Every number is the ordinary field's, so the label settings' toggles and affixes govern it.
 // Also: the Well with tank's tee and tank are ordinary nodes with ordinary labels; the block sheds rows before the heading.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -101,13 +100,13 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 function net(tank) {
 	const doc = fresh();
 	L.setMode(tank ? 'add-welltank' : 'add-well'); press(200, 150);
-	if (tank) { press(200, 150, hitNode('W1P')); press(400, 400); }
+	if (tank) { press(200, 150, hitNode('W1')); press(400, 400); }
 	const j = L.addNode('junction', 600, 150); j._demand = 10;
-	L.addLink('pipe', 'W1P', j.id, []);
+	L.addLink('pipe', 'W1', j.id, []);
 	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) });
 	doc.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
 	L.setProp(doc.links[0], 'curveId', 'DD1'); L.setProp(doc.links[1], 'curveId', 'PC1');
-	L.setProp(L.nodeById('W1P'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
+	L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
 	if (tank) { L.setProp(L.nodeById('T1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'elev', 150); }
 	return doc;
 }
@@ -120,15 +119,14 @@ for (const tank of [false, true]) {
 	const ls = L.scnLabels();
 	ls.node.head = true; ls.node.elev = true; ls.node.pressure = true; ls.link.flow = true;
 	const lines = (id) => L.nodeLines(L.nodeById(id), ls, null).map((x) => x.text);
-	const block = lines('W1P');
+	const block = lines('W1');
 	console.log('        ' + JSON.stringify(block));
-	ok('four lines: the heading and one row each for W1R, W1D and W1P', block.length === 4 && /^W1 /.test(block[0]) && /^W1R /.test(block[1]) && /^W1D /.test(block[2]) && /^W1P /.test(block[3]), JSON.stringify(block));
-	ok('the heading is Z then Q', /^W1 Z=\S+ Q=\S+$/.test(block[0].replace(/,/g, '')), block[0]);
-	ok('the heading carries no head and no pressure', !/H=|P=/.test(block[0]));
+	ok('three lines: the heading, then one row each for W1R and W1D (no row for the outlet)', block.length === 3 && /^W1 /.test(block[0]) && /^W1R /.test(block[1]) && /^W1D /.test(block[2]), JSON.stringify(block));
+	ok('the heading is Z then Q then P', /^W1 Z=\S+ Q=\S+ P=\S+$/.test(block[0].replace(/,/g, '')), block[0]);
+	ok('the heading carries no head', !/H=/.test(block[0]));
 	ok('W1R and W1D: H and no P', /H=/.test(block[1]) && !/P=/.test(block[1]) && /H=/.test(block[2]) && !/P=/.test(block[2]));
-	ok('W1P: H and P', /H=/.test(block[3]) && /P=/.test(block[3]));
-	ok('one Q in the whole block, and none in a row', block.join(' ').split('Q=').length === 2 && !block.slice(1).some((r) => /Q=/.test(r)));
-	ok('the drawdown valve has no row and no label of its own', !block.some((r) => /^W1V /.test(r)) && L.linkLines(L.linkById('W1V'), ls, null).length === 0 && L.linkLines(L.linkById('W1'), ls, null).length === 0);
+	ok('one Q and one P in the whole block, and none in a row', block.join(' ').split('Q=').length === 2 && block.join(' ').split('P=').length === 2 && !block.slice(1).some((r) => /Q=|P=/.test(r)));
+	ok('the drawdown valve has no row and no label of its own', !block.some((r) => /^W1DV /.test(r)) && L.linkLines(L.linkById('W1DV'), ls, null).length === 0 && L.linkLines(L.linkById('W1P'), ls, null).length === 0);
 	ok('W1R and W1D draw no label of their own', lines('W1R').length === 0 && lines('W1D').length === 0);
 	if (tank) {
 		const tee = lines('J1'), tk = lines('T1');
@@ -136,23 +134,23 @@ for (const tank of [false, true]) {
 	}
 	// The settings govern it.
 	ls.node.head = false;
-	let b2 = lines('W1P');
-	ok('with H off the rows give only P (W1P) and the others fall away', b2.length === 2 && /^W1 /.test(b2[0]) && /^W1P /.test(b2[1]) && !/H=/.test(b2.join(' ')) && /P=/.test(b2[1]), JSON.stringify(b2));
+	let b2 = lines('W1');
+	ok('with H off the rows fall away and the heading stays', b2.length === 1 && /^W1 /.test(b2[0]) && /P=/.test(b2[0]) && !/H=/.test(b2.join(' ')), JSON.stringify(b2));
 	ls.node.head = true; ls.node.elev = false;
-	b2 = lines('W1P');
-	ok('with Z off the heading is the ID and Q', /^W1 Q=/.test(b2[0]) && !/Z=/.test(b2[0]), b2[0]);
+	b2 = lines('W1');
+	ok('with Z off the heading is the ID, Q and P', /^W1 Q=\S+ P=/.test(b2[0].replace(/,/g, '')) && !/Z=/.test(b2[0]), b2[0]);
 	ls.node.elev = true; ls.link.flow = false;
-	b2 = lines('W1P');
-	ok('with Q off the heading is the ID and Z', /^W1 Z=/.test(b2[0]) && !/Q=/.test(b2[0]), b2[0]);
+	b2 = lines('W1');
+	ok('with Q off the heading is the ID, Z and P', /^W1 Z=\S+ P=/.test(b2[0].replace(/,/g, '')) && !/Q=/.test(b2[0]), b2[0]);
 	ls.link.flow = true; ls.node.pressure = false;
-	b2 = lines('W1P');
-	ok('with P off no row has P', !/P=/.test(b2.join(' ')));
+	b2 = lines('W1');
+	ok('with P off the heading is the ID, Z and Q and no row has P', /^W1 Z=\S+ Q=\S+$/.test(b2[0].replace(/,/g, '')) && !/P=/.test(b2.join(' ')), b2[0]);
 	ls.node.pressure = true; ls.node.id = false; ls.link.id = false;
-	b2 = lines('W1P');
+	b2 = lines('W1');
 	ok('with IDs off the heading stays: it is the tag', /^W1 /.test(b2[0]));
 	ls.node.id = true; ls.link.id = true;
 	ls.node.head = false; ls.node.elev = false; ls.node.pressure = false; ls.link.flow = false;
-	b2 = lines('W1P');
+	b2 = lines('W1');
 	ok('with nothing to show but IDs the block is the ID alone', b2.length === 1 && b2[0] === 'W1', JSON.stringify(b2));
 }
 
@@ -162,7 +160,7 @@ console.log('\n--- shedding: the rows go first, the heading last ---');
 	L.runSolve();
 	await wait(1500);
 	const ls = L.scnLabels(); ls.node.head = true; ls.node.elev = true; ls.node.pressure = true; ls.link.flow = true;
-	const full = L.nodeLines(L.nodeById('W1P'), ls, null);
+	const full = L.nodeLines(L.nodeById('W1'), ls, null);
 	ok('the heading ranks above every row (it sheds last)', full[0].shedRank > Math.max.apply(null, full.slice(1).map((x) => x.shedRank)), JSON.stringify(full.map((x) => x.shedRank)));
 	ok('the rows shed from the first down', full.slice(1).every((x, i, a) => i === 0 || x.shedRank > a[i - 1].shedRank));
 }

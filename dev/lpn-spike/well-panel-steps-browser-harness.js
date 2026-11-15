@@ -73,33 +73,33 @@ async function main() {
 		await a.menuClickSub('Insert', 'Well', 'project');
 		await P.mouse.click(at('112').x, at('112').y); await a.settle(700);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(500);
-		let c = await nodeC('W1P');
+		let c = await nodeC('W1');
 		await P.mouse.click(c.x, c.y); await a.settle(900);
 		ok('the Well\'s box opens, titled with the Well', (await title()) === 'Properties: Well W1', await title());
 		const setSel = async (idx, text) => { await P.evaluate(([i, t]) => { const s = document.querySelectorAll('#lpn_popup_fields select')[i]; const o = Array.from(s.options).find((x) => x.textContent.indexOf(t) >= 0); s.value = o.value; s.dispatchEvent(new Event('change', { bubbles: true })); }, [idx, text]); await a.settle(500); };
 		await setSel(0, 'Drawdown'); await setSel(1, 'WellPump');
 		await P.keyboard.press('Escape'); await a.settle(2000);
 		let bl = await wlabels();
-		ok('the block shows numbers once both curves are chosen', bl.length === 1 && /Q=/.test(bl[0].text) && !bl[0].hidden, JSON.stringify(bl));
+		ok('the block carries the numbers once both curves are chosen: Z, Q and P in the heading (it may stand hidden at the fit, in this crowded pipe)', bl.length === 1 && /Z=/.test(bl[0].text) && /Q=/.test(bl[0].text) && /P=/.test(bl[0].text), JSON.stringify(bl));
 		console.log('\n--- the block is always rows, at every zoom ---');
-		c = await nodeC('W1P');
+		c = await nodeC('W1');
 		let everRows = false, folded = [];
 		for (let n = 0; n <= 7; n++) {
 			bl = await wlabels();
 			if (bl.length && !bl[0].hidden) {
-				const rowsInText = (bl[0].text.match(/W\dR|W\dD|W\dP/g) || []).length;
+				const rowsInText = (bl[0].text.match(/W\dR|W\dD/g) || []).length;
 				if (rowsInText > 0 && bl[0].rows < 2) { folded.push(n + ':' + bl[0].text); }
-				if (bl[0].rows >= 4) { everRows = true; }
+				if (bl[0].rows >= 3) { everRows = true; }
 			}
-			await P.mouse.move(c.x, c.y); await P.mouse.wheel(0, -300); await a.settle(1500); c = await nodeC('W1P');
+			await P.mouse.move(c.x, c.y); await P.mouse.wheel(0, -300); await a.settle(1500); c = await nodeC('W1');
 		}
 		ok('whenever member rows are drawn they are rows (never folded into one line)', folded.length === 0, folded.join(' | '));
-		ok('zoomed in the block is the heading and the three member rows, as Tom\'s example', everRows);
+		ok('zoomed in the block is the heading and the rows W1R and W1D (Tom, 2026-11-14), all three drawn', everRows);
 		bl = await wlabels();
 		console.log('        ' + JSON.stringify(bl));
 
 		console.log('\n--- Explode: the block goes at once and the status bar says so ---');
-		c = await nodeC('W1P');
+		c = await nodeC('W1');
 		await P.mouse.click(c.x, c.y); await a.settle(900);
 		await P.click('#lpn_popup_fields button[data-assembly-explode="1"]'); await a.settle(300);
 		ok('the status bar says the Well was separated', /Separated W1 /.test(await notice()), await notice());
@@ -118,7 +118,7 @@ async function main() {
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(500);
 		const ids = await P.evaluate(() => Array.from(new Set(Array.from(document.querySelectorAll('#lpn_canvas [data-node]')).map((e) => e.getAttribute('data-node')))).filter((n) => /^W2/.test(n)));
 		ok('a second Well, W2, with its tee and tank beside it', ids.length === 3, ids.join(','));
-		const cc = await nodeC('W2P');
+		const cc = await nodeC('W2');
 		for (const dy of [0, 2, 8]) {
 			await P.keyboard.press('Escape'); await P.mouse.click(cc.x, cc.y + dy); await a.settle(800);
 			ok('pressing the symbol at centre +' + dy + ' px opens the Well, never the tee', (await title()) === 'Properties: Well W2', await title());

@@ -2,9 +2,10 @@
 //   node dev/lpn-spike/well-harness.js
 //
 // Task 822 (dev/assemblies.md; Tom's Well properties of 2026-10-25: groundwater static elevation, a general purpose valve for the drawdown
-// curve, a pump curve; "Pump+ and Well on Pump"; the round 6 pass: "W1, W1R, W1D, and W1P"). R (W1R) is a reservoir at the static elevation, D (W1D) the
-// drawdown node, the pump's upstream junction, P (W1P) the pump's outlet at the ground, where the system's pipes attach; V (W1V) is a GPV from R
-// to D whose head-loss curve is the drawdown against pumping rate, W1 the pump from D to P. The tank form is three points (well-tank-three-point-harness.js).
+// curve, a pump curve; "Pump+ and Well on Pump"; Round 8, Tom 2026-11-14: W1 the Well, W1R the aquifer reservoir, W1DV the virtual valve for
+// drawdown, W1D the node that shows drawdown, W1P the physical pump, W1 the node at the outlet). R (W1R) is a reservoir at the static elevation, D (W1D) the
+// drawdown node, the pump's upstream junction, P (W1) the pump's outlet at the ground, where the system's pipes attach; V (W1DV) is a GPV from R
+// to D whose head-loss curve is the drawdown against pumping rate, W1P the pump from D to P. The tank form is three points (well-tank-three-point-harness.js).
 // Every assertion drives the page's own tool and handlers and reads the result out of `doc`. Covered:
 //   1. place on open ground: R, D, P coincident, V and the pump between them, one grouping, one undo step, IDs;
 //   2. place by pressing a pipe: both halves of the pipe attach to P; the ground elevation follows the pipe;
@@ -99,7 +100,7 @@ function allKids(el, out) {
 	(el.childNodes || el.children || []).forEach(function (c) { out.push(c); allKids(c, out); });
 	return out;
 }
-const WELL_IDS = ['W1P', 'W1R', 'W1D'];
+const WELL_IDS = ['W1', 'W1R', 'W1D'];
 
 (async function () {
 console.log('\n--- 1. place on open ground ---');
@@ -109,15 +110,15 @@ console.log('\n--- 1. place on open ground ---');
 	const d0 = L.undoDepth();
 	press(200, 150);
 	const types = doc.nodes.map((n) => n.id + ':' + n.type).sort().join(',');
-	ok('three nodes: a reservoir W1R, the drawdown node W1D and the outlet W1P (Tom: W1, W1R, W1D, W1P)', types === 'W1D:junction,W1P:junction,W1R:reservoir', types);
-	ok('two links: the GPV W1V from R to D and the pump W1 from D to P', doc.links.length === 2 &&
+	ok('three nodes: a reservoir W1R, the drawdown node W1D and the outlet W1, which carries the Well\'s own ID (Tom, 2026-11-14)', types === 'W1:junction,W1D:junction,W1R:reservoir', types);
+	ok('two links: the GPV W1DV from R to D and the pump W1P from D to P', doc.links.length === 2 &&
 		doc.links[0].type === 'valve' && doc.links[0].valveType === 'GPV' && doc.links[0].from === 'W1R' && doc.links[0].to === 'W1D' &&
-		doc.links[1].type === 'pump' && doc.links[1].from === 'W1D' && doc.links[1].to === 'W1P', doc.links.map((l) => l.id + ':' + l.type + ' ' + l.from + '>' + l.to).join('; '));
+		doc.links[1].type === 'pump' && doc.links[1].from === 'W1D' && doc.links[1].to === 'W1', doc.links.map((l) => l.id + ':' + l.type + ' ' + l.from + '>' + l.to).join('; '));
 	ok('all three nodes are on one point', doc.nodes.every((n) => n.x === 200 && n.y === 150));
 	const w = doc.assemblies[0];
-	ok('one grouping, kind well, id W1 (the pump), nodes W1R W1D W1P, links W1V W1', doc.assemblies.length === 1 && JSON.stringify(w) ===
-		JSON.stringify({ id: 'W1', kind: 'well', nodes: ['W1R', 'W1D', 'W1P'], links: ['W1V', 'W1'] }), JSON.stringify(w));
-	const R = L.nodeById('W1R'), S = L.nodeById('W1D'), T = L.nodeById('W1P');
+	ok('one grouping, kind well, id W1 (the outlet node\'s), nodes W1R W1D W1, links W1DV W1P', doc.assemblies.length === 1 && JSON.stringify(w) ===
+		JSON.stringify({ id: 'W1', kind: 'well', nodes: ['W1R', 'W1D', 'W1'], links: ['W1DV', 'W1P'] }), JSON.stringify(w));
+	const R = L.nodeById('W1R'), S = L.nodeById('W1D'), T = L.nodeById('W1');
 	ok('the static elevation is the same at R and S, and below the ground', R.elev === S.elev && R.elev < T.elev, R.elev + ' ' + S.elev + ' ' + T.elev);
 	ok('in SI the static elevation opens a round 30 m below the ground', R.elev === +(T.elev - 30).toFixed(4), R.elev + ' vs ground ' + T.elev);
 	ok('the reservoir states no head of its own (it follows the static elevation)', R.head === undefined);
@@ -125,13 +126,13 @@ console.log('\n--- 1. place on open ground ---');
 	ok('one undo step', L.undoDepth() === d0 + 1, L.undoDepth() - d0);
 	ok('the tool stays armed', L.getMode() === 'add-well');
 	ok('Settings holds a well prefix, W, and it rides in the saved project like the others', L.getSettings().idPrefixes.W === 'W' && JSON.parse(JSON.stringify(L.serializeProject())).settings.idPrefixes.W === 'W');
-	ok('the well is its pump: the pump carries W1, the valve W1V', doc.links[1].id === 'W1' && doc.links[0].id === 'W1V');
+	ok('the pump is W1P and the valve W1DV; the Well is W1, the node at its outlet', doc.links[1].id === 'W1P' && doc.links[0].id === 'W1DV' && doc.nodes.some((n) => n.id === 'W1') && doc.assemblies[0].id === 'W1');
 	{
 		// A taken member passes the whole number over, so the group never mixes two numbers.
-		L.addNode('junction', 900, 900, 'W2V'); L.addNode('junction', 900, 950, 'W2D');
+		L.addNode('junction', 900, 900, 'W2DV'); L.addNode('junction', 900, 950, 'W2D');   // a taken derived ID, W2DV or W2D, passes the whole number over
 	}
 	press(500, 150);
-	ok('a second well skips W2 (its U is taken) and takes W3 for all five members', doc.assemblies.length === 2 && doc.assemblies[1].nodes.join() === 'W3R,W3D,W3P', JSON.stringify(doc.assemblies[1]));
+	ok('a second well skips W2 (W2D is taken) and takes W3 for all five members', doc.assemblies.length === 2 && doc.assemblies[1].nodes.join() === 'W3R,W3D,W3', JSON.stringify(doc.assemblies[1]));
 	L.undo();
 	ok('undo takes the second away whole', L.getDoc().nodes.length === 5 && L.getDoc().links.length === 2 && L.getDoc().assemblies.length === 1);
 	L.undo();
@@ -143,7 +144,7 @@ console.log('\n--- 1b. the default static level, in each unit ---');
 	// Tom, 2026-11-09: a Well at ground 0 came in at -98.4252, 30 m shown in feet. In US units it is a round 100 ft.
 	setUnitSet('us');
 	const d2 = fresh(); L.setMode('add-well'); press(200, 150);
-	const R2 = L.nodeById('W1R'), T2 = L.nodeById('W1P');
+	const R2 = L.nodeById('W1R'), T2 = L.nodeById('W1');
 	ok('in US units the static elevation opens a round 100 ft below the ground, not 98.4252', R2.elev === +(T2.elev - 100).toFixed(4), R2.elev + ' vs ground ' + T2.elev);
 	setUnitSet('si'); fresh(); L.setMode('add-well'); press(200, 150);
 }
@@ -152,7 +153,7 @@ console.log('\n--- 1b2. the static level follows the ground until the user has t
 {
 	setUnitSet('us');
 	const d3 = fresh(); L.setMode('add-well'); press(200, 150);
-	const gR = L.nodeById('W1R'), gS = L.nodeById('W1D'), gT = L.nodeById('W1P'), gD = L.nodeById('W1P');
+	const gR = L.nodeById('W1R'), gS = L.nodeById('W1D'), gT = L.nodeById('W1'), gD = L.nodeById('W1');
 	const g0 = gT.elev;
 	L.setProp(gT, 'elev', 690);
 	ok('ground 690: the static level moved with it, keeping its 100 ft depth, at R and S', gR.elev === 590 && gS.elev === 590, gR.elev + ' ' + gS.elev + ' (ground was ' + g0 + ')');
@@ -170,7 +171,7 @@ console.log('\n--- 1b2. the static level follows the ground until the user has t
 	const back = JSON.parse(JSON.stringify(L.serializeProject()));
 	ok('an unmarked well is saved without the mark', back.assemblies[0].staticTyped === undefined);
 	L.applySaved(saved);
-	L.setProp(L.nodeById('W1P'), 'elev', 900);
+	L.setProp(L.nodeById('W1'), 'elev', 900);
 	ok('a reopened project keeps it typed: the static level stays', L.nodeById('W1R').elev === 550, String(L.nodeById('W1R').elev));
 	L.undo();
 	setUnitSet('si'); fresh();
@@ -179,11 +180,11 @@ console.log('\n--- 1b2. the static level follows the ground until the user has t
 console.log('\n--- 1c. the ground from the DEM, and the static level that follows it ---');
 {
 	const doc = fresh(); L.setMode('add-well'); press(200, 150);
-	ok('the reservoir and the pump node are underground: no door that reads the land surface may write them; the tank is not', L.wellUnderground('W1R') && L.wellUnderground('W1D') && !L.wellUnderground('W1P'));
+	ok('the reservoir and the pump node are underground: no door that reads the land surface may write them; the tank is not', L.wellUnderground('W1R') && L.wellUnderground('W1D') && !L.wellUnderground('W1'));
 	// A Well born where the ground was still to be read has no static level yet; the DEM reading of its tank gives it one.
-	delete L.nodeById('W1R').elev; delete L.nodeById('W1D').elev; delete L.nodeById('W1P').elev;
-	const wrote = L.terrainFill([{ id: 'W1P', meters: 1000 }, { id: 'W1R', meters: 1000 }, { id: 'W1D', meters: 1000 }]);
-	ok('the DEM fill wrote the tank only, from its reading', L.nodeById('W1P').elev === 1000, JSON.stringify(wrote));
+	delete L.nodeById('W1R').elev; delete L.nodeById('W1D').elev; delete L.nodeById('W1').elev;
+	const wrote = L.terrainFill([{ id: 'W1', meters: 1000 }, { id: 'W1R', meters: 1000 }, { id: 'W1D', meters: 1000 }]);
+	ok('the DEM fill wrote the tank only, from its reading', L.nodeById('W1').elev === 1000, JSON.stringify(wrote));
 	ok('and the static level is that ground less 30 m, at the reservoir and the pump node alike', L.nodeById('W1R').elev === 970 && L.nodeById('W1D').elev === 970, L.nodeById('W1R').elev + ' ' + L.nodeById('W1D').elev);
 }
 
@@ -195,10 +196,10 @@ console.log('\n--- 2. place by pressing a pipe ---');
 	L.nodeById(a).elev = 100; L.nodeById(b).elev = 200;
 	L.setMode('add-well');
 	press(200, 0, hitLink(pipe.id));
-	const T = L.nodeById('W1P');
+	const T = L.nodeById('W1');
 	ok('halfway along the pipe the ground is 150', T && T.elev === 150, T && T.elev);
 	const pipes = doc.links.filter((l) => l.type === 'pipe');
-	ok('the two halves of the pipe both attach to the outlet P', pipes.length === 2 && pipes[0].from === a && pipes[0].to === 'W1P' && pipes[1].from === 'W1P' && pipes[1].to === b,
+	ok('the two halves of the pipe both attach to the outlet P', pipes.length === 2 && pipes[0].from === a && pipes[0].to === 'W1' && pipes[1].from === 'W1' && pipes[1].to === b,
 		pipes.map((l) => l.from + '>' + l.to).join('; '));
 	ok('no stray junction is left behind: R, D and P only, besides the two ends', doc.nodes.length === 5, doc.nodes.map((n) => n.id).join(','));
 	ok('the static elevation is below that ground', L.nodeById('W1R').elev < 150 && L.nodeById('W1R').elev === L.nodeById('W1D').elev);
@@ -226,18 +227,18 @@ console.log('\n--- 3. selection, the box, the shared values, a rename ---');
 	console.log('        labels: ' + labels.join(' | '));
 	L.setProp(L.nodeById('W1R'), 'elev', 80);
 	ok('the static elevation typed on R lands on S', L.nodeById('W1D').elev === 80 && L.nodeById('W1R').elev === 80);
-	ok('and leaves the ground alone', L.nodeById('W1P').elev !== 80);
+	ok('and leaves the ground alone', L.nodeById('W1').elev !== 80);
 	L.setProp(L.nodeById('W1D'), 'elev', 75);
 	ok('typed on S it lands on R', L.nodeById('W1R').elev === 75);
-	L.setProp(L.nodeById('W1P'), 'elev', 140);
-	ok('the ground elevation typed on T lands on T and the tee alone', L.nodeById('W1P').elev === 140 && L.nodeById('W1P').elev === 140 && L.nodeById('W1R').elev === 75 && L.nodeById('W1D').elev === 75);
-	L.setProp(L.nodeById('W1P'), 'x', 250);
-	ok('x moves all four: they stay coincident', ['W1R', 'W1D', 'W1P', 'W1P'].every((id) => L.nodeById(id).x === 250));
-	L.setProp(L.nodeById('W1P'), 'x', 200);
+	L.setProp(L.nodeById('W1'), 'elev', 140);
+	ok('the ground elevation typed on T lands on T and the tee alone', L.nodeById('W1').elev === 140 && L.nodeById('W1').elev === 140 && L.nodeById('W1R').elev === 75 && L.nodeById('W1D').elev === 75);
+	L.setProp(L.nodeById('W1'), 'x', 250);
+	ok('x moves all four: they stay coincident', ['W1R', 'W1D', 'W1', 'W1'].every((id) => L.nodeById(id).x === 250));
+	L.setProp(L.nodeById('W1'), 'x', 200);
 	L.applyNodeRename('W1D', 'SUC');
 	L.applyLinkRename(doc.links[1].id, 'WP');
 	const w = L.getDoc().assemblies[0];
-	ok('renaming a node and the pump keeps the group true', JSON.stringify(w.nodes) === JSON.stringify(['W1R', 'SUC', 'W1P']) && w.links[1] === 'WP', JSON.stringify(w));
+	ok('renaming a node and the pump keeps the group true', JSON.stringify(w.nodes) === JSON.stringify(['W1R', 'SUC', 'W1']) && w.links[1] === 'WP', JSON.stringify(w));
 }
 
 console.log('\n--- 4. Explode, undo, delete ---');
@@ -246,8 +247,8 @@ console.log('\n--- 4. Explode, undo, delete ---');
 	L.setMode('add-well');
 	press(200, 150);
 	L.setMode('select');
-	press(200, 150, hitNode('W1P'));
-	L.openPopup('W1P', 10, 10);
+	press(200, 150, hitNode('W1'));
+	L.openPopup('W1', 10, 10);
 	const explode = allKids(fieldsOf()).find((k) => k.getAttribute && k.getAttribute('data-assembly-explode') === '1');
 	const d0 = L.undoDepth();
 	(explode._listeners.click || []).forEach((fn) => fn({}));
@@ -268,7 +269,7 @@ console.log('\n--- 4. Explode, undo, delete ---');
 	L.setMode('add-well');
 	press(200, 150);
 	L.setMode('select');
-	press(200, 150, hitNode('W1P'));
+	press(200, 150, hitNode('W1'));
 	const d1 = L.undoDepth();
 	setHitTarget(null);
 	const KEYDEL = (global.document && global.document._keydown) || null;
@@ -285,12 +286,12 @@ console.log('\n--- 5. pipes meet the tank ---');
 	press(600, 150, hitNode(j.id));
 	press(200, 150, hitNode('W1R'));
 	let p = doc.links.filter((l) => l.type === 'pipe' && !l.virtual)[0];
-	ok('a pipe drawn to the well ends at the tee, though the reservoir was pressed', p && p.from === j.id && p.to === 'W1P', p && (p.from + '>' + p.to));
+	ok('a pipe drawn to the well ends at the tee, though the reservoir was pressed', p && p.from === j.id && p.to === 'W1', p && (p.from + '>' + p.to));
 	L.setMode('add-pipe');
 	press(200, 150, hitNode('W1D'));
 	press(-200, 150, hitNode(j2.id));
 	p = doc.links.filter((l) => l.type === 'pipe' && !l.virtual)[1];
-	ok('a pipe drawn from the well starts at the tee', p && p.from === 'W1P' && p.to === j2.id, p && (p.from + '>' + p.to));
+	ok('a pipe drawn from the well starts at the tee', p && p.from === 'W1' && p.to === j2.id, p && (p.from + '>' + p.to));
 }
 
 // ---- the hydraulics ----
@@ -302,15 +303,15 @@ function wellNetwork() {
 	press(200, 150);
 	const j = L.addNode('junction', 600, 150);
 	j._demand = 10;
-	L.addLink('pipe', 'W1P', j.id, []);
+	L.addLink('pipe', 'W1', j.id, []);
 	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) });
 	doc.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
 	const G = doc.links[0], P = doc.links[1];
 	L.setProp(G, 'curveId', 'DD1');
 	L.setProp(P, 'curveId', 'PC1');
-	L.setProp(L.nodeById('W1P'), 'elev', 150);
+	L.setProp(L.nodeById('W1'), 'elev', 150);
 	L.setProp(L.nodeById('W1R'), 'elev', 120);
-	L.setProp(L.nodeById('W1P'), 'level', 3);
+	L.setProp(L.nodeById('W1'), 'level', 3);
 	return doc;
 }
 function interp(pts, q) {
@@ -332,7 +333,7 @@ console.log('\n--- 6. hydraulics: discharge head = static - drawdown(Q) + pump h
 	for (const [nm, r] of results) {
 		ok(nm + ': solved and converged', r.ok && r.converged, JSON.stringify(r.engineError || r.issues || ''));
 		const Q = r.flows[pm.id] * 1000;     // l/s
-		const hS = r.heads.W1D, hT = r.heads.W1P;
+		const hS = r.heads.W1D, hT = r.heads.W1;
 		ok(nm + ': the pump pumps a positive rate inside both curves', Q > 0 && Q < 60, Q.toFixed(4) + ' l/s');
 		const dd = interp(DD, Q);
 		ok(nm + ': suction head = static - drawdown(Q)', Math.abs(hS - (120 - dd)) <= 1e-4, 'diff ' + (hS - (120 - dd)).toExponential(2) + ' m  (Q ' + Q.toFixed(3) + ', drawdown ' + dd.toFixed(4) + ')');
@@ -358,7 +359,7 @@ console.log('\n--- 7b. a Well with no curve is refused by name in both engines; 
 	L.setMode('add-well');
 	press(200, 150);
 	const j = L.addNode('junction', 600, 150);
-	L.addLink('pipe', 'W1P', j.id, []);
+	L.addLink('pipe', 'W1', j.id, []);
 	const wid = doc.assemblies[0].id;
 	const PC = global.EngCalcs.pageConfig;
 	const diag = EC.lpnDiagnose(L.currentModel());
@@ -383,37 +384,39 @@ console.log('\n--- 8. the project file and the .inp ---');
 {
 	const doc = wellNetwork();
 	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
-	ok('the saved project holds the grouping with its three nodes', saved.assemblies && saved.assemblies.length === 1 && saved.assemblies[0].nodes.join() === 'W1R,W1D,W1P', JSON.stringify(saved.assemblies));
+	ok('the saved project holds the grouping with its three nodes', saved.assemblies && saved.assemblies.length === 1 && saved.assemblies[0].nodes.join() === 'W1R,W1D,W1', JSON.stringify(saved.assemblies));
 	L.applySaved(L.migrateSaved(saved)); L.buildDom();
 	ok('opened again, the group is there', L.getDoc().assemblies.length === 1 && L.getDoc().assemblies[0].kind === 'well');
 	const out = EC.lpnExportInp(L.serializeProject(), {});
 	ok('the export succeeds', out.ok, JSON.stringify(out.error));
 	const gid = doc.links[0].id, pid = doc.links[1].id;
-	ok('it carries the ;ASSEMBLY: well comment line', new RegExp('^;ASSEMBLY: well W1R W1D W1P ' + gid + ' ' + pid + '$', 'm').test(out.inp), (out.inp.match(/^;ASSEMBLY.*$/m) || [''])[0]);
+	ok('it carries the ;ASSEMBLY: well comment line', new RegExp('^;ASSEMBLY: well W1R W1D W1 ' + gid + ' ' + pid + ' ID=W1$', 'm').test(out.inp), (out.inp.match(/^;ASSEMBLY.*$/m) || [''])[0]);
 	ok('the GPV is a VALVES row off the reservoir', new RegExp('^\\s*' + gid + '\\s+W1R\\s+W1D\\s+\\S+\\s+GPV\\s+DD1', 'm').test(out.inp), (out.inp.match(new RegExp('^\\s*' + gid + '.*$', 'm')) || [''])[0]);
 	const parsed = EC.lpnInpParse(out.inp);
 	ok('read back, the group is restored with nothing reported', parsed.ok && parsed.assemblies.length === 1 && parsed.assemblies[0].kind === 'well' &&
-		parsed.assemblies[0].nodes.join() === 'W1R,W1D,W1P' && !(parsed.dropped || []).some((d) => d.code === 'assembly-unresolved'), JSON.stringify(parsed.assemblies));
+		parsed.assemblies[0].nodes.join() === 'W1R,W1D,W1' && !(parsed.dropped || []).some((d) => d.code === 'assembly-unresolved'), JSON.stringify(parsed.assemblies));
 	L.applyUnitSelections(L.inpUnitSelections(parsed));
 	L.applySaved(L.migrateSaved(L.docFromInp(parsed, 'w'))); L.buildDom();
 	ok('opened as a project it is a group again', L.getDoc().assemblies.length === 1);
 	const out2 = EC.lpnExportInp(L.serializeProject(), { title: '' });
 	const asm = (t) => (t.match(/^;ASSEMBLY.*$/m) || [''])[0];
 	ok('the line survives unchanged', asm(out2.inp) === asm(out.inp) && asm(out.inp) !== '');
+	ok('the Well\'s own ID is read back from the line (ID=W1, the outlet node), and a line without it (a file before Round 8) gives the pump\'s', parsed.assemblies[0].id === 'W1' &&
+		EC.lpnInpParse(out.inp.replace(' ID=W1\n', '\n')).assemblies[0].id === 'W1P');
 	const p2 = EC.lpnInpParse(out2.inp);
 	L.applyUnitSelections(L.inpUnitSelections(p2));
 	L.applySaved(L.migrateSaved(L.docFromInp(p2, 'w'))); L.buildDom();
 	const out3 = EC.lpnExportInp(L.serializeProject(), { title: '' });
 	ok('export, import, export is byte-identical', out3.inp === out2.inp);
-	for (const miss of ['W1R', 'W1D', 'W1P']) {
-		const t = out.inp.replace(';ASSEMBLY: well W1R W1D W1P', ';ASSEMBLY: well ' + miss.replace(miss, 'NOPE') + ' W1D W1P');
+	for (const miss of ['W1R', 'W1D', 'W1']) {
+		const t = out.inp.replace(';ASSEMBLY: well W1R W1D W1', ';ASSEMBLY: well ' + miss.replace(miss, 'NOPE') + ' W1D W1');
 		void t;
 	}
-	const broken = EC.lpnInpParse(out.inp.replace(';ASSEMBLY: well W1R W1D W1P', ';ASSEMBLY: well W1R NOPE W1P'));
+	const broken = EC.lpnInpParse(out.inp.replace(';ASSEMBLY: well W1R W1D W1', ';ASSEMBLY: well W1R NOPE W1'));
 	ok('a group naming a node the file lacks is reported, not half-restored', broken.assemblies.length === 0 && broken.dropped.some((d) => d.code === 'assembly-unresolved'));
-	const broken2 = EC.lpnInpParse(out.inp.replace(' ' + gid + ' ' + pid + '\n', ' ' + gid + ' NOPE\n'));
+	const broken2 = EC.lpnInpParse(out.inp.replace(' ' + gid + ' ' + pid + ' ID=W1\n', ' ' + gid + ' NOPE ID=W1\n'));
 	ok('so is one naming a link the file lacks', broken2.assemblies.length === 0 && broken2.dropped.some((d) => d.code === 'assembly-unresolved'));
-	const short = EC.lpnInpParse(out.inp.replace(' ' + gid + ' ' + pid + '\n', ' ' + gid + '\n'));
+	const short = EC.lpnInpParse(out.inp.replace(' ' + gid + ' ' + pid + ' ID=W1\n', ' ' + gid + ' ID=W1\n'));
 	ok('and one that lacks a member is not a well', short.assemblies.length === 0);
 	L.getDoc().assemblies = [];
 	ok('with no group, no comment line', !/;ASSEMBLY/.test(EC.lpnExportInp(L.serializeProject(), {}).inp));

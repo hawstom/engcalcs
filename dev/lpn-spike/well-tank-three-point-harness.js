@@ -128,7 +128,7 @@ console.log('\n--- 1. three presses ---');
 	ok('the mode hint says the same (the notice expires in 8 s, the hint stays)', byId.lpn_mode_hint && /tee/i.test(byId.lpn_mode_hint.textContent), byId.lpn_mode_hint && byId.lpn_mode_hint.textContent);
 	press(500, 150);
 	ok('the second press makes an ordinary junction there and a pipe from the well outlet to it', doc.nodes.length === 4 && L.nodeById('J1') && L.nodeById('J1').type === 'junction' && L.nodeById('J1').x === 500 && L.nodeById('J1').y === 150 &&
-		doc.links.some((l) => l.type === 'pipe' && l.from === 'W1P' && l.to === 'J1' && !l.virtual), doc.links.map((l) => l.id + ' ' + l.type + ' ' + l.from + '>' + l.to).join('; '));
+		doc.links.some((l) => l.type === 'pipe' && l.from === 'W1' && l.to === 'J1' && !l.virtual), doc.links.map((l) => l.id + ' ' + l.type + ' ' + l.from + '>' + l.to).join('; '));
 	const p1 = doc.links.find((l) => l.type === 'pipe');
 	ok('that pipe takes its length from the drawing (Auto), and it is not zero', p1.lenAuto === true && L.linkAutoLength(p1, true) > 0, p1.lenAuto + ' ' + L.linkAutoLength(p1, true));
 	ok('and the status bar asks for the tank', /tank/i.test(L.lastNotice()) && L.lastNotice().indexOf('tee') !== 0 || L.lastNotice().indexOf(TANK_PROMPT) === 0, L.lastNotice());
@@ -140,7 +140,7 @@ console.log('\n--- 1. three presses ---');
 	ok('the group is one Well that knows its tee, its tank and the two pipes', a.kind === 'well' && a.tee === 'J1' && a.tank === 'T1' && JSON.stringify(a.branch) === JSON.stringify([p1.id, doc.links.filter((l) => l.type === 'pipe')[1].id]) && a.nodes.length === 3 && a.links.length === 2, JSON.stringify(a));
 	ok('the wizard is finished and the status bar is cleared', !L.pending() && L.lastNotice() === '', JSON.stringify(L.lastNotice()));
 	ok('the whole act is ONE undo step, and the tool stays armed', L.undoDepth() === d0 + 1 && L.getMode() === 'add-welltank');
-	ok('three symbols: the tee and the tank are ordinary nodes, not members of the group', L.assemblyOfNode('J1') === null && L.assemblyOfNode('T1') === null && L.assemblyOfNode('W1P') === a && L.wellHasTank(a));
+	ok('three symbols: the tee and the tank are ordinary nodes, not members of the group', L.assemblyOfNode('J1') === null && L.assemblyOfNode('T1') === null && L.assemblyOfNode('W1') === a && L.wellHasTank(a));
 	L.undo();
 	ok('one Undo takes the well, the tee, the tank and both pipes away', doc.nodes.length === 0 && doc.links.length === 0 && doc.assemblies.length === 0 || (L.getDoc().nodes.length === 0 && L.getDoc().links.length === 0 && L.getDoc().assemblies.length === 0), L.getDoc().nodes.length + ' nodes');
 }
@@ -155,9 +155,9 @@ console.log('\n--- 2. where the tee and the tank may stand ---');
 {
 	const doc = fresh();
 	L.setMode('add-welltank'); press(200, 150);
-	press(200, 150, hitNode('W1P'));
+	press(200, 150, hitNode('W1'));
 	const pipe = doc.links.find((l) => l.type === 'pipe');
-	ok('a tee on the well\'s own point is a new junction on that point, joined by a virtual pipe (no pipe at a distance)', doc.nodes.length === 4 && !!pipe && pipe.virtual === true && pipe.from === 'W1P' && L.nodeById(pipe.to).x === 200 && L.nodeById(pipe.to).y === 150, JSON.stringify(pipe));
+	ok('a tee on the well\'s own point is a new junction on that point, joined by a virtual pipe (no pipe at a distance)', doc.nodes.length === 4 && !!pipe && pipe.virtual === true && pipe.from === 'W1' && L.nodeById(pipe.to).x === 200 && L.nodeById(pipe.to).y === 150, JSON.stringify(pipe));
 	press(200, 150);   // a tank on the very same point: the press names the tee, a junction, which is not a tank
 	ok('a tank cannot be pressed onto that point: it names the tee, and the wizard asks again', !doc.assemblies[0].tank && L.pending() && L.pending().stage === 'tank' && /tank/i.test(L.lastNotice()), L.lastNotice());
 }
@@ -167,7 +167,7 @@ console.log('\n--- 2. where the tee and the tank may stand ---');
 	L.setMode('add-welltank'); press(200, 150);
 	const n0 = doc.nodes.length;
 	press(600, 100, hitNode(j.id));
-	ok('an existing junction can be the tee: no new node, an ordinary pipe to it', doc.nodes.length === n0 && doc.assemblies[0].tee === 'undefined' || (doc.nodes.length === n0 && L.pending().tee === j.id && doc.links.some((l) => l.type === 'pipe' && l.from === 'W1P' && l.to === j.id && !l.virtual)));
+	ok('an existing junction can be the tee: no new node, an ordinary pipe to it', doc.nodes.length === n0 && doc.assemblies[0].tee === 'undefined' || (doc.nodes.length === n0 && L.pending().tee === j.id && doc.links.some((l) => l.type === 'pipe' && l.from === 'W1' && l.to === j.id && !l.virtual)));
 	const t = L.addNode('tank', 800, 300);
 	press(800, 300, hitNode(t.id));
 	ok('an existing tank can be the tank', doc.assemblies[0].tank === t.id && doc.assemblies[0].tee === j.id, JSON.stringify(doc.assemblies[0]));
@@ -219,16 +219,16 @@ console.log('\n--- 4. the group, its box and its controls ---');
 	const doc = fresh();
 	const a = place3(200, 150, 500, 150, 500, 400);
 	curves(doc, a);
-	L.setProp(L.nodeById('W1P'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
-	L.openPopup('W1P', 10, 10);
+	L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
+	L.openPopup('W1', 10, 10);
 	const labels = boxLabels();
 	console.log('        box: ' + labels.join(' | '));
 	ok('Pump on below and Pump off above are asked once, on the well', labels.filter((x) => /^Pump on below/.test(x)).length === 1 && labels.filter((x) => /^Pump off above/.test(x)).length === 1);
 	ok('and the tank\'s own depths and diameter are not on the well\'s box (it is an ordinary tank with a box of its own)', !labels.some((x) => /Initial depth|Minimum depth|Maximum depth|Tank diameter/.test(x)));
-	ok('Flow is stated once', labels.filter((x) => /^Flow/.test(x)).length === 1);
+	ok('the Well\'s flow is stated once, above the headings; the only other Flow rows are the two branch pipes\' own (Round 8: every member has its heading)', labels.filter((x) => /^Flow/.test(x)).length === 3);
 	a.pumpOn = 3; a.pumpOff = 6; L.syncWellControls(a);
 	const mine = L.getDoc().controls.filter((c) => c.asm === 'W1');
-	ok('the two controls are written for the pump and the tank', mine.length === 2 && mine.every((c) => c.link === 'W1' && c.condition && c.condition.node === 'T1'), JSON.stringify(mine.map((c) => c.raw)));
+	ok('the two controls are written for the pump and the tank', mine.length === 2 && mine.every((c) => c.link === 'W1P' && c.condition && c.condition.node === 'T1'), JSON.stringify(mine.map((c) => c.raw)));
 	const t = L.nodeById('T1');
 	ok('the tank is selectable and editable on its own: clicking it selects only it', (function () { L.setMode('select'); press(500, 400, hitNode('T1')); return L.selected().length === 1 && L.selected()[0].id === 'T1'; }()));
 }
@@ -249,7 +249,7 @@ console.log('\n--- 5. Explode, delete, rename ---');
 	let a = place3(200, 150, 500, 150, 500, 400);
 	curves(doc, a); a.pumpOn = 3; a.pumpOff = 6; L.syncWellControls(a);
 	L.deleteElement('node', 'T1');
-	ok('deleting the tank ends the group (what is left is plain) and frees its controls', L.getDoc().assemblies.length === 0 && L.getDoc().nodes.some((n) => n.id === 'W1P') && L.getDoc().controls.every((c) => !c.asm));
+	ok('deleting the tank ends the group (what is left is plain) and frees its controls', L.getDoc().assemblies.length === 0 && L.getDoc().nodes.some((n) => n.id === 'W1') && L.getDoc().controls.every((c) => !c.asm));
 }
 {
 	const doc = fresh();
@@ -260,7 +260,7 @@ console.log('\n--- 5. Explode, delete, rename ---');
 {
 	const doc = fresh();
 	let a = place3(200, 150, 500, 150, 500, 400);
-	L.deleteElement('node', 'W1P');
+	L.deleteElement('node', 'W1');
 	ok('deleting the well takes its five members; the tee and the tank stay, plain', L.getDoc().assemblies.length === 0 && !L.getDoc().nodes.some((n) => /^W1/.test(n.id)) && L.getDoc().nodes.some((n) => n.id === 'T1') && L.getDoc().nodes.some((n) => n.id === 'J1'), L.getDoc().nodes.map((n) => n.id).join() + ' / ' + JSON.stringify(L.getDoc().assemblies));
 }
 {
@@ -280,11 +280,11 @@ console.log('\n--- 6. the .inp and the project file ---');
 	const doc = fresh();
 	let a = place3(200, 150, 500, 150, 500, 400);
 	curves(doc, a); a.pumpOn = 3; a.pumpOff = 6; L.syncWellControls(a);
-	L.setProp(L.nodeById('W1P'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
+	L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
 	const out = EC.lpnExportInp(L.serializeProject(), {});
 	ok('the export succeeds', out.ok, JSON.stringify(out.error));
 	const line = (out.inp.match(/^;ASSEMBLY.*$/m) || [''])[0];
-	ok('the comment names the five members, then the tee, tank and pipes', line === ';ASSEMBLY: well W1R W1D W1P W1V W1 ON=3 OFF=6 TEE=J1 TANK=T1 PIPES=' + a.branch.join(','), line);
+	ok('the comment names the five members, then the tee, tank and pipes', line === ';ASSEMBLY: well W1R W1D W1 W1DV W1P ID=W1 ON=3 OFF=6 TEE=J1 TANK=T1 PIPES=' + a.branch.join(','), line);
 	const parsed = EC.lpnInpParse(out.inp);
 	ok('read back, the Well with tank is restored with nothing reported', parsed.ok && parsed.assemblies.length === 1 && parsed.assemblies[0].tank === 'T1' && parsed.assemblies[0].tee === 'J1' && !(parsed.dropped || []).some((d) => /^assembly/.test(d.code)), JSON.stringify(parsed.assemblies));
 	L.applyUnitSelections(L.inpUnitSelections(parsed));
@@ -312,29 +312,29 @@ console.log('\n--- 7. old files: a one-point Well with a tank ---');
 	const doc = fresh();
 	const r = L.addNode('reservoir', 0, 0, 'W1R'), u = L.addNode('junction', 0, 0, 'W1U'), t = L.addNode('tank', 0, 0, 'W1T'), d = L.addNode('junction', 0, 0, 'W1D');
 	r.elev = 70; u.elev = 70; d.elev = 150; t.elev = 150; u._demand = 0;
-	const g = L.addLink('valve', 'W1R', 'W1U', [], 'W1V'); g.valveType = 'GPV';
-	const p = L.addLink('pump', 'W1U', 'W1D', [], 'W1');
+	const g = L.addLink('valve', 'W1R', 'W1U', [], 'W1DV'); g.valveType = 'GPV';
+	const p = L.addLink('pump', 'W1U', 'W1D', [], 'W1P');
 	const b = L.addLink('pipe', 'W1D', 'W1T', [], 'W1B'); b.virtual = true;
 	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((q) => q.slice()) }, { id: 'PC1', kind: 'head', points: PH.map((q) => q.slice()) });
 	g.curveId = 'DD1'; p.curveId = 'PC1';
-	doc.assemblies = [{ id: 'W1', kind: 'well', nodes: ['W1R', 'W1U', 'W1T', 'W1D'], links: ['W1V', 'W1', 'W1B'], pumpOn: 3, pumpOff: 6 }];
-	doc.controls = [{ link: 'W1', action: { status: 'open' }, condition: { kind: 'node', node: 'W1T', cmp: 'below', value: 3 }, raw: 'LINK W1 OPEN IF NODE W1T BELOW 3', asm: 'W1' },
-		{ link: 'W1', action: { status: 'closed' }, condition: { kind: 'node', node: 'W1T', cmp: 'above', value: 6 }, raw: 'LINK W1 CLOSED IF NODE W1T ABOVE 6', asm: 'W1' }];
+	doc.assemblies = [{ id: 'W1P', kind: 'well', nodes: ['W1R', 'W1U', 'W1T', 'W1D'], links: ['W1DV', 'W1P', 'W1B'], pumpOn: 3, pumpOff: 6 }];
+	doc.controls = [{ link: 'W1P', action: { status: 'open' }, condition: { kind: 'node', node: 'W1T', cmp: 'below', value: 3 }, raw: 'LINK W1P OPEN IF NODE W1T BELOW 3', asm: 'W1P' },
+		{ link: 'W1P', action: { status: 'closed' }, condition: { kind: 'node', node: 'W1T', cmp: 'above', value: 6 }, raw: 'LINK W1P CLOSED IF NODE W1T ABOVE 6', asm: 'W1P' }];
 	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
 	L.applySaved(L.migrateSaved(saved)); L.buildDom();
 	const d2 = L.getDoc();
 	ok('the project file opens with every element kept: four nodes, three links', d2.nodes.length === 4 && d2.links.length === 3 && d2.curves.length === 2);
 	ok('and no grouping, since the form is gone', d2.assemblies.length === 0);
 	ok('its controls are ordinary, the user\'s own, still there', d2.controls.length === 2 && d2.controls.every((c) => !c.asm));
-	ok('and it says so in the status bar', /one-point/i.test(L.lastNotice()) && /W1/.test(L.lastNotice()), L.lastNotice());
+	ok('and it says so in the status bar', /one-point/i.test(L.lastNotice()) && /W1P/.test(L.lastNotice()), L.lastNotice());
 	// The .inp spelling of the same.
-	const text = EC.lpnExportInp(L.serializeProject(), {}).inp.replace(/^\[END\]/m, ';ASSEMBLY: well W1R W1U W1T W1D W1V W1 W1B ON=3 OFF=6\n\n[END]');
+	const text = EC.lpnExportInp(L.serializeProject(), {}).inp.replace(/^\[END\]/m, ';ASSEMBLY: well W1R W1U W1T W1D W1DV W1P W1B ON=3 OFF=6\n\n[END]');
 	const parsed = EC.lpnInpParse(text);
 	ok('the .inp comment of the old form reads as elements: no group', parsed.ok && parsed.assemblies.length === 0 && parsed.nodes.length === 4 && parsed.links.length === 3, JSON.stringify(parsed.assemblies));
-	ok('and the import report says what it did', (parsed.dropped || []).some((x) => x.code === 'assembly-well-tank' && x.ids.indexOf('W1') >= 0), JSON.stringify(parsed.dropped));
+	ok('and the import report says what it did', (parsed.dropped || []).some((x) => x.code === 'assembly-well-tank' && x.ids.indexOf('W1P') >= 0), JSON.stringify(parsed.dropped));
 	ok('and its two controls come in as ordinary controls', parsed.controls.length === 2 && parsed.controls.every((c) => !c.asm));
 	// The earlier form still: R S T G P, no tee.
-	const text2 = text.replace(/^;ASSEMBLY.*$/m, ';ASSEMBLY: well W1R W1U W1T W1V W1');
+	const text2 = text.replace(/^;ASSEMBLY.*$/m, ';ASSEMBLY: well W1R W1U W1T W1DV W1P');
 	const parsed2 = EC.lpnInpParse(text2);
 	ok('the slice-1 spelling (R S T G P) is read as elements too', parsed2.ok && parsed2.assemblies.length === 0 && (parsed2.dropped || []).some((x) => x.code === 'assembly-well-tank'));
 }
@@ -344,11 +344,11 @@ console.log('\n--- 8. the solvers ---');
 	const doc = fresh();
 	let a = place3(200, 150, 500, 150, 500, 400);
 	curves(doc, a);
-	L.setProp(L.nodeById('W1P'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
+	L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
 	L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'demand', 10);
 	L.setProp(L.nodeById('T1'), 'elev', 150);
 	const m = L.currentModel();
-	ok('the model carries the well with its tank for the diagnosis', m.wells.length === 1 && m.wells[0].gpv === 'W1V' && m.wells[0].pump === 'W1');
+	ok('the model carries the well with its tank for the diagnosis', m.wells.length === 1 && m.wells[0].gpv === 'W1DV' && m.wells[0].pump === 'W1P');
 	const issues = EC.lpnDiagnose(m);
 	ok('and nothing about a well is refused', !(issues || []).some((i) => /^well/.test(i.code)), JSON.stringify((issues || []).map((i) => i.code)));
 	L.runSolve();

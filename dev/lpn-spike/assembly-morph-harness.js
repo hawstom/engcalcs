@@ -100,14 +100,14 @@ const FORMS = {
 	'Well': function (doc) {
 		L.setMode('add-well'); press(200, 150);
 		const j = L.addNode('junction', 600, 150); j._demand = 5; j.elev = 150;
-		L.addLink('pipe', 'W1P', j.id, []);
+		L.addLink('pipe', 'W1', j.id, []);
 		wellCurves(doc);
 		return doc.assemblies[0];
 	},
 	'Well with tank': function (doc) {
 		L.setMode('add-welltank'); press(200, 150); press(400, 150); press(400, 400);
 		const j = L.addNode('junction', 600, 150); j._demand = 5; j.elev = 150;
-		L.addLink('pipe', 'W1P', j.id, []);
+		L.addLink('pipe', 'W1', j.id, []);
 		wellCurves(doc);
 		const g = doc.assemblies[0];
 		g.pumpOn = 1; g.pumpOff = 3;
@@ -118,7 +118,7 @@ function wellCurves(doc) {
 	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((q) => q.slice()) });
 	doc.curves.push({ id: 'PC1', kind: 'head', points: PH.map((q) => q.slice()) });
 	L.setProp(doc.links[0], 'curveId', 'DD1'); L.setProp(doc.links[1], 'curveId', 'PC1');
-	L.setProp(L.nodeById('W1P'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
+	L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
 }
 function membersOf(a) {
 	const nodes = [].concat(a.nodes || [a.up, a.down]), links = a.links.slice();

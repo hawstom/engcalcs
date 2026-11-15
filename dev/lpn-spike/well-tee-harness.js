@@ -98,18 +98,18 @@ function network(level) {
 	const doc = fresh();
 	L.setMode('add-welltank');
 	press(200, 150);
-	press(200, 150, hitNode('W1P'));   // the tee on the well's own point: a virtual pipe
+	press(200, 150, hitNode('W1'));   // the tee on the well's own point: a virtual pipe
 	press(400, 150);                  // the tank, 200 away; its pipe is made virtual below, so the numbers are the one-point form's
 	const a = doc.assemblies[0];
 	L.linkById(a.branch[1]).virtual = true;
 	const j = L.addNode('junction', 600, 150);
 	j._demand = 10;
-	L.addLink('pipe', 'W1P', j.id, []);
+	L.addLink('pipe', 'W1', j.id, []);
 	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) });
 	doc.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
 	L.setProp(doc.links[0], 'curveId', 'DD1');
 	L.setProp(doc.links[1], 'curveId', 'PC1');
-	L.setProp(L.nodeById('W1P'), 'elev', 150);
+	L.setProp(L.nodeById('W1'), 'elev', 150);
 	L.setProp(L.nodeById(a.tee), 'elev', 150);
 	L.setProp(L.nodeById(a.tank), 'elev', 150);
 	L.setProp(L.nodeById('W1R'), 'elev', 120);
@@ -128,7 +128,7 @@ for (const [label, level] of [['full', 3], ['half full', 1.5]]) {
 	const model = L.currentModel();
 	const eng = [['built-in', EC.lpnSolve(model)], ['EPANET', await EC.lpnSolveEpanet(model, { moduleUrl: NODE_ENGINE_URL })]];
 	for (const [nm, r] of eng) {
-		const a = doc.assemblies[0], q = r.flows.W1, qb = r.flows[a.branch[1]], ex = EXPECT[label];
+		const a = doc.assemblies[0], q = r.flows.W1P, qb = r.flows[a.branch[1]], ex = EXPECT[label];
 		ok(nm + ': solved and converged', r.ok && r.converged, JSON.stringify(r.engineError || r.issues || ''));
 		console.log('        ' + nm + ': pump ' + q + ', branch ' + qb + ', tee ' + r.heads[a.tee] + ', tank ' + r.heads[a.tank]);
 		if (level === 3) {
@@ -142,6 +142,28 @@ for (const [label, level] of [['full', 3], ['half full', 1.5]]) {
 			ok(nm + ': branch flow equals EPANET\'s ' + ex.branch, Math.abs(qb - ex.branch) <= 5e-6, qb);
 		}
 	}
+}
+
+// Tom, 2026-11-14: "If I set the elevation of the tank 700 feet lower than the node, I get unreasonable flow and velocity in the linking pipe even after the
+// tank is at max level." EPANET 2.2's hydstatus.c tankstatus() shuts a link that would carry flow into a tank at or above its maximum head, however far
+// below the tee the tank stands; both engines do the same (measured here: equal to 1e-9 m3/s). While the tank is NOT full the pipe carries whatever the
+// head difference drives, which is the physics, not an engine fault.
+console.log('\n--- the tank 700 ft (213.36 m) below the tee, on a real pipe ---');
+for (const [label, level] of [['full', 3], ['half full', 1.5]]) {
+	const doc = network(level);
+	const a = doc.assemblies[0];
+	L.linkById(a.branch[1]).virtual = false;
+	L.setProp(L.nodeById(a.tank), 'elev', 150 - 213.36);
+	const model = L.currentModel();
+	const res = [['built-in', EC.lpnSolve(model)], ['EPANET', await EC.lpnSolveEpanet(model, { moduleUrl: NODE_ENGINE_URL })]];
+	for (const [nm, r] of res) {
+		const qb = r.flows[a.branch[1]], v = r.velocities[a.branch[1]];
+		ok(nm + ' (' + label + '): solved and converged', r.ok && r.converged);
+		if (level === 3) { ok(nm + ' (full): the pipe to the full tank carries nothing and has no velocity, at any depth below the tee', Math.abs(qb) <= 1e-9 && v === 0, qb + ' ' + v); }
+		else { ok(nm + ' (half full): the pipe carries the head difference\'s flow, fast', qb > 0.04 && v > 5, qb + ' ' + v); }
+	}
+	const q = res.map((x) => x[1].flows[a.branch[1]]);
+	ok(label + ': the two engines agree on the pipe\'s flow to 1e-6 m3/s', Math.abs(q[0] - q[1]) <= 1e-6, q.join(' '));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

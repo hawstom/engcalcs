@@ -423,7 +423,8 @@
 					var gt = gm[2].split(/\s+/).filter(Boolean), gOpt = {};
 					// `ON=3 OFF=6` after a well's ids: the pump-on and pump-off tank depths its two controls were written from.
 					// `TEE=` `TANK=` `PIPES=a,b` after a Well with tank's ids: its tee, its tank and the two pipes between them (Round 7).
-					gt = gt.filter(function (tk) { var kv = /^(ON|OFF|TEE|TANK|PIPES)=(.+)$/i.exec(tk); if (kv) { gOpt[kv[1].toLowerCase()] = kv[2]; return false; } return true; });
+					// `ID=` the Well's own id, written where it is not the pump's (Round 8: the outlet node's, W1, the pump being W1P).
+					gt = gt.filter(function (tk) { var kv = /^(ID|ON|OFF|TEE|TANK|PIPES)=(.+)$/i.exec(tk); if (kv) { gOpt[kv[1].toLowerCase()] = kv[2]; return false; } return true; });
 					if (gm[1].toUpperCase() === 'VIRTUAL') { markVirtual = markVirtual.concat(gt); }
 					else if (gt[0].toLowerCase() === 'well') {
 						// `;ASSEMBLY: well R D P V W` is the Well: groundwater reservoir, drawdown node, pump outlet, drawdown valve, pump. A Well with tank
@@ -1397,7 +1398,8 @@
 					a.links.every(function (id) { return !!linkIndex[id]; })) {
 					if (wn[2].type === 'tank') { wellTankOld.push(a.links[1]); return; }
 					opt = a.opt || {};
-					w = { id: a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: true, _opt: opt };
+					// The group's id is the outlet node's when the file says so (`ID=`), else the pump's, as a file written before Round 8 has it.
+					w = { id: opt.id === a.nodes[2] ? a.nodes[2] : a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: true, _opt: opt };
 					pipes = String(opt.pipes || '').split(',');
 					if (nodeIndex[opt.tee] && nodeIndex[opt.tee].type === 'junction' && nodeIndex[opt.tank] && nodeIndex[opt.tank].type === 'tank' && pipes.length === 2 &&
 						pipes.every(function (id) { return !!linkIndex[id]; })) {
@@ -3774,7 +3776,7 @@
 				if (!a || !ends || !ends.every(Boolean) || !a.links || !a.links.length) { return; }
 				if (ends.concat(tail.slice(0, 2)).some(function (id) { return omitted[id]; }) || !a.links.concat(tail.slice(2)).every(function (id) { return live[id]; })) { return; }
 				out += ';ASSEMBLY: ' + [a.kind || 'pump'].concat(ends, a.links).join(' ') +
-					(a.kind === 'well' && wellOwns(a, 'open') ? ' ON=' + a.pumpOn : '') + (a.kind === 'well' && wellOwns(a, 'closed') ? ' OFF=' + a.pumpOff : '') +
+					(a.kind === 'well' && a.id === a.nodes[2] ? ' ID=' + a.id : '') + (a.kind === 'well' && wellOwns(a, 'open') ? ' ON=' + a.pumpOn : '') + (a.kind === 'well' && wellOwns(a, 'closed') ? ' OFF=' + a.pumpOff : '') +
 					(tail.length ? ' TEE=' + tail[0] + ' TANK=' + tail[1] + ' PIPES=' + tail[2] + ',' + tail[3] : '') + '\n';
 			});
 			return out ? out + '\n' : '';

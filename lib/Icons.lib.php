@@ -52,12 +52,13 @@ define('EC_WELL_UPPER_HALF', 5);
 
 // **THE WELL'S DRAWING** (Tom's sketch of 2026-10-25, WELL, and his notes from the round 6 pass): a ground line across the top that runs past the pit on both
 // sides; a wide upper cylinder; below it a narrow, deep cylinder with a closed bottom; the drawdown curves, which fall from the ground line's
-// ends to meet the narrow cylinder above its bottom. Two holes are drilled and nothing is wider at the bottom. The FIRST path is the outline of the
-// two cylinders: JS closes it for the symbol's backdrop and grab shape.
+// ends to meet the narrow cylinder above its bottom. Two holes are drilled and nothing is wider at the bottom. A short horizontal line across the
+// narrow hole where the curves meet it is the water level (Tom, round 7 pass: "There should be no box. But I think there should be a water level
+// horizontal line in the hole"). The FIRST path is the outline of the two cylinders: JS closes it for the symbol's backdrop and grab shape.
 function ecWellDrawing() {
 	$l = 12 - EC_WELL_UPPER_HALF; $r = 12 + EC_WELL_UPPER_HALF;
 	return '<path d="M' . $l . ' 4V11H10.5V21.5H13.5V11H' . $r . 'V4"/><path d="M2 4H22"/>'
-		. '<path d="M2 13C6 13 9.3 14.2 10.5 18M22 13C18 13 14.7 14.2 13.5 18"/>';
+		. '<path d="M2 13C6 13 9.3 14.2 10.5 18M22 13C18 13 14.7 14.2 13.5 18"/><path d="M10.5 18H13.5"/>';
 }
 // **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (Tom, round 6 pass: the earlier one drew the tank underground):
 // the well's drawing at 0.62 hanging from a ground line, with a tank standing ABOVE that line beside it. Strokes keep their width.

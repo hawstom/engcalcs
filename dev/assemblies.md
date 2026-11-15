@@ -178,13 +178,14 @@ head-loss curve is the drawdown against pumping rate (it includes the point 0, 0
 pipes attach to and the one that carries the ground elevation and the drawing. The pump's curve is the head lifted from the pumping level (the static
 elevation less the drawdown), not from the static elevation.
 
-- **IDs and symbol (Tom, 2026-11-09 and the round 6 pass: "W1, W1R, W1D, and W1P"):** the well is its pump and carries its ID, W1 from a project prefix **W**
-  (Settings, beside the others; the pump prefix's Apply to all leaves well pumps alone). Its members are W1R (Reservoir), W1D (Drawdown node), W1V
-  (Drawdown valve) and W1P (Pump outlet). A file written before Round 7 keeps its own IDs (W1U for the drawdown node, W1D for the outlet): import and
-  opening never rename. It is drawn as one symbol, the toolbar icon's own paths, on the outlet node; the other nodes and both links draw as nothing.
+- **IDs and symbol (Tom, 2026-11-14, replacing the Round 7 list):** the well's ID is W1, from a project prefix **W** (Settings, beside the others), and it
+  is also the ID of the node at the outlet. Its members are W1R (aquifer Reservoir), W1DV (virtual valve for well drawdown, the GPV), W1D (the node that
+  shows drawdown), W1P (the physical pump) and W1 (the outlet node). A file written before Round 8 keeps its own IDs (pump W1, outlet W1P, valve W1V); a
+  file before Round 7 its W1U and W1D: import and opening never rename. It is drawn as one symbol, the toolbar icon's own paths, on the outlet node; the other nodes and both links draw as nothing.
   A new well's static elevation is the ground less 100 ft or 30 m; where the ground waits for the DEM, the static level follows the fill, and no door
   that reads the land surface ever writes R or D.
-- **Grouping:** `{ id: W, kind: 'well', nodes: [R, D, P], links: [V, W] }`; pump and valve groups keep `up` and `down`. The `.inp` comment is
+- **Grouping:** `{ id: W, kind: 'well', nodes: [R, D, P], links: [V, W] }` (`id` is P's, the outlet node's, in a Well made since Round 8, and the pump's in
+  an older one); pump and valve groups keep `up` and `down`. The `.inp` comment is
   `;ASSEMBLY: well R D P V W`, restored only when all five exist (R a reservoir, D and P junctions), else `assembly-unresolved`.
 - **Shared values:** x and y reach every node; the static water level elevation typed on R or D reaches the other of the two; the ground elevation typed
   on P reaches nothing else. A pipe that ends on or starts at a well joins P. Splicing into a pipe makes P the node both halves attach to, with the
@@ -206,7 +207,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 
 - **The box:** the assembly's own entry area first (ID, Description, Tag, Elevation, Static water level elevation, the two curves, the
   pump's or valve's own inputs, Closed, Active, Explode), then one heading per sub-element from upstream to downstream, titled with its
-  kind and ID (Well: Reservoir W1R, Drawdown valve W1V, Junction W1D, Pump W1, Junction W1P; Pump+ and
+  kind and ID (Well: Reservoir W1R, Drawdown valve W1DV, Junction W1D, Pump W1P, Junction W1; Pump+ and
   Valve+: Junction, Pump or Valve, Junction). Under each, the rows that element owns, from the ordinary box's own row functions
   (`junctionResultFields`, `linkResultFields`, `tankResultFields`, `reservoirResultFields`, `tankDepthFields`): its solved head,
   pressure, flow, velocity, head loss and status; the Tank's Base elevation, depths and diameter. Not collapsible: every edit rebuilds the box.
@@ -265,16 +266,15 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 
 ### Round 7 (Tom, round 6 pass, from his round 6 browser pass; `well-simple-harness.js`, `well-label-rows-harness.js`, `well-tank-three-point-harness.js`, `assembly-morph-harness.js`)
 
-- **Well member IDs** (*"How about Reservoir R, Drawdown D, and Pump outlet P. In other words, W1, W1R, W1D, and W1P?"*): W1R reservoir, W1D the
-  drawdown node (was W1U), W1V the drawdown valve, W1 the pump, W1P the pump outlet (was W1D). Files before this keep their IDs; nothing is renamed on
-  import. The Explode tips are unchanged, in the words Tom approved.
-- **The label block** (his example: `W1 Z = 999', Q=99 gpm` / `W1R H=899'` / `W1D H= 799'` / `W1P H=1099', P=40 psi`): the heading is the ID with Z (the
-  outlet's ground elevation) and Q (the pump's flow), nothing else; W1R and W1D give H, W1P gives H and P; the drawdown valve has no row. The numbers are
-  the ordinary fields', so the label settings govern which show. Order of the two heading numbers: `WELL_HEADING_FIELDS` (Z then Q, as in his example;
-  he also asked *"Do we want to try to put Q first after the W1 ID?"*, so it is a one-word swap if he wants it).
+- **Well member IDs** (*"How about Reservoir R, Drawdown D, and Pump outlet P. In other words, W1, W1R, W1D, and W1P?"*): replaced by Round 8's list. The
+  Explode tips are unchanged, in the words Tom approved.
+- **The label block** (his example `W1 Z = 999', Q=99 gpm` / `W1R H=899'` / `W1D H= 799'` / `W1P H=1099', P=40 psi`, replaced by Round 8's three rows): the numbers
+  are the ordinary fields', so the label settings govern which show. Order of the heading numbers: `WELL_HEADING_FIELDS` (Z then Q then P; he also asked
+  *"Do we want to try to put Q first after the W1 ID?"*, so it is a swap if he wants it).
 - **The Properties box:** flow once, above the headings (the pump's); pressure only under the outlet. The reservoir's Pressure row is gone too.
 - **The symbol** (his sketch of 2026-10-25, WELL): a ground line, a wide upper cylinder, a narrow deep cylinder with a closed bottom below it, the drawdown
-  curves meeting the narrow one above its bottom; the box at the bottom (it read as a pump) is gone. The upper cylinder's width is
+  curves meeting the narrow one above its bottom, and (Round 8) a short horizontal water-level line across the narrow one where they meet it; the box at the
+  bottom (it read as a pump) is gone. The upper cylinder's width is
   `EC_WELL_UPPER_HALF` in `lib/Icons.lib.php`, one line; the map symbol's grab shape is derived from the icon's first path, so one number moves all.
   He is asking colleagues whether it should be much narrower, only a little wider than the deep one.
 - **Well with tank is three points** (*"Physically and geographically, a well is a location/point with a reservoir, drawdown, and pump. Cramming a tank into
@@ -308,6 +308,28 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **Merge checklist, before this branch goes to master:** Morph works with every + form (done, above); Pump+/Valve+/Well/Well with tank open and save
   from old files (done); the pressure tank is not built (said in the public text, if any).
 - **The pump's selected circle** is unchanged (Tom wondered if it is "cartoonishly large"); its radius is in the round 7 report.
+
+### Round 8 (Tom, 2026-11-14, from his round 7 pass; `assembly-ids-harness.js`, `well-label-rows-harness.js`, `well-tee-harness.js`)
+
+- **THE TRANSPARENCY RULE, NO EXCEPTIONS:** every member element of every assembly form (Pump+, Valve+, Well, Well with tank) is listed in the group's Properties under
+  its own ID (*"I like that we are transparent in that we list every model element in Properties. Let's ensure that we make that a rule with no exceptions."*).
+  A Well with tank therefore also lists its pipe, tee, pipe and tank, results only. `assembly-ids-harness.js` builds each form and asserts it.
+- **IDs (Tom's list):** W1 the Well; W1R aquifer reservoir (node); W1DV virtual valve for well drawdown (link); W1D node that shows drawdown; W1P physical pump
+  (link); W1 the node at the outlet. The group's ID is its bearer's (`assemblyBearer()`): the outlet node's for a Well made since this round, the pump's for
+  an older one, the device's for a Pump+ or Valve+. It follows a rename of its bearer only, and never of another member. The group is not in the node or the
+  link namespace, so a group and a node may be one text; `;ASSEMBLY:` carries `ID=W1` when the group's ID is the outlet node's (a line without it reads as the
+  pump's). The Well prefix's Apply to all renames the bearers; no other prefix's batch takes a Well's member.
+- **The label block:** `W1 Z=, Q=, P=` (Z ground elevation, Q the pump's flow, P the pressure at the outlet node W1), then `W1R H=`, then `W1D H=`; the outlet has
+  no row of its own and the drawdown valve none. Always rows.
+- **Symbol:** the water-level line across the narrow hole at the drawdown, `lib/Icons.lib.php`. The upper hole's tint is the reservoir's and the tank's: one
+  class (`lpn-node-symbol-backdrop`, 18 % of the symbol's ink over paper).
+- **Well with tank elevations:** a tee and a tank the Well's own placing made follow the Well's elevation until the user types one of their own into either
+  (`teeFollow`, `tankFollow` on the grouping, true only while following); an existing junction or tank pressed as the tee or tank, a tee on a pipe, a file from
+  before this round and an `.inp` import never follow. The DEM fill of the tee's or tank's own point does not end it.
+- **A tank far below the tee (Tom: 700 ft lower gives unreasonable flow and velocity "even after the tank is at max level"):** EPANET 2.2 `tankstatus()`
+  (src/hydstatus.c) closes (TEMPCLOSED) any link whose flow would enter a tank whose head is at or above its maximum, however far below the tee it stands; both
+  engines do the same and agree with EPANET to 1e-6 m3/s. Below the maximum the pipe carries the head difference's flow: 213 m through the default 4-inch
+  (100 mm) branch pipe is 6.5 m/s. A steady-state run holds the tank at its Initial depth and never fills it.
 
 ### Open, from Tom's 2026-11-11 notes
 

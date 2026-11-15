@@ -76,17 +76,17 @@ function network(on, off) {
 	const doc = fresh();
 	// Round 7: a Well with tank is three presses. The tee stands on the well's own point and the tank 200 away on a virtual pipe.
 	L.setMode('add-welltank');
-	press(200, 150); press(200, 150, hitNode('W1P')); press(400, 150);
+	press(200, 150); press(200, 150, hitNode('W1')); press(400, 150);
 	L.linkById(doc.assemblies[0].branch[1]).virtual = true;
 	const j = L.addNode('junction', 600, 150);
 	j._demand = 15;
-	L.addLink('pipe', 'W1P', j.id, []);
+	L.addLink('pipe', 'W1', j.id, []);
 	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) });
 	doc.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
 	L.setProp(doc.links[0], 'curveId', 'DD1');
 	L.setProp(doc.links[1], 'curveId', 'PC1');
 	const t = L.nodeById('T1');
-	L.setProp(t, 'elev', 150); L.setProp(L.nodeById('W1P'), 'elev', 150); L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
+	L.setProp(t, 'elev', 150); L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
 	L.setProp(t, 'minLevel', 0); L.setProp(t, 'maxLevel', 8); L.setProp(t, 'level', 4.5); L.setProp(t, 'tankDiameter', 6);
 	doc.times = Object.assign(EC.lpnTimesDefaults(), { duration: 24 * 3600 });
 	const a = L.assemblyById('W1');
@@ -110,7 +110,7 @@ console.log('--- the controls the well writes ---');
 const { doc, a } = network();
 a.pumpOn = 3; a.pumpOff = 6;
 // The box writes them through its own setter; reach it by opening the box and changing the fields.
-L.openLinkPopup('W1');
+L.openLinkPopup('W1P');
 const fieldsOf = byId.lpn_popup_fields;
 function all(el, out) { out = out || []; (el.childNodes || el.children || []).forEach((c) => { out.push(c); all(c, out); }); return out; }
 const labels = all(fieldsOf).filter((n) => /Pump (on|off)/.test(n.textContent || '') && n.tagName === 'LABEL');
@@ -120,7 +120,7 @@ inputs.forEach((inp, k) => { inp.value = k === 0 ? '3' : '6'; (inp._listeners.ch
 ok('the well holds the two levels', a.pumpOn === 3 && a.pumpOff === 6, a.pumpOn + ' ' + a.pumpOff);
 const mine = doc.controls.filter((c) => c.asm === 'W1');
 ok('two controls are tagged as the well\'s', mine.length === 2, JSON.stringify(doc.controls.map((c) => c.raw)));
-ok('the sentences are EPANET\'s simple controls', mine[0].raw === 'LINK W1 OPEN IF NODE T1 BELOW 3' && mine[1].raw === 'LINK W1 CLOSED IF NODE T1 ABOVE 6', mine.map((c) => c.raw).join(' / '));
+ok('the sentences are EPANET\'s simple controls', mine[0].raw === 'LINK W1P OPEN IF NODE T1 BELOW 3' && mine[1].raw === 'LINK W1P CLOSED IF NODE T1 ABOVE 6', mine.map((c) => c.raw).join(' / '));
 
 console.log('\n--- both engines cycle the pump the same way ---');
 {
@@ -129,12 +129,12 @@ console.log('\n--- both engines cycle the pump the same way ---');
 	model.hydraulics = Object.assign({}, model.hydraulics, { accuracy: 1e-5 });
 	const nat = EC.lpnNativeRun(JSON.parse(JSON.stringify(model))), epa = await EC.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
 	ok('both ran', nat.ok && epa.ok, JSON.stringify([nat.error, epa.error, nat.issues]).slice(0, 200));
-	const sn = switches(nat, 'W1'), se = switches(epa, 'W1');
+	const sn = switches(nat, 'W1P'), se = switches(epa, 'W1P');
 	console.log('        switches built-in ' + JSON.stringify(sn) + ' EPANET ' + JSON.stringify(se));
 	ok('the pump switches more than twice in 24 h', se.length >= 3, se.length);
 	ok('both engines switch at the same times', JSON.stringify(sn) === JSON.stringify(se));
 	let worst = 0, pumpWorst = 0;
-	nat.frames.forEach((f, k) => { const d = Math.abs(f.levels.T1 - epa.frames[k].levels.T1); worst = Math.max(worst, d); pumpWorst = Math.max(pumpWorst, Math.abs(f.flows.W1 - epa.frames[k].flows.W1)); });
+	nat.frames.forEach((f, k) => { const d = Math.abs(f.levels.T1 - epa.frames[k].levels.T1); worst = Math.max(worst, d); pumpWorst = Math.max(pumpWorst, Math.abs(f.flows.W1P - epa.frames[k].flows.W1P)); });
 	ok('the pump flows agree within 2e-6 m3/s at every step', pumpWorst <= 2e-6, pumpWorst);
 	// Each step's pump flow agrees to 2e-6 m3/s (the other EPS harnesses' tolerance); the tank integrates that over a 28 m2 surface, so levels drift apart by a millimetre or two.
 	// Two virtual pipes now stand between the pump and the tank (well to tee, tee to tank), each EPANET's millimetre stand-in, so the levels drift a little further: 5 mm.
@@ -146,7 +146,7 @@ console.log('\n--- both engines cycle the pump the same way ---');
 console.log('\n--- export, import, and a hand edit ---');
 {
 	const inp = EC.lpnExportInp(L.serializeProject(), {}).inp;
-	console.log((inp.match(/\[CONTROLS\][^[]*/) || [''])[0]); ok('the .inp holds them as ordinary [CONTROLS] lines', /\[CONTROLS\]\nLINK W1 OPEN IF NODE T1 BELOW 3\nLINK W1 CLOSED IF NODE T1 ABOVE 6/.test(inp));
+	console.log((inp.match(/\[CONTROLS\][^[]*/) || [''])[0]); ok('the .inp holds them as ordinary [CONTROLS] lines', /\[CONTROLS\]\nLINK W1P OPEN IF NODE T1 BELOW 3\nLINK W1P CLOSED IF NODE T1 ABOVE 6/.test(inp));
 	ok('and the assembly comment carries the levels', /^;ASSEMBLY: well .* ON=3 OFF=6( TEE=.*)?$/m.test(inp), (inp.match(/^;ASSEMBLY.*$/m) || [''])[0]);
 	const p = EC.lpnInpParse(inp);
 	ok('read back, the well owns both again', p.assemblies[0].pumpOn === 3 && p.assemblies[0].pumpOff === 6 && p.controls.filter((c) => c.asm === 'W1').length === 2);
@@ -178,14 +178,14 @@ console.log('\n--- Explode ---');
 {
 	const { doc: d3, a: a3 } = network();
 	a3.pumpOn = 3; a3.pumpOff = 6;
-	L.openLinkPopup('W1');
+	L.openLinkPopup('W1P');
 	const labs = all(byId.lpn_popup_fields).filter((n) => /Pump (on|off)/.test(n.textContent || '') && n.tagName === 'LABEL');
 	labs.map((l) => all(l).filter((n) => n.tagName === 'INPUT')[0]).forEach((inp, k) => { inp.value = k === 0 ? '3' : '6'; (inp._listeners.change || []).forEach((fn) => fn({})); });
 	ok('before: two owned', d3.controls.filter((c) => c.asm).length === 2);
 	L.explode('W1');
 	ok('after Explode: two ordinary controls, none owned', d3.controls.length === 2 && d3.controls.every((c) => !c.asm), JSON.stringify(d3.controls.map((c) => c.raw + '|' + c.asm)));
 	const inp = EC.lpnExportInp(L.serializeProject(), {}).inp;
-	ok('and no ON= on the file', !/ON=/.test(inp) && /LINK W1 OPEN IF NODE T1 BELOW 3/.test(inp));
+	ok('and no ON= on the file', !/ON=/.test(inp) && /LINK W1P OPEN IF NODE T1 BELOW 3/.test(inp));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

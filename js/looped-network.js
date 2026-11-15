@@ -3062,9 +3062,16 @@ var EngCalcs = EngCalcs || {};
 				if (!rec) { return; }
 				seen[id] = true; recs.push(rec);
 			};
+			// **AN ASSEMBLY'S BLOCK GIVES ROWS UP FOR ITS OWN SAKE ONLY, NEVER AS SOMEBODY ELSE'S BLOCKER** (Round 8; Tom, 2026-11-14: "two labels, where we need
+			// four"). A neighbour that found no side (Net1's N23 at the window's edge) enlists every label overlapping any of its 28 candidate sides, and each of
+			// those gave up its lowest-ranked value per rung: two rungs took both of a Well's member rows, leaving its heading alone, in a view with room all round it.
+			var blocksOnly = function (id) {
+				var n = nodeOf[id], ne = n && nodeEls[n.id];
+				if (!(ne && ne.allLines && assemblyBlockLines(ne.allLines))) { enlist(id); }
+			};
 			dropped.forEach(function (lbl) {
 				enlist(lbl.id);
-				nodeShedBlockers(lbl, index, local, pad).forEach(enlist);
+				nodeShedBlockers(lbl, index, local, pad).forEach(blocksOnly);
 			});
 			if (!recs.length) { break; }   // nothing left to give up: the drops stand and go whole
 			// EVERY WRITE, THEN EVERY READ -- one forced layout for the rung instead of one per
@@ -5965,7 +5972,27 @@ var EngCalcs = EngCalcs || {};
 		wellStaticAuto = true;
 		try { setProp(r, 'elev', +(+effective(r, 'elev') + (now - was)).toFixed(4)); } finally { wellStaticAuto = false; }
 	}
+	// **A WELL WITH TANK'S TEE AND TANK FOLLOW THE WELL'S GROUND ELEVATION UNTIL THE USER TYPES ONE OF THEIR OWN** (Task 822; Tom, 2026-11-14: "Can the tank
+	// and node elevation follow the well elevation until they are diverged by the user?"). The same shape as the static level above: a value typed
+	// on the tee or the tank ends its following (`teeFollow`, `tankFollow` on the grouping, which the project carries, are true only while it follows) and
+	// it stays as typed. Only a tee or tank the Well's own placing made follows: one opened on an existing junction or tank, or on a point of a pipe, was already
+	// the user's, and so is any in a file written before the flags, or imported from an `.inp`. The program's own write (`wellTankAuto`: the follow itself,
+	// and the DEM fill of the tee's or tank's own point) neither ends it nor follows.
+	var wellTankAuto = false;
+	function wellTankFollow(asm, el, value) {
+		if (wellTankAuto || !asm || !asm.tank) { return; }
+		if (el.id === asm.tee) { delete asm.teeFollow; return; }
+		if (el.id === asm.tank) { delete asm.tankFollow; return; }
+		if (el.id !== asm.nodes[2]) { return; }
+		[['tee', 'teeFollow'], ['tank', 'tankFollow']].forEach(function (k) {
+			var n = nodeById(asm[k[0]]);
+			if (!n || !asm[k[1]]) { return; }
+			wellTankAuto = true;
+			try { setProp(n, 'elev', value); updateNode(n.id, true); } finally { wellTankAuto = false; }
+		});
+	}
 	function setProp(el, prop, value) {
+		if (prop === 'elev' && elGroup(el) === 'node' && !assemblyWriting) { wellTankFollow(assemblyOfAnyMember('node', el.id), el, value); }
 		// **THE TWO NODES OF AN ASSEMBLY SHARE ELEVATION AND PLACE** (Task 822): the partner is written
 		// by the same call, whichever door (Properties, Tables, the marker's tick) the edit came by.
 		if ((prop === 'elev' || prop === 'x' || prop === 'y') && elGroup(el) === 'node' && !assemblyWriting) {
@@ -21185,8 +21212,10 @@ var EngCalcs = EngCalcs || {};
 		if (!pending.length) { refreshPopupIfOpen(); return []; }
 		saveUndoSnapshot();
 		pending.forEach(function (p) {
-			var a = assemblyOfNode(p.n.id), r;
-			setProp(p.n, 'elev', p.v);
+			var a = assemblyOfNode(p.n.id), a0 = assemblyOfAnyMember('node', p.n.id), r;
+			// A tee's or a tank's own point reads its own ground: the program's write, which neither marks it as typed nor follows the well.
+			wellTankAuto = !!(a0 && a0.tank && (a0.tee === p.n.id || a0.tank === p.n.id));
+			try { setProp(p.n, 'elev', p.v); } finally { wellTankAuto = false; }
 			// A Well born where the ground was not yet known has no static level yet: it takes the ground less the round depth.
 			r = a && a.kind === 'well' && a.nodes.indexOf(p.n.id) >= 2 ? nodeById(a.nodes[0]) : null;
 			if (r && !terrainHasElev(r)) { wellStaticAuto = true; try { setProp(r, 'elev', +(p.v - wellStaticDepth()).toFixed(4)); } finally { wellStaticAuto = false; } }
@@ -39368,6 +39397,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			add('node', a.nodes[1], jn);
 			add('link', a.links[1], pc.lpn_tool_add_pump || 'Pump', true);
 			add('node', a.nodes[2], jn);
+			// A Well with tank lists its tee, tank and the two pipes too, in the order the water goes (the rule: every member, under its own ID).
+			if (a.tank) {
+				add('link', a.branch[0], pc.lpn_tool_add_pipe || 'Pipe');
+				add('node', a.tee, jn);
+				add('link', a.branch[1], pc.lpn_tool_add_pipe || 'Pipe');
+				add('node', a.tank, pc.lpn_tool_add_tank || 'Tank');
+			}
 		} else {
 			add('node', a.up, jn);
 			add('link', a.links[0], a.kind === 'valve' ? (pc.lpn_tool_add_valve || 'Valve') : (pc.lpn_tool_add_pump || 'Pump'), true);
@@ -40586,6 +40622,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// flow would fill it) shuts that pipe and never the pump.
 	function wellOutNode(a) { return a.nodes[2]; }
 	function assemblyDeviceLink(a) { return linkById(a.kind === 'well' ? a.links[1] : a.links[0]); }
+	// **THE ELEMENT THAT BEARS A GROUP'S ID** (Tom, 2026-11-14: W1 is the Well, and W1 is also the node at its outlet; the pump is W1P). A group's
+	// id is one of its members' ids and follows that member's rename: a pump's or a valve's is its device's, a Well's is its outlet node's, except
+	// a Well saved before Round 8, whose id is its pump's (W1; its outlet W1P). `a.id` says which; a group id and a node id may be the same text
+	// because the group is not in the node or the link namespace (allIds() never lists it).
+	function assemblyBearer(a) {
+		return a.kind === 'well' && a.id === a.nodes[2] ? { group: 'node', id: a.nodes[2] } : { group: 'link', id: a.links[a.kind === 'well' ? 1 : 0] };
+	}
+	function assemblyBearerEl(a) { var b = assemblyBearer(a); return b.group === 'node' ? nodeById(b.id) : linkById(b.id); }
 	function assemblyOfNode(id) {
 		var list = assemblyList(), i;
 		for (i = 0; i < list.length; i++) { if (assemblyNodeIds(list[i]).indexOf(id) >= 0) { return list[i]; } }
@@ -40627,6 +40671,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// A Well with tank: its tee, tank and the two pipes, all present, else it is the simple Well it was before the tank went in.
 					if (a.tee && a.tank && Array.isArray(a.branch) && a.branch.length === 2 && nodeIds[a.tee] && nodeIds[a.tank] && a.branch.every(function (id) { return linkIds[id]; })) {
 						w.tee = a.tee; w.tank = a.tank; w.branch = a.branch.slice();
+						if (a.teeFollow) { w.teeFollow = true; }
+						if (a.tankFollow) { w.tankFollow = true; }
 					} else { w.pumpOn = undefined; w.pumpOff = undefined; }
 					out.push(w);
 				}
@@ -40688,13 +40734,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} finally { assemblyBlockBuilding = false; }
 		return (any || ls.node.id || ls.link.id) ? lines : [];
 	}
-	// **A WELL'S LABEL BLOCK** (Round 7; Tom, round 6 pass, his example: `W1 Z = 999', Q=99 gpm` / `W1R H=899'` / `W1D H= 799'` / `W1P H=1099', P=40 psi`).
-	// The heading is the well's ID with the two numbers that are the well's own: Z, the ground elevation (the outlet node's), and Q, the pump's flow;
-	// there is one flow in a well, so no other row carries one. One row per member node that has a value to show: the groundwater reservoir and the
-	// drawdown node show H (a pressure there makes no sense), the pump outlet shows H and P. The drawdown valve has no row: its flow is the pump's.
-	// Each number is the ordinary field's, so the label settings' toggles and affixes govern it. The order of the heading's two numbers is this array.
-	var WELL_HEADING_FIELDS = ['elev', 'flow'];
-	var WELL_ROW_FIELDS = [[0, ['head']], [1, ['head']], [2, ['head', 'pressure']]];
+	// **A WELL'S LABEL BLOCK** (Round 8; Tom, 2026-11-14: "We need W1 Z, Q, and P (for outlet node); W1R Res H; and W1D Drawdown H."): `W1 Z=999', Q=99 gpm, P=40 psi`
+	// / `W1R H=899'` / `W1D H=799'`. The heading is the well's ID (it is also the outlet node's) with the three numbers that belong to the well as a
+	// whole: Z, the ground elevation (the outlet node's), Q, the pump's flow, and P, the pressure at the outlet node; there is one flow in a well, so no
+	// other row carries one. Then one row per upstream member node that has a value to show: the groundwater reservoir and the drawdown node show H (a
+	// pressure there makes no sense). The outlet has no row of its own (the heading is it) and the drawdown valve has none: its flow is the pump's.
+	// Each number is the ordinary field's, so the label settings' toggles and affixes govern it. The order of the heading's numbers is this array.
+	var WELL_HEADING_FIELDS = ['elev', 'flow', 'pressure'];
+	var WELL_ROW_FIELDS = [[0, ['head']], [1, ['head']]];
 	function wellLabelBlock(a, ls, extrema) {
 		var sep = labelSeparator(), pump = linkById(a.links[1]), out = nodeById(a.nodes[2]), lines = [], any = false, head = [];
 		if (!pump || !out) { return []; }
@@ -40822,10 +40869,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return a;
 	}
 	/**
-	 * **A WELL: THREE NODES AT ONE POINT, TWO LINKS** (Task 822; Tom, 2026-11-06: "Pump+ and Well on Pump"; the round 6 pass: "W1, W1R, W1D, and W1P").
-	 * The pump is the well and carries its ID, W1; the rest take it with a letter: W1R the groundwater Reservoir, W1D the Drawdown node (the pump's
-	 * upstream node, where the water stands once the pump draws), W1V the drawdown Valve, W1P the pump's outlet, the Pump node the system's pipes
-	 * attach to and the one that carries the ground elevation and the drawing.
+	 * **A WELL: THREE NODES AT ONE POINT, TWO LINKS** (Task 822; Tom, 2026-11-06: "Pump+ and Well on Pump"; his list of 2026-11-14).
+	 * The Well carries one ID, W1, which is also the ID of the node at its outlet (the node the system's pipes attach to, and the one that carries the ground
+	 * elevation and the drawing); the rest take it with letters: W1R the aquifer Reservoir, W1D the Drawdown node (the pump's upstream node, where the
+	 * water stands once the pump draws), W1DV the virtual valve for drawdown (a GPV), W1P the physical Pump.
 	 * R is a reservoir whose head is the groundwater's static elevation; D is a junction with no demand standing at that elevation; V is a general
 	 * purpose valve from R to D whose head-loss curve is the drawdown against pumping rate; the pump runs from D to P and its curve is the head it
 	 * lifts from the pumping level (the static elevation less the drawdown). Every one is an ordinary node or link in `doc.nodes` and `doc.links`;
@@ -40840,20 +40887,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function wellHasTank(a) { return !!(a && a.kind === 'well' && a.tank && nodeById(a.tank)); }
 	function completeWell(d, x, y) {
 		var ground = d ? d.elev : undefined,
-			base = mintGroupBase('W', ['R', 'D', 'V', 'P']),
+			base = mintGroupBase('W', ['R', 'D', 'DV', 'P']),
 			stat, r, s, g, p, a;
 		if (typeof ground !== 'number') { ground = (scnSetting('defaults') || {}).nodeElev; }
 		// Where the ground is still to be read from the DEM, the static level waits for it (terrainFillElevations()).
 		stat = typeof ground === 'number' && !(d && typeof d.elev !== 'number' && elevSourceIsDem()) ? +(ground - wellStaticDepth()).toFixed(4) : undefined;
-		if (d) { renameFresh(d, base + 'P'); } else { d = addNode('junction', x, y, base + 'P'); }
+		if (d) { renameFresh(d, base); } else { d = addNode('junction', x, y, base); }
 		r = addNode('reservoir', d.x, d.y, base + 'R'); s = addNode('junction', d.x, d.y, base + 'D');
 		// The static level is the groundwater's, so neither node reads the land surface.
 		if (stat !== undefined) { r.elev = stat; s.elev = stat; }   // base-write: construction
 		s._demand = 0;   // base-write: construction: the drawdown node draws nothing
-		g = addLink('valve', r.id, s.id, [], base + 'V');
+		g = addLink('valve', r.id, s.id, [], base + 'DV');
 		g.valveType = 'GPV'; g._setting = defaultValveSetting('GPV');   // base-write: construction
-		p = addLink('pump', s.id, d.id, [], base);
-		a = { id: p.id, kind: 'well', nodes: [r.id, s.id, d.id], links: [g.id, p.id] };
+		p = addLink('pump', s.id, d.id, [], base + 'P');
+		a = { id: d.id, kind: 'well', nodes: [r.id, s.id, d.id], links: [g.id, p.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
 		syncAssemblyGlyphs();
@@ -40888,22 +40935,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The node a press names, if any: the one under the pointer, else the nearest within the gesture's own reach.
 	function wellTankHitNode(e, t) { var id = (t && t.dataset && t.dataset.node) || (nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) || {}).id; return id ? nodeById(id) : null; }
 	function wellTankStep(e, w, t) {
-		var a = wellTankPending && assemblyById(wellTankPending.id), hit, wellOut, tee, tank, pid, pipe, r, p1, p2, from;
+		var a = wellTankPending && assemblyById(wellTankPending.id), hit, wellOut, tee, tank, pid, pipe, r, p1, p2, from, teeFollows = false, tankFollows = false;
 		if (wellTankPending && (!a || a.tank)) { wellTankPending = null; a = null; }
 		if (!a) { return false; }
 		wellOut = nodeById(a.nodes[2]);
 		hit = wellTankHitNode(e, t);
 		if (wellTankPending.stage === 'tee') {
-			if (hit && assemblyOfNode(hit.id) === a) { tee = addNode('junction', wellOut.x, wellOut.y); if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } }   // base-write: construction: the tee stands where the well does
+			if (hit && assemblyOfNode(hit.id) === a) { tee = addNode('junction', wellOut.x, wellOut.y); if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } teeFollows = true; }   // base-write: construction: the tee stands where the well does, at its elevation, and follows it
 			else if (hit && hit.type === 'junction' && !assemblyOfNode(hit.id) && wellTankNotOurs(a, hit.id)) { tee = hit; }
 			else if (hit) { wellTankPrompt('lpn_welltank_tee_refused', 'The tee must be a junction that is not part of another assembly. Specify the tee again.'); return true; }
 			else {
 				pid = tapLinkId(t); pipe = pid ? linkById(pid) : null;
 				if (pipe && pipe.type === 'pipe' && inBaseScenario() && wellTankNotOurs(a, pipe.id) && nodeById(pipe.from) && nodeById(pipe.to)) {
 					r = breakPipeAtPoint(pipe, 'junction', w.x, w.y, null); tee = r.node;
-				} else { tee = addNode('junction', w.x, w.y); }
+				} else { tee = addNode('junction', w.x, w.y); if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } teeFollows = true; }   // base-write: construction: open ground takes the well's elevation and follows it
 			}
-			wellTankPending.tee = tee.id; wellTankPending.stage = 'tank';
+			wellTankPending.tee = tee.id; wellTankPending.stage = 'tank'; wellTankPending.teeFollow = teeFollows;
 			wellTankPending.pipe1 = wellTankPipe(wellOut.id, tee.id).id;
 			wellTankPrompt('lpn_welltank_tank_prompt', 'Now specify the tank: a tank or a point on the map. Press Escape to stop with the well and its tee.');
 			updateModeHint();
@@ -40911,9 +40958,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (hit && hit.type === 'tank' && !assemblyOfNode(hit.id) && wellTankNotOurs(a, hit.id)) { tank = hit; }
 		else if (hit) { wellTankPrompt('lpn_welltank_tank_refused', 'The tank must be a tank that is not part of another assembly. Specify the tank again.'); return true; }
-		else { tank = addNode('tank', w.x, w.y); }
+		else { tank = addNode('tank', w.x, w.y); if (typeof wellOut.elev === 'number') { tank.elev = wellOut.elev; } tankFollows = true; }   // base-write: construction: a new tank takes the well's elevation and follows it
 		p2 = wellTankPipe(wellTankPending.tee, tank.id);
 		a.tee = wellTankPending.tee; a.tank = tank.id; a.branch = [wellTankPending.pipe1, p2.id];
+		if (wellTankPending.teeFollow) { a.teeFollow = true; }
+		if (tankFollows) { a.tankFollow = true; }
 		wellTankPending = null;
 		setNotice('');
 		updateModeHint();
@@ -41008,8 +41057,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			labelCacheTaint(); labelRefreshPending = true; flushLabelRefresh();
 		}
 	}
-	function renameInAssemblies(oldId, newId) {
+	function renameInAssemblies(oldId, newId, group) {
 		assemblyList().forEach(function (a) {
+			var bearer = assemblyBearer(a);
 			if (a.up === oldId) { a.up = newId; }
 			if (a.down === oldId) { a.down = newId; }
 			if (a.nodes) { a.nodes = a.nodes.map(function (x) { return x === oldId ? newId : x; }); }
@@ -41018,7 +41068,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (a.tee === oldId) { a.tee = newId; }
 			if (a.tank === oldId) { a.tank = newId; }
 			if (a.branch) { a.branch = a.branch.map(function (x) { return x === oldId ? newId : x; }); }
-			if (a.id === oldId) { a.id = newId; (doc.controls || []).forEach(function (c) { if (c && c.asm === oldId) { c.asm = newId; } }); }
+			// The group's own id follows its bearer only (a node and a link may share a text), and is read before the lists above changed it.
+			if (a.id === oldId && bearer.group === group && bearer.id === oldId) {
+				a.id = newId;
+				(doc.controls || []).forEach(function (c) { if (c && c.asm === oldId) { c.asm = newId; } });
+				// An open box of this group, and the sub-asset the graph was left on, follow it (a rename from the Tables pane changes the Well's ID too).
+				if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === oldId) { currentPopup = { kind: 'assembly', id: newId }; }
+				if (pgAsmPick[oldId] !== undefined) { pgAsmPick[newId] = pgAsmPick[oldId]; delete pgAsmPick[oldId]; }
+			}
 		});
 	}
 	// **A WELL'S PUMP CONTROLS** (Task 822; Tom, 2026-11-09: "controls connecting the pump and the tank"). The well holds two depths on its
@@ -41152,16 +41209,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function renderWellFields(a) {
 		var fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {}, res = lastSolveResult, tankForm = wellHasTank(a),
 			r = nodeById(a.nodes[0]), s = nodeById(a.nodes[1]), t = nodeById(a.nodes[2]),
-			g = linkById(a.links[0]), pump = linkById(a.links[1]);
-		idField(pump.id, function (newId) {
-			applyLinkRename(pump.id, newId);
-			currentPopup = { kind: 'assembly', id: assemblyOfLink(newId).id };
+			g = linkById(a.links[0]), pump = linkById(a.links[1]), bearer = assemblyBearer(a), bearerEl = assemblyBearerEl(a);
+		// The Well's ID is its outlet node's (a Well saved before Round 8: its pump's); renaming it renames that one element and the group follows.
+		idField(bearer.id, function (newId) {
+			if (bearer.group === 'node') { applyNodeRename(bearer.id, newId); } else { applyLinkRename(bearer.id, newId); }
+			currentPopup = { kind: 'assembly', id: (bearer.group === 'node' ? assemblyOfNode(newId) : assemblyOfLink(newId)).id };
 			renderAssemblyFields(currentPopup.id);
 			scheduleSolve();
-		}, 'link');
+		}, bearer.group);
 		clearFields(fields);
-		descField(fields, pump);
-		tagField(fields, pump);
+		descField(fields, bearerEl);
+		tagField(fields, bearerEl);
 		unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 			function () { return effective(t, 'elev'); },
 			function (v) { setProp(t, 'elev', v); updateNode(t.id, true); refreshPopupIfOpen(); },
@@ -41207,6 +41265,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		asmSection(fields, pc.lpn_tool_add_junction || 'Junction', s.id, function (rows) { asmJunctionRows(rows, s.id, true); });
 		asmSection(fields, pc.lpn_tool_add_pump || 'Pump', pump.id, function (rows) { asmLinkRows(rows, pump, true); });
 		asmSection(fields, pc.lpn_tool_add_junction || 'Junction', t.id, function (rows) { asmJunctionRows(rows, t.id, false); });
+		// **EVERY MEMBER, UNDER ITS OWN ID, NO EXCEPTIONS** (Tom, 2026-11-14: "I like that we are transparent in that we list every model element in
+		// Properties. Let's ensure that we make that a rule with no exceptions."): a Well with tank adds its pipe, tee, pipe and tank, results only
+		// (the tank's own depths and elevation are typed in the tank's own box).
+		if (tankForm) {
+			asmSection(fields, pc.lpn_tool_add_pipe || 'Pipe', a.branch[0], function (rows) { asmLinkRows(rows, linkById(a.branch[0])); });
+			asmSection(fields, pc.lpn_tool_add_junction || 'Junction', a.tee, function (rows) { asmJunctionRows(rows, a.tee); });
+			asmSection(fields, pc.lpn_tool_add_pipe || 'Pipe', a.branch[1], function (rows) { asmLinkRows(rows, linkById(a.branch[1])); });
+			asmSection(fields, pc.lpn_tool_add_tank || 'Tank', a.tank, function (rows) { tankResultFields(rows, nodeById(a.tank)); });
+		}
 		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
@@ -65445,7 +65512,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['P', pc.lpn_tool_add_pump || 'Pump'],
 			['V', pc.lpn_tool_add_valve || 'Valve'],
 			['M', pc.lpn_tool_add_meter || 'Customer'],
-			// A well's pump is the well, W1; its reservoir, drawdown node, drawdown valve and outlet are W1R, W1D, W1V and W1P (Task 822).
+			// A well is W1, which is also its outlet node; its reservoir, drawdown node, drawdown valve and pump are W1R, W1D, W1DV and W1P (Task 822).
 			['W', pc.lpn_tool_add_well || 'Well']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input'), wrap = document.createElement('span');
@@ -76207,7 +76274,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			what = (propsTypeWord(el, currentPopup.kind) + ' ' + el.id).replace(/^ /, '');
 		} else if (currentPopup.kind === 'assembly') {
 			el = assemblyById(currentPopup.id);
-			what = el ? (pc['lpn_tool_add_' + (el.kind === 'well' ? 'well' : el.kind === 'valve' ? 'valveplus' : 'pumpplus')] || '') + ' ' + (assemblyDeviceLink(el) ? assemblyDeviceLink(el).id : el.id) : '';
+			what = el ? (pc['lpn_tool_add_' + (el.kind === 'well' ? 'well' : el.kind === 'valve' ? 'valveplus' : 'pumpplus')] || '') + ' ' + el.id : '';
 			what = what.replace(/^ /, '');
 		} else if (currentPopup.kind === 'customer') {
 			el = customerById(currentPopup.id);
@@ -76358,7 +76425,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function applyNodeRename(oldId, newId) {
 		var n = nodeById(oldId);
-		renameInAssemblies(oldId, newId);
+		renameInAssemblies(oldId, newId, 'node');
 		n.id = newId;
 		invalidateIdMaps();   // an id changed IN PLACE -- the one mutation the array check cannot see
 		if (currentPopup && currentPopup.kind === 'node' && currentPopup.id === oldId) {
@@ -76406,7 +76473,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// this one function, and only one of them used to finish the job.
 	function applyLinkRename(oldId, newId) {
 		var l = linkById(oldId);
-		renameInAssemblies(oldId, newId);
+		renameInAssemblies(oldId, newId, 'link');
 		l.id = newId;
 		invalidateIdMaps();   // as applyNodeRename() -- see byId()
 		if (currentPopup && currentPopup.kind === 'link' && currentPopup.id === oldId) {
@@ -76471,17 +76538,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// prefixes at once" button cycles become reachable, and the failure would be a corrupted drawing.
 
 	function elementsForIdKey(key) {
-		// A well's pump is the well: its own prefix's, and the pump prefix's batch leaves it alone.
-		var wellPumps = assemblyList().filter(function (a) { return a.kind === 'well'; }).map(function (a) { return a.links[1]; });
-		if (key === 'W') { return wellPumps.map(linkById).filter(Boolean); }
-		return doc.nodes.filter(function (n) { return (LPN_ID_KEY[n.type] || 'J') === key; })
-			.concat(doc.links.filter(function (l) { return (LPN_ID_KEY[l.type] || 'L') === key && wellPumps.indexOf(l.id) < 0; }));
+		// A well's ID is its bearer's (the outlet node, or the pump of a Well saved before Round 8): its own prefix's batch, and the other
+		// prefixes' batches leave every member of a well alone (a Well with tank's tee, tank and pipes are ordinary elements and stay in theirs).
+		var wells = assemblyList().filter(function (a) { return a.kind === 'well'; }), bearers = wells.map(assemblyBearerEl).filter(Boolean),
+			mine = {};
+		wells.forEach(function (a) { a.nodes.forEach(function (id) { mine['n' + id] = 1; }); a.links.forEach(function (id) { mine['l' + id] = 1; }); });
+		if (key === 'W') { return bearers; }
+		return doc.nodes.filter(function (n) { return (LPN_ID_KEY[n.type] || 'J') === key && !mine['n' + n.id]; })
+			.concat(doc.links.filter(function (l) { return (LPN_ID_KEY[l.type] || 'L') === key && !mine['l' + l.id]; }));
 	}
 	function applyIdPrefixToAll(key) {
 		var pc = EngCalcs.pageConfig || {}, prefix = settings.idPrefixes[key] || key,
 			batch = elementsForIdKey(key), moving = [], skipped = 0, taken = {}, highest = 0;
 		// One key is one element type, so one namespace (allIds()); taken is that pool.
-		allIds(batch.length ? elGroup(batch[0]) : undefined).forEach(function (id) { taken[id] = true; });
+		// (A Well's batch can hold an outlet node and, in a project with an older Well, a pump: then the pool is both groups'.)
+		allIds(batch.length && batch.every(function (x) { return elGroup(x) === elGroup(batch[0]); }) ? elGroup(batch[0]) : undefined).forEach(function (id) { taken[id] = true; });
 		batch.forEach(function (x) {
 			var m = /^(.*?)(\d+)$/.exec(String(x.id));
 			if (m && +m[2] > highest) { highest = +m[2]; }
