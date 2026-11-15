@@ -1856,6 +1856,8 @@ $ec_lang['lpn_tsb_menu']='Time series graph';
 $ec_lang['lpn_ctx_edit_text']='Edit text';
 $ec_lang['lpn_ctx_reset_position']='Reset position';
 $ec_lang['lpn_ctx_reset_position_off_tip']='Only a label or an attached Text that has been dragged from its own position can be reset.';
+// The box that opens when one click lands on several elements (Task 861); read by screen readers.
+$ec_lang['lpn_pick_chooser_label']='Select one of the elements here';
 $ec_lang['lpn_tsb_off_tip']='Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.';
 $ec_lang['lpn_tsb_close']='Close graph';
 $ec_lang['lpn_tsb_resize']='Drag to resize';

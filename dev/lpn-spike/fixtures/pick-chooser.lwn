@@ -1,0 +1,456 @@
+{
+	"format": "hawsedc-lpn",
+	"app": "https://hawsedc.com/engcalcs/Looped-Network.php",
+	"v": 6,
+	"project": {
+		"name": "Pick chooser",
+		"activeScenario": "base"
+	},
+	"scenarios": [
+		{
+			"id": "base",
+			"name": "Base",
+			"isBase": true,
+			"overrides": {}
+		}
+	],
+	"nodes": [
+		{
+			"id": "R1",
+			"type": "reservoir",
+			"x": 0,
+			"y": 0,
+			"_head": 800,
+			"tok": {
+				"x": "0.00",
+				"y": "0.00"
+			},
+			"_initQuality": 1
+		},
+		{
+			"id": "A",
+			"type": "junction",
+			"x": 30,
+			"y": 0,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "30.00",
+				"y": "0.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "B",
+			"type": "junction",
+			"x": 90,
+			"y": 0,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "90.00",
+				"y": "0.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "M",
+			"type": "junction",
+			"x": 60,
+			"y": 0,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "60.00",
+				"y": "0.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "J1",
+			"type": "junction",
+			"x": 60,
+			"y": -40,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "60.00",
+				"y": "-40.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "J2",
+			"type": "junction",
+			"x": 60,
+			"y": -40,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "60.00",
+				"y": "-40.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "J3",
+			"type": "junction",
+			"x": 60,
+			"y": -40,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "60.00",
+				"y": "-40.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "D1",
+			"type": "junction",
+			"x": 20,
+			"y": 40,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "20.00",
+				"y": "40.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "D2",
+			"type": "junction",
+			"x": 80,
+			"y": 40,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "80.00",
+				"y": "40.00"
+			},
+			"_initQuality": 0.5
+		}
+	],
+	"links": [
+		{
+			"id": "PR",
+			"type": "pipe",
+			"from": "R1",
+			"to": "A",
+			"verts": [],
+			"_diameter": 18,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "P1",
+			"type": "pipe",
+			"from": "A",
+			"to": "B",
+			"verts": [],
+			"_diameter": 18,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "PU9",
+			"type": "pump",
+			"from": "J1",
+			"to": "J2",
+			"verts": [],
+			"_diameter": 18,
+			"lenAuto": false,
+			"_k": 0,
+			"curvePoints": [
+				[
+					1500,
+					250
+				]
+			],
+			"curveRef": null,
+			"h0": 101.600508,
+			"a": 2836.195251533382,
+			"b": 2,
+			"curveId": "1"
+		},
+		{
+			"id": "P2",
+			"type": "pipe",
+			"from": "J2",
+			"to": "J3",
+			"verts": [],
+			"_diameter": 18,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "P3",
+			"type": "pipe",
+			"from": "A",
+			"to": "J1",
+			"verts": [],
+			"_diameter": 18,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "P4",
+			"type": "pipe",
+			"from": "J3",
+			"to": "B",
+			"verts": [],
+			"_diameter": 18,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "Q1",
+			"type": "pipe",
+			"from": "D1",
+			"to": "D2",
+			"verts": [],
+			"_diameter": 18,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "Q2",
+			"type": "pipe",
+			"from": "D1",
+			"to": "D2",
+			"verts": [],
+			"_diameter": 18,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		}
+	],
+	"labels": [],
+	"nextId": {
+		"J": 4,
+		"R": 2,
+		"T": 1,
+		"L": 1,
+		"P": 5,
+		"V": 1,
+		"X": 1
+	},
+	"labelSettings": {
+		"node": {
+			"id": true,
+			"elev": true,
+			"demand": true,
+			"head": false,
+			"pressure": true
+		},
+		"link": {
+			"id": true,
+			"diameter": false,
+			"length": false,
+			"roughness": false,
+			"km": false,
+			"flow": true,
+			"velocity": true,
+			"headloss": false,
+			"gradient": false
+		},
+		"prefix": {
+			"node": {
+				"id": "N"
+			},
+			"link": {
+				"id": "L"
+			}
+		},
+		"separator": " ",
+		"markExtrema": true
+	},
+	"backdrop": null,
+	"settings": {
+		"idPrefixes": {
+			"J": "J",
+			"R": "R",
+			"T": "T",
+			"L": "L",
+			"P": "P",
+			"V": "V",
+			"X": "X"
+		},
+		"emitterExponent": 0.5,
+		"hydraulics": {
+			"specificGravity": 1,
+			"viscosity": 1,
+			"trials": 40,
+			"accuracy": 0.001,
+			"checkFreq": 2,
+			"maxCheck": 10,
+			"dampLimit": 0,
+			"unbalanced": "continue",
+			"unbalancedTrials": 10,
+			"demandMultiplier": 1,
+			"emitterExponent": 0.5
+		},
+		"engine": "epanet",
+		"defaults": {
+			"nodeElev": 0,
+			"demand": 0,
+			"diameter": 4,
+			"roughness": 100,
+			"k": 2,
+			"tankLevel": 20,
+			"tankMinLevel": 0,
+			"tankMaxLevel": 30,
+			"tankDiameter": 50
+		},
+		"sectionsOpen": {
+			"idPrefixes": false,
+			"defaults": false,
+			"mapDisplay": true,
+			"computation": true,
+			"files": false
+		},
+		"textSize": 12,
+		"symbolSize": 12,
+		"linkWidth": 4,
+		"symbolOpacity": 1,
+		"backdropOpacity": 0.5,
+		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
+		"legendPosition": "top-right",
+		"labelReadabilityBias": 110,
+		"mapHeight": 900,
+		"method": "hw",
+		"qualityOptions": {
+			"quality": "Chlorine mg/L",
+			"diffusivity": "1.0",
+			"tolerance": "0.01"
+		},
+		"quality": {
+			"mode": "chemical",
+			"traceNode": "",
+			"src": "Chlorine mg/L"
+		},
+		"reactions": {
+			"orderBulk": 1,
+			"orderTank": 1,
+			"orderWall": 1,
+			"globalBulk": -0.5,
+			"globalWall": -1,
+			"limitingPotential": 0,
+			"roughnessCorrelation": 0,
+			"tank": {}
+		},
+		"energy": {
+			"globalEfficiency": 75,
+			"globalPrice": 0,
+			"demandCharge": 0,
+			"effic": {}
+		}
+	},
+	"view": {
+		"cx": 45,
+		"cy": -5,
+		"s": 3.5
+	},
+	"units": {
+		"lpn_u_length": "ft",
+		"lpn_u_elevhead": "fth2o",
+		"lpn_u_pressure": "psi",
+		"lpn_u_diameter": "in",
+		"lpn_u_flow": "gpm",
+		"lpn_u_velocity": "ftps",
+		"lpn_u_gradient": "gradePercent"
+	},
+	"patterns": [
+		{
+			"id": "1",
+			"multipliers": [
+				1,
+				1.2,
+				1.4,
+				1.6,
+				1.4,
+				1.2,
+				1,
+				0.8,
+				0.6,
+				0.4,
+				0.6,
+				0.8
+			],
+			"note": "Demand Pattern",
+			"head": [
+				";ID              \tMultipliers"
+			],
+			"tok": {
+				"m0": "1.0",
+				"m6": "1.0"
+			}
+		}
+	],
+	"defaultPattern": "1",
+	"curves": [
+		{
+			"id": "1",
+			"kind": "head",
+			"points": [
+				[
+					1500,
+					250
+				]
+			],
+			"src": [
+				";PUMP: Pump Curve for Pump 9",
+				" 1               \t1500        \t250"
+			],
+			"note": "Pump Curve for Pump 9"
+		}
+	],
+	"times": {
+		"duration": 86400,
+		"hydraulicStep": 3600,
+		"patternStep": 7200,
+		"patternStart": 0,
+		"reportStep": 3600,
+		"reportStart": 0,
+		"startClock": 0,
+		"text": {
+			"duration": "24:00",
+			"hydraulicStep": "1:00",
+			"patternStep": "2:00",
+			"patternStart": "0:00",
+			"reportStep": "1:00",
+			"reportStart": "0:00",
+			"startClock": "12 am",
+			"qualityStep": "0:05",
+			"statistic": "None"
+		},
+		"qualityStep": 300,
+		"statistic": "NONE"
+	},
+	"controls": [],
+	"rules": [],
+	"inpSections": {}
+}

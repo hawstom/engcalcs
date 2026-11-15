@@ -906,6 +906,105 @@ EngCalcs.lpnGeom = (function () {
 	function mercY(latDeg) { return mercRadY(latDeg) * 180 / Math.PI; }
 	function mercLat(yDeg) { return mercLatFromRad(yDeg * Math.PI / 180); }
 
+	// ---- WHICH ELEMENTS A SINGLE CLICK COULD EQUALLY MEAN (Task 861) ---------------------------
+	//
+	// Pure: the caller hands in the document's nodes and links and says how to read a position, so
+	// nothing here touches the DOM or the editor's closure. Returns the ordered candidate list for
+	// a press at world point (wx, wy), with `s` screen pixels per world unit. **AN EMPTY LIST MEANS
+	// THE PRESS IS ORDINARY** -- the browser's own hit test already names the element, and the
+	// caller changes nothing. **A LIST (always two or more) MEANS THE CLICK CANNOT TELL THEM APART**,
+	// and the caller asks the visitor which one was meant. One equally good candidate is never
+	// returned: it is not a choice.
+	//
+	// THE RULE, in screen pixels, stated once:
+	//   1. NODES. Take the nodes within `nodeReach` of the press and the nearest of them. Every
+	//      node within `same` of THAT node's position is coincident with it. Two or more coincident
+	//      nodes are candidates. A single node, with other nodes or pipes about it, is the ordinary
+	//      case and is never ambiguous: a junction sitting on a pipe still selects the junction.
+	//   2. BURIED LINKS. A link whose whole drawn length is at most `zero` has both ends under one
+	//      point and cannot be clicked by any other route (an exploded pump or valve assembly is
+	//      made of them). One within `nodeReach` of the press is a candidate, and so are its two
+	//      end nodes, which are what the press is on.
+	//   3. COINCIDENT LINKS, only where no node is within `nodeReach` (a node outranks a link, as it
+	//      does everywhere else on this page). Take the links within `linkReach` of the press; the
+	//      nearest one's foot on its centreline is the point, and every link whose own foot lies
+	//      within `same` of it is coincident with it: two pipes drawn over each other, a pump over
+	//      its bypass, two pipes crossing exactly at the press.
+	// ORDER: nodes, then links, each by distance from the press and then by id in natural order
+	// (so J2 comes before J10). Text objects are the caller's to append after these.
+	//
+	// opts: nodeReach (6), linkReach (3), same (1.5), zero (2), all screen px; nodeX(n), nodeY(n),
+	// linkPts(l) -> [{x, y}] and nodeOk(n), linkOk(l) read the document the way the caller draws
+	// it (default: n.x, n.y, [], always true). Each candidate is {kind: 'node'|'link', id, type,
+	// distPx}. A caller that groups elements (an assembly) maps this list afterwards; nothing here
+	// knows about groups.
+	function pickCandidates(nodes, links, wx, wy, s, opts) {
+		var o = opts || {}, nodeReach = o.nodeReach === undefined ? 6 : o.nodeReach,
+			linkReach = o.linkReach === undefined ? 3 : o.linkReach,
+			same = o.same === undefined ? 1.5 : o.same, zero = o.zero === undefined ? 2 : o.zero,
+			nx = o.nodeX || function (n) { return n.x; }, ny = o.nodeY || function (n) { return n.y; },
+			lp = o.linkPts || function () { return []; },
+			nOk = o.nodeOk || function () { return true; }, lOk = o.linkOk || function () { return true; },
+			byId = {}, near = [], list = [], seen = {}, i, j, n, l, pts, d, nearest = null, buried = [],
+			cands = [], first, hit, group;
+		function natural(a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); }
+		function addNode(m, dPx) {
+			if (seen['n' + m.id]) { return; }
+			seen['n' + m.id] = true;
+			list.push({ kind: 'node', id: m.id, type: m.type, distPx: dPx });
+		}
+		for (i = 0; i < nodes.length; i++) {
+			n = nodes[i];
+			if (!nOk(n)) { continue; }
+			byId[n.id] = n;
+			d = Math.hypot(nx(n) - wx, ny(n) - wy) * s;
+			if (d > nodeReach) { continue; }
+			near.push({ n: n, d: d });
+			if (!nearest || d < nearest.d) { nearest = { n: n, d: d }; }
+		}
+		if (nearest) {
+			near.forEach(function (c) {
+				if (Math.hypot(nx(c.n) - nx(nearest.n), ny(c.n) - ny(nearest.n)) * s <= same) { addNode(c.n, c.d); }
+			});
+			if (list.length < 2) { list = []; seen = {}; }
+		}
+		for (i = 0; i < links.length; i++) {
+			l = links[i];
+			if (!lOk(l)) { continue; }
+			pts = lp(l);
+			if (!pts || pts.length < 2) { continue; }
+			if (polylineLength(pts) * s <= zero) {
+				hit = nearestFractionOnPolyline(pts, wx, wy);
+				if (hit.dist * s <= nodeReach) { buried.push({ l: l, d: hit.dist * s }); }
+			} else if (!nearest) {
+				hit = nearestFractionOnPolyline(pts, wx, wy);
+				if (hit.dist * s <= linkReach) { cands.push({ l: l, d: hit.dist * s, x: hit.x, y: hit.y }); }
+			}
+		}
+		if (buried.length) {
+			buried.forEach(function (b) {
+				for (j = 0; j < 2; j++) {
+					n = byId[j ? b.l.to : b.l.from];
+					if (n) { addNode(n, Math.hypot(nx(n) - wx, ny(n) - wy) * s); }
+				}
+			});
+		}
+		list.sort(function (a, b) { return (a.distPx - b.distPx) || natural(a.id, b.id); });
+		group = buried.map(function (b) { return { kind: 'link', id: b.l.id, type: b.l.type, distPx: b.d }; });
+		if (!nearest && cands.length) {
+			cands.sort(function (a, b) { return a.d - b.d; });
+			first = cands[0];
+			cands.forEach(function (c) {
+				if (Math.hypot(c.x - first.x, c.y - first.y) * s <= same) {
+					group.push({ kind: 'link', id: c.l.id, type: c.l.type, distPx: c.d });
+				}
+			});
+			if (group.length < 2) { group = []; }
+		}
+		group.sort(function (a, b) { return (a.distPx - b.distPx) || natural(a.id, b.id); });
+		return list.concat(group);
+	}
+
 	return {
 		pointInPolygon: pointInPolygon,
 		rectRing: rectRing,
@@ -930,6 +1029,7 @@ EngCalcs.lpnGeom = (function () {
 		serviceLabelSpots: serviceLabelSpots,
 		rotatedLabelBox: rotatedLabelBox,
 		orientedLabelBox: orientedLabelBox,
+		pickCandidates: pickCandidates,
 		pointToSegmentDistance: pointToSegmentDistance,
 		pointToPolylineDistance: pointToPolylineDistance,
 		buildSegmentIndex: buildSegmentIndex,

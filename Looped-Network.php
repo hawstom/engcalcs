@@ -2430,6 +2430,7 @@ EngCalcs.pageConfig = {
 	lpn_paste_props_off_kind: <?=json_encode($ec_lang['lpn_paste_props_off_kind'])?>,
 	lpn_tsb_menu: <?=json_encode($ec_lang['lpn_tsb_menu'])?>,
 	lpn_ctx_edit_text: <?=json_encode($ec_lang['lpn_ctx_edit_text'])?>,
+	lpn_pick_chooser_label: <?=json_encode($ec_lang['lpn_pick_chooser_label'])?>,
 	lpn_ctx_reset_position: <?=json_encode($ec_lang['lpn_ctx_reset_position'])?>,
 	lpn_ctx_reset_position_off_tip: <?=json_encode($ec_lang['lpn_ctx_reset_position_off_tip'])?>,
 	lpn_tsb_off_tip: <?=json_encode($ec_lang['lpn_tsb_off_tip'])?>,

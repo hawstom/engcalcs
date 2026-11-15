@@ -16612,8 +16612,10 @@ var EngCalcs = EngCalcs || {};
 	// Not e.target on a pointerdown either: elementsFromPoint() is a document query and is unaffected
 	// by the setPointerCapture() retargeting that made pointerup use elementFromPoint() in the first
 	// place, so one call serves every gesture.
-	function mapHitAt(cx, cy, skip) {
-		var list = document.elementsFromPoint(cx, cy) || [], i, t;
+	// With `all`, every confirmed hit under the point, topmost first (the chooser's Text rows).
+	function mapHitsAt(cx, cy) { return mapHitAt(cx, cy, null, true); }
+	function mapHitAt(cx, cy, skip, all) {
+		var list = document.elementsFromPoint(cx, cy) || [], i, t, out = [];
 		for (i = 0; i < list.length; i++) {
 			if (list[i] === svg) { break; }
 			if (skip && list[i] === skip) { continue; }   // see gripClickHandsThrough()
@@ -16623,9 +16625,9 @@ var EngCalcs = EngCalcs || {};
 			// and the walk is here precisely so a rejected candidate does not take the real hit
 			// beneath it away with it.
 			if (!hitIsVisible(t)) { continue; }
-			if (hitConfirmed(t, cx, cy)) { return t; }
+			if (hitConfirmed(t, cx, cy)) { if (!all) { return t; } out.push(t); }
 		}
-		return svg;
+		return all ? out : svg;
 	}
 	/**
 	 * **THE GRIP IS FOR DRAGGING; A CLICK ON IT GOES TO WHAT IS UNDER IT** (Perry's pre-review of
@@ -35965,14 +35967,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return false;
 	}
 	function paneCloseContextMenu() {
-		if (paneCtxMenuEl && paneCtxMenuEl.parentNode) { paneCtxMenuEl.parentNode.removeChild(paneCtxMenuEl); }
+		var gone = paneCtxMenuEl;
+		if (gone && gone.parentNode) { gone.parentNode.removeChild(gone); }
 		paneCtxMenuEl = null;
+		if (gone && gone._lpnOnClose) { gone._lpnOnClose(); }
 	}
 	// Closed by anything else that happens on the page -- a left click elsewhere, a key, or the
 	// table rebuilding out from under it (renderPaneTable never reaches into this, so a stale
 	// row/column would otherwise sit in a menu whose target no longer exists).
 	document.addEventListener('mousedown', function (e) {
-		if (paneCtxMenuEl && !paneCtxMenuContains(e.target)) { paneCloseContextMenu(); }
+		// A finger's lift sends a compatibility mousedown to whatever is under it, which is the map and
+		// not a just-opened menu: `_lpnGhostUntil` is the chooser's window for ignoring that one.
+		if (paneCtxMenuEl && !paneCtxMenuContains(e.target) && !(Date.now() < (paneCtxMenuEl._lpnGhostUntil || 0))) { paneCloseContextMenu(); }
 	});
 	document.addEventListener('keydown', function (e) {
 		if (paneCtxMenuEl && e && e.key === 'Escape') { paneCloseContextMenu(); }
@@ -59641,6 +59647,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var gestureMoved = false;
 		svg.addEventListener('pointerdown', function (e) {
 			gestureMoved = false;
+			pickPress = null;
 			if (regMode) { return; } // a Scale/Position registration click sequence is pending -- see wireBackdropMenu()
 			// **GUARDED, BECAUSE A THROW HERE TAKES THE WHOLE GESTURE WITH IT.** setPointerCapture()
 			// rejects with NotFoundError when the browser no longer considers the pointer active, and
@@ -59771,10 +59778,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			// A Shape is found by distance, under every asset; a selected Shape's grip over them all.
 			t = shapeHitOver(e.clientX, e.clientY, t, reachPx(e));
+			// **A PRESS THAT COULD EQUALLY MEAN SEVERAL ELEMENTS SELECTS NONE OF THEM YET** (Task 861):
+			// the tap that ends it opens the chooser (pointerup, below), and a drag from it moves what
+			// the press landed on as it always did, selecting that at the first frame of the drag
+			// (`drag.deferSel`). So a dismissed chooser has changed nothing.
+			pickPress = pickPressAt(e, t);
 			// **SHIFT ADDS, AND ADDS BY TOGGLING** (Task 266). It is how a marquee that caught one
 			// thing too many is corrected, and how a selection of three unrelated pipes is built at
 			// all -- neither of which any ring can do.
-			if (e.shiftKey) { toggleFromHit(t); } else { selectFromHit(t); }
+			if (pickPress) { void 0; }
+			else if (e.shiftKey) { toggleFromHit(t); } else { selectFromHit(t); }
 			if (t.dataset.shape !== undefined || t.dataset.shapept !== undefined) {
 				// A Shape moves whole; its grip moves one point (Task 779).
 				drag = shapeDragStart(t, e, common) || Object.assign({ type: 'pan', tx0: state.tx, ty0: state.ty }, common);
@@ -59862,6 +59875,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			} else {
 				drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; Object.assign(drag, common);
 			}
+			if (pickPress && drag && t !== svg) { drag.deferSel = t; drag.deferShift = !!e.shiftKey; }
 		});
 		svg.addEventListener('pointermove', function (e) {
 			if (!pointers.has(e.pointerId)) { return; }
@@ -59877,11 +59891,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (typeof drag.startX === 'number' &&
 					Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < tapMovePx(e)) { return; }
 				gestureMoved = true;
+				if (drag.deferSel) {
+					// The press that would have been a chooser became a drag: select what it grabbed.
+					if (drag.deferShift) { toggleFromHit(drag.deferSel); } else { selectFromHit(drag.deferSel); }
+					drag.deferSel = null; pickPress = null;
+				}
 			}
 			dragDirty = true;
 		});
 		function endPointer(e, cancelled) {
 			pointers.delete(e.pointerId);
+			if (cancelled) { pickPress = null; }
 			// The Zoom Window release (ROADMAP Task 682; R-180) -- a cancelled pointer drops the box
 			// rather than zooming to wherever the browser happened to take the gesture away, the
 			// same rule select-area's own cancel follows two lines down. A release that is not
@@ -60070,6 +60090,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// noteMapTap().
 			noteMapTap(downPt.touch);
 			downPt = null;
+			// A tap that could equally mean several elements asks which (Task 861); see pickPressAt().
+			if (mode === 'select' && pickPress && pickPress.id === e.pointerId) {
+				var pickAsk = pickPress;
+				pickPress = null;
+				openPickChooser(pickAsk);
+				return;
+			}
 			// elementFromPoint, not e.target: setPointerCapture(svg) retargets pointerup's
 			// target to the capturing element (svg itself) on desktop Chrome, so e.target here
 			// is never the actual node/link/label clicked -- see phase0-acceptance.md round 2.
@@ -60754,10 +60781,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **THE MAP'S RIGHT-CLICK MENU, AS A ROW LIST** -- [{label, enabled, tip, run}] -- so a later command
 	// (Task 784's Time series graph) is one more entry. A row that does not apply is greyed, never hidden.
-	function openMapContextMenu(x, y, rows) {
+	// `opts` (optional): cls, an extra class; onClose(), run when it closes by any door; ghostMs, a
+	// window after a finger's tap in which the lift's compatibility mousedown does not close it. A
+	// row may carry hover(on), called when the pointer or the keyboard is on it and when it leaves.
+	function openMapContextMenu(x, y, rows, opts) {
 		var menu = document.createElement('div'), first = null;
 		paneCloseContextMenu();
-		menu.className = 'lpn-pane-ctxmenu';
+		menu.className = 'lpn-pane-ctxmenu' + (opts && opts.cls ? ' ' + opts.cls : '');
+		if (opts && opts.onClose) { menu._lpnOnClose = opts.onClose; }
+		if (opts && opts.ghostMs) { menu._lpnGhostUntil = Date.now() + opts.ghostMs; }
 		menu.setAttribute('role', 'menu');
 		menu.style.left = x + 'px';
 		menu.style.top = y + 'px';
@@ -60772,6 +60804,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			off = r.enabled === false;
 			if (off) { b.setAttribute('aria-disabled', 'true'); if (r.tip) { b.title = r.tip; } }
 			b.addEventListener('click', function () { if (off) { return; } paneCloseContextMenu(); r.run(); });
+			if (r.hover) {
+				['mouseenter', 'focus'].forEach(function (ev) { b.addEventListener(ev, function () { r.hover(true); }); });
+				['mouseleave', 'blur'].forEach(function (ev) { b.addEventListener(ev, function () { r.hover(false); }); });
+			}
 			menu.appendChild(b);
 			if (!first && !off) { first = b; }
 		});
@@ -60780,6 +60816,97 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		paneClampMenu(menu, x, y);
 		if (first) { first.focus(); }
 	}
+	// ---- THE PICK CHOOSER (Task 861) --------------------------------------------------------------
+	//
+	// **WHEN ONE CLICK HITS MORE THAN ONE ELEMENT, ASK WHICH.** Tom, 2026-11-14: *"a disambiguating
+	// chooser when there are multiple elements in one click such as when any assembly is exploded
+	// ... I find that it's hard for me to work with this without that feature."* His earlier call on
+	// coincident plain elements: *"a box asking which one (AutoCAD's Ctrl selection cycling noted,
+	// not wanted first)."* So a box, not cycling.
+	//
+	// **WHAT COUNTS AS EQUALLY GOOD IS ONE PURE RULE** (Geom.pickCandidates(): coincident nodes,
+	// zero-length links with their end nodes, links drawn over each other). The ordinary click, a
+	// junction on a pipe, gives no list and goes the way it always did. pickCandidatesAt() is the one
+	// door that builds the list for a press; an assembly group would map the list it returns
+	// (members to one row) and nothing else here would change.
+	//
+	// **THE BOX IS THE MAP'S OWN MENU** (openMapContextMenu), so arrows, Home/End, Enter, Escape and
+	// close-on-press-elsewhere are the menu's. A press elsewhere on the map only closes it (pickPress
+	// stays null and the press is swallowed below), so "nothing changed" is literal. Rows are
+	// buttons, finger-sized on a coarse pointer by CSS; nothing depends on hover. The element a row
+	// is on wears the hover mark on the map as an extra. Choosing a row selects and opens that
+	// element the way a click on it does, Shift-added when the press was Shift-held.
+	function pickCandidatesAt(cx, cy, touch) {
+		var w = screenToWorld(cx, cy), list, seenLbl = {};
+		list = Geom.pickCandidates(doc.nodes, doc.links, w.x, w.y, state.s, {
+			nodeReach: touch ? TOUCH_REACH_PX : LPN_NODE_HIT_PX / 2,
+			linkReach: touch ? LPN_LINK_HIT_PX / 2 : LPN_LINK_HIT_FLOOR_PX,
+			nodeX: nodeDrawX, nodeY: nodeDrawY, linkPts: linkPointList,
+			nodeOk: function (n) { return !!nodeEls[n.id]; },
+			linkOk: function (l) { return !!linkEls[l.id] && !!nodeById(l.from) && !!nodeById(l.to); }
+		});
+		if (list.length < 2) { return []; }
+		// A Text under the press is one more thing the press could mean, only when the rest already
+		// is a choice (a Text over a lone junction selects the Text, as it always did).
+		mapHitsAt(cx, cy).forEach(function (h) {
+			var id = h.dataset && h.dataset.lbl;
+			if (id !== undefined && !seenLbl[id] && labelById(id)) { seenLbl[id] = true; list.push({ kind: 'label', id: id }); }
+		});
+		return list;
+	}
+	// "Junction J1", "Pump 9", "Text" and its first words. The type word is the one the toolbar uses.
+	function pickRowLabel(c) {
+		var pc = EngCalcs.pageConfig || {}, el, words;
+		if (c.kind === 'label') {
+			el = labelById(c.id);
+			words = String((el && effective(el, 'text')) || '').replace(/\s+/g, ' ').trim().slice(0, 24);
+			// A Text still saying just "Text" is named by its ID, as the other rows are.
+			return (pc.lpn_tool_add_text || 'Text') + ' ' + ((words && words !== (pc.lpn_tool_add_text || 'Text') && words !== (pc.lpn_new_text || 'Text')) ? words : c.id);
+		}
+		return reportTypeNoun(c.kind, c.type) + ' ' + c.id;
+	}
+	var pickPress = null;
+	// The press that may become a chooser: Select mode, the main button, on bare map, a junction or
+	// a pipe (never a label, a handle, a meter or a Shape: those were pressed on purpose).
+	function pickPressAt(e, t) {
+		var list;
+		if (mode !== 'select' || (e.button !== undefined && e.button !== 0)) { return null; }
+		if (!t || (t !== svg && t.dataset.node === undefined &&
+			!(t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')))) { return null; }
+		list = pickCandidatesAt(e.clientX, e.clientY, e.pointerType === 'touch');
+		return list.length >= 2 ? { id: e.pointerId, x: e.clientX, y: e.clientY, shift: !!e.shiftKey,
+			touch: e.pointerType === 'touch', list: list } : null;
+	}
+	function pickHover(c, on) {
+		paintHoverPreview({ kind: c.kind, id: c.id }, on);
+	}
+	function pickChoose(c, p) {
+		var open = { node: openPopup, link: openLinkPopup, label: openLabelPopup }[c.kind];
+		if (!selectionExists({ kind: c.kind, id: c.id })) { return; }
+		if (p.shift) {
+			toggleInSelection(c.kind, c.id);
+			if (selectionCount()) { openMultiProperties(); } else { closePopup(); }
+			return;
+		}
+		setSelection(c.kind, c.id);
+		open(c.id, p.x, p.y);
+	}
+	function openPickChooser(p) {
+		var pc = EngCalcs.pageConfig || {};
+		openMapContextMenu(p.x, p.y, p.list.map(function (c) {
+			return { label: pickRowLabel(c), enabled: true, hover: function (on) { pickHover(c, on); },
+				run: function () { pickChoose(c, p); } };
+		}), { cls: 'lpn-pick-chooser', ghostMs: p.touch ? GHOST_CLICK_MS : 0,
+			onClose: function () { p.list.forEach(function (c) { pickHover(c, false); }); } });
+		if (paneCtxMenuEl) { paneCtxMenuEl.setAttribute('aria-label', pc.lpn_pick_chooser_label || 'Select one of the elements here'); }
+	}
+	// A press elsewhere on the map while the chooser is open only closes it.
+	document.addEventListener('pointerdown', function (e) {
+		if (!paneCtxMenuEl || !paneCtxMenuEl.classList.contains('lpn-pick-chooser')) { return; }
+		if (paneCtxMenuContains(e.target) || !ctxOnCanvas(e)) { return; }
+		paneCloseContextMenu();
+		e.stopPropagation();
+	}, true);
 	// **ONLY A NODE, A LINK OR A TEXT IS INTERCEPTED** (a node's or link's own label counts as that
 	// asset, marked `onLabel`). Captured on the document ahead of the map's press handlers, so the
 	// press neither selects, drags nor opens a property sheet; empty canvas (right-drag pans) and

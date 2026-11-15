@@ -4743,6 +4743,11 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-ctxmenu-accel { color: var(--ec-gray-888); font-size: .85em; white-space: nowrap; }
 .lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: var(--ec-hue-eef1f4); outline: 0; }
 .lpn-pane-ctxmenu button:disabled, .lpn-pane-ctxmenu button[aria-disabled="true"] { color: var(--ec-gray-888); cursor: default; background: none; }
+/* THE PICK CHOOSER (Task 861): the same menu, asked when one click lands on several elements. Rows are
+   finger-sized where the primary pointer is coarse (nothing in it waits on a hover), and a long list
+   scrolls rather than leaving the window. */
+.lpn-pick-chooser { max-height: calc(100vh - 16px); overflow-y: auto; min-width: 11em; }
+@media (pointer: coarse) { .lpn-pick-chooser button { min-height: 48px; padding: 8px 14px; font-size: 1.05em; } }
 /* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
    (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
    heading row, and is the ONLY thing there that takes a col-resize cursor -- so the gesture

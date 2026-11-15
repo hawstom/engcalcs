@@ -2427,6 +2427,8 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-ctxmenu-accel { color: var(--ec-gray-888); font-size: .85em; white-space: nowrap; }
 .lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: var(--ec-hue-eef1f4); outline: 0; }
 .lpn-pane-ctxmenu button:disabled, .lpn-pane-ctxmenu button[aria-disabled="true"] { color: var(--ec-gray-888); cursor: default; background: none; }
+.lpn-pick-chooser { max-height: calc(100vh - 16px); overflow-y: auto; min-width: 11em; }
+@media (pointer: coarse) { .lpn-pick-chooser button { min-height: 48px; padding: 8px 14px; font-size: 1.05em; } }
 .lpn-pane-colgrip {
 	position: absolute; top: 0; inset-inline-end: 0; width: 7px; height: 100%;
 	cursor: col-resize; user-select: none;
