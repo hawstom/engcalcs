@@ -595,14 +595,14 @@
 		// `Pattern` line has always followed: writing a line that says the default is a statement
 		// the source file never made, and it would fail the byte-identity test the round trip is
 		// held to.
-		var flowKey = 'GPM', headloss = 'H-W', emitterExponent = 0.5, demandMultiplier = 1,
+		var flowKey = 'GPM', headloss = 'H-W', headlossStated = false, emitterExponent = 0.5, demandMultiplier = 1,
 			defaultPattern = null, hydraulics = {}, qualityOptions = {}, fileOptions = {}, rows, r;
 		rows = rawSections.OPTIONS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			var key = (r[0] || '').toUpperCase();
 			if (key === 'UNITS' && r[1]) { flowKey = r[1].toUpperCase(); }
-			else if (key === 'HEADLOSS' && r[1]) { headloss = r[1].toUpperCase(); }
+			else if (key === 'HEADLOSS' && r[1]) { headloss = r[1].toUpperCase(); headlossStated = true; }
 			else if (key === 'EMITTER' && r[2]) { emitterExponent = num(r[2], 0.5); hydraulics.emitterExponent = emitterExponent; }
 			// **`Demand` NAMES TWO DIFFERENT OPTIONS AND ONLY ONE OF THEM IS A NUMBER.**
 			// `Demand Multiplier 1.5` scales every demand; `Demand Model PDA` chooses EPANET 2.2's
@@ -1665,6 +1665,9 @@
 			// keeps a second copy of these constants.
 			scale: { len: lenSI, dia: diaSI, head: headSI, press: pressSI, flow: qSI },
 			headloss: headloss,
+			// Whether [OPTIONS] said it at all: a file that does not leaves the project's formula unstated
+			// (EPANET's own default, H-W, and a Settings row that reads "(default)").
+			headlossStated: headlossStated,
 			// The unit EPANET reads a D-W roughness in for this file (millifeet in a US file,
 			// millimetres in an SI one); null for the two dimensionless formulas.
 			roughnessUnit: headloss === 'D-W' ? (us ? 'millifeet' : 'mm') : null,

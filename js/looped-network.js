@@ -47738,7 +47738,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					s.defaults = s.defaults || {};
 					s.defaults.roughness = defaultRoughnessFor(fileMethod, fileMethod === 'dw' ? parsed.roughnessUnit : null);
 				}
-				s.method = fileMethod;
+				if (parsed.headlossStated === false) { delete s.method; } else { s.method = fileMethod; }
 				s.hydraulics = parsed.hydraulics || {};
 				s.qualityOptions = parsed.qualityOptions || {};
 				s.fileOptions = parsed.fileOptions || {};
@@ -73473,7 +73473,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		reservoir: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', '#coords', 'lpn_field_head', 'lpn_field_head_pattern',
 			'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|', '#qresult', '#notes'],
 		tank: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', 'lpn_field_tank_base_elev', 'lpn_field_tank_diameter',
-			'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', 'lpn_field_tank_minvol', 'lpn_field_tank_overflow', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
+			'lpn_field_tank_minvol', 'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', 'lpn_field_tank_overflow', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
 			'lpn_mixing_model', 'lpn_mixing_fraction', 'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|',
 			'lpn_field_head', 'lpn_result_pressure', 'lpn_result_depth', 'lpn_result_tank_volume', '#qresult', '#notes'],
 		pipe: ['lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_pipetype', 'lpn_field_diameter',
