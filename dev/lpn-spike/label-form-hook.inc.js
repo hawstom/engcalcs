@@ -102,6 +102,38 @@
 			L.forEach(function (g) { var seen = {}; R.forEach(function (r) { if (r.k !== g.k && !seen[r.k] && hit(g, r)) { seen[r.k] = true; out.push(g.k + ' through ' + r.k); } }); });
 			return out;
 		},
+		// Every drawn leader as a drafter would judge it (Task 812, leaders a person would draw), in screen pixels: its
+		// two ends, the rows of its own label, every pipe segment with the pipe's ends, and every node's centre. A
+		// label set along a pipe (rotated) is left out. The faults are counted by label-leader-shapes-browser-harness.js.
+		leaderShapes: function () {
+			var c = svg.getBoundingClientRect(), out = { leaders: [], pipes: [], nodes: [], nodesShown: 0, pipesShown: 0 };
+			function vis(t) { return !!t && !!t.textContent && t.checkVisibility({ visibilityProperty: true, opacityProperty: true }); }
+			function rows(t) {
+				var res = [], cur = null, ts = t.querySelectorAll('tspan'), i, r;
+				for (i = 0; i < ts.length; i++) {
+					r = ts[i].getBoundingClientRect();
+					if (!(r.width > 0)) { continue; }
+					if (ts[i].hasAttribute('x') || !cur) { cur = { l: r.left - c.left, t: r.top - c.top, r: r.right - c.left, b: r.bottom - c.top }; res.push(cur); }
+					else { cur.l = Math.min(cur.l, r.left - c.left); cur.t = Math.min(cur.t, r.top - c.top); cur.r = Math.max(cur.r, r.right - c.left); cur.b = Math.max(cur.b, r.bottom - c.top); }
+				}
+				return res;
+			}
+			function px(p) { return { x: p.x * state.s + state.tx, y: p.y * state.s + state.ty }; }
+			function add(k, h, own) {
+				var e = h && h.leader;
+				if (h && !h.empty && vis(h.text)) { if (k.charAt(0) === 'N') { out.nodesShown++; } else { out.pipesShown++; } }
+				if (e && e.style.display !== 'none' && e.style.visibility !== 'hidden' && e.getAttribute('x1') != null && h.text && vis(h.text) && !/rotate/.test(h.text.getAttribute('transform') || '')) {
+					out.leaders.push({ k: k, own: own, a: px({ x: +e.getAttribute('x1'), y: +e.getAttribute('y1') }), b: px({ x: +e.getAttribute('x2'), y: +e.getAttribute('y2') }), rows: rows(h.text) });
+				}
+			}
+			doc.nodes.forEach(function (n) { var p = nodeAt(n); out.nodes.push({ id: n.id, x: p.x * state.s + state.tx, y: p.y * state.s + state.ty }); add('N' + n.id, nodeEls[n.id], { node: n.id }); });
+			doc.links.forEach(function (l) {
+				var pts = linkPointList(l), i;
+				for (i = 1; i < pts.length; i++) { out.pipes.push({ id: l.id, from: l.from, to: l.to, a: px(pts[i - 1]), b: px(pts[i]) }); }
+				add('L' + l.id, linkEls[l.id], { link: l.id });
+			});
+			return out;
+		},
 		// Every label the last crossing hide hid, and which of them cross nothing in the entries it measured.
 		hiddenCrossedAudit: function () {
 			var g = lastFinalGround, E = g ? crossingEntries(g.nodeLabels, g.nodePlaced, g.labels, g.placed, g.obs) : [], pairs = EngCalcs.lpnCollide.labelCrossings(E).pairs, inPair = {}, out = { hidden: [], unjustified: [], forms: window.__lpnForm.nodeForms(['161']) };
@@ -112,6 +144,7 @@
 			});
 			return out;
 		},
+		attachOf: function (id) { var ne = nodeEls[id]; return ne ? { attach: ne.leaderAttach || null, lines: (ne.lines || []).length, inline: !!ne.inline, struck: !!ne.leaderStruck, x1: ne.leader && ne.leader.getAttribute('x1'), y2: ne.leader && ne.leader.getAttribute('y2'), y1: ne.leader && ne.leader.getAttribute('y1') } : null; },
 		fit: function () { zoomExtent(); },
 		// Pipe labels in the view, counted as drawn: shown, fields shown of fields asked, shed (shown with
 		// fewer fields than asked), hidden, level, leaders. (Task 812, round 5.)

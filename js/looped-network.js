@@ -358,7 +358,9 @@ var EngCalcs = EngCalcs || {};
 		// move when the box's pixel width did, and the angle with it (Task 328).
 		holder.leader.style.display = '';
 		holder.leader.setAttribute('x1', anchor.x); holder.leader.setAttribute('y1', anchor.y);
-		holder.leader.setAttribute('x2', end.x); holder.leader.setAttribute('y2', end.y);
+		// A stack's leader meets the row nearest its node (dropStruckLeaders()), for the label it was worked out for only.
+		var at = holder.leaderAttach, ey = at && Math.abs(at.x - end.x) < 1e-6 && Math.abs(at.y - end.y) < 1e-6 ? end.y + at.dy : end.y;
+		holder.leader.setAttribute('x2', end.x); holder.leader.setAttribute('y2', ey);
 	}
 	// WHERE THE TEXT GOES, given the endpoint the user placed. The box hangs off B on whichever
 	// side keeps it from lying across its own leader -- a fact about legibility, and therefore
@@ -928,6 +930,8 @@ var EngCalcs = EngCalcs || {};
 	// re-placed labels far enough out that the shed cascade stopped running -- 19 labels shedding
 	// where node-shed-harness.js requires 30. Placing labels further from their nodes rather than
 	// shedding a value is a design change nobody asked for.
+	var LPN_LEADER_PIPES = true;
+	function nodeFitOpts(pad) { return LPN_LEADER_PIPES ? { pad: pad, leaderPipes: leaderThreshold() } : { pad: pad }; }
 	function nodeFirstFitSpec(n, ne, fs) {
 		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id), s0 = state.s || 1, f = ne.inlineFrom,
 			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
@@ -997,6 +1001,7 @@ var EngCalcs = EngCalcs || {};
 	// A tie that finds no place is not tried a second time: the same counts, a quarter of the time.
 	var LPN_YIELD = true;
 	var LPN_TIE_LINE = true;
+	var LPN_TIE_RETRY = true;
 	// **A LABEL THAT LOST SOMETHING MAY TAKE GROUND HELD ONLY BY A PIPE LABEL THAT YIELDS** (`takeYield`;
 	// a tie may not). The pipe label is hidden by yieldStationedLabels() and is then tried level beside
 	// its pipe, so it often keeps a place. Over 64 views: +16 labels, +423 values, no view with fewer
@@ -1096,7 +1101,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (!specs.length) { return []; }
 		return Collide.placeLabelsFirstFit(rankNodeLabels(specs), withDraggedLabels(obs, fs),
-			{ pad: fs * LPN_ALIGNED_PAD_FRAC });
+			nodeFitOpts(fs * LPN_ALIGNED_PAD_FRAC));
 	}
 	function shedAlignedForConflicts(fsNow, fs) {
 		// **NO PAD HERE.** LPN_ALIGNED_PAD_FRAC is 0.35 of a font size and grows the box on EVERY
@@ -2911,7 +2916,7 @@ var EngCalcs = EngCalcs || {};
 			if (sp) { specs.push(Object.assign({}, sp, it.spec, { release: LPN_OPEN_SIDE })); }
 		});
 		if (!specs.length) { return { placed: placed, took: [] }; }
-		out = Collide.placeLabelsFirstFit(specs, ground, { pad: pad, lastPad: pad, strict: true, leaderMin: min });
+		out = Collide.placeLabelsFirstFit(specs, ground, { pad: pad, lastPad: pad, strict: true, leaderMin: min, leaderPipes: LPN_LEADER_PIPES ? min : 0 });
 		var took = [], res = {};
 		out.forEach(function (r) { if (!r.dropped) { res[r.id] = r; took.push(r.id); } });
 		// The labels that took a line are that line from here on, for the repair and the hides after.
@@ -2923,7 +2928,9 @@ var EngCalcs = EngCalcs || {};
 		// **A SECOND ROUND, BECAUSE THE FIRST GIVES GROUND BACK ONLY AS IT GOES** (Task 812): a label
 		// tried before its neighbour finds the neighbour's stack still standing on the ground it wants.
 		// Once the neighbour has gone to its line, the ones that found no place are tried again.
-		var needing = list.filter(function (it) { return !it.tie; });
+		// A tie that found no place is tried again too (LPN_TIE_RETRY): N163 on Novato, a stack beside neighbours that were
+		// stacks when it was tried, takes its line at 12 to 16 notches (Chromium), where the stub sees no gain.
+		var needing = LPN_TIE_RETRY ? list : list.filter(function (it) { return !it.tie; });
 		if (LPN_OPEN_SIDE && !(round > 0) && took.length && needing.length && took.length < list.length) {
 			var again = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, needing.filter(function (it) { return !res[it.id]; }), ring, 1);
 			return { placed: again.placed, took: took.concat(again.took) };
@@ -3060,7 +3067,7 @@ var EngCalcs = EngCalcs || {};
 					rec.lbl.lines = labelRowWidths(rec.ne);
 				});
 			});
-			placed = perfDebugAccum('  ns:refit', function () { return Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad }); });
+			placed = perfDebugAccum('  ns:refit', function () { return Collide.placeLabelsFirstFit(nodeLabels, obs, nodeFitOpts(pad)); });
 			rungs++;
 		}
 		lastNodeShedRungs = rungs;
@@ -3416,7 +3423,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_DROP_STRUCK = true;
 	function dropStruckLeaders(nodeLabels, nodePlaced, labels, placed, obs, holders) {
 		var min = leaderThreshold(), lmin = levelLeaderMin(), specs = {}, leaders = [], rows = [], struck = 0, air = effectiveFontSize() * LPN_LEVEL_PAD_FRAC;
-		doc.nodes.forEach(function (n) { var ne = nodeEls[n.id]; if (ne) { ne.leaderStruck = false; } });
+		doc.nodes.forEach(function (n) { var ne = nodeEls[n.id]; if (ne) { ne.leaderStruck = false; ne.leaderAttach = null; } });
 		doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le) { le.leaderStruck = false; } });
 		if (!LPN_DROP_STRUCK) { return 0; }
 		nodeLabels.concat(labels).forEach(function (sp) { specs[sp.id] = sp; });
@@ -3431,7 +3438,7 @@ var EngCalcs = EngCalcs || {};
 			if (r.dropped || !sp || !h || !shown(r.id)) { return; }
 			bs.forEach(function (b) { rows.push({ id: r.id, b: b }); });
 			if (!sp.dragged && (Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y) > min || h.leaderDue)) {
-				leaders.push({ id: r.id, h: h, g: Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id) });
+				leaders.push({ id: r.id, h: h, g: Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id), r: r });
 			}
 		});
 		placed.forEach(function (r) {
@@ -3454,7 +3461,53 @@ var EngCalcs = EngCalcs || {};
 				if (rows[i].id !== ld.id && rows[i].b.w > 0 && Collide.segmentInBoxFraction(ld.g, rows[i].b) > 0) { ld.h.leaderStruck = true; struck++; return; }
 			}
 		});
+		if (LPN_LEADER_NEAREST_ROW) {
+			leaders.forEach(function (ld) { if (ld.r && !ld.h.leaderStruck) { attachToNearestRow(ld, leaders, rows, obs); } });
+		}
 		return struck;
+	}
+	// **A STACK'S LEADER MEETS THE ROW NEAREST ITS NODE** (Task 812, Tom's lesson "leaders a person would draw"). The leader runs to the
+	// stack's first row, wherever the node stands: a stack set above and beside its node was reached across its whole height (a
+	// 72 px leader to a stack whose lowest row stood 19 px from the node; a median of 6 px and a top tenth of 30 px more than the shortest
+	// way in over Novato). The leader's end slides down the label's near edge to the row whose line is nearest the node, and stays where it
+	// was if the shorter one would cross a label, a leader, another node's symbol, or more pipes than the leader it replaces. Only the
+	// leader's end moves: no label does, so none is hidden or shown by it. Angles are no longer on the 15-degree grid (Tom, 2026-08-16:
+	// *"constrain leader angles to be at multiples of 15 degrees and not orthogonal"*), which is why this is a flag.
+	var LPN_LEADER_NEAREST_ROW = true;
+	function attachToNearestRow(ld, leaders, rows, obs) {
+		var bx = ld.r.boxes, g = ld.g, k = 0, bd, i, dy, g2, d, ownRows = [];
+		if (!bx || bx.length < 2) { return; }
+		bd = Math.abs(g.ay - ld.r.y);
+		for (i = 1; i < bx.length; i++) {
+			d = Math.abs(g.ay - (ld.r.y + bx[i].cy - bx[0].cy));
+			if (d < bd - 1e-9) { bd = d; k = i; }
+		}
+		if (!k) { return; }
+		dy = bx[k].cy - bx[0].cy;
+		g2 = Collide.segment(g.ax, g.ay, g.bx, g.by + dy, 'leader', ld.id);
+		for (i = 0; i < rows.length; i++) {
+			if (rows[i].id !== ld.id && rows[i].b.w > 0 && Collide.segmentInBoxFraction(g2, rows[i].b) > 0) { return; }
+		}
+		// its own rows, but the one it ends at: the end stands on that row's edge
+		for (i = 0; i < bx.length; i++) { if (i !== k && Collide.segmentInBoxFraction(g2, Collide.box(bx[i].cx, bx[i].cy, bx[i].w - 1e-6, bx[i].h, bx[i].a)) > 0) { return; } }
+		for (i = 0; i < leaders.length; i++) { if (leaders[i] !== ld && Collide.segmentsCross(g2, leaders[i].g)) { return; } }
+		function pipes(q) {
+			var n = 0, j, o, e = 1e-6;
+			for (j = 0; j < obs.segments.length; j++) {
+				o = obs.segments[j];
+				if (o.kind !== 'link') { continue; }
+				if ((Math.abs(o.ax - g.ax) < e && Math.abs(o.ay - g.ay) < e) || (Math.abs(o.bx - g.ax) < e && Math.abs(o.by - g.ay) < e)) { continue; }
+				if (Collide.segmentsCross(q, o)) { n++; }
+			}
+			return n;
+		}
+		for (i = 0; i < obs.boxes.length; i++) {
+			var o = obs.boxes[i];
+			if (o.kind === 'symbol' && o.w > 0 && !(Math.hypot(o.cx - g.ax, o.cy - g.ay) <= o.w / 2) && Collide.segmentInBoxFraction(g2, o) > 0) { return; }
+		}
+		if (pipes(g2) > pipes(g)) { return; }
+		ld.h.leaderAttach = { x: g.bx, y: g.by, dy: dy };
+		ld.g = g2;
 	}
 	// **EVERYTHING THE LEVEL PASS READS IS TAKEN TO A MILLIONTH OF A DRAWING UNIT**: boxes and segments are measured in
 	// pixels over a scale, and one scale reached by two wheel histories differs in its last bit; a spot that grazes a box then flips
@@ -3862,7 +3915,7 @@ var EngCalcs = EngCalcs || {};
 		// second, cruder mechanism reaching the same situation by another door, and a reader cannot
 		// tell the two apart. If a node label still cannot fit once link labels have shed, it drops.
 		var pad = fs * LPN_ALIGNED_PAD_FRAC, nodeObs = withDraggedLabels(obs, fs),
-			nodePlaced = perfDebugAccum('  cl:firstFit', function () { return Collide.placeLabelsFirstFit(nodeLabels, nodeObs, { pad: pad }); });
+			nodePlaced = perfDebugAccum('  cl:firstFit', function () { return Collide.placeLabelsFirstFit(nodeLabels, nodeObs, nodeFitOpts(pad)); });
 		// **AND THEN THE ONES THAT DID NOT FIT GIVE UP A PROPERTY AND TRY AGAIN** (Task 469). This
 		// is the graceful rung the node half never had; the drop above is now its terminal one.
 		//
@@ -63950,7 +64003,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			placedSide: h.placedSide, side: h.side, lines: h.lines ? h.lines.slice() : null,
 			lineCount: h.lineCount, shedCount: h.shedCount || 0,
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
-			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, leaderDue: !!h.leaderDue, leaderStruck: !!h.leaderStruck, hiddenDropped: !!h.hiddenDropped,
+			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, leaderDue: !!h.leaderDue, leaderStruck: !!h.leaderStruck, leaderAttach: h.leaderAttach ? { x: h.leaderAttach.x, y: h.leaderAttach.y, dy: h.leaderAttach.dy } : null, hiddenDropped: !!h.hiddenDropped,
 			crowdHidden: !!h.crowdHidden,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
 			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
@@ -64005,7 +64058,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.shedCount = c.shedCount;
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
 		h.hiddenBlocked = c.hiddenBlocked;
-		h.hiddenCrossed = c.hiddenCrossed; h.leaderDue = !!c.leaderDue; h.leaderStruck = !!c.leaderStruck; h.hiddenDropped = c.hiddenDropped;
+		h.hiddenCrossed = c.hiddenCrossed; h.leaderDue = !!c.leaderDue; h.leaderStruck = !!c.leaderStruck; h.leaderAttach = c.leaderAttach ? { x: c.leaderAttach.x, y: c.leaderAttach.y, dy: c.leaderAttach.dy } : null; h.hiddenDropped = c.hiddenDropped;
 		h.crowdHidden = c.crowdHidden;
 		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;

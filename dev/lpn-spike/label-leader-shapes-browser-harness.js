@@ -1,0 +1,159 @@
+// LEADERS A PERSON WOULD DRAW, IN A REAL CHROMIUM (ROADMAP Task 812, Tom's lesson "leaders a person would draw"). Two rules,
+// each one flag on the page (the harness lays every view out twice from the same files, the rules on and off):
+//   LPN_LEADER_PIPES       a node label takes a side whose leader crosses no other pipe before one whose leader does
+//                          (Collide's `leaderPipes`);
+//   LPN_LEADER_NEAREST_ROW a stack's leader meets the row nearest its node, not always the first (dropStruckLeaders()).
+// Run with:
+//   node dev/lpn-spike/label-leader-shapes-browser-harness.js
+//   LEADER_SHAPES_SHOTS=<dir>   saves the pictures Tom is shown, rules off ("before") and on ("after")
+// One fixed scale per view: Novato at wheel notches about N163 (1920 x 1000), Net3 in a phone-sized window, the 600-junction
+// network at notches 3, 6 and 9. Node fields ID, Qb, Z, H, P; link fields ID, Q, V. A leader "crosses a pipe" when it runs across a
+// pipe that is not its own element's (a node's own pipes arrive at the leader's start and do not count). A leader "runs long" when it
+// is more than 8 px longer than the way from its node to the nearest row of its label.
+// ASSERTED: over all views the rules leave fewer drawn leaders across a pipe and fewer running long, show no fewer node labels
+// and no fewer pipe fields, draw no more leaders through another label; and the label pass costs at most half as much again
+// (a gross guard: the measure of time is label-settle-bench-browser.js).
+//
+// Copyright 2009 Thomas Gail Haws
+// Licensed under GNU GPL v3.0 or later
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const { spawnSync } = require('child_process');
+
+const REPO = path.resolve(__dirname, '..', '..');
+const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
+const LOCK_ENV = 'EC_LEADER_SHAPES_BROWSER_LOCKED';
+const NAME = 'label-leader-shapes-browser-harness';
+
+if (process.env[LOCK_ENV] !== '1') {
+	const r = spawnSync('flock', ['-E', '75', '-w', '280', LOCK_FILE, process.execPath, __filename], {
+		stdio: 'inherit', env: Object.assign({}, process.env, { [LOCK_ENV]: '1' })
+	});
+	if (r.error) { console.error(NAME + ': flock re-exec failed: ' + r.error.message); process.exit(1); }
+	if (r.status === 75) { console.error(NAME + ': NOT RUN -- another session held ' + LOCK_FILE + ' for 280 s.'); process.exit(1); }
+	process.exit(r.status === null ? 1 : r.status);
+}
+
+let checks = 0, failures = 0;
+function ok(label, cond, detail) {
+	checks++;
+	if (!cond) { failures++; }
+	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
+}
+
+const MARKER = "\tdocument.addEventListener('DOMContentLoaded'";
+const HOOK = fs.readFileSync(path.join(__dirname, 'label-form-hook.inc.js'), 'utf8');
+const NODE_FIELDS = ['id', 'demand', 'elev', 'head', 'pressure'], LINK_FIELDS = ['id', 'flow', 'velocity'];
+const NOVATO = 'dev/water-network-examples/Net3-Novato-CA-World.lwn', NET3 = 'dev/water-network-examples/Net3.lwn', N600 = 'dev/lpn-spike/fixtures/plain-downtown-n600-seed71.lwn';
+const SHOTS = process.env.LEADER_SHAPES_SHOTS || null;
+const SCENES = [
+	{ key: 'novato', file: NOVATO, view: { width: 1920, height: 1000 }, around: '163', notches: [2, 4, 6, 8, 9, 10, 12, 14], shots: [9, 12] },
+	{ key: 'net3-phone', file: NET3, view: { width: 390, height: 844 }, around: null, notches: [0, 3, 6], shots: [3] },
+	{ key: 'n600', file: N600, view: { width: 1920, height: 1000 }, around: null, notches: [3, 6, 9], shots: [] }
+];
+
+function cross(a, b, c, d) {
+	const o = (p, q, r) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+	return o(c, d, a) * o(c, d, b) < 0 && o(a, b, c) * o(a, b, d) < 0;
+}
+function rectDist(p, r) { return Math.hypot(Math.max(r.l - p.x, 0, p.x - r.r), Math.max(r.t - p.y, 0, p.y - r.b)); }
+// Drawn leaders that cross a pipe other than their own element's, those that run long, and the drawn leaders' count.
+function faults(S) {
+	let across = 0, long = 0;
+	const ids = [];
+	S.leaders.forEach((g) => {
+		let n = 0;
+		S.pipes.forEach((p) => {
+			if (g.own.link === p.id) { return; }
+			if (g.own.node !== undefined && (p.from === g.own.node || p.to === g.own.node)) { return; }
+			if (cross(g.a, g.b, p.a, p.b)) { n++; }
+		});
+		if (n) { across++; ids.push(g.k); }
+		const len = Math.hypot(g.b.x - g.a.x, g.b.y - g.a.y);
+		if (g.rows.length && len - Math.min(...g.rows.map((r) => rectDist(g.a, r))) > 8) { long++; }
+	});
+	return { across: across, long: long, leaders: S.leaders.length, ids: ids };
+}
+
+async function layOut(Session, browser, sc, mode) {
+	const a = await Session.open(browser, NAME, { serviceWorkers: 'block', viewport: sc.view });
+	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+	await a.page.route(/\/js\/looped-network\.js/, async (route) => {
+		const resp = await route.fetch();
+		let body = await resp.text();
+		if (body.indexOf(MARKER) >= 0) { body = body.replace(MARKER, HOOK + MARKER); }
+		if (mode === 'off') {
+			['LPN_LEADER_PIPES', 'LPN_LEADER_NEAREST_ROW'].forEach((f) => {
+				if (body.indexOf('var ' + f + ' = true') < 0) { throw new Error('no ' + f); }
+				body = body.replace('var ' + f + ' = true', 'var ' + f + ' = false');
+			});
+		}
+		await route.fulfill({ response: resp, body: body });
+	});
+	try {
+		await a.goto('Looped-Network.php?ec_nolog=1');
+		await a.answerTrainingPanel().catch(() => {});
+		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		const proj = JSON.parse(fs.readFileSync(path.join(REPO, sc.file), 'utf8'));
+		proj.settings = Object.assign({}, proj.settings, { labelMaxWidth: null });
+		await a.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_wheel', txt); }, JSON.stringify(proj));
+		await a.reload();
+		await a.answerTrainingPanel().catch(() => {});
+		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await a.page.waitForFunction(() => window.__lpnForm && window.__lpnForm.solved(), null, { timeout: 120000 });
+		await a.page.evaluate(([n, l]) => window.__lpnForm.fields(n, l), [NODE_FIELDS, LINK_FIELDS]);
+		await a.settle(2000);
+		const rows = [];
+		for (const k of sc.notches) {
+			await a.page.evaluate(([n, around]) => { window.__lpnForm.fitNotch(n, around); window.__lpnForm.content(); }, [k, sc.around]);
+			await a.settle(1500);
+			const S = await a.page.evaluate(() => window.__lpnForm.leaderShapes());
+			const strikes = await a.page.evaluate(() => window.__lpnForm.leaderStrikes().length);
+			const pf = await a.page.evaluate(() => window.__lpnForm.pipeFields());
+			const ms = await a.page.evaluate(() => window.__lpnForm.timeContent(3));
+			rows.push({ k: k, f: faults(S), nodesShown: S.nodesShown, pipesShown: S.pipesShown, pipeRows: pf.rows, strikes: strikes, ms: ms });
+			if (SHOTS && sc.shots.indexOf(k) >= 0) {
+				fs.mkdirSync(SHOTS, { recursive: true });
+				await a.page.screenshot({ path: path.join(SHOTS, sc.key + '-notch' + k + '-' + (mode === 'off' ? 'before' : 'after') + '.png') });
+			}
+		}
+		return { rows: rows, errors: a.errors.slice() };
+	} finally {
+		await a.close();
+	}
+}
+
+async function main() {
+	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
+	const { Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js'));
+	const { chromium } = require(path.join(REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));
+	await env.startServer();
+	const browser = await chromium.launch({ executablePath: env.findChromium() });
+	const T = { on: { across: 0, long: 0, leaders: 0, nodes: 0, pipes: 0, rows: 0, strikes: 0, ms: 0 }, off: { across: 0, long: 0, leaders: 0, nodes: 0, pipes: 0, rows: 0, strikes: 0, ms: 0 } };
+	try {
+		for (const sc of SCENES) {
+			const on = await layOut(Session, browser, sc, 'on'), off = await layOut(Session, browser, sc, 'off');
+			ok(sc.key + ': no page errors', !on.errors.length && !off.errors.length, (on.errors[0] || off.errors[0] || '').slice(0, 200));
+			on.rows.forEach((r, i) => {
+				const b = off.rows[i];
+				console.log(`        ${sc.key} ${String(r.k).padStart(2)}: leaders across a pipe ${b.f.across} -> ${r.f.across}, running long ${b.f.long} -> ${r.f.long}, of ${b.f.leaders} -> ${r.f.leaders}; node labels ${b.nodesShown} -> ${r.nodesShown}; pipe labels ${b.pipesShown} -> ${r.pipesShown}; strikes ${b.strikes} -> ${r.strikes}; ${b.ms} -> ${r.ms} ms`);
+				[['on', r], ['off', b]].forEach(([t, x]) => { T[t].across += x.f.across; T[t].long += x.f.long; T[t].rows += x.pipeRows; T[t].leaders += x.f.leaders; T[t].nodes += x.nodesShown; T[t].pipes += x.pipesShown; T[t].strikes += x.strikes; T[t].ms += x.ms; });
+			});
+		}
+		console.log(`        TOTAL leaders across a pipe ${T.off.across} -> ${T.on.across}; running long ${T.off.long} -> ${T.on.long}; pipe fields ${T.off.rows} -> ${T.on.rows}; leaders ${T.off.leaders} -> ${T.on.leaders}; node labels ${T.off.nodes} -> ${T.on.nodes}; pipe labels ${T.off.pipes} -> ${T.on.pipes}; strikes ${T.off.strikes} -> ${T.on.strikes}; pass ${T.off.ms} -> ${T.on.ms} ms`);
+		ok('over all views, fewer drawn leaders across a pipe', T.on.across < T.off.across, `${T.off.across} -> ${T.on.across}`);
+		ok('over all views, fewer drawn leaders running long', T.on.long < T.off.long, `${T.off.long} -> ${T.on.long}`);
+		ok('over all views, no fewer pipe fields shown', T.on.rows >= T.off.rows, `${T.off.rows} -> ${T.on.rows}`);
+		ok('over all views, no fewer node labels shown', T.on.nodes >= T.off.nodes, `${T.off.nodes} -> ${T.on.nodes}`);
+		ok('over all views, no more drawn leaders through a label', T.on.strikes <= T.off.strikes, `${T.off.strikes} -> ${T.on.strikes}`);
+		ok('the label pass costs at most half as much again', T.on.ms <= 1.5 * T.off.ms, `${T.off.ms} -> ${T.on.ms} ms`);
+	} finally {
+		await browser.close();
+		env.stopServer();
+	}
+	console.log('\n' + NAME + ': ' + (checks - failures) + '/' + checks + ' checks passed');
+	process.exit(failures ? 1 : 0);
+}
+main().catch((e) => { console.error(e); process.exit(1); });
