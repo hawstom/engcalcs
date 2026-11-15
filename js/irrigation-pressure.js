@@ -21,32 +21,12 @@ EngCalcs.dataSingletonsCount = 15;
 EngCalcs.dataColumnsFirstRowCount = 7;
 EngCalcs.dataColumnsOtherRowsCount = 7;
 
-// Darcy-Weisbach friction factor for one reach, same 3-regime approach as darcy-weisbach.js.
+// Reach geometry and the Darcy-Weisbach friction factor, which is EPANET's: EngCalcs.dwFriction in
+// js/PipeHydraulics.lib.js (q m3/s, d and e metres, visc m2/s).
 EngCalcs.ipFriction = function (q, d, e, visc) {
 	'use strict';
-	var a = Math.PI * d * d / 4,
-		v = q / a,
-		re = Math.abs(v) * d / visc,
-		f;
-	if (re === 0) {
-		f = 0;
-	} else if (re < 2000) {
-		f = 64 / re;
-	} else if (re < 4000) {
-		var r = re / 2000,
-			y2 = e / (3.7 * d) + 5.74 / Math.pow(re, 0.9),
-			y3 = -0.86859 * Math.log(e / (3.7 * d) + 5.74 / Math.pow(4000, 0.9)),
-			fa = Math.pow(y3, -2),
-			fb = fa * (2 - 0.00514215 / (y2 * y3)),
-			x1 = 7 * fa - fb,
-			x2 = 0.128 - 17 * fa + 2.5 * fb,
-			x3 = -0.128 + 13 * fa - 2 * fb,
-			x4 = r * (0.032 - 3 * fa + 0.5 * fb);
-		f = x1 + r * (x2 + r * (x3 + x4));
-	} else {
-		f = 0.25 / Math.pow(Math.log10(e / (3.7 * d) + 5.74 / Math.pow(re, 0.9)), 2);
-	}
-	return { a: a, v: v, f: f };
+	var a = Math.PI * d * d / 4;
+	return { a: a, v: q / a, f: EngCalcs.dwFriction(q, d, e, visc) };
 };
 
 // Christiansen's multi-outlet reduction factor for n equally-spaced, equal-discharge outlets.

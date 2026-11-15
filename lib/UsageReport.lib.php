@@ -361,7 +361,7 @@ function ecUsageRowInWindow(array $row, $from, $to)
 
 /** A blank per-bucket accumulator: totals, a daily series, and named field tallies -- everything a
  * table or a chart on spock.php reads, and nothing a row array is needed for afterward. */
-function ecUsageNewSeries(array $fields)
+function ecUsageNewSeries(array $fields, $trackDays = false)
 {
     $s = array(
         'bucketTotals' => array('visitor' => 0, 'visit' => 0),
@@ -372,10 +372,17 @@ function ecUsageNewSeries(array $fields)
         'codes'        => array(),
         'codesBy'      => array(),
         'uncoded'      => 0,
+        // Distinct (browser code, day) pairs, said-yes rows only, kept when $trackDays is true. The
+        // logs carry no visit identifier, so this is the nearest honest count of visits: one per
+        // browser per day, however many rows. Memory is bounded by browsers x days x field values.
+        'trackDays'    => (bool) $trackDays,
+        'codeDays'     => array(),
+        'codeDaysBy'   => array(),
     );
     foreach ($fields as $f) {
         $s['countBy'][$f] = array('visitor' => array(), 'visit' => array());
         $s['codesBy'][$f] = array();
+        $s['codeDaysBy'][$f] = array();
     }
     return $s;
 }
@@ -394,12 +401,15 @@ function ecUsageFeedSeries(array &$s, array $row, $from, $to)
     if ($b === 'visitor') {
         if ($code === '') { $s['uncoded']++; } else { $s['codes'][$code] = true; }
     }
+    $dayKey = ($s['trackDays'] && $code !== '') ? $code . ' ' . $row['day'] : '';
+    if ($dayKey !== '') { $s['codeDays'][$dayKey] = true; }
     foreach (array_keys($s['countBy']) as $field) {
         $v = isset($row[$field]) ? $row[$field] : '';
         if ($v === '') { $v = '(none)'; }
         if (!isset($s['countBy'][$field][$b][$v])) { $s['countBy'][$field][$b][$v] = 0; }
         $s['countBy'][$field][$b][$v]++;
         if ($code !== '') { $s['codesBy'][$field][$v][$code] = true; }
+        if ($dayKey !== '') { $s['codeDaysBy'][$field][$v][$dayKey] = true; }
     }
 }
 
@@ -408,6 +418,19 @@ function ecUsageSeriesBrowsers(array $s, $field = null, $value = null)
 {
     if ($field === null) { return count($s['codes']); }
     return isset($s['codesBy'][$field][$value]) ? count($s['codesBy'][$field][$value]) : 0;
+}
+
+/**
+ * Browser-days in a series that tracks them: the number of distinct (browser, day) pairs among the
+ * said-yes rows, in total or for one value of one field. A browser that did the action twice in one
+ * day is one browser-day; on two days, two. A said-yes row with no code cannot be placed and is not
+ * counted here (it is in the series' 'uncoded'). There is no others counterpart: an others row
+ * carries no code and nothing that ties it to any other row.
+ */
+function ecUsageSeriesBrowserDays(array $s, $field = null, $value = null)
+{
+    if ($field === null) { return count($s['codeDays']); }
+    return isset($s['codeDaysBy'][$field][$value]) ? count($s['codeDaysBy'][$field][$value]) : 0;
 }
 
 /** A series' daily counts over a fixed day list, so a quiet day is a zero rather than a gap --
@@ -445,7 +468,7 @@ function ecUsageReportBuild(array $dirs, $from, $to)
         'send'   => array(),
     );
     $series = array();
-    foreach ($fieldsByKind as $kind => $fields) { $series[$kind] = ecUsageNewSeries($fields); }
+    foreach ($fieldsByKind as $kind => $fields) { $series[$kind] = ecUsageNewSeries($fields, $kind === 'calc'); }
     $presets         = ecUsageNewSeries(array('detail', 'asked'));
     $commands        = ecUsageNewSeries(array('detail'));   // Task 815: lpn cmd: rows, kept out of 'signal'
     $contactViews    = ecUsageNewSeries(array());

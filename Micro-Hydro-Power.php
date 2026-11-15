@@ -59,6 +59,7 @@ EngCalcs.pageConfig = {
 	hl_bad_tip:  <?=json_encode($ec_lang['mhp_hl_bad_tip'])?>
 };
 </script>
+<script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
 <script src="/engcalcs/js/micro-hydro-power.js?v=<?=filemtime(__DIR__.'/js/micro-hydro-power.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
