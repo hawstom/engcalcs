@@ -240,6 +240,30 @@ async function main() {
 		const tx = await page.evaluate(() => { const r = document.querySelector('#lpn_canvas text.lpn-lbl[data-lbl="X1"]').getBoundingClientRect(); return { x: r.right - 6, y: r.top + r.height / 2 }; });
 		await click(tx);
 		ok('a click on the Text away from the junctions selects the Text with no box', !(await chooserOpen()) && J(await selected()) === J(['other']), J([tx, pile2, await rows(), await selected()]));
+
+		console.log('\nF. A click right after a dismissed box (Perry saw one select differently once; tried to reproduce)');
+		const quick = async (p) => { await page.mouse.move(p.x, p.y); await page.mouse.click(p.x, p.y); };
+		await click({ x: 700, y: 820 });
+		await click(onPipe);
+		await closeProps();
+		ok('(P1 is selected to start)', J(await selected()) === J(['link:P1']), J(await selected()));
+		await click(pile);
+		await page.keyboard.press('Escape');
+		await quick(mid); await S.settle(450);
+		ok('Escape, then at once a click on junction M: M is selected', J(await selected()) === J(['node:M']), J(await selected()));
+		await closeProps();
+		await click(onPipe); await closeProps();
+		await click(pile);
+		await click({ x: 700, y: 820 });
+		await quick(mid); await S.settle(450);
+		ok('a press on bare map to dismiss, then at once a click on M: M is selected', J(await selected()) === J(['node:M']), J(await selected()));
+		await closeProps();
+		await click(onPipe); await closeProps();
+		await click(pile);
+		await click(mid);
+		ok('a press on M itself while the box is open only closes the box: the selection is unchanged', !(await chooserOpen()) && J(await selected()) === J(['link:P1']), J(await selected()));
+		await quick(mid); await S.settle(450);
+		ok('...and the next click on M selects it', J(await selected()) === J(['node:M']), J(await selected()));
 		await S.page.close();
 
 		// =========================================================== thick pipes

@@ -60825,8 +60825,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// not wanted first)."* So a box, not cycling.
 	//
 	// **WHAT COUNTS AS EQUALLY GOOD IS ONE PURE RULE** (Geom.pickCandidates(): coincident nodes,
-	// zero-length links with their end nodes, links drawn over each other). The ordinary click, a
-	// junction on a pipe, gives no list and goes the way it always did. pickCandidatesAt() is the one
+	// zero-length links with their end nodes, links drawn over each other), judged in the MODEL so the
+	// zoom never matters. The ordinary click, a junction on a pipe, gives no list and goes the way it
+	// always did, at every zoom. pickCandidatesAt() is the one
 	// door that builds the list for a press; an assembly group would map the list it returns
 	// (members to one row) and nothing else here would change.
 	//

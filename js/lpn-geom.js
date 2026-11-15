@@ -916,38 +916,48 @@ EngCalcs.lpnGeom = (function () {
 	// and the caller asks the visitor which one was meant. One equally good candidate is never
 	// returned: it is not a choice.
 	//
-	// THE RULE, in screen pixels, stated once:
-	//   1. NODES. Take the nodes within `nodeReach` of the press and the nearest of them. Every
-	//      node within `same` of THAT node's position is coincident with it. Two or more coincident
-	//      nodes are candidates. A single node, with other nodes or pipes about it, is the ordinary
-	//      case and is never ambiguous: a junction sitting on a pipe still selects the junction.
-	//   2. BURIED LINKS. A link whose whole drawn length is at most `zero` has both ends under one
-	//      point and cannot be clicked by any other route (an exploded pump or valve assembly is
-	//      made of them). One within `nodeReach` of the press is a candidate, and so are its two
-	//      end nodes, which are what the press is on.
+	// **AMBIGUITY IS JUDGED IN THE MODEL, NEVER ON THE SCREEN.** The pointer's pixel reach decides
+	// only WHICH LOCATION was clicked (the nodes within `nodeReach` of the press, the pipes within
+	// `linkReach`); whether elements there are one choice or several is a fact about the drawing.
+	// A screen-pixel test ("a pipe 2 px long", "nodes 1.5 px apart") is true of ordinary short pipes
+	// and close junctions the moment the view is zoomed out, and every click opened a box (Net3 at
+	// 12 notches out: 39 boxes in 97 clicks, where the plain rule gives none at any zoom). So:
+	// two things coincide when their stored positions are equal to within `eps`, which is
+	// **1e-6 of the diagonal of the nodes' own extent** unless the caller says otherwise. That is far
+	// below any real spacing (a 1 mm offset in a 1 km network is 1e-6), above floating-point noise
+	// on a coordinate that was typed, imported or shifted, and relative, so a geographic project
+	// drawn in degrees and one drawn in feet get the same answer. Zooming never changes the result.
+	//
+	//   1. NODES. Take the nodes within `nodeReach` of the press and the nearest of them. Every one of
+	//      them at that node's position (within eps) is coincident with it. Two or more are
+	//      candidates. A single node, with other nodes or pipes about it, is the ordinary case and
+	//      is never ambiguous: a junction sitting on a pipe still selects the junction, and so does
+	//      the nearer of two close but separate junctions.
+	//   2. BURIED LINKS. A link whose whole model length is at most eps has both ends at one point and
+	//      cannot be clicked by any other route (an exploded pump or valve assembly is made of them).
+	//      One whose location is the nearest node's is a candidate, and so are its two end nodes.
 	//   3. COINCIDENT LINKS, only where no node is within `nodeReach` (a node outranks a link, as it
 	//      does everywhere else on this page). Take the links within `linkReach` of the press; the
-	//      nearest one's foot on its centreline is the point, and every link whose own foot lies
-	//      within `same` of it is coincident with it: two pipes drawn over each other, a pump over
-	//      its bypass, two pipes crossing exactly at the press.
+	//      nearest one's foot on its centreline is the point, and every link whose own foot is at that
+	//      point (within eps) lies over it: two pipes drawn over each other, a pump over its bypass.
 	// ORDER: nodes, then links, each by distance from the press and then by id in natural order
 	// (so J2 comes before J10). Text objects are the caller's to append after these.
 	//
-	// opts: nodeReach (6), linkReach (1.5: half the drawn stroke, floored at 3 px across, the reach the
-	// browser's own hit test gives a pipe; the caller passes the live stroke), same (1.5), zero (2), all screen px; nodeX(n), nodeY(n),
-	// linkPts(l) -> [{x, y}] and nodeOk(n), linkOk(l) read the document the way the caller draws
-	// it (default: n.x, n.y, [], always true). Each candidate is {kind: 'node'|'link', id, type,
-	// distPx}. A caller that groups elements (an assembly) maps this list afterwards; nothing here
-	// knows about groups.
+	// opts: nodeReach (6) and linkReach (1.5: half the drawn stroke, floored at 3 px across, the reach
+	// the browser's own hit test gives a pipe; the caller passes the live stroke), screen px; eps, in
+	// world units (default above); nodeX(n), nodeY(n), linkPts(l) -> [{x, y}], nodeOk(n), linkOk(l)
+	// and nodeById(id) read the document the way the caller draws it (default: n.x, n.y, [], always
+	// true, an index built here). Each candidate is {kind: 'node'|'link', id, type, distPx}. A caller
+	// that groups elements (an assembly) maps this list afterwards; nothing here knows about groups.
 	function pickCandidates(nodes, links, wx, wy, s, opts) {
 		var o = opts || {}, nodeReach = o.nodeReach === undefined ? 6 : o.nodeReach,
-			linkReach = o.linkReach === undefined ? 1.5 : o.linkReach,
-			same = o.same === undefined ? 1.5 : o.same, zero = o.zero === undefined ? 2 : o.zero,
+			linkReach = o.linkReach === undefined ? 1.5 : o.linkReach, eps,
 			nx = o.nodeX || function (n) { return n.x; }, ny = o.nodeY || function (n) { return n.y; },
 			lp = o.linkPts || function () { return []; },
 			nOk = o.nodeOk || function () { return true; }, lOk = o.linkOk || function () { return true; },
 			byId = {}, near = [], find, list = [], seen = {}, i, j, n, l, pts, d, nearest = null, buried = [],
-			cands = [], first, hit, group, margin, fa, fb, x0, x1, y0, y1;
+			cands = [], first, hit, group, margin, fa, fb, x0, x1, y0, y1, px, py,
+			minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
 		// nodeById(id), when the caller already holds one, saves indexing every node on every press.
 		find = o.nodeById || function (id) { return byId[id]; };
 		function natural(a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); }
@@ -959,17 +969,22 @@ EngCalcs.lpnGeom = (function () {
 		for (i = 0; i < nodes.length; i++) {
 			n = nodes[i];
 			if (!o.nodeById) { byId[n.id] = n; }
+			px = nx(n); py = ny(n);
+			if (px < minX) { minX = px; } if (px > maxX) { maxX = px; }
+			if (py < minY) { minY = py; } if (py > maxY) { maxY = py; }
 			// A box test before the square root; every press walks every node.
-			if (Math.abs(nx(n) - wx) * s > nodeReach || Math.abs(ny(n) - wy) * s > nodeReach || !nOk(n)) { continue; }
-			d = Math.hypot(nx(n) - wx, ny(n) - wy) * s;
+			if (Math.abs(px - wx) * s > nodeReach || Math.abs(py - wy) * s > nodeReach || !nOk(n)) { continue; }
+			d = Math.hypot(px - wx, py - wy) * s;
 			if (d > nodeReach) { continue; }
 			near.push({ n: n, d: d });
 			if (!nearest || d < nearest.d) { nearest = { n: n, d: d }; }
 		}
+		eps = o.eps !== undefined ? o.eps : Math.max(1e-6 * Math.hypot(maxX - minX, maxY - minY), 1e-12);
+		function atNearest(m) {
+			return Math.hypot(nx(m) - nx(nearest.n), ny(m) - ny(nearest.n)) <= eps;
+		}
 		if (nearest) {
-			near.forEach(function (c) {
-				if (Math.hypot(nx(c.n) - nx(nearest.n), ny(c.n) - ny(nearest.n)) * s <= same) { addNode(c.n, c.d); }
-			});
+			near.forEach(function (c) { if (atNearest(c.n)) { addNode(c.n, c.d); } });
 			if (list.length < 2) { list = []; seen = {}; }
 		}
 		margin = Math.max(nodeReach, linkReach) / s;
@@ -991,9 +1006,9 @@ EngCalcs.lpnGeom = (function () {
 			}
 			pts = lp(l);
 			if (!pts || pts.length < 2) { continue; }
-			if (polylineLength(pts) * s <= zero) {
-				hit = nearestFractionOnPolyline(pts, wx, wy);
-				if (hit.dist * s <= nodeReach) { buried.push({ l: l, d: hit.dist * s }); }
+			if (polylineLength(pts) <= eps) {
+				// Buried: judged at the location the press chose, never at the link's own on-screen size.
+				if (nearest && fa && atNearest(fa)) { buried.push({ l: l, d: nearestFractionOnPolyline(pts, wx, wy).dist * s }); }
 			} else if (!nearest) {
 				hit = nearestFractionOnPolyline(pts, wx, wy);
 				if (hit.dist * s <= linkReach) { cands.push({ l: l, d: hit.dist * s, x: hit.x, y: hit.y }); }
@@ -1013,7 +1028,7 @@ EngCalcs.lpnGeom = (function () {
 			cands.sort(function (a, b) { return a.d - b.d; });
 			first = cands[0];
 			cands.forEach(function (c) {
-				if (Math.hypot(c.x - first.x, c.y - first.y) * s <= same) {
+				if (Math.hypot(c.x - first.x, c.y - first.y) <= eps) {
 					group.push({ kind: 'link', id: c.l.id, type: c.l.type, distPx: c.d });
 				}
 			});
