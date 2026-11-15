@@ -2832,7 +2832,7 @@
 		opts = opts || {};
 		// The properties a document stores under their own name rather than an underscore, which
 		// every one became overridable as (Tom, 2026-10-12; LPN_BARE_PROP in js/looped-network.js).
-		var BARE = { elev: 1, bottomElev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, mixingModel: 1, mixingFraction: 1,
+		var BARE = { elev: 1, bottomElev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, minVolume: 1, overflow: 1, mixingModel: 1, mixingFraction: 1,
 			headPattern: 1, speed: 1, speedPattern: 1 };
 		// A caller's resolver written before then reads `_prop` only; a bare one it cannot find is
 		// read off the element, which is what Base holds.
@@ -3061,14 +3061,14 @@
 					n(cLen, nd, 'tankDiameter', eff(nd, 'tankDiameter') || 0),
 					// MinVol, as the file wrote it (a volume: the length unit cubed). Absent is EPANET's
 					// own 0, "no separate minimum volume".
-					(typeof nd.minVolume === 'number' && isFinite(nd.minVolume))
-						? n(cLen.same ? PLAIN : { same: false, mul: Math.pow(cLen.mul, 3) }, nd, 'minVolume', nd.minVolume) : '0'];
+					(typeof eff(nd, 'minVolume') === 'number' && isFinite(eff(nd, 'minVolume')))
+						? n(cLen.same ? PLAIN : { same: false, mul: Math.pow(cLen.mul, 3) }, nd, 'minVolume', eff(nd, 'minVolume')) : '0'];
 				if (eff(nd, 'volCurve')) {
 					tankRow.push(String(eff(nd, 'volCurve')));
-				} else if (nd.overflow) {
+				} else if (eff(nd, 'overflow')) {
 					tankRow.push(nd.volColumn || '*');   // the eighth column stands aside for the ninth
 				}
-				if (nd.overflow) { tankRow.push(String(nd.overflow)); }
+				if (eff(nd, 'overflow')) { tankRow.push(String(eff(nd, 'overflow'))); }
 				tanks.push(row(tankRow) + descOf(nd));
 			} else {
 				// **THE PATTERN COLUMN IS THE JUNCTION'S OWN OR NOTHING** (Task 423). A blank column

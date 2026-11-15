@@ -5276,6 +5276,7 @@ var EngCalcs = EngCalcs || {};
 		// if we raise this tank" or "what if this pump runs at 90 percent" is exactly a scenario's
 		// question. Stored bare, as the file and EPANET name them: see LPN_BARE_PROP.
 			elev: true, bottomElev: true, minLevel: true, maxLevel: true, tankDiameter: true, volCurve: true,
+			minVolume: true, overflow: true,
 			mixingModel: true, mixingFraction: true, headPattern: true,
 		// `demands` is a junction's WHOLE DEMAND BREAKDOWN -- every row's base, pattern and
 		// description -- as ONE property (R-369; Tom, 2026-09-28: *"Add a demand category in a
@@ -5350,6 +5351,7 @@ var EngCalcs = EngCalcs || {};
 	// that is not marked `// base-write:`.
 	// A Text's own look is stored bare too, as it always was (`sizeMult`, `align`...).
 	var LPN_BARE_PROP = { x: true, y: true, elev: true, bottomElev: true, minLevel: true, maxLevel: true, tankDiameter: true, volCurve: true,
+		minVolume: true, overflow: true,
 		mixingModel: true, mixingFraction: true, headPattern: true, speed: true, speedPattern: true,
 		sizeMult: true, align: true, valign: true, bold: true, rot: true, allZoom: true };
 	// **WHERE BASE KEEPS A JUNCTION'S `demands`** (R-369): row 0 is `_demand` plus two of these
@@ -6157,6 +6159,7 @@ var EngCalcs = EngCalcs || {};
 			// mixing model we place with the rest of water quality; a reservoir's head pattern goes
 			// with the head it varies.
 			elev: 'physical', bottomElev: 'physical', minLevel: 'physical', maxLevel: 'physical', tankDiameter: 'physical', volCurve: 'physical',
+			minVolume: 'physical', overflow: 'physical',
 			headPattern: 'physical',
 			mixingModel: 'constituent', mixingFraction: 'constituent' },
 		link: { diameter: 'physical', roughness: 'physical', k: 'physical', length: 'physical',
@@ -9020,6 +9023,16 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', prop: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return effective(n, 'tankDiameter'); }, set: function (n, v) { n.tankDiameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** ([TANKS] columns 7 and 9). The volume is a number
+			// in the Length unit cubed; Can overflow is a YES/NO choice on the same `choices` door the
+			// mixing model uses, the codes being EPANET's own words.
+			{ key: 'minVolume', group: 'node', field: 'minVolume', prop: 'minVolume', label: pc.lpn_field_tank_minvol || 'Minimum volume',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return effective(n, 'minVolume'); }, set: function (n, v) { n.minVolume = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			{ key: 'overflow', group: 'node', field: 'overflow', prop: 'overflow', choices: ['YES', 'NO'],
+				label: pc.lpn_field_tank_overflow || 'Can overflow',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return tankOverflowWord(n); }, set: function (n, v) { n.overflow = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **THE MIXING MODEL, A FOUR-WAY CHOICE**, on the same `choices` door `status` uses
 			// above. The CODES are the internal EPANET tokens and are never translated, so a saved
 			// query keeps reading in every language -- but the WORDS a person picks from are the
@@ -12808,6 +12821,15 @@ var EngCalcs = EngCalcs || {};
 	// A volume is shown in the LENGTH unit cubed (cubic feet or cubic metres, which is what EPANET
 	// pairs with its length): the factor and the mark come from the one LENGTH selector.
 	function tankVolumeFactor() { var f = unitFactor('lpn_u_length'); return f * f * f; }
+	// A tank's Can overflow as EPANET's own word. The file's spelling is kept in storage (`yes`, `NO`),
+	// because it is carried and never computed with; this is how every venue reads it. Absent is NO.
+	function tankOverflowWord(n) { return /^y/i.test(String(effective(n, 'overflow') || '')) ? 'YES' : 'NO'; }
+	// What a venue writes: EPANET's two words. Writing the word the file already spells that way
+	// keeps its characters, so editing a tank to the value it already had changes nothing.
+	function tankOverflowWrite(n, word) {
+		if (tankOverflowWord(n) === word && effective(n, 'overflow')) { return; }
+		setProp(n, 'overflow', word);
+	}
 	function tankVolumeUnitText() {
 		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_length');
 		if (k === 'ft') { return pc.u_ft3 || 'ft^3'; }
@@ -24037,6 +24059,8 @@ var EngCalcs = EngCalcs || {};
 			['minLevel', 'lpn_field_tank_minlevel', 'Lowest water depth'],
 			['maxLevel', 'lpn_field_tank_maxlevel', 'Highest water depth'],
 			['tankDiameter', 'lpn_field_tank_diameter', 'Tank diameter'],
+			['minVolume', 'lpn_field_tank_minvol', 'Minimum volume'],
+			['overflow', 'lpn_field_tank_overflow', 'Can overflow'],
 			['mixingModel', 'lpn_mixing_model', 'Mixing model'],
 			['mixingFraction', 'lpn_mixing_fraction', 'Mixing fraction']
 		];
@@ -24111,7 +24135,7 @@ var EngCalcs = EngCalcs || {};
 				} else if (key === 'emitter') {
 					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
 				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel' || key === 'depth' || key === 'volume'
-						|| key === 'bottomElev' || key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
+						|| key === 'bottomElev' || key === 'tankDiameter' || key === 'minVolume' || key === 'overflow' || key === 'mixingModel' || key === 'mixingFraction') {
 					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
 				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
 					if (d.group !== 'link' || (d.type && d.type !== 'pump')) { return; }
@@ -24753,6 +24777,14 @@ var EngCalcs = EngCalcs || {};
 			if (cand.group !== 'node' || cand.el.type !== 'tank') { return undefined; }
 			var tankVal = prop === 'bottomElev' ? tankBottom(cand.el) : effective(cand.el, prop);
 			return (typeof tankVal === 'number' && isFinite(tankVal)) ? tankVal : undefined;
+		}
+		// **MINIMUM VOLUME AND CAN OVERFLOW** (a volume in the Length unit cubed; EPANET's YES/NO).
+		if (prop === 'minVolume') {
+			var mv = (cand.group === 'node' && cand.el.type === 'tank') ? effective(cand.el, 'minVolume') : undefined;
+			return (typeof mv === 'number' && isFinite(mv)) ? mv : undefined;
+		}
+		if (prop === 'overflow') {
+			return (cand.group === 'node' && cand.el.type === 'tank') ? tankOverflowWord(cand.el) : undefined;
 		}
 		// **THE MIXING MODEL, AS THE TOKEN THE DOCUMENT STORES** -- 'MIXED' is the standing
 		// default, exactly as the table's own get() answers it.
@@ -30321,6 +30353,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter',
 						get: function (n) { return effective(n, 'tankDiameter'); },
 						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
+					// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** (audit 2026-11). The volume is in the
+					// Length unit cubed, so its heading names that, as the Available volume column does.
+					(function () {
+						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume',
+							get: function (n) { return effective(n, 'minVolume'); },
+							set: function (n, v) { setProp(n, 'minVolume', v); updateNode(n.id, true); } };
+						c.unitText = tankVolumeUnitText;
+						return c;
+					}()),
+					{ key: 'overflow', label: 'lpn_field_tank_overflow', em: 3.5, prop: 'overflow',
+						choices: function () {
+							var pc = EngCalcs.pageConfig || {};
+							return [['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']];
+						},
+						get: function (n) { return tankOverflowWord(n); },
+						set: function (n, v) { tankOverflowWrite(n, v); updateNode(n.id, true); } },
 					// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), the twin of the pipe pair:
 					// water sits in a tank far longer than it sits in any main, so this is where a
 					// residual is actually lost. A bulk rate, in the same 1/day.
@@ -40806,6 +40854,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				label: pc.lpn_field_tank_maxlevel_short || 'Maximum depth' },
 			{ types: ['tank'], keys: ['tankDiameter'], props: ['tankDiameter'], unit: 'lpn_u_length',
 				label: pc.lpn_field_tank_diameter || 'Tank diameter' },
+			{ types: ['tank'], keys: ['minVolume'], props: ['minVolume'], unitText: tankVolumeUnitText, label: pc.lpn_field_tank_minvol || 'Minimum volume' },
+			{ types: ['tank'], keys: ['overflow'], props: ['overflow'], none: ['NO', 'no', 'No'], label: pc.lpn_field_tank_overflow || 'Can overflow' },
 			{ types: ['tank'], keys: ['volCurve'], props: ['volCurve'], label: pc.lpn_curve_kind_volume || 'Tank volume' },
 			{ types: ['tank'], keys: ['mixingModel'], props: ['mixingModel'], none: ['MIXED'], label: pc.lpn_mixing_model || 'Mixing model' },
 			{ types: ['tank'], keys: ['mixingFraction'], props: ['mixingFraction'], label: pc.lpn_mixing_fraction || 'Mixing fraction' },
@@ -47468,7 +47518,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// vessel's geometry. Present only where the file stated them. MinVol is in the length
 				// unit cubed, as the file wrote it; Overflow is the file's word. Nothing on the page
 				// edits either; both engines are handed them by assembleModel().
-				if (n.overflow) { tk.overflow = n.overflow; }
+				if (n.overflow) { tk.overflow = n.overflow; }   // base-write: an imported document is born in Base
 				if (n.volColumn) { tk.volColumn = n.volColumn; }
 				// The ground starts as the same number in the same characters, so a DXF or GeoJSON
 				// written straight after import states it as the file did.
@@ -61528,7 +61578,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// that actually now owns the number, or a Length change would rescale a field this dialog
 		// never mentioned.
 		if (name === 'lpn_u_length') {
-			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter'];
+			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter',
+				pc.lpn_field_tank_minvol || 'Minimum volume'];
 		}
 		if (name === 'lpn_u_diameter') { return [pc.lpn_field_diameter || 'Diameter']; }
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
@@ -61616,6 +61667,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// rescale it and an Elevation/Head change must leave it alone, both now true below.
 			doc.nodes.forEach(function (nd) { conv(nd, 'tankDiameter'); });
 			convOverrides('tankDiameter');
+			// **MINIMUM VOLUME IS THE LENGTH UNIT CUBED**, so it moves by the cube of the length factor.
+			(function () {
+				var k1 = k;
+				k = k1 * k1 * k1;
+				doc.nodes.forEach(function (nd) { conv(nd, 'minVolume'); });
+				convOverrides('minVolume');
+				k = k1;
+			}());
 		} else if (name === 'lpn_u_diameter') {
 			doc.links.forEach(function (l) { conv(l, '_diameter'); });
 			convOverrides('diameter');
@@ -73390,7 +73449,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		reservoir: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', '#coords', 'lpn_field_head', 'lpn_field_head_pattern',
 			'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|', '#qresult', '#notes'],
 		tank: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', 'lpn_field_tank_base_elev', 'lpn_field_tank_diameter',
-			'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
+			'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', 'lpn_field_tank_minvol', 'lpn_field_tank_overflow', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
 			'lpn_mixing_model', 'lpn_mixing_fraction', 'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|',
 			'lpn_field_head', 'lpn_result_pressure', 'lpn_result_depth', 'lpn_result_tank_volume', '#qresult', '#notes'],
 		pipe: ['lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_pipetype', 'lpn_field_diameter',
@@ -75833,6 +75892,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				function () { return effective(n, 'tankDiameter'); },
 				function (v) { setProp(n, 'tankDiameter', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
+			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is in the Length unit cubed, as the
+			// Available volume below it is; blank is EPANET's 0, "use the diameter".
+			numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')',
+				effective(n, 'minVolume'),
+				function (v) { setProp(n, 'minVolume', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_minvol_tip, { el: n, prop: 'minVolume' });
+			selectFieldPlain(fields, pc.lpn_field_tank_overflow || 'Can overflow',
+				[['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']],
+				tankOverflowWord(n),
+				function (v) { tankOverflowWrite(n, v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_overflow_tip);
 			// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), shown on the same terms as the
 			// pipe pair: only while a chemical is being tracked, blank-capable because blank means
 			// "use the coefficient set for the whole network", and written through setProp()
@@ -77390,7 +77460,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		roughness: 'lpn_field_roughness_tip', km: 'lpn_field_km_short_tip', length: 'lpn_field_length_slope_tip', diameter: 'lpn_field_pipetype_tip', typeId: 'lpn_field_pipetype_tip',
 		fittingsId: 'lpn_field_fittings_tip', axis1: 'lpn_field_coord_tip', axis2: 'lpn_field_coord_tip', allZoom: 'lpn_field_text_all_zoom_tip', anchor: 'lpn_field_text_attached_tip',
 		bottomElev: 'lpn_field_tank_base_elev_tip', level: 'lpn_field_tank_level_short_tip', minLevel: 'lpn_field_tank_minlevel_short_tip', maxLevel: 'lpn_field_tank_maxlevel_short_tip',
-		tankDiameter: 'lpn_field_tank_diameter_tip', demand: 'lpn_demand_tip', fireFlow: 'lpn_ff_required_node_tip', initQuality: 'lpn_quality_initial_tip',
+		tankDiameter: 'lpn_field_tank_diameter_tip', minVolume: 'lpn_field_tank_minvol_tip', overflow: 'lpn_field_tank_overflow_tip', demand: 'lpn_demand_tip', fireFlow: 'lpn_ff_required_node_tip', initQuality: 'lpn_quality_initial_tip',
 		sourceType: 'lpn_source_type_tip', sourceQuality: 'lpn_source_quality_tip', sourcePattern: 'lpn_source_pattern_tip', mixingModel: 'lpn_mixing_model_tip', mixingFraction: 'lpn_mixing_fraction_tip',
 		curveId: 'lpn_pump_curve_source_tip', efficCurveId: 'lpn_pump_effic_curve_tip', energyPrice: 'lpn_energy_price_tip', energyPattern: 'lpn_energy_price_pattern_tip'   // the pump's curves, price and price pattern carry the `?` one pump's Properties gives them
 	};
@@ -79586,9 +79656,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// **THE FILE'S MinVol AND Overflow** (audit 2026-11, F2), for both engines: MinVol in
 					// cubic metres (the length unit cubed), Overflow as a flag. Absent where the file
 					// stated none, so a tank drawn here is built exactly as before.
-					minVolume: (typeof n.minVolume === 'number' && n.minVolume > 0)
-						? n.minVolume * Math.pow(toSI(1, 'lpn_u_length'), 3) : undefined,
-					overflow: (n.overflow && /^y/i.test(String(n.overflow))) ? true : undefined
+					minVolume: (typeof effective(n, 'minVolume') === 'number' && effective(n, 'minVolume') > 0)
+						? effective(n, 'minVolume') * Math.pow(toSI(1, 'lpn_u_length'), 3) : undefined,
+					overflow: (effective(n, 'overflow') && /^y/i.test(String(effective(n, 'overflow')))) ? true : undefined
 				};
 			}
 			return n.type === 'reservoir'

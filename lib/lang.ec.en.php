@@ -903,6 +903,11 @@ $ec_lang['lpn_field_tank_maxlevel_tip']='Maximum allowable depth, measured up fr
 $ec_lang['lpn_field_tank_diameter']='Tank diameter';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_diameter_tip']='For a vertical cylinder. Same units as elevation, not pipe diameter. It sets how much water a given depth holds.';
+// EPANET's Minimum Volume and Can Overflow ([TANKS] columns 7 and 9). The volume is in the Length unit cubed.
+$ec_lang['lpn_field_tank_minvol']='Minimum volume';
+$ec_lang['lpn_field_tank_minvol_tip']='The volume of water in the tank at its minimum depth, in the length unit cubed, for a tank with a sloped or curved bottom; 0 uses the tank diameter, and a volume curve overrides it.';
+$ec_lang['lpn_field_tank_overflow']='Can overflow';
+$ec_lang['lpn_field_tank_overflow_tip']='Yes lets a full tank spill what it cannot hold, so the pipe into it stays open; No closes the pipe into a full tank. Only an extended period simulation uses it.';
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07

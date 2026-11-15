@@ -342,6 +342,15 @@ overflow ${word}
 				nrun.ok && nframes >= 6 && nw < 0.005, nframes + ' hours, worst ' + nw.toFixed(4) + ' m');
 			seen[word] = ref;
 		}
+		// What MinVol is for (EPANET 2.2 input3.c: Vmin = A*Hmin, or MinVol when it is above zero; hydraul.c
+		// tankgrade(): level = Hmin + (V - Vmin)/A). For a straight-sided tank only the DIFFERENCE V - Vmin
+		// reaches the heads, so MinVol changes what the stored volume IS (the volume the water quality
+		// model mixes in) and not the hydraulics.
+		const mvText = (mv) => TANKS(' T1 20 10 2 20 30 ' + mv).replace('[OPTIONS]', '[TIMES]\n Duration 6:00\n Hydraulic Timestep 1:00\n\n[OPTIONS]');
+		const h0 = await rawSeries(mvText(0)), h1 = await rawSeries(mvText(5000));
+		let mvApart = 0, mvHours = 0;
+		for (const t in h0) { mvHours++; for (const id in h0[t]) { mvApart = Math.max(mvApart, Math.abs(h0[t][id] - h1[t][id])); } }
+		ok('for a straight-sided tank, MinVol 5000 gives EPANET the same heads as MinVol 0 at every hour', mvHours >= 6 && mvApart < 1e-4, mvHours + ' hours, worst ' + mvApart.toFixed(6) + ' m');
 		let apart = 0;
 		for (const t in seen.YES) { for (const id in seen.YES[t]) { apart = Math.max(apart, Math.abs(seen.YES[t][id] - seen.NO[t][id])); } }
 		ok('the probe can fail: Overflow YES and NO give EPANET different heads', apart > 0.05, apart.toFixed(3) + ' m');
