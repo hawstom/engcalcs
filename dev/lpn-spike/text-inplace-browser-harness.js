@@ -547,10 +547,32 @@ async function main() {
 		await m.P.keyboard.press('Control+Shift+V');
 		await m.settle(700);
 		let pt = await m.storedTexts();
-		if (pt.length === 1) { await m.P.keyboard.press('Control+V'); await m.settle(700); pt = await m.storedTexts(); }
 		ok('the paste is refused as every paste with an unmakeable row is: no wordless Text is made', pt.length === 1 && pt[0]._text === 'Seed', JSON.stringify(pt) + ' ' + JSON.stringify(heads));
 		const note = await c3.notice();
 		ok('the paste says the other row needs its words', note.indexOf((await c3.lang('lpn_pane_paste_text_no_words')).replace('{row}', '1')) >= 0, note);
+
+		console.log('\n14. Emptying a Text\'s words in the Text table deletes it, as one Undo step');
+		const wordsCell = () => m.P.evaluate(() => {
+			const td = Array.from(document.querySelectorAll('#lpn_pane_text tbody td')).find((t) => t._lpnPaneKey === 'text');
+			if (!td) { return null; }
+			const r = td.getBoundingClientRect();
+			return { x: r.left + Math.min(12, r.width / 2), y: r.top + r.height / 2 };
+		});
+		const wc = await wordsCell();
+		await m.P.mouse.dblclick(wc.x, wc.y);
+		await m.settle(300);
+		await m.P.keyboard.press('Control+a');
+		await m.P.keyboard.press('Delete');
+		await m.P.keyboard.type('  ');
+		await m.P.keyboard.press('Enter');
+		await m.settle(500);
+		ok('blank words typed in the table cell delete the Text', (await m.storedTexts()).length === 0 && (await m.mapTexts()).length === 0,
+			JSON.stringify(await m.storedTexts()));
+		await m.P.mouse.click(5, 5);
+		await m.P.keyboard.press('Control+z');
+		await m.settle(500);
+		ok('...and one Undo brings it back with its words', (await m.storedTexts()).length === 1 && (await m.storedTexts())[0]._text === 'Seed',
+			JSON.stringify(await m.storedTexts()));
 		await c3.close();
 		await c2.close();
 	} catch (e) {

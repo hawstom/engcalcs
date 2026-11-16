@@ -27006,7 +27006,11 @@ var EngCalcs = EngCalcs || {};
 				label: pc.lpn_tool_add_text || 'Text',
 				applies: function () { return true; },
 				get: function (lb) { return effective(lb, 'text') || ''; },
-				set: function (lb, v) { setProp(lb, 'text', v); refreshLabelContent(lb.id); } },
+				// A Text is never left wordless: Replace to nothing is refused, as a paste is.
+				set: function (lb, v) {
+					if (!String(v).trim()) { return false; }
+					setProp(lb, 'text', v); refreshLabelContent(lb.id);
+				} },
 			{ key: 'allZoom', group: 'label', field: 'allZoom',
 				label: pc.lpn_field_text_all_zoom || 'Show at all zoom levels',
 				applies: function () { return true; },
@@ -30290,7 +30294,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Every column here writes through setProp() (Task 407; all overridable since 2026-10-12).
 			{ key: 'text', label: 'lpn_tool_add_text', str: true, em: 9, prop: 'text',
 				get: function (lb) { return effective(lb, 'text'); },
-				set: function (lb, v) { setProp(lb, 'text', v); refreshLabelContent(lb.id); } },
+				// **WORDS CLEARED IN THE TABLE DELETE THE TEXT, as in Properties and on the map**
+				// (paneCommitCell() hands them to writeTextWords()); a paste never writes a wordless
+				// Text, so a blank here is refused and counted.
+				deletesOnBlank: true,
+				set: function (lb, v) {
+					if (!String(v).trim()) { return false; }
+					setProp(lb, 'text', v); refreshLabelContent(lb.id);
+				} },
 			// Not overridable, like every other element's Description (see descField()).
 			paneColDesc(),
 			{ key: 'sizeMult', label: 'lpn_field_text_size', em: 2.5, prop: 'sizeMult',
@@ -34610,6 +34621,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// needs exactly one undo step for the whole thing, anchor included -- so `opts.noSnapshot`
 		// lets the caller take that single snapshot itself, before this write, rather than getting
 		// a second one here that would split Ctrl+Z into two presses.
+		// A Text emptied here is deleted by the one rule every route to a Text's words shares
+		// (writeTextWords(), which takes its own undo step), not written empty.
+		if (c.deletesOnBlank && !String(p.v).trim() && !(was.ok && was.v === p.v)) {
+			writeTextWords(el, p.v);
+			completeEdit(null);
+			refreshPopupIfOpen();
+			paneLeaveEdit(input);
+			return true;
+		}
 		if (!(opts && opts.noSnapshot) && !(was.ok && was.v === p.v)) { saveUndoSnapshot(); }
 		c.set(el, p.v);
 		// **A SETTER THAT MAY REFUSE OR NORMALISE WHAT WAS TYPED SAYS SO, AND THE CELL IS RE-READ**
