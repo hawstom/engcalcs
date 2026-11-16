@@ -3482,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='Значение по умолчанию �
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Предел сходимости, которого должен достичь решатель, прежде чем остановиться; измеряется как суммарное изменение расхода от одной итерации к следующей, делённое на суммарный расход в связях. Меньшее число точнее, но расчёт длится дольше.';
 $ec_lang['lpn_settings_specific_gravity']='Относительная плотность';
-$ec_lang['lpn_settings_viscosity']='Относительная вязкость';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3491,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='Относительная вязкость'
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='Вязкость жидкости относительно воды при 20 градусах Цельсия. Она меняет результат только при использовании метода Дарси-Вейсбаха.';
 $ec_lang['lpn_settings_trials']='Максимум итераций';
 $ec_lang['lpn_settings_trials_tip']='Наибольшее число итераций, после которого решатель останавливается на сети, которая не сходится.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from

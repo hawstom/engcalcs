@@ -3482,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='Der Standard ist {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Konvergenzgrenze, die der Löser erreichen muss, bevor er anhält, gemessen als die gesamte Durchflussänderung von einem Versuch zum nächsten, geteilt durch den Gesamtdurchfluss in den Verbindungen. Eine kleinere Zahl ist genauer und dauert länger.';
 $ec_lang['lpn_settings_specific_gravity']='Spezifisches Gewicht';
-$ec_lang['lpn_settings_viscosity']='Relative Viskosität';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3491,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='Relative Viskosität';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='Die Viskosität der Flüssigkeit im Vergleich zu Wasser bei 20 Grad Celsius. Sie ändert das Ergebnis nur bei der Methode Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Maximale Versuche';
 $ec_lang['lpn_settings_trials_tip']='Maximale Anzahl von Versuchen, bevor der Löser bei einem nicht konvergierenden Netz anhält.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from

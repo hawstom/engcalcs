@@ -3482,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='Výchozí hodnota je {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Mez konvergence, které musí řešič dosáhnout, než se zastaví, měřená jako celková změna průtoku z jedné zkoušky na další, dělená celkovým průtokem ve spojích. Menší číslo je přesnější a trvá déle.';
 $ec_lang['lpn_settings_specific_gravity']='Měrná hmotnost';
-$ec_lang['lpn_settings_viscosity']='Poměrná viskozita';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3491,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='Poměrná viskozita';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='Viskozita kapaliny ve srovnání s vodou při 20 stupních Celsia. Mění výsledek jen podle metody Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Maximální počet zkoušek';
 $ec_lang['lpn_settings_trials_tip']='Maximální počet zkoušek, než se řešič zastaví u sítě, která nedosahuje konvergence.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from

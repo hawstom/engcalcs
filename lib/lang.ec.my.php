@@ -3482,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='ပုံမှန်တန်ဖိုး�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='ဖြေရှင်းစက် မရပ်မီ ရောက်ရမည့် converge ကန့်သတ်ချက်၊ ထပ်ခါထပ်ခါတွက်ချက်မှုတစ်ခုမှ နောက်တစ်ခုသို့ ရေစီးနှုန်း၏ စုစုပေါင်းပြောင်းလဲမှုကို link များရှိ စုစုပေါင်းရေစီးနှုန်းဖြင့် စားထားသည်ကို တိုင်းတာသည်။ ဂဏန်းငယ်လေ ပိုတိကျပြီး ပိုကြာသည်။';
 $ec_lang['lpn_settings_specific_gravity']='အထူးဆွဲငင်အား';
-$ec_lang['lpn_settings_viscosity']='အချိုးအားဖြင့် စေးကပ်မှု';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3491,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='အချိုးအားဖြင့် �
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='ဆယ်လ်စီးယပ် ဒီဂရီ 20 ရှိ ရေနှင့် နှိုင်းယှဉ်သော အရည်၏ စေးကပ်မှု။ Darcy-Weisbach နည်းလမ်းအောက်တွင်သာ အဖြေကို ပြောင်းလဲစေသည်။';
 $ec_lang['lpn_settings_trials']='အများဆုံး ထပ်ခါထပ်ခါ တွက်ချက်မှု အကြိမ်ရေ';
 $ec_lang['lpn_settings_trials_tip']='converge မဖြစ်သော ကွန်ရက်တွင် ဖြေရှင်းစက် မရပ်မီ ထပ်ခါထပ်ခါတွက်ချက်မှု အများဆုံးအရေအတွက်။';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from

@@ -3482,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='پہلے سے مقررہ قدر {n} ہے۔'
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='ہم آہنگی کی وہ حد جس تک حل کار کو رکنے سے پہلے پہنچنا ہے، جو ایک کوشش سے اگلی تک بہاؤ میں کل تبدیلی کو لنکس میں کل بہاؤ سے تقسیم کر کے ناپی جاتی ہے۔ چھوٹا عدد زیادہ درست ہے اور زیادہ وقت لیتا ہے۔';
 $ec_lang['lpn_settings_specific_gravity']='مخصوص کثافت';
-$ec_lang['lpn_settings_viscosity']='نسبتی چپکاؤ';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3491,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='نسبتی چپکاؤ';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='20 ڈگری سیلسیس پر پانی کے مقابلے میں سیال کا چپکاؤ۔ یہ صرف Darcy-Weisbach طریقے کے تحت جواب بدلتا ہے۔';
 $ec_lang['lpn_settings_trials']='زیادہ سے زیادہ کوششیں';
 $ec_lang['lpn_settings_trials_tip']='ایسے نیٹ ورک پر جو ہم آہنگ نہیں ہوتا، حل کار کے رکنے سے پہلے کوششوں کی زیادہ سے زیادہ تعداد۔';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from

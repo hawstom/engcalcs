@@ -3482,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='ডিফল্ট হলো {n}।';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='থামার আগে সমাধানকারীকে যে কনভার্জেন্স সীমায় পৌঁছাতে হবে, যা এক ট্রায়াল থেকে পরের ট্রায়ালে প্রবাহের মোট পরিবর্তনকে লিংকগুলোর মোট প্রবাহ দিয়ে ভাগ করে মাপা হয়। ছোট সংখ্যা বেশি নির্ভুল এবং বেশি সময় নেয়।';
 $ec_lang['lpn_settings_specific_gravity']='আপেক্ষিক ঘনত্ব';
-$ec_lang['lpn_settings_viscosity']='আপেক্ষিক সান্দ্রতা';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3491,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='আপেক্ষিক সান্দ্�
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='২০ ডিগ্রি সেলসিয়াসে পানির তুলনায় তরলের সান্দ্রতা। এটি শুধুমাত্র Darcy-Weisbach পদ্ধতিতে উত্তর পরিবর্তন করে।';
 $ec_lang['lpn_settings_trials']='সর্বোচ্চ ট্রায়াল';
 $ec_lang['lpn_settings_trials_tip']='কনভার্জ করে না এমন নেটওয়ার্কে সমাধানকারী থামার আগে ট্রায়ালের সর্বোচ্চ সংখ্যা।';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from

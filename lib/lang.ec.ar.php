@@ -3482,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='الافتراضي هو {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='حد التقارب الذي يجب أن يبلغه الحلّال قبل أن يتوقف، ويُقاس بالتغير الكلي في التدفق من محاولة إلى التالية مقسوماً على التدفق الكلي في الروابط. الرقم الأصغر أدق ويستغرق وقتاً أطول.';
 $ec_lang['lpn_settings_specific_gravity']='الكثافة النوعية';
-$ec_lang['lpn_settings_viscosity']='اللزوجة النسبية';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3491,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='اللزوجة النسبية';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='لزوجة السائل مقارنة بالماء عند 20 درجة مئوية. لا تغيّر الإجابة إلا في طريقة دارسي-فايسباخ.';
 $ec_lang['lpn_settings_trials']='أقصى عدد للمحاولات';
 $ec_lang['lpn_settings_trials_tip']='أقصى عدد من المحاولات قبل أن يتوقف الحلّال في شبكة لا تتقارب.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from

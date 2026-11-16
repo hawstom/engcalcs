@@ -3484,7 +3484,6 @@ $ec_lang['lpn_settings_default_is']='مقدار پیش‌فرض {n} است.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='حد همگرایی که حل‌کننده پیش از توقف باید به آن برسد، که به‌صورت مجموع تغییر دبی از یک تکرار به تکرار بعدی، تقسیم بر مجموع دبی در اتصال‌ها سنجیده می‌شود. عدد کوچک‌تر دقیق‌تر است و بیشتر طول می‌کشد.';
 $ec_lang['lpn_settings_specific_gravity']='وزن مخصوص نسبی';
-$ec_lang['lpn_settings_viscosity']='ویسکوزیتهٔ نسبی';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3493,7 +3492,6 @@ $ec_lang['lpn_settings_viscosity']='ویسکوزیتهٔ نسبی';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='ویسکوزیتهٔ سیال در مقایسه با آب در 20 درجهٔ سلسیوس. فقط در روش دارسی-وایسباخ پاسخ را تغییر می‌دهد.';
 $ec_lang['lpn_settings_trials']='حداکثر آزمایش‌ها';
 $ec_lang['lpn_settings_trials_tip']='بیشترین تعداد تکرار پیش از آنکه حل‌کننده روی شبکه‌ای که همگرا نمی‌شود متوقف شود.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from

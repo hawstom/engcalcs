@@ -3482,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='Zadana vrijednost je {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Granica konvergencije koju rješavač mora dosegnuti prije zaustavljanja, mjerena kao ukupna promjena protoka od jedne iteracije do sljedeće, podijeljena ukupnim protokom u vodovima. Manji broj je točniji i traje dulje.';
 $ec_lang['lpn_settings_specific_gravity']='Specifična težina';
-$ec_lang['lpn_settings_viscosity']='Relativna viskoznost';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3491,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='Relativna viskoznost';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='Viskoznost tekućine u odnosu na vodu pri 20 stupnjeva Celzijevih. Mijenja rezultat samo pri metodi Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Najveći broj iteracija';
 $ec_lang['lpn_settings_trials_tip']='Najveći broj iteracija prije nego što se rješavač zaustavi na mreži koja ne konvergira.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from

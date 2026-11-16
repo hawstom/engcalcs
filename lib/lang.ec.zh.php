@@ -3482,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='默认值为 {n}。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='求解器停止前必须达到的收敛限值，以相邻两次试算之间流量的总变化量除以连接线中的总流量来衡量。数值越小越精确，耗时越长。';
 $ec_lang['lpn_settings_specific_gravity']='比重';
-$ec_lang['lpn_settings_viscosity']='相对粘度';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3491,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='相对粘度';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='流体相对于 20 摄氏度水的粘度。只有在使用达西-韦斯巴赫方法时才会影响结果。';
 $ec_lang['lpn_settings_trials']='最大试算次数';
 $ec_lang['lpn_settings_trials_tip']='对无法收敛的管网，求解器停止之前的最大试算次数。';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from

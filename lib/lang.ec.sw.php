@@ -3482,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='Chaguo-msingi ni {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Kikomo cha muunganiko ambacho kitatuzi lazima kifikie kabla ya kusimama, kikipimwa kama jumla ya mabadiliko ya mtiririko kutoka jaribio moja hadi linalofuata, ikigawanywa kwa jumla ya mtiririko katika viungo. Namba ndogo zaidi ni sahihi zaidi na huchukua muda mrefu zaidi.';
 $ec_lang['lpn_settings_specific_gravity']='Uzito maalum';
-$ec_lang['lpn_settings_viscosity']='Unato wa uwiano';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3491,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='Unato wa uwiano';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='Unato wa maji maji ukilinganishwa na maji kwenye nyuzi 20 Selsiasi. Hubadilisha jibu tu chini ya mbinu ya Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Idadi ya juu ya marudio';
 $ec_lang['lpn_settings_trials_tip']='Idadi ya juu ya majaribio kabla kitatuzi hakijasimama kwenye mtandao usiofikia suluhisho.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
