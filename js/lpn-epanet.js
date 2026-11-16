@@ -72,6 +72,7 @@
 		// which analysis it asked for -- the number carries no unit with it.
 		EN_QUALITY = 12,
 		EN_FLOW = 8,
+		EN_TANKLEVEL = 8,
 		EN_VELOCITY = 9,
 		EN_HEADLOSS = 10,
 		EN_INITSTATUS = 4,
@@ -1283,6 +1284,37 @@
 			return k + '=' + v;
 		}).join('');
 	}
+	// THE HOLD ITSELF (see pinFullTanks() in the run loop for why). `p` is an engine project in the middle of a
+	// run (after nextH()), `nodeIdx` the model's node ids to engine indexes, `pinned` a record the caller keeps
+	// of the tanks that had to be set by EN_TANKLEVEL (their initial levels need restoring).
+	EngCalcs.lpnHoldFullTanks = function (p, model, nodeIdx, pinned) {
+		var k, n, ix, h, el, mx, j, v, done;
+		for (k = 0; k < model.nodes.length; k++) {
+			n = model.nodes[k];
+			if (n.type !== 'tank' || !(n.diameter > 0) || n.overflow) { continue; }
+			try {
+				// Everything here is in the engine's own length unit, which is not always metres (a run in US units
+				// reads feet), so no number of the model's is mixed with one of the engine's.
+				ix = nodeIdx[n.id];
+				// The initial level, as the engine states it, before anything here can move it (restoreTankStarts()).
+				if (pinned['@' + n.id] === undefined) { pinned['@' + n.id] = p.getNodeValue(ix, EN_TANKLEVEL); }
+				h = p.getNodeValue(ix, EN_HEAD);
+				el = p.getNodeValue(ix, EN_ELEVATION);
+				mx = p.getNodeValue(ix, EN_MAXLEVEL);
+				if (!(mx > 0) || !(h >= el + mx - 1e-7)) { continue; }
+				try { p.setNodeValue(ix, EN_MAXLEVEL, h - el - 1e-12); }
+				catch (e225) {
+					// A tank that started full: its maximum cannot go under its initial level. Set its level to the
+					// greatest value the engine takes at or under its maximum.
+					done = false;
+					for (j = 8; j >= -8 && !done; j--) {
+						v = mx * (1 + j * 2.3e-16);
+						try { p.setNodeValue(ix, EN_TANKLEVEL, v); pinned[n.id] = true; done = true; } catch (e) { /* above Hmax */ }
+					}
+				}
+			} catch (err) { /* the engine could not be asked or told; the tank is left as it stands */ }
+		}
+	};
 	function signatureOf(model) {
 		var parts = [model.method || 'hw', model.emitterExponent || 0.5], i, n, l;
 		// **EVERY `[OPTIONS]` VALUE IS IN THE SIGNATURE, AND IT HAS TO BE** (Task 553). These are
@@ -2482,6 +2514,28 @@
 						}
 						return out;
 					}
+					// **A FULL TANK IS HELD FULL, SO THE ENGINE CLOSES THE LINK INTO IT.** OWA-EPANET 2.3.5's
+					// tankstatus() calls a tank full only when `NodeHead >= Hmax`, and tanklevels() sets NodeHead to a head
+					// rebuilt from the snapped volume, which lands one ulp UNDER Hmax for some tanks (a 20 ft tank with a
+					// 30 ft limit does, so do 10 ft / 25 ft and 80 ft / 25 ft, on a tank standing at ground 0). That tank
+					// is not full to the engine, the pipe into it stays open, and water enters a full tank for the rest
+					// of the run. EPANET 2.2.0 tests `>= Hmax - Htol` and its development branch tests the volume; this
+					// does the same job from outside: a tank standing at its limit (within a tenth of a micrometre) has
+					// its maximum lowered to a picometre under the head it stands at, by the toolkit's own EN_MAXLEVEL,
+					// which leaves its initial level and volume alone. A tank that STARTED full cannot have a maximum
+					// under its initial level (error 225); that one is set to its limit by EN_TANKLEVEL instead, which
+					// also moves its initial level, so restoreTankStarts() puts that back before the quality walk. A
+					// tank that can overflow is left alone: it is meant to keep taking water at its limit.
+					var pinned = {};
+					function pinFullTanks() { EngCalcs.lpnHoldFullTanks(p, model, nodeIdx, pinned); }
+					// EN_TANKLEVEL also writes the tank's INITIAL level and volume, which the quality walk starts its tanks
+					// from. Put them back before the hydraulics close: the pin is a hydraulic device, not a new start.
+					function restoreTankStarts() {
+						Object.keys(pinned).forEach(function (id) {
+							if (id.charAt(0) === '@' || pinned[id] !== true) { return; }
+							try { p.setNodeValue(nodeIdx[id], EN_TANKLEVEL, pinned['@' + id]); } catch (err) { /* left as pinned */ }
+						});
+					}
 					function failed(e) {
 						var kept = hydPhase ? frames : [], last = kept.length ? kept[kept.length - 1].t : null;
 						// Read BEFORE shutdown(): whether each tank stood full or empty at the
@@ -2560,6 +2614,7 @@
 							// closeH() flushes the saved hydraulics the quality walk reads. It is
 							// the precondition, not tidying up.
 							hydPhase = false;
+							restoreTankStarts();
 							p.closeH();
 							p.openQ();
 							// EN_SAVE here is what writes `temp.out` at all -- see the rateOn note
@@ -2613,6 +2668,7 @@
 						var k, cnt, sp, id;
 						try {
 							hydPhase = false;
+							restoreTankStarts();
 							p.closeH();
 							p.saveHydFile('temp.hyd');
 							// A COPY of the user's characters, written to the engine's own disk.
@@ -2714,6 +2770,7 @@
 									}
 								}
 								tstep = p.nextH();
+								if (tstep > 0) { pinFullTanks(); }
 								// **A SINGLE INSTANT COUNTS AS ONE HOUR**, as EPANET's addenergy() does when
 								// the duration is 0 (nextH() then returns 0): the box shows the pump's
 								// power for an hour, not a table of nothing.

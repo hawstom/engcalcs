@@ -611,6 +611,68 @@ const SLICE5_CASES = [
 		reaches: 'max', spills: 'P2', statusOf: 'PU', switches: 2 }
 ];
 
+// A FULL TANK TAKES NO WATER IN, on tanks whose rebuilt head is NOT exactly the limit in EPANET's arithmetic (feet and
+// cubic feet from a metres file): 10 ft / 25 ft, 20 / 30, 40 / 30 and 80 / 25 feet of diameter / limit, which
+// OWA-EPANET 2.3.5 left open to inflow, and a tank that fills on a pattern and then drains again.
+const FT_M = 0.3048;
+const SEALED_CASES = [[10, 25], [20, 30], [40, 30], [80, 25]].map(([d, mx]) => ({
+	name: `full tank takes no water in: ${d} ft tank, ${mx} ft limit, 48 h`,
+	// The tank stands on the ground at 0: EPANET's rebuilt head, El + (V - Vmin) / A, depends on the elevation too.
+	model: (() => {
+		const m = lineWithTank({ level: 20 * FT_M, min: 0, max: mx * FT_M, dia: d * FT_M, q: 0.001 });
+		const t = m.nodes.find((n) => n.type === 'tank');
+		t.elev = 0; t.ground = 0; t.head = t.level;
+		m.nodes.find((n) => n.id === 'J').elev = 0.5;
+		return m;
+	})(), reaches: 'max', sealed: 'P2' }));
+// A tank that STARTS full (its initial level is its limit, so the engine's maximum cannot be lowered under it): the pipe into it
+// is shut from the first step in both engines.
+SEALED_CASES.push(...[[20, 30], [10, 25]].map(([d, mx]) => ({
+	name: `full tank takes no water in: ${d} ft tank starts full at ${mx} ft, 48 h`,
+	model: (() => {
+		const m = lineWithTank({ level: mx * FT_M, min: 0, max: mx * FT_M, dia: d * FT_M, q: 0.001 });
+		const t = m.nodes.find((n) => n.type === 'tank');
+		t.elev = 0; t.ground = 0; t.head = t.level;
+		m.nodes.find((n) => n.id === 'J').elev = 0.5;
+		return m;
+	})(), reaches: 'max', sealed: 'P2' })));
+// The same tanks on HIGH ground, where a head in metres has a coarser last bit and the metres/feet round trip through
+// the engine's own units can undo a hold that is too thin (a tank standing at 1000 m, 3000 m and 5000 m).
+[1000, 3000, 5000].forEach((E) => [[10, 25], [20, 30], [40, 30], [80, 25], [30, 20], [60, 27]].forEach(([d, mx]) => {
+	SEALED_CASES.push({
+		name: `full tank takes no water in: ${d} ft tank, ${mx} ft limit, ground at ${E} m, 48 h`,
+		model: (() => {
+			const m = lineWithTank({ level: 20 * FT_M, min: 0, max: mx * FT_M, dia: d * FT_M, q: 0.001, rHead: 80 + E });
+			const t = m.nodes.find((n) => n.type === 'tank');
+			t.elev = E; t.ground = E; t.head = E + t.level;
+			m.nodes.find((n) => n.id === 'J').elev = E + 0.5;
+			return m;
+		})(), reaches: 'max', sealed: 'P2' });
+}));
+// A tank that fills, drains and fills AGAIN (the hold must not stop it refilling to its real maximum), a tank that starts full on
+// high ground, and a tank on a volume curve at its limit.
+[[4.8768, 3], [5, 3], [4.572, 3], [4.9, 4]].forEach(([mx, lv]) => {
+	SEALED_CASES.push({
+		name: `full tank takes no water in: fills, drains and refills, limit ${mx} m, starts at ${lv} m`,
+		model: lineWithTank({ level: lv, min: 0.5, max: mx, dia: 18, q: 30, rHead: 66 }),
+		reaches: 'max', moves: 'T', minSwing: 0.5 });
+});
+[1000, 3000].forEach((E) => [[20, 30], [10, 25], [30, 20]].forEach(([d, mx]) => {
+	SEALED_CASES.push({
+		name: `full tank takes no water in: ${d} ft tank starts full at ${mx} ft, ground at ${E} m, 48 h`,
+		model: (() => {
+			const m = lineWithTank({ level: mx * FT_M, min: 0, max: mx * FT_M, dia: d * FT_M, q: 0.001, rHead: 80 + E });
+			const t = m.nodes.find((n) => n.type === 'tank');
+			t.elev = E; t.ground = E; t.head = E + t.level;
+			m.nodes.find((n) => n.id === 'J').elev = E + 0.5;
+			return m;
+		})(), reaches: 'max', sealed: 'P2' });
+}));
+[3.5, 7.62, 9.144, 12].forEach((mx) => {
+	SEALED_CASES.push({
+		name: `full tank takes no water in: volume-curve tank, limit ${mx} m, 48 h`,
+		model: onCurve(lineWithTank({ level: 2, min: 0.5, max: mx, dia: 18, q: 0.001 }), NARROW), reaches: 'max', sealed: 'P2' });
+});
 const MODULE_URL = 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
 
 async function compare(c) {
@@ -708,12 +770,30 @@ async function compare(c) {
 		exercised = exercised && (c.spillsNot ? !spilling : spilling) && (c.spillsNot ? qN < 1e-4 : qN > 1e-4);
 		why += `${why ? '; ' : ''}${c.spills} carries ${(q * 1000).toFixed(2)} L/s into the full tank at the end`;
 	}
+	// A FULL TANK TAKES NO WATER IN. In every frame where EPANET's own tank stands at its limit, the link
+	// named in `sealed` carries nothing in either engine (a tank that cannot overflow: mass balance), and at
+	// least three frames are at the limit so the case cannot pass on a tank that never filled. Found
+	// 2026-11-15 on a 20 ft tank with a 30 ft limit: OWA-EPANET 2.3.5's tankstatus() tests a head rebuilt from the
+	// volume, one ulp under Hmax, so the pipe stayed open and 2465 gpm entered a full tank for 24 h.
+	if (c.sealed && sameSteps) {
+		const tkS = model.nodes.find((n) => n.type === 'tank');
+		let nFull = 0, worstE = 0, worstN = 0;
+		epa.frames.forEach((fe, i) => {
+			if (fe.levels[tkS.id] >= tkS.maxLevel - 1e-6) {
+				nFull++;
+				worstE = Math.max(worstE, Math.abs(fe.flows[c.sealed]));
+				worstN = Math.max(worstN, Math.abs(nat.frames[i].flows[c.sealed]));
+			}
+		});
+		exercised = exercised && nFull >= 3 && worstE < 1e-9 && worstN < 1e-9;
+		why += `${why ? '; ' : ''}${nFull} frames full, ${c.sealed} carries at most ${(worstE * 1000).toExponential(1)} (EPANET) / ${(worstN * 1000).toExponential(1)} (built-in) L/s into the full tank`;
+	}
 	ok(c.name, sameSteps && dH <= hTol && dL <= hTol && dQ <= qTol && unconv === 0 && exercised && stDiff === 0,
 		`steps ${nat.frames.length}/${epa.frames.length}${sameSteps ? '' : ' DIFFER'}  ` +
 		`dH=${dH.toExponential(2)} m @${atH}  dLevel=${dL.toExponential(2)} m @${atL || '-'}  ` +
 		`dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})` +
 		(unconv ? ` ${unconv} UNCONVERGED` : '') + (stDiff ? ` ${stDiff} STATUS DIFFERENCES` : '') +
-		(c.moves || c.reaches || c.statusOf || c.offGrid || c.spills ? `  [${why}${exercised ? '' : ' NOT EXERCISED'}]` : ''));
+		(c.moves || c.reaches || c.statusOf || c.offGrid || c.spills || c.sealed ? `  [${why}${exercised ? '' : ' NOT EXERCISED'}]` : ''));
 	// THE RUN REPORT (native-wire slice 4): EPANET's own text, line for line, the clock stamps aside. The flow balance's
 	// numbers are compared to 0.0015 L/s, because the two hydraulics differ by 3e-5 L/s and a third decimal can fall either side.
 	// Known gaps, said where they are: a case with a pressure or flow control valve, a pressure control on a junction, a
@@ -731,7 +811,8 @@ async function compare(c) {
 			if (x && y && x[2] === y[2] && Math.abs(Number(x[3]) - Number(y[3])) <= 0.0015) { continue; }
 			first = i; break;
 		}
-		const gap = /\b(PRV|PSV|FCV|PBV|TCV|GPV)\b|junction pressure|Darcy-Weisbach|overflow|SPEED 1\.3/.test(c.name);
+		// (A pinned full tank (js/lpn-epanet.js pinFullTanks()) closes its pipe on a different trial than the built-in loop does, so the trial counts differ.)
+		const gap = /\b(PRV|PSV|FCV|PBV|TCV|GPV)\b|junction pressure|Darcy-Weisbach|overflow|SPEED 1\.3|full tank takes no water in/.test(c.name);
 		const held = first < 0 && a.length > 40;
 		if (held || !gap) {
 			ok(c.name + ': the run report is EPANET\'s', held, held ? a.length + ' lines' : `line ${first + 1}: EPANET "${a[first]}" built-in "${b[first]}"`);
@@ -813,6 +894,8 @@ async function run() {
 
 	console.log('-- slice 5: tank volume curves, minimum volume, overflow');
 	for (const c of SLICE5_CASES) { await compare(c); }
+	console.log('-- a full tank takes no water in');
+	for (const c of SEALED_CASES) { await compare(c); }
 	{
 		// A stated minimum volume with no curve only moves the zero of the volume scale: the answer
 		// must be the one without it, in EPANET and in the loop alike.

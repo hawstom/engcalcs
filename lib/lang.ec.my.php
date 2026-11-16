@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='ဤဖိုင်သည် ဆက်စပ်န
 $ec_lang['lpn_inp_drop_report']='ဤဖိုင်တွင် EPANET အစီရင်ခံစာဖော်မတ် ဆက်တင်များ ပါသည်။ လည်ပတ်မှု အစီရင်ခံစာကို အစီရင်ခံစာများ၊ လည်ပတ်မှု တွင် ရနိုင်သော်လည်း ဤဆက်တင်များ သတ်မှတ်သော ဖော်မတ်အစား စံ EPANET ဖော်မတ်ကို သုံးသည်။ လိုင်းများကို ထားပြီး EPANET ဖိုင်သိမ်းလျှင် ပြန်ရေးသည်။';
 $ec_lang['lpn_inp_drop_sections']='ဤဖိုင်တွင် ဤစာမျက်နှာက လုံးဝ မဖတ်သော အပိုင်းတစ်ခု ပါရှိသည်။ ဤနေရာတွင် ၎င်းကို အသုံးမပြုပါ။ ၎င်းကို အပြည့်အစုံ ဆက်ထိန်းသိမ်းထားပြီး၊ EPANET ဖိုင်တစ်ခု သိမ်းလိုက်ပါက ၎င်းကို ပြန်ရေးပေးမည်။';
 $ec_lang['lpn_inp_drop_comments']='ဤဖိုင်၏ ပုံစံများ သို့မဟုတ် ရိုးရိုးထိန်းချုပ်မှုများရှိ ဤမှတ်ချက်လိုင်းများကို မတင်သွင်းခဲ့ပါ၊ အကြောင်းမှာ ဤစာမျက်နှာတွင် ၎င်းတို့ကို ထားရန် နေရာမရှိသောကြောင့် ဖြစ်သည် (ဥပမာ ပုံစံတစ်ခု၏ အတန်းများကြား)။ ပုံစံတိုင်းနှင့် ထိန်းချုပ်မှုတိုင်းကို အပြည့်အဝ တင်သွင်းခဲ့သည်။';
-$ec_lang['lpn_inp_drop_quality_options']='ဤဖိုင်သည် EPANET ရေအရည်အသွေး ရွေးစရာများကို ဖော်ပြသည် - ရေအရည်အသွေး ခွဲခြမ်းစိတ်ဖြာမှု အမျိုးအစားကို အမည်ပေးသော Quality option နှင့် ဓာတုပစ္စည်းနှင့် တွဲပါသော ဆက်တင်နှစ်ခု Relative diffusivity နှင့် Quality tolerance။ သုံးခုလုံးကို ထားပြီး သုံးသည်။ ရေအသက်၊ ရင်းမြစ်ခြေရာခံခြင်းနှင့် ဓာတုပစ္စည်းတစ်ခုကို ဤနေရာတွင် တစ်ခုစီ တွက်ချက်ပြီး ဓာတုပစ္စည်းဆက်တင်နှစ်ခုကို ဓာတုပစ္စည်းတစ်ခု လည်ပတ်သည့်အခါ သုံးသည်။ EPANET ဖိုင်သိမ်းလျှင် ၎င်းတို့အားလုံးကို ပြန်ရေးသည်။';
 $ec_lang['lpn_inp_drop_file_options']='ဤဖိုင်သည် အကူအညီဖိုင်တစ်ခုကို ရည်ညွှန်းသည် - သြဒီနိတ်များပါသော Map သို့မဟုတ် ယခင်တွက်ချက်ပြီး ဟိုက်ဒရောလစ်များပါသော Hydraulics။ ဤစာမျက်နှာသည် နှစ်ခုလုံးကို မဖွင့်နိုင်သဖြင့် လိုင်းများကို ရှိသည့်အတိုင်း ထားပြီး EPANET ဖိုင်သိမ်းလျှင် ပြန်ရေးသည်။';
 $ec_lang['lpn_inp_drop_other_options']='ဤဖိုင်သည် ဤစာမျက်နှာက မဖတ်သော ရွေးချယ်စရာများကို ဖော်ပြသည်။ ဤနေရာတွင် ၎င်းတို့ကို အသုံးမပြုပါ။ ၎င်းတို့ကို ဆက်ထိန်းသိမ်းထားပြီး၊ EPANET ဖိုင်တစ်ခု သိမ်းလိုက်ပါက ၎င်းတို့ကို ပြန်ရေးပေးမည်။';
 $ec_lang['lpn_inp_drop_net_options']='ဤ EPANET .net ဖိုင်သည် ဤစာမျက်နှာတွင် ထိန်းချုပ်မှု မရှိသော ဆက်တင်များကို ဖော်ပြထားသောကြောင့်၊ ၎င်းတို့၏ တန်ဖိုးများကို ဆက်ကူးမည့်အစား ဤနေရာတွင် စာရင်းပြုစုထားသည်။ ကျန်အားလုံးကို ဆက်ကူးထားသည်။ ၎င်းတို့ လိုအပ်ပါက EPANET တွင် ဖိုင်ကို ဖွင့်ပြီး File, Export, Network ကို သုံးကာ .inp ဖိုင်တစ်ခုအဖြစ် သိမ်းပြီး၊ ထိုဖိုင်ကို တင်သွင်းပါ။';
@@ -3483,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='ပုံမှန်တန်ဖိုး�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='ဖြေရှင်းစက် မရပ်မီ ရောက်ရမည့် converge ကန့်သတ်ချက်၊ ထပ်ခါထပ်ခါတွက်ချက်မှုတစ်ခုမှ နောက်တစ်ခုသို့ ရေစီးနှုန်း၏ စုစုပေါင်းပြောင်းလဲမှုကို link များရှိ စုစုပေါင်းရေစီးနှုန်းဖြင့် စားထားသည်ကို တိုင်းတာသည်။ ဂဏန်းငယ်လေ ပိုတိကျပြီး ပိုကြာသည်။';
 $ec_lang['lpn_settings_specific_gravity']='အထူးဆွဲငင်အား';
-$ec_lang['lpn_settings_viscosity']='အချိုးအားဖြင့် စေးကပ်မှု';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3492,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='အချိုးအားဖြင့် �
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='ဆယ်လ်စီးယပ် ဒီဂရီ 20 ရှိ ရေနှင့် နှိုင်းယှဉ်သော အရည်၏ စေးကပ်မှု။ Darcy-Weisbach နည်းလမ်းအောက်တွင်သာ အဖြေကို ပြောင်းလဲစေသည်။';
 $ec_lang['lpn_settings_trials']='အများဆုံး ထပ်ခါထပ်ခါ တွက်ချက်မှု အကြိမ်ရေ';
 $ec_lang['lpn_settings_trials_tip']='converge မဖြစ်သော ကွန်ရက်တွင် ဖြေရှင်းစက် မရပ်မီ ထပ်ခါထပ်ခါတွက်ချက်မှု အများဆုံးအရေအတွက်။';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -3858,8 +3855,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='အရည်အသွေး သည်းခံနိုင်မှု';
 $ec_lang['lpn_quality_tolerance_tip']='ကပ်လျက်ရေအစုနှစ်ခုကို EPANET က တစ်ခုတည်းအဖြစ် သဘောထားသည့် ပါဝင်ပမာဏ ကွာခြားချက်အောက်ကန့်သတ်။ အလွတ်ထားလျှင် EPANET မူလ 0.01 ကို သုံးသည်။';
-$ec_lang['lpn_quality_diffusivity']='အချိုးအစား ပျံ့နှံ့နိုင်စွမ်း';
-$ec_lang['lpn_quality_diffusivity_tip']='ကလိုရင်းနှင့် နှိုင်းယှဉ်သော ရေထဲရှိ ဓာတုပစ္စည်း၏ ပျံ့နှံ့နိုင်စွမ်း။ အလွတ်ထားလျှင် EPANET မူလ 1.0 ကို သုံးသည်။';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='{chemical} ပါဝင်ပမာဏ';
