@@ -142,8 +142,8 @@ async function main() {
 		await closeProps();
 		await click(pile);
 		ok('a click on the assembly opens the box', await chooserOpen());
-		const want = ['Junction J1', 'Junction J2', 'Junction J3', 'Pipe P2', 'Pump PU9'];
-		ok('...listing the symbols there as their type word and ID, junctions then links, and the zero-length pipe (a point, not a line) but not the long pipes that end there', J(await rows()) === J(want), J(await rows()));
+		const want = ['Junction J3', 'Junction J1', 'Junction J2', 'Pipe P2', 'Pump PU9'];   // the one a plain click would hit (J3, drawn on top) first
+		ok('...listing the symbols there as their type word and ID, the plain-click element first, then by distance, with the zero-length pipe (a point, not a line) but not the long pipes that end there', J(await rows()) === J(want), J(await rows()));
 		ok('...selecting nothing yet: the selection is as it was (the junction M)', J(await selected()) === J(['node:M']), J(await selected()));
 		const box = await page.evaluate(() => { const b = document.querySelector('.lpn-pick-chooser').getBoundingClientRect(); return { l: b.left, t: b.top, w: b.width, h: b.height }; });
 		ok('...at the pointer, wholly on screen', Math.abs(box.l - pile.x) < 40 && Math.abs(box.t - pile.y) < 40 && box.l + box.w <= 1400 && box.t + box.h <= 900, J(box));
@@ -171,16 +171,16 @@ async function main() {
 		ok('the zero-length pipe, which nothing else can reach, is chosen the same way', J(await selected()) === J(['link:P2']) && (await popupTitle()) === 'P2', J(await selected()));
 		await click(pile);
 		const focused = () => page.evaluate(() => (document.activeElement && document.activeElement.textContent || '').trim());
-		ok('the first row has the keyboard focus', (await focused()) === 'Junction J1', await focused());
+		ok('the first row has the keyboard focus', (await focused()) === 'Junction J3', await focused());
 		await page.keyboard.press('ArrowDown'); await page.keyboard.press('ArrowDown');
-		ok('ArrowDown moves down the rows', (await focused()) === 'Junction J3', await focused());
+		ok('ArrowDown moves down the rows', (await focused()) === 'Junction J2', await focused());
 		await page.keyboard.press('ArrowUp');
-		ok('ArrowUp moves back', (await focused()) === 'Junction J2', await focused());
+		ok('ArrowUp moves back', (await focused()) === 'Junction J1', await focused());
 		await page.keyboard.press('ArrowDown');
 		await page.keyboard.press('Enter');
 		await S.settle(500);
-		ok('Enter chooses the focused row (Junction J3)', J(await selected()) === J(['node:J3']) && !(await chooserOpen()), J(await selected()));
-		ok('...and opens its Properties', (await popupTitle()) === 'J3', String(await popupTitle()));
+		ok('Enter chooses the focused row (Junction J2)', J(await selected()) === J(['node:J2']) && !(await chooserOpen()), J(await selected()));
+		ok('...and opens its Properties', (await popupTitle()) === 'J2', String(await popupTitle()));
 		// Shift adds.
 		await click(mid);
 		await closeProps();
@@ -239,7 +239,7 @@ async function main() {
 		const pile2 = await centre('#lpn_canvas [data-node="J4"]');
 		await click(pile2);
 		ok('a click on two coincident junctions with a Text over them opens the box', await chooserOpen(), J(await rows()));
-		ok('...listing the two junctions and the Text by its words', J(await rows()) === J(['Junction J4', 'Junction J5', 'Text Booster']), J(await rows()));
+		ok('...listing the two junctions and the Text by its words', J(await rows()) === J(['Text Booster', 'Junction J4', 'Junction J5']), J(await rows()));
 		await (await rowBtn('Text Booster')).click();
 		await S.settle(500);
 		ok('...choosing the Text selects it and opens its Properties', (await page.evaluate(() => !!document.querySelector('#lpn_canvas text.lpn-lbl.lpn-selected'))) && J(await selected()) === J(['other']), J(await selected()));
@@ -323,12 +323,12 @@ async function main() {
 		const zc = await centre('#lpn_canvas [data-node="Z1"]');
 		await click(zc);
 		ok('eight junctions at one point open a box of at most six rows', (await rows()).length === 6, J(await rows()));
-		ok('...all of them from the pile, the one nearest the press first (the one the browser hit is always among them)', (await rows()).every((r) => /^Junction Z[1-8]$/.test(r)) && (await rows())[0] === 'Junction Z1', J(await rows()));
+		ok('...all of them from the pile, the one a plain click hits (Z8, drawn on top) first', (await rows()).every((r) => /^Junction Z[1-8]$/.test(r)) && (await rows())[0] === 'Junction Z8', J(await rows()));
 		await page.keyboard.press('Escape'); await S.settle(200);
 		await click({ x: 700, y: 820 });
 		const o1 = await centre('#lpn_canvas [data-node="O1"]');
 		await click(o1);
-		ok('two junctions overlapping by half a width or more open a box', J(await rows()) === J(['Junction O1', 'Junction O2']), J(await rows()));
+		ok('two junctions overlapping by half a width or more open a box', J((await rows()).slice().sort()) === J(['Junction O1', 'Junction O2']), J(await rows()));
 		await page.keyboard.press('Escape'); await S.settle(200);
 		await click({ x: 700, y: 820 });
 		const g1 = await centre('#lpn_canvas [data-node="G1"]'), g2 = await centre('#lpn_canvas [data-node="G2"]');
@@ -419,7 +419,7 @@ async function main() {
 		await tap(tpile);
 		if (!(await t.chooserOpen())) { console.log('  (debug) top elements at the pile: ' + J(await T.page.evaluate((p) => document.elementsFromPoint(p.x, p.y).slice(0, 5).map((e) => e.tagName + '.' + String(e.className && e.className.baseVal !== undefined ? e.className.baseVal : e.className).slice(0, 40)), tpile))); }
 		ok('a tap on the assembly opens the box (it stays open: the lift is not a press elsewhere)', await t.chooserOpen());
-		ok('...with the same five rows', J(await t.rows()) === J(['Junction J1', 'Junction J2', 'Junction J3', 'Pipe P2', 'Pump PU9']), J(await t.rows()));
+		ok('...with the same five rows', J(await t.rows()) === J(['Junction J3', 'Junction J1', 'Junction J2', 'Pipe P2', 'Pump PU9']), J(await t.rows()));
 		const heights = await T.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => Math.round(b.getBoundingClientRect().height)));
 		ok('...each row finger-sized (at least 44 px tall)', heights.length === 5 && heights.every((h) => h >= 44), J(heights));
 		const inView = await T.page.evaluate(() => { const b = document.querySelector('.lpn-pick-chooser').getBoundingClientRect(); return b.left >= 0 && b.top >= 0 && b.right <= innerWidth && b.bottom <= innerHeight; });
@@ -448,7 +448,7 @@ async function main() {
 		const nearP6 = { x: tp2.x, y: tp2.y + 15 };
 		await t.closeProps();
 		await tap(nearP6);
-		ok('a finger on pipe P6, 15 px from the pile, gets the two junctions and no pipe', J(await t.rows()) === J(['Junction J6', 'Junction J7']), J([await t.rows(), nearP6]));
+		ok('a finger on pipe P6, 15 px from the pile, gets the two junctions and no pipe', J((await t.rows()).slice().sort()) === J(['Junction J6', 'Junction J7']), J([await t.rows(), nearP6]));
 		await (async () => { const b = await t.rowBtn('Junction J7'); const bb = await b.boundingBox(); await tap({ x: bb.x + bb.width / 2, y: bb.y + bb.height / 2 }); })();
 		ok('...and choosing Junction J7 selects it', J(await t.selected()) === J(['node:J7']) && !(await t.chooserOpen()), J(await t.selected()));
 		await t.closeProps();

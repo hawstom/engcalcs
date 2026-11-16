@@ -61063,7 +61063,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// overlapping each other, are an ordinary click on the nearer. **NO LINE IS IN THE LIST**: no pipe
 	// and no Shape that is an open polyline (*"all symbols, shapes, and text, but not pipes"*); a
 	// click with only lines under it is an ordinary click, which may select a pipe. The one pipe that
-	// is a row is a point: its two end symbols drawn deeply on top of one another (an exploded
+	// is a row is a point: its two ends at one point (an exploded
 	// assembly's zero-length pipe); two pipes drawn exactly over each other cannot be reached by a click.
 	// The element the browser itself hit (never a plain pipe) is always one of the rows. The symbols are
 	// a node (any kind), a pump or valve glyph, a Text, and a Shape that is a point or closed.
@@ -61122,8 +61122,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Every SYMBOL the page drew near a press, as a client-px extent for Geom.pickSymbols(): a
 	// junction's disc, a reservoir's or tank's silhouette, a pump's or valve's turned glyph, a Text's
 	// words, a Shape that is a point or closed. Never a pipe and never an open polyline, with ONE
-	// exception that is not a line on the screen: **a pipe whose two end symbols are drawn deeply on
-	// top of one another is a point**, and is a circle at its midpoint (an exploded assembly's zero-length pipe, which no
+	// exception that is not a line on the screen: **a pipe whose two ends are at one point
+	// in the drawing (never merely close on screen) is a point**, and is a circle at its midpoint (an exploded assembly's zero-length pipe, which no
 	// click could otherwise reach). The sizes are the draw code's own helpers, so what overlaps here
 	// is what the reader sees overlap. Every kind is bounded by the press, `reach` and the largest
 	// symbol before anything is measured.
@@ -61152,9 +61152,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!inNear(sx(nodeDrawX(fa)), sy(nodeDrawY(fa)), near + 2 * nodeRadius(fa) * s)) { continue; }
 			pts = linkPointList(l);
 			len = Geom.polylineLength(pts) * s;
-			// A visible line is never a row. A pipe is a point when its two end symbols are drawn deeply
-			// on top of one another (the pipe cannot be seen between them).
-			if (!Geom.pickOverlaps(pickNodeItem(fa, s, sx(nodeDrawX(fa)), sy(nodeDrawY(fa))), pickNodeItem(fb, s, sx(nodeDrawX(fb)), sy(nodeDrawY(fb))), 0.4)) { continue; }
+			// A visible line is never a row. A pipe is a point only when its two ends are at one point
+			// in the drawing (ZERO_LEN_EPS, at any zoom): an exploded assembly's zero-length pipe.
+			if (Math.hypot(nodeDrawX(fa) - nodeDrawX(fb), nodeDrawY(fa) - nodeDrawY(fb)) > ZERO_LEN_EPS) { continue; }
+			pts = linkPointList(l);
+			len = Geom.polylineLength(pts) * s;
 			pl = Geom.pointAlongPolyline(pts, 0.5); qx = sx(pl.x); qy = sy(pl.y);
 			if (inNear(qx, qy, near)) { items.push({ kind: 'link', id: l.id, type: l.type, rank: PICK_KIND_RANK.link, soft: true, circle: { x: qx, y: qy, r: Math.max(len / 2, 0.5) } }); }
 		}
@@ -61205,23 +61207,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!t || (t !== svg && t.dataset.node === undefined && t.dataset.lbl === undefined && t.dataset.shape === undefined &&
 			!(t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')))) { return null; }
 		list = pickCandidatesAt(e.clientX, e.clientY, e.pointerType === 'touch');
-		// **THE ELEMENT THE BROWSER ACTUALLY HIT IS ALWAYS ONE OF THE ROWS** once there is a choice, so
+		// **THE ELEMENT THE BROWSER ACTUALLY HIT IS ALWAYS A ROW, AND THE FIRST** once there is a choice, so
 		// a box never hides what a plain click would have selected. A plain pipe is not offered (a line).
 		if (list.length >= 2) { pickEnsureHit(list, t); }
 		return list.length >= 2 ? { id: e.pointerId, x: e.clientX, y: e.clientY, shift: !!e.shiftKey,
 			touch: e.pointerType === 'touch', list: list } : null;
 	}
 	function pickEnsureHit(list, h) {
-		var d = (h && h.dataset) || {}, kind, id, el, sh;
+		var d = (h && h.dataset) || {}, kind, id, el, sh, i;
 		if (d.node !== undefined) { kind = 'node'; id = d.node; }
 		else if (d.link !== undefined && h.classList.contains('lpn-link-symbol-hit')) { kind = 'link'; id = d.link; }
 		else if (d.lbl !== undefined) { kind = 'label'; id = d.lbl; }
 		else if (d.shape !== undefined) { sh = shapeById(d.shape); if (sh && (sh.pts.length === 1 || sh.closed)) { kind = 'shape'; id = d.shape; } }
-		if (!kind || list.some(function (c) { return c.kind === kind && c.id === id; })) { return; }
+		if (!kind) { return; }
+		// What a plain click would select comes first; the rest keep their order (by distance).
+		for (i = 0; i < list.length; i++) {
+			if (list[i].kind === kind && list[i].id === id) { list.unshift(list.splice(i, 1)[0]); return; }
+		}
 		el = kind === 'node' ? nodeById(id) : (kind === 'link' ? linkById(id) : (kind === 'shape' ? shapeById(id) : labelById(id)));
 		if (!el) { return; }
 		if (list.length >= PICK_MAX_ROWS) { list.pop(); }
-		list.push({ kind: kind, id: id, type: el.type });
+		list.unshift({ kind: kind, id: id, type: el.type });
 	}
 	// The row's element wears the hover mark through setHoverPreview(), the one write site, so the
 	// page's record of what is marked cannot go stale; viaLabel lights it and opens no hover card.
