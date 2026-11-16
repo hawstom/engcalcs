@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='ይህ ፋይል ለአንዳንድ መገናኛ�
 $ec_lang['lpn_inp_drop_report']='ይህ ፋይል የEPANET የሪፖርት ቅርጸት ቅንብሮችን ይይዛል። የስራ ሪፖርቱ በሪፖርቶች፣ ስራ ስር ይገኛል፣ ነገር ግን እነዚህ ቅንብሮች ከሚገልጹት ቅርጸት ይልቅ መደበኛውን የEPANET ቅርጸት ይጠቀማል። መስመሮቹ ይያዛሉ፣ የEPANET ፋይል ካስቀመጡም ተመልሰው ይጻፋሉ።';
 $ec_lang['lpn_inp_drop_sections']='ይህ ፋይል ይህ ገጽ በጭራሽ የማያነበው ክፍል ይይዛል። እዚህ ጥቅም ላይ አይውልም። ሙሉ በሙሉ ይያዛል፣ የEPANET ፋይል ካስቀመጡም ይመለሳል።';
 $ec_lang['lpn_inp_drop_comments']='በዚህ ፋይል ስርዓቶች ወይም ቀላል መቆጣጠሪያዎች ውስጥ ያሉ እነዚህ የአስተያየት መስመሮች አልገቡም፣ ምክንያቱም ይህ ገጽ የሚያስቀምጥበት ቦታ የለውም (ለምሳሌ በአንድ ስርዓት ረድፎች መካከል)። ሁሉም ስርዓቶችና መቆጣጠሪያዎች ሙሉ በሙሉ ገብተዋል።';
-$ec_lang['lpn_inp_drop_quality_options']='ይህ ፋይል የEPANET የውሃ ጥራት አማራጮችን ይገልጻል፦ የውሃ ጥራት ትንተናውን ዓይነት የሚሰይመው Quality አማራጭ፣ እና ከኬሚካል ጋር የሚሄዱ ሁለት ቅንብሮች፣ አንጻራዊ ስርጭትና የጥራት መቻቻል። ሦስቱም ይያዛሉ እና ጥቅም ላይ ይውላሉ። የውሃ እድሜ፣ የምንጭ ፍለጋና ኬሚካል እያንዳንዳቸው እዚህ ይሰላሉ፣ ሁለቱ የኬሚካል ቅንብሮችም ኬሚካል ሲሰራ ጥቅም ላይ ይውላሉ። ሁሉም የEPANET ፋይል ካስቀመጡ ተመልሰው ይጻፋሉ።';
 $ec_lang['lpn_inp_drop_file_options']='ይህ ፋይል ተጨማሪ ፋይል ይጠቅሳል፦ መጋጠሚያዎችን የያዘ Map፣ ወይም አስቀድሞ የተሰላ ሃይድሮሊክስ የያዘ Hydraulics። ይህ ገጽ የትኛውንም መክፈት ስለማይችል፣ መስመሮቹ እንዳሉ ይያዛሉ፣ የEPANET ፋይል ካስቀመጡም ይመለሳሉ።';
 $ec_lang['lpn_inp_drop_other_options']='ይህ ፋይል ይህ ገጽ የማያነባቸውን አማራጮች ይገልጻል። እዚህ ጥቅም ላይ አይውሉም። ይያዛሉ፣ የEPANET ፋይል ካስቀመጡም ይመለሳሉ።';
 $ec_lang['lpn_inp_drop_net_options']='ይህ የEPANET .net ፋይል ይህ ገጽ መቆጣጠሪያ የሌለው ቅንብሮችን ይገልጻል፣ ስለዚህ ዋጋዎቻቸው ተላልፈው ከመግባት ይልቅ እዚህ ተዘርዝረዋል። የቀረው ሁሉ ገብቷል። ካስፈለጉዎት፣ ፋይሉን በEPANET ውስጥ ይክፈቱ እና ፋይል፣ ላክ፣ መረብ ተጠቅመው እንደ .inp ፋይል ያስቀምጡት፣ ከዚያም እሱን ያስገቡ።';
@@ -3858,8 +3857,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='የጥራት መቻቻል';
 $ec_lang['lpn_quality_tolerance_tip']='EPANET ሁለት የተጎራበቱ የውሃ ክፍሎችን እንደ አንድ የሚቆጥርበት በታች ያለው የክምችት ልዩነት። ባዶ የEPANET ነባሪ 0.01ን ይጠቀማል።';
-$ec_lang['lpn_quality_diffusivity']='አንጻራዊ ስርጭት';
-$ec_lang['lpn_quality_diffusivity_tip']='የኬሚካሉ በውሃ ውስጥ ያለው ስርጭት፣ ከክሎሪን አንጻር። ባዶ የEPANET ነባሪ 1.0ን ይጠቀማል።';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='{chemical} ክምችት';

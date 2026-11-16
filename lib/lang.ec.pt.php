@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='Este arquivo atribui etiquetas a algumas junçõe
 $ec_lang['lpn_inp_drop_report']='Este arquivo contém configurações de formato de relatório do EPANET. O relatório da execução está disponível em Relatórios, Execução, mas usa o formato padrão do EPANET, e não o formato que estas configurações especificam. As linhas são mantidas e são gravadas de volta se você salvar um arquivo EPANET.';
 $ec_lang['lpn_inp_drop_sections']='Este arquivo tem uma seção que esta página não lê. Nada aqui a usa. Ela é mantida inteira, e é gravada de volta se você salvar um arquivo EPANET.';
 $ec_lang['lpn_inp_drop_comments']='Estas linhas de comentário nos padrões ou nos controles simples deste arquivo não foram importadas, porque esta página não tem onde guardá-las (por exemplo, entre as linhas de um padrão). Todos os padrões e controles foram importados por inteiro.';
-$ec_lang['lpn_inp_drop_quality_options']='Este arquivo indica opções de qualidade da água do EPANET: a opção Quality, que nomeia o tipo de análise de qualidade da água, e duas configurações associadas a um produto químico, Relative diffusivity e Quality tolerance. As três são mantidas e usadas. Idade da água, rastreamento de fonte e um produto químico são calculados aqui, e as duas configurações do produto químico são usadas quando um produto químico é executado. Todas elas são gravadas de volta se você salvar um arquivo EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='Este arquivo referencia um arquivo auxiliar: Map, que contém coordenadas, ou Hydraulics, que contém a hidráulica já calculada. Esta página não pode abrir nenhum dos dois, então as linhas são mantidas como estão e gravadas de volta se você salvar um arquivo EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='Este arquivo define opções que esta página não lê. Nada aqui as usa. Elas são mantidas e são gravadas de volta se você salvar um arquivo EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='Este arquivo .net do EPANET define configurações para as quais esta página não tem controle, então seus valores são listados aqui em vez de transportados. Todo o resto foi importado. Se precisar delas, abra o arquivo no EPANET e use Arquivo, Exportar, Rede para salvá-lo como um arquivo .inp, depois importe esse.';
@@ -3858,8 +3857,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Tolerância de qualidade';
 $ec_lang['lpn_quality_tolerance_tip']='Diferença de concentração abaixo da qual o EPANET trata duas parcelas de água vizinhas como uma só. Em branco usa o padrão do EPANET, 0,01.';
-$ec_lang['lpn_quality_diffusivity']='Difusividade relativa';
-$ec_lang['lpn_quality_diffusivity_tip']='Difusividade do produto químico na água, em relação ao cloro. Em branco usa o padrão do EPANET, 1,0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='Concentração de {chemical}';

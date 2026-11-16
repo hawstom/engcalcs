@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='קובץ זה מקצה תגיות לחלק מהצ
 $ec_lang['lpn_inp_drop_report']='קובץ זה מכיל הגדרות תבנית דוח של EPANET. דוח ההרצה זמין תחת דוחות, הרצה, אך הוא משתמש בתבנית הסטנדרטית של EPANET ולא בתבנית שהגדרות אלה קובעות. השורות נשמרות ונכתבות בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inp_drop_sections']='קובץ זה מחזיק סעיף שעמוד זה אינו קורא כלל. שום דבר כאן אינו משתמש בו. הוא נשמר במלואו, והוא נכתב בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inp_drop_comments']='שורות ההערה האלה בתבניות או בבקרות הפשוטות של קובץ זה לא יובאו, מפני שלעמוד זה אין מקום לשמור אותן (למשל, בין שורותיה של תבנית אחת). כל תבנית וכל בקרה יובאו במלואן.';
-$ec_lang['lpn_inp_drop_quality_options']='קובץ זה קובע אפשרויות איכות מים של EPANET: האפשרות Quality, המציינת את סוג ניתוח איכות המים, ושתי הגדרות הקשורות לחומר כימי, Relative diffusivity ו-Quality tolerance. שלושתן נשמרות ונמצאות בשימוש. גיל המים, מעקב מקור וחומר כימי מחושבים כאן כל אחד, ושתי הגדרות החומר הכימי נמצאות בשימוש כשמריצים חומר כימי. כולן נכתבות בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='קובץ זה מפנה לקובץ עזר: Map, המחזיק קואורדינטות, או Hydraulics, המחזיק תוצאות הידראוליקה שכבר חושבו. עמוד זה אינו יכול לפתוח אף אחד מהם, כך שהשורות נשמרות כפי שהן ונכתבות בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='קובץ זה קובע אפשרויות שעמוד זה אינו קורא. שום דבר כאן אינו משתמש בהן. הן נשמרות והן נכתבות בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='קובץ .net זה של EPANET קובע הגדרות שלעמוד זה אין בקרה עליהן, כך שערכיהן מפורטים כאן במקום לעבור הלאה. כל השאר עבר. אם אתם זקוקים להן, פתחו את הקובץ ב-EPANET והשתמשו בקובץ, ייצוא, רשת כדי לשמור אותו כקובץ ‎.inp, ואז ייבאו אותו.';
@@ -3858,8 +3857,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='סבילות איכות';
 $ec_lang['lpn_quality_tolerance_tip']='הפרש הריכוז שמתחתיו EPANET מתייחס לשתי מנות מים סמוכות כאל אחת. ריק משתמש בברירת המחדל של EPANET, 0.01.';
-$ec_lang['lpn_quality_diffusivity']='דיפוזיביות יחסית';
-$ec_lang['lpn_quality_diffusivity_tip']='דיפוזיביות החומר הכימי במים, יחסית לכלור. ריק משתמש בברירת המחדל של EPANET, 1.0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='ריכוז {chemical}';

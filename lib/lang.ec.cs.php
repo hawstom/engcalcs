@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='Tento soubor přiřazuje značky některým uzlů
 $ec_lang['lpn_inp_drop_report']='Tento soubor obsahuje nastavení formátu sestavy EPANET. Sestava výpočtu je k dispozici v Sestavy, Výpočet, ale používá standardní formát EPANET, nikoli formát, který tato nastavení určují. Řádky jsou zachovány a při uložení souboru EPANET se zapíší zpět.';
 $ec_lang['lpn_inp_drop_sections']='Tento soubor obsahuje část, kterou tato stránka vůbec nečte. Nic se zde z ní nepoužívá. Je zachována celá a při uložení souboru EPANET se zapíše zpět.';
 $ec_lang['lpn_inp_drop_comments']='Tyto řádky komentářů ve vzorcích nebo jednoduchých řízeních tohoto souboru nebyly importovány, protože tato stránka pro ně nemá místo (například mezi řádky jednoho vzorce). Každý vzorec a každé řízení bylo importováno celé.';
-$ec_lang['lpn_inp_drop_quality_options']='Tento soubor uvádí možnosti kvality vody EPANET: možnost Quality, která určuje druh analýzy kvality vody, a dvě nastavení patřící k chemické látce, Relativní difuzivitu a Toleranci kvality. Všechny tři jsou zachovány a používány. Stáří vody, sledování zdroje a chemická látka se zde počítají a obě nastavení chemické látky se použijí při výpočtu chemické látky. Všechny se při uložení souboru EPANET zapíší zpět.';
 $ec_lang['lpn_inp_drop_file_options']='Tento soubor odkazuje na pomocný soubor: Map, který obsahuje souřadnice, nebo Hydraulics, který obsahuje dříve vypočtenou hydrauliku. Tato stránka neumí otevřít ani jeden, proto jsou řádky zachovány tak, jak jsou, a při uložení souboru EPANET se zapíší zpět.';
 $ec_lang['lpn_inp_drop_other_options']='Tento soubor uvádí možnosti, které tato stránka nečte. Nic se zde z nich nepoužívá. Jsou zachovány a při uložení souboru EPANET se zapíší zpět.';
 $ec_lang['lpn_inp_drop_net_options']='Tento soubor EPANET .net uvádí nastavení, pro která tato stránka nemá žádný ovládací prvek, takže jejich hodnoty jsou uvedeny zde místo aby se převedly. Všechno ostatní se převedlo. Pokud je potřebujete, otevřete soubor v EPANET a pomocí File, Export, Network jej uložte jako soubor .inp, a poté ten naimportujte.';
@@ -3858,8 +3857,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/l';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Tolerance kvality';
 $ec_lang['lpn_quality_tolerance_tip']='Rozdíl koncentrace, pod nímž EPANET považuje dva sousedící objemy vody za jeden. Prázdné pole použije výchozí hodnotu EPANET 0,01.';
-$ec_lang['lpn_quality_diffusivity']='Relativní difuzivita';
-$ec_lang['lpn_quality_diffusivity_tip']='Difuzivita chemické látky ve vodě, relativně k chloru. Prázdné pole použije výchozí hodnotu EPANET 1,0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='Koncentrace {chemical}';

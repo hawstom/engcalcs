@@ -256,7 +256,7 @@ lines rather than appending corrections.
 - **Archived as tags, branches deleted:** `feat/desktop`, `feat/sqlite-reader` (his *"OK."*). `fix/legend-tank-phone` deleted (superseded by `fix/legend-phone`).
 - **Task 749:** his WaterGEMS test matches EPANET exactly once rules run at EPANET's default rule step (a tenth of the hydraulic step); the 8.75/14.48 expectation assumed hourly and was ours. Pressures differ 0.02 psi by unit weight (WaterGEMS 0.43353 psi/ft, EPANET 0.4333). `feat/wtg-scenario` code-reviewed and fixed; waits his merge word.
 - **Johnson City is the extension example**, done in `fix/munday-elevations` (his *"Do the same for Johnson."* was already done).
-- **Open his:** single-pipe pages keep g = 9.80665 where EPANET's D-W uses 32.2 ft/s² (0.08 %); "Relative diffusivity" left as is; MinVol/Overflow not in labels, colouring or update-from-file.
+- **Open his:** single-pipe pages keep g = 9.80665 where EPANET's D-W uses 32.2 ft/s² (0.08 %); MinVol/Overflow not in labels, colouring or update-from-file.
 - **Flaky under load, green alone:** `contour-harness.js`, `collide-harness.js` (timeout), `fresh-open-harness.js` Phone Net3 (8.5 s blocks at load 20+), `label-pipe-fields-browser-harness.js` (104/104 alone).
 
 ## STATE — carried from earlier sessions (still open, recorded nowhere else)

@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='Bu dosya, bazı düğümlerine, borularına veya 
 $ec_lang['lpn_inp_drop_report']='Bu dosya EPANET rapor biçimi ayarları içeriyor. Çalıştırma raporu Raporlar, Çalıştırma altında bulunur, ancak bu ayarların belirttiği biçimi değil, standart EPANET biçimini kullanır. Satırlar korunur ve bir EPANET dosyası kaydederseniz geri yazılır.';
 $ec_lang['lpn_inp_drop_sections']='Bu dosya, bu sayfanın hiç okumadığı bir bölüm içeriyor. Burada kullanılmaz. Bütün olarak korunur ve bir EPANET dosyası kaydederseniz geri yazılır.';
 $ec_lang['lpn_inp_drop_comments']='Bu dosyanın desenlerindeki veya basit kontrollerindeki bu yorum satırları içe aktarılmadı, çünkü bu sayfada onları tutacak bir yer yok (örneğin bir desenin satırları arasında). Her desen ve kontrol eksiksiz olarak aktarıldı.';
-$ec_lang['lpn_inp_drop_quality_options']='Bu dosya EPANET su kalitesi seçeneklerini belirtiyor: su kalitesi analizinin türünü adlandıran Kalite seçeneği ve bir kimyasalla birlikte giden iki ayar, Bağıl difüzivite ve Kalite toleransı. Üçü de korunur ve kullanılır. Su yaşı, kaynak izleme ve bir kimyasal burada hesaplanır; iki kimyasal ayarı ise bir kimyasal çalıştırıldığında kullanılır. Bir EPANET dosyası kaydederseniz hepsi geri yazılır.';
 $ec_lang['lpn_inp_drop_file_options']='Bu dosya, koordinatları tutan Harita ya da önceden hesaplanmış hidroliği tutan Hidrolik gibi yardımcı bir dosyaya başvuruyor. Bu sayfa bunlardan hiçbirini açamaz, bu yüzden satırlar oldukları gibi korunur ve bir EPANET dosyası kaydederseniz geri yazılır.';
 $ec_lang['lpn_inp_drop_other_options']='Bu dosya, bu sayfanın okumadığı seçenekler belirtiyor. Burada kullanılmazlar. Korunurlar ve bir EPANET dosyası kaydederseniz geri yazılırlar.';
 $ec_lang['lpn_inp_drop_net_options']='Bu EPANET .net dosyası, bu sayfanın bir denetimi olmayan ayarlar belirtiyor, bu yüzden değerleri aktarılmak yerine burada listelenir. Geri kalan her şey aktarıldı. Bunlara ihtiyacınız varsa, dosyayı EPANET\'te açın ve bir .inp dosyası olarak kaydetmek için Dosya, Dışa aktar, Şebeke\'yi kullanın, sonra onu içe aktarın.';
@@ -3858,8 +3857,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Kalite toleransı';
 $ec_lang['lpn_quality_tolerance_tip']='EPANET\'in iki bitişik su parselini bir kabul etmeden önce derişimlerinin ne kadar farklı olabileceği. Boş bırakılırsa EPANET\'in kendi varsayılanı olan 0,01 kullanılır.';
-$ec_lang['lpn_quality_diffusivity']='Göreli yayınım';
-$ec_lang['lpn_quality_diffusivity_tip']='Kimyasalın, klora göre suda ne kadar kolay yayıldığı. Boş bırakılırsa EPANET\'in kendi varsayılanı olan 1,0 kullanılır.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='{chemical} derişimi';

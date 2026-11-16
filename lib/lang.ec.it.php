@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='Questo file assegna tag ad alcuni nodi, tubazioni
 $ec_lang['lpn_inp_drop_report']='Questo file contiene impostazioni di formato del rapporto di EPANET. Il rapporto della simulazione è disponibile in Rapporti, Calcolo, ma usa il formato standard di EPANET invece di quello specificato da queste impostazioni. Le righe sono conservate e sono riscritte se salvi un file EPANET.';
 $ec_lang['lpn_inp_drop_sections']='Questo file contiene una sezione che questa pagina non legge affatto. Nulla qui la usa. È conservata per intero, ed è riscritta se salvi un file EPANET.';
 $ec_lang['lpn_inp_drop_comments']='Queste righe di commento nei modelli o nei controlli semplici di questo file non sono state importate, perché questa pagina non ha un posto dove conservarle (per esempio tra le righe di un modello). Ogni modello e ogni controllo sono stati importati per intero.';
-$ec_lang['lpn_inp_drop_quality_options']='Questo file indica le opzioni di qualità dell\'acqua di EPANET: l\'opzione Quality, che nomina il tipo di analisi della qualità dell\'acqua, e due impostazioni associate a una sostanza chimica, Relative diffusivity e Quality tolerance. Tutte e tre sono conservate e usate. L\'età dell\'acqua, la traccia della sorgente e una sostanza chimica sono ciascuna calcolate qui, e le due impostazioni della sostanza chimica sono usate quando si esegue una sostanza chimica. Tutte sono riscritte se salvi un file EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='Questo file fa riferimento a un file ausiliario: Map, che contiene le coordinate, oppure Hydraulics, che contiene un calcolo idraulico già eseguito. Questa pagina non può aprire nessuno dei due, quindi le righe sono conservate così come sono e riscritte se salvi un file EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='Questo file indica opzioni che questa pagina non legge. Nulla qui le usa. Sono conservate e sono riscritte se salvi un file EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='Questo file .net di EPANET indica impostazioni per cui questa pagina non ha un controllo, quindi i loro valori sono elencati qui invece di essere trasferiti. Tutto il resto è stato importato. Se ti servono, apri il file in EPANET e usa File, Esporta, Rete per salvarlo come file .inp, poi importa quello.';
@@ -3858,8 +3857,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Tolleranza di qualità';
 $ec_lang['lpn_quality_tolerance_tip']='Differenza di concentrazione al di sotto della quale EPANET tratta due porzioni d\'acqua adiacenti come una sola. Vuoto usa il valore predefinito di EPANET, 0,01.';
-$ec_lang['lpn_quality_diffusivity']='Diffusività relativa';
-$ec_lang['lpn_quality_diffusivity_tip']='Diffusività della sostanza chimica nell\'acqua, relativa al cloro. Vuoto usa il valore predefinito di EPANET, 1,0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='Concentrazione di {chemical}';

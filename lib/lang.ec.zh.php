@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='此文件为部分节点、管道或其他元件�
 $ec_lang['lpn_inp_drop_report']='此文件包含 EPANET 报告格式设置。运行报告可在“报告”、“EPANET 运行”下查看，但它采用标准 EPANET 格式，而不是这些设置所指定的格式。这些行会被保留，如果您保存为 EPANET 文件，也会被写回。';
 $ec_lang['lpn_inp_drop_sections']='此文件包含一个本页面完全不读取的部分。这里不会用到它。它会被完整保留，如果您保存为 EPANET 文件，会被写回。';
 $ec_lang['lpn_inp_drop_comments']='此文件的时间模式或简单控制中有一些注释行未被导入，因为本页面没有地方保存它们（例如位于同一时间模式的各行之间的注释）。所有时间模式和控制均已完整导入。';
-$ec_lang['lpn_inp_drop_quality_options']='此文件给出了 EPANET 水质选项：Quality 选项（指明水质分析的种类），以及与化学物质相关的两项设置，即相对扩散系数和水质容差。这三项均会被保留并使用。水龄、水源追踪和化学物质均在本页面计算，运行化学物质时会使用其中两项化学物质设置。如果您保存为 EPANET 文件，全部内容都会被写回。';
 $ec_lang['lpn_inp_drop_file_options']='此文件引用了一个辅助文件：Map（保存坐标），或 Hydraulics（保存已经算好的水力结果）。本页面无法打开这两种文件，因此这些行会保持原样，并在您保存为 EPANET 文件时被写回。';
 $ec_lang['lpn_inp_drop_other_options']='此文件设置了本页面不读取的选项。这里不会用到它们。它们会被保留，并在您保存为 EPANET 文件时被写回。';
 $ec_lang['lpn_inp_drop_net_options']='此 EPANET .net 文件设置了本页面没有对应控件的选项，因此它们的数值列在此处，而不会被本页面采用。其余内容均已导入。如果您需要这些设置，请在 EPANET 中打开该文件，使用“文件”、“导出”、“网络”将其另存为 .inp 文件，然后导入该文件。';
@@ -3858,8 +3857,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='水质容差';
 $ec_lang['lpn_quality_tolerance_tip']='低于该浓度差时，EPANET 将两个相邻水体视为一个。留空则使用 EPANET 的默认值 0.01。';
-$ec_lang['lpn_quality_diffusivity']='相对扩散系数';
-$ec_lang['lpn_quality_diffusivity_tip']='该化学物质在水中扩散的难易程度，相对于氯而言。留空则使用 EPANET 自身的默认值 1.0。';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='{chemical} 浓度';

@@ -10,7 +10,7 @@
 //      he sees in EPANET)." Asserted off the rendered <select>'s own option order, not off the
 //      source array, so a future reorder that forgets this row fails here rather than in his
 //      browser.
-//   2. **QUALITY TOLERANCE AND RELATIVE DIFFUSIVITY HAD NO BOX.** "I don't see this in our
+//   2. **QUALITY TOLERANCE AND DIFFUSIVITY HAD NO BOX.** "I don't see this in our
 //      interface. Is it missing?" -- twice. They were carried in the file and handed to the
 //      engine all along; what is new is a control, so this proves the control reaches the same
 //      two places the carry already did: the exported `.inp` and the engine's own input text.
@@ -130,15 +130,15 @@ if (paramSel) {
 }
 
 // =================================================================================================
-console.log('\n2. QUALITY TOLERANCE AND RELATIVE DIFFUSIVITY HAVE A BOX (R-322)');
+console.log('\n2. QUALITY TOLERANCE AND DIFFUSIVITY HAVE A BOX (R-322)');
 // =================================================================================================
 L.setQuality({ mode: 'chemical', traceNode: '', chemical: 'Chlorine mg/L' });
 L.rebuildSettings();
 const rows = rowsIn(byId.lpn_set_quality_fields);
 ok('the row says "Quality tolerance", EPANET\'s own name',
 	rows.some(r => r.text.indexOf(PC.lpn_quality_tolerance || 'Quality tolerance') >= 0), rows.map(r => r.text).join(' | '));
-ok('the row says "Relative diffusivity", EPANET\'s own name',
-	rows.some(r => r.text.indexOf(PC.lpn_quality_diffusivity || 'Relative diffusivity') >= 0), rows.map(r => r.text).join(' | '));
+ok('the row says "Diffusivity", EPANET\'s own name',
+	rows.some(r => r.text.indexOf(PC.lpn_quality_diffusivity || 'Diffusivity') >= 0), rows.map(r => r.text).join(' | '));
 const texts = controlsIn(byId.lpn_set_quality_fields, 'INPUT').filter(n => n.type === 'text');
 const tolBox = texts.filter(n => n.placeholder === '0.01')[0];
 const diffBox = texts.filter(n => n.placeholder === '1.0')[0];
@@ -172,7 +172,7 @@ L.rebuildSettings();
 ok('neither row survives outside a chemical run',
 	rowsIn(byId.lpn_set_quality_fields).every(r =>
 		r.text.indexOf(PC.lpn_quality_tolerance || 'Quality tolerance') < 0
-		&& r.text.indexOf(PC.lpn_quality_diffusivity || 'Relative diffusivity') < 0));
+		&& r.text.indexOf(PC.lpn_quality_diffusivity || 'Diffusivity') < 0));
 L.setQuality({ mode: 'chemical', traceNode: '', chemical: 'Chlorine mg/L', tolerance: undefined });
 L.getSettings().qualityOptions = { diffusivity: '1.2' };
 

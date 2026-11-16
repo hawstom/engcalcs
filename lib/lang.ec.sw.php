@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='Faili hili linatoa vitambulisho (tag) kwa baadhi 
 $ec_lang['lpn_inp_drop_report']='Faili hili lina mipangilio ya muundo wa ripoti ya EPANET. Ripoti ya uendeshaji inapatikana chini ya Ripoti, Uendeshaji, lakini inatumia muundo wa kawaida wa EPANET badala ya muundo unaotajwa na mipangilio hii. Mistari hiyo inahifadhiwa na kuandikwa tena ukihifadhi faili la EPANET.';
 $ec_lang['lpn_inp_drop_sections']='Faili hili lina sehemu ambayo ukurasa huu hausomi kabisa. Hakuna kinachoitumia hapa. Inahifadhiwa yote kama ilivyo, na inaandikwa tena ukihifadhi faili la EPANET.';
 $ec_lang['lpn_inp_drop_comments']='Mistari hii ya maoni katika miundo au vidhibiti rahisi vya faili hili haikuingizwa, kwa sababu ukurasa huu hauna mahali pa kuihifadhi (kwa mfano, kati ya safu za muundo mmoja). Kila muundo na kidhibiti viliingizwa kikamilifu.';
-$ec_lang['lpn_inp_drop_quality_options']='Faili hili linatamka chaguo za ubora wa maji za EPANET: chaguo la Ubora wa maji, linalotaja aina ya uchambuzi wa ubora wa maji, na mipangilio miwili inayoambatana na kemikali, Usambaaji wa uwiano na Uvumilivu wa ubora. Yote matatu yanahifadhiwa na kutumika. Umri wa maji, ufuatiliaji wa chanzo, na kemikali kila moja hukokotolewa hapa, na mipangilio miwili ya kemikali hutumika kemikali inapoendeshwa. Yote huandikwa tena ukihifadhi faili la EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='Faili hili linarejelea faili la ziada: Ramani, linaloshikilia kuratibu, au Haidroliki, linaloshikilia matokeo ya haidroliki yaliyokokotolewa awali. Ukurasa huu hauwezi kufungua lolote kati ya hayo, hivyo mistari hiyo inahifadhiwa kama ilivyo na kuandikwa tena ukihifadhi faili la EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='Faili hili linaeleza chaguo ambazo ukurasa huu hausomi. Hakuna kinachozitumia hapa. Zinahifadhiwa na zinaandikwa tena ukihifadhi faili la EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='Faili hili la .net la EPANET linaeleza mipangilio ambayo ukurasa huu hauna kidhibiti chake, hivyo thamani zake zimeorodheshwa hapa badala ya kuingizwa moja kwa moja. Kila kitu kingine kiliingia. Ikiwa unazihitaji, fungua faili kwenye EPANET na tumia Faili, Hamisha, Mtandao ili kuihifadhi kama faili la .inp, kisha liingize hilo.';
@@ -3858,8 +3857,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Uvumilivu wa ubora';
 $ec_lang['lpn_quality_tolerance_tip']='Tofauti ya mkusanyiko ambayo chini yake EPANET huchukulia vipande viwili vya maji vinavyopakana kama kimoja. Wazi hutumia chaguo-msingi la EPANET la 0.01.';
-$ec_lang['lpn_quality_diffusivity']='Usambaaji wa uwiano';
-$ec_lang['lpn_quality_diffusivity_tip']='Usambaaji wa kemikali ndani ya maji, kulingana na klorini. Wazi hutumia chaguo-msingi la EPANET la 1.0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='Mkusanyiko wa {chemical}';
