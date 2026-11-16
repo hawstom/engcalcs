@@ -76,15 +76,14 @@ function ecWellDrawing($cx = 12, $gy = 4, $k = 1) {
 		. '<path class="ec-water" stroke-linecap="butt" d="M' . $X($a) . ' ' . $Y($ly) . 'H' . $X($b) . '"/>';
 }
 // **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (B7 of the 2026-11-14 proofs, Tom's pick): the Well's own drawing at 0.55 on the
-// left under a ground line; a riser from its head to a tee; a capped stub leaving the tee to the left; and the run to a wide, flat tank (2 to 1, rounded). A ground
-// tank's outlet is at its floor (Mary's finding, WV 64-77-9 and WI NR 811.64; Tom, round 8: a pipe drains a tank only from the bottom), so the tank is raised until
-// its floor is the run's own height and the run enters at its bottom corner. $legs adds two short legs down to the ground line.
-function ecWellTankIcon($legs = false) {
-	$k = .55; $cx = 6.4; $gy = 13.5; $run = 9.5; $tx = 12.5; $tw = 11; $th = 5.5;
+// left under a ground line; a riser from its head to a tee; a short capped stub leaving the tee to the left; and the run to a wide, flat tank (2 to 1, rounded)
+// standing on the ground line. A ground tank's outlet is at its floor or a few inches above it (Mary's finding, WV 64-77-9 and WI NR 811.64; Tom, round 8: a
+// pipe drains a tank only from the bottom), so the run is lowered to within a stroke of the ground line and enters just above the tank's floor.
+function ecWellTankIcon() {
+	$k = .55; $cx = 6.4; $gy = 13.5; $run = 11.7; $tx = 12.5; $tw = 10.4; $th = 5.2;
 	return '<g stroke-width="1.2">' . ecWellDrawing($cx, $gy, $k) . '</g>'
-		. '<g stroke-width="1.6"><path d="M' . $cx . ' ' . $gy . 'V' . $run . 'M2 ' . ($run - 1.6) . 'V' . ($run + 1.6) . 'M2 ' . $run . 'H' . $tx . '"/>'
-		. '<rect x="' . $tx . '" y="' . ($run - $th) . '" width="' . $tw . '" height="' . $th . '" rx="1"/>'
-		. ($legs ? '<path d="M' . ($tx + 1.5) . ' ' . $run . 'V' . $gy . 'M' . ($tx + $tw - 1.5) . ' ' . $run . 'V' . $gy . '"/>' : '') . '</g>';
+		. '<g stroke-width="1.6"><path d="M' . $cx . ' ' . $gy . 'V' . $run . 'M' . ($cx - 3) . ' ' . $run . 'H' . $tx . 'M' . ($cx - 3) . ' ' . ($run - 1.3) . 'V' . ($run + 1.3) . '"/>'
+		. '<rect x="' . $tx . '" y="' . ($gy - $th) . '" width="' . $tw . '" height="' . $th . '" rx="1"/></g>';
 }
 
 $ec_icons = array(
