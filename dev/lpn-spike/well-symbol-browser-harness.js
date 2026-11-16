@@ -90,7 +90,7 @@ async function main() {
 		ok('the Well, the Tank and the Reservoir are all drawn as symbols', !!symbols.well && !!symbols.tank && !!symbols.reservoir);
 		ok('the tint in the Well\'s holes is the Tank\'s and the Reservoir\'s: the same class, the same fill, the same strength', symbols.well && symbols.well.cls === symbols.tank.cls && symbols.well.cls === symbols.reservoir.cls && symbols.well.fill === symbols.tank.fill && symbols.well.fill === symbols.reservoir.fill && symbols.well.op === symbols.tank.op && symbols.well.op === symbols.reservoir.op, JSON.stringify([symbols.well, symbols.tank, symbols.reservoir]));
 		const lines = (symbols.paths || []).filter((p) => !/backdrop/.test(p.cls));
-		ok('the symbol has a horizontal water-level line across the narrow hole, and its linework is the casing, the ground, the curves and that line, with no box', lines.length === 4 && lines.some((p) => /^M9\.75 18\.5H14\.25$/.test(p.d)) && !lines.some((p) => /Z/i.test(p.d)), lines.map((p) => p.d).join(' | '));
+		ok('the symbol has the water in the narrow hole, level at its top, and its linework is the casing, the ground, the curves and that water, with no box', lines.length === 4 && lines.some((p) => /^M9 16\.5H15V21\.5H9Z$/.test(p.d)) && lines.filter((p) => /Z/i.test(p.d)).length === 1, lines.map((p) => p.d).join(' | '));
 		if (process.env.EC_WELL_SHOT) {   // a picture of the Well's symbol, for a review: EC_WELL_SHOT=/path/to.png
 			const c = await wc();
 			await P.evaluate(() => { document.querySelectorAll('#lpn_canvas .lpn-label, #lpn_canvas text').forEach((t) => { t.style.visibility = 'hidden'; }); });

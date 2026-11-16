@@ -11913,7 +11913,7 @@ var EngCalcs = EngCalcs || {};
 	// closed along the ground line**, so the width of the upper cylinder (EC_WELL_UPPER_HALF) is one number; the literal is for a page with no icons.
 	function wellSilhouette() {
 		var ic = EngCalcs.icons && EngCalcs.icons.well, m = ic && /d="([^"]+)"/.exec(ic);
-		return m ? m[1] + 'Z' : 'M7 4V11H9.75V21.5H14.25V11H17V4Z';
+		return m ? m[1] + 'Z' : 'M7 4V11H9V21.5H15V11H17V4Z';
 	}
 	var RESERVOIR_HALF_W = 1.9878;
 	var RESERVOIR_HALF_H = 1.9878;
