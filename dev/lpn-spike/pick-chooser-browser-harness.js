@@ -290,6 +290,30 @@ async function main() {
 		await S.settle(450);
 		ok('...and choosing the junction selects the junction', J(await selected()) === J(['node:W1']) && !(await shapeSel()), J(await selected()));
 		await closeProps();
+
+		console.log('\nH. Review fixes: keys typed in the box, a network that changes under it');
+		await click({ x: 700, y: 820 });
+		await click(mid); await closeProps();
+		await click(pile);
+		ok('(the box is open over a selected junction M)', (await chooserOpen()) && J(await selected()) === J(['node:M']));
+		await page.keyboard.press('Delete'); await S.settle(300);
+		await page.keyboard.press('Backspace'); await S.settle(300);
+		ok('Delete and Backspace typed in the box do not delete the selection it left alone', (await page.$$('#lpn_canvas [data-node="M"]')).length > 0 && (await chooserOpen()), J(await selected()));
+		await page.keyboard.press('Escape'); await S.settle(200);
+		// Undo while the box is open closes it.
+		await click({ x: 700, y: 820 });
+		await page.mouse.move(mid.x, mid.y); await page.mouse.down();
+		for (let i = 1; i <= 6; i++) { await page.mouse.move(mid.x, mid.y + i * 8); await sleep(20); }
+		await page.mouse.up(); await S.settle(400);
+		const midMoved = await centre('#lpn_canvas [data-node="M"]');
+		ok('(M was dragged 48 px down)', midMoved && Math.abs(midMoved.y - mid.y - 48) < 3, J([mid, midMoved]));
+		await closeProps();
+		await click(pile);
+		ok('(the box is open over the changed map)', await chooserOpen());
+		await page.keyboard.press('Control+z'); await S.settle(500);
+		const midBack = await centre('#lpn_canvas [data-node="M"]');
+		ok('Undo with the box open undoes the move', midBack && Math.abs(midBack.y - mid.y) < 3, J(midBack));
+		ok('...and closes the box, whose rows belong to the drawing that was undone', !(await chooserOpen()));
 		await S.page.close();
 
 		// =========================================================== thick pipes

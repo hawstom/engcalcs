@@ -16369,6 +16369,9 @@ var EngCalcs = EngCalcs || {};
 	var labelPassDeferred = false;
 	function buildDom() {
 		var i;
+		// A chooser open over the old drawing lists elements the new one may not have, or other ones
+		// under the same ids (undo, a project opened): it closes with the drawing it was about.
+		if (paneCtxMenuEl && paneCtxMenuEl.classList.contains('lpn-pick-chooser')) { paneCloseContextMenu(); }
 		// The elements laid out as the scenario showing sees them (Morph) before any is drawn.
 		morphViewSync();
 		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; labelsLayer.innerHTML = '';
@@ -23289,6 +23292,9 @@ var EngCalcs = EngCalcs || {};
 	document.addEventListener('keydown', function (e) {
 		if (e.key !== 'Delete' && e.key !== 'Backspace') { return; }
 		if (keyboardIsTyping()) { return; }
+		// A key typed in an open menu (the pick chooser holds the focus on its first row) is the menu's:
+		// the selection it leaves untouched is not what the reader is looking at.
+		if (paneCtxMenuEl && paneCtxMenuContains(document.activeElement)) { return; }
 		if (!selection) {
 			// Only for Delete. Backspace with nothing selected is a browser gesture people press by
 			// habit and answering it with a notice would be noise on a page they are only reading.
@@ -35984,6 +35990,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else if (key === 'End') { i = n - 1; }
 		else if (key === 'Escape' || key === 'Esc' || key === 'Tab') {
 			back = paneCtxReturnFocus;
+			paneCtxReturnFocus = null;
 			paneCloseContextMenu();
 			if (back && back.focus) { try { back.focus(); } catch (err) { /* gone with a rebuild */ } }
 			if (e.preventDefault) { e.preventDefault(); }
@@ -60908,6 +60915,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function openMapContextMenu(x, y, rows, opts) {
 		var menu = document.createElement('div'), first = null;
 		paneCloseContextMenu();
+		paneCtxReturnFocus = null;   // a table menu's cell is not where Escape on this one goes back to
 		menu.className = 'lpn-pane-ctxmenu' + (opts && opts.cls ? ' ' + opts.cls : '');
 		if (opts && opts.onClose) { menu._lpnOnClose = opts.onClose; }
 		if (opts && opts.ghostMs) { menu._lpnGhostUntil = Date.now() + opts.ghostMs; }
