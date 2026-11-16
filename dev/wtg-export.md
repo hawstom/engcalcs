@@ -179,7 +179,7 @@ see its row). The "Yes" in a row below is Tom's reading of the product, not a qu
 | Tags | **Not found in Bentley's public pages**; EPANET's `[TAGS]` may have no equivalent | | none found |
 | Demand category names | **Not found in Bentley's public pages**; WaterGEMS stores several demands per node (a collection) but no category name was seen | https://bentleysystems.service-now.com/community?id=kb_article_view&sysparm_article=KB0016105 | `IdahoDemandNode_Demand_DemandCollection` has no name column |
 | Non-US units | n/a | | storage units measured for US only |
-| Scenarios and overrides | Yes | Tom's own file | not written (see below) |
+| Scenarios and overrides | Yes | Tom's own files | candidate only: children of Base with pipe diameter and junction demand overrides ("Child scenarios"); not on the page |
 
 Two rows say "not found": tags and demand category names. The strings make no claim about WaterGEMS
 for them either; they say only that this export does not write them.
@@ -561,11 +561,10 @@ mostly data entry rather than discovery.
    status, speed and target-head actions; each valve kind with a setting; a pump with a multipoint curve and one
    with constant power; a tank with a volume curve; a reservoir with a head pattern. The template already holds
    a live prototype of every element kind, so the element side is mostly written.
-4. Scenarios. Tom's own file shows how WaterGEMS stores a child scenario: a scenario row with a parent, an
-   alternative row with a parent of its own, and a *complete copy* of every element's rows under the child
-   alternative (pipe `P-1` has one row for the Base Physical alternative and another, with a different diameter, for
-   the child's). So exporting our scenario tree means cloning rows per alternative, which the writer's
-   clone step already does for Base. Unseen: how WaterGEMS stores which values the child overrides, if it tracks that at all.
+4. Scenarios. Tom's saves show how WaterGEMS stores a child scenario and its child alternatives ("Child scenarios",
+   below). A candidate writer (`opts.candidate.scenarios`) writes children of Base whose overrides are pipe diameters
+   and junction demands, and waits for his WaterGEMS to open one. Every other kind of override is named and the
+   scenario is left out whole.
 5. The export report (every item in "What cannot be carried", by element ID) and a harness per
    element kind, run against the reader.
 6. Coordinates: choose and write the spatial reference so a geographic project lands on the right place in
@@ -735,7 +734,7 @@ His file's other facts, read so nobody repeats them: his control 2 has the tank 
 
 The chlorine network with Tom's three composite controls (`~/tom-files/2026-11-09/wtg-composite-test/ctl-composite-test`), all three held in one control set. Rule 3 never fires on this network (T1 peaks at 17.6 ft), so its second action is only checked by whether the control reads correctly in step 2; rules 1 and 2 are exercised.
 
-EPANET evaluates rules every rule time step, default 6 minutes, so it switches PU1 inside an hour (Off at 3:06, On at 5:06). WaterGEMS has no such setting we know of and may check once an hour. Both are given:
+EPANET evaluates rules every rule time step, default 6 minutes, so it switches PU1 inside an hour (Off at 3:06, On at 5:06). WaterGEMS has no such setting and checks at EPANET's default (Tom's readings of 2026-11-13 match the 6 minute column; see "Expected for `wtg-scenario-test`"). Both are given:
 
 | Hour | EPANET, rule step 6 min | EPANET, rule step 1 h |
 |---|---|---|
@@ -744,4 +743,49 @@ EPANET evaluates rules every rule time step, default 6 minutes, so it switches P
 | 18 | On, 10.94 | On, 9.02 |
 | 24 | On, 11.69 | On, 10.36 |
 
-The hourly column equals the 2-pressure trajectory (the OR rule 2 does the work of the two pressure controls), and 2-pressure matched WaterGEMS to 0.04 ft; so if WaterGEMS checks once an hour its column is expected to be the right-hand one. A match to the left column means it checks as often as EPANET. A value that is neither means a rule is read differently (an OR taken as AND would leave PU1 On through hour 4; read the step 2 answer first). At a trip instant PU1 may show the state before the trip, as above; hours 6, 12, 18 and 24 are not trip instants in the hourly column.
+The hourly column equals the 2-pressure trajectory (simple pressure controls, which EPANET tests once an hour). Tom's WaterGEMS read the 6 minute column, so rules are tested at the default rule step.
+
+## Child scenarios: Tom's saves of 2026-10-21 and 2026-11-13
+
+Observed from two saves of Tom's WaterGEMS 26.0.0.532 (schema 1.0.54.0), read as tables only. **2026-11-13:** `ctl-composite-test.wtg.sqlite` (the base project this export wrote, Base only) and `ctl-composite-test-w-scenario.wtg.sqlite` with its `.wtg` and its EPANET export `ctl-composite-test-w-scenario.inp` (Scenario - 1), in `~/tom-files/2026-11-09/wtg-composite-test/`. **2026-10-21:** `~/webdev/fixtures/wtg-tgh-1/` (`WTG-tgh-1.wtg.sqlite`, with the `.inp` of Base and of its child TGH-1), which already held a child that overrides.
+
+**What changed between the two 2026-11-13 files**, table by table (every other table is row-for-row equal):
+
+| Table | Change | Meaning |
+|---|---|---|
+| `HMIScenario` | `+ (ScenarioID 60, ParentID 1, IsDeleted 0, DomainDataSetID 1)` | The child scenario. Its ID is the ID of its own `HMIModelingElement` row. `ParentID` is the parent's `ScenarioID` (Base is 1, `ParentID` null). |
+| `HMIModelingElement` | `+ (60, ElementType 2, Label 'Scenario - 1', SmartLabel 'Scenario - 0000001')` and `+ (59, ElementType 4, Label '', SmartLabel NULL)` | The scenario is element type 2; 59 is the support element below. GISIDs `NULL` became `''` on every row (noise). |
+| `HMIScenarioAlternative` | `+` 18 rows `(ScenarioID 60, AlternativeTypeID t, AlternativeID a, IsLocal 0)`, one per alternative type, each `a` Base's own alternative | The child **inherits** every alternative: `IsLocal` 0 and Base's `AlternativeID`. |
+| `HMIScenarioCalculationOptions` | `+` 10 rows `(60, NumericalEngineTypeID, CalculationOptionsID, IsLocal 0)` | The child inherits Base's ten calculation-option rows. |
+| `HMISupportElement`, `QBATDefinition` | `+ (SupportElementID 59, type 1000)` and `+ (59, QBATDefinition_HMIActiveTopologyAlternative 4, ..._IncludeConnectedNodes 1, HMIActiveTopologyMode 0, HMIActiveTopologyQueriesCount 0)` | Appears with the first child scenario (TGH-1 holds the same row, id 30). Alternative 4 is Base's Active Topology alternative. |
+| `HMIElementTypeCount` | `(2, ElementTypeID 0)` 1 to 2; `(4, ElementTypeID 1000)` 0 to 1 | Scenario count and QBAT count. |
+| `HMIDomainDataSet` | `ActiveScenarioID` 1 to 60 | Tom saved with the child active. |
+| `HMISchemaVersionInfo` | the two open counters 4 to 5 | |
+| `.wtg` | `ProjectOptions ActiveScenarioID` 60; `ScenarioSettings ScenarioID="60"` and `<Node Identifier="60">` added | Nothing else changed in the presentation file (no compute-status row, no view). |
+
+**Scenario - 1 overrides nothing in the file.** There is no `HMIAlternative` row with a parent and no `IsLocal` 1 anywhere in the child. Two values did change between the saves, **in Base's own alternatives**: `IdahoDemandNode_Demand_DemandCollection` for J1 (element 34, alternative 7; the row was deleted and re-inserted, `ItemID` 1 to 2) from 0.6684 to 1.1140 ft3/s, which is 300 to 500 gpm, and `IdahoPipe_Physical_Data` for pipe 2 (element 37, alternative 6) `Physical_PipeDiameter` 0.6667 to 0.8333 ft, which is 8 to 10 in. The `.inp` of Scenario - 1 states J1 500 and pipe 2 at 10 in, so the child simply inherits Base's new values: the edits were made to Base (or WaterGEMS wrote them through to the alternative the child inherits), not as overrides. The reader (`js/lpn-wtg.js`, branch `feat/sqlite-reader`) agrees: Scenario - 1 has no overrides and no differences. The rest of that `.inp` is WaterGEMS's own spelling of the same network (a pump is two nodes `39-A`, `39-B`; feet coordinates), so it cannot be compared line by line with our Base text; the table comparison is the evidence.
+
+**How a child alternative is recorded** (TGH-1, 2026-10-21; the child TGH-1 overrides pipe diameters, tank diameter, a tank volume curve and node elevations, and its `.inp` shows each):
+
+- `HMIAlternative`: `(AlternativeID, ParentID = the Base alternative of that type, AlternativeTypeID, IsDeleted 0, DomainDataSetID 1, Level 2)`; Base's rows have `ParentID` null and `Level` 1. Its own `HMIModelingElement` row is element type 1, labelled with the scenario's name.
+- `HMIScenarioAlternative`: for each alternative **type** the child either inherits (`IsLocal` 0, `AlternativeID` Base's) or holds its own (`IsLocal` 1, `AlternativeID` the child alternative). TGH-1 has two local picks: type 4 (Physical) and type 20 (Demand).
+- Inside a child alternative the rows are the **same tables** as Base's, with the child's `AlternativeID`. They exist **only for the elements edited**: pipes `P-1` to `P-33` each have both their Physical tables (`BaseLink_Physical_Data`, `IdahoPipe_Physical_Data`), every edited element has every table of its class chain for that alternative type, and the elements that were not edited (five of the six valves) have **no row** and take Base's. So an override is stored as a copy of the element's rows of that alternative type with the new value, and "inherited" is the absence of a row. Nothing marks which column changed; the copy is whole. (The reader resolves a scenario this way and its differences from Base equal the `.inp` pair: pipe diameters 10 in, T-1 diameter 50 ft, T-2 volume curve.)
+- Diameter is `IdahoPipe_Physical_Data.Physical_PipeDiameter`, feet, in the Physical alternative (type 4). A junction's demand rows are `IdahoDemandNode_Demand_Data` (`DemandCollectionCount`) and `IdahoDemandNode_Demand_DemandCollection` (`DemandCollection_BaseFlow` ft3/s, `..._DemandPattern`) in the Demand alternative (type 20); the child holds all of that junction's rows, not the one changed.
+- Not settled by any save: a child of a child (`Level` 3, the parent alternative of a grandchild), and whether WaterGEMS accepts a whole-element copy of an element that was not edited in the child (TGH-1 holds such copies, written by WaterGEMS itself: junctions J-2, J-4 and others carry unchanged rows).
+
+**Written (candidate)** (`writeScenarios()` and `scenarioOverrides()` in `js/lpn-wtg-export.js`, only with `opts.candidate.scenarios = [{ name, inp | parsed }]`; the page never passes it): each entry is a project scenario's resolved network read as Base is read (`lpnExportInp` with that scenario's resolver, then `lpnInpParse`), a child of Base. If every difference from Base is a pipe's diameter or the base flows of the same demand rows of a junction (same count, same patterns), the scenario is written as above: scenario, modeling-element and `HMIScenarioAlternative` rows, ten inherited calculation options, the QBAT support element once, a child Physical alternative holding the edited pipes' rows, a child Demand alternative holding the edited junctions' rows, the element-type counts, and the `.wtg`'s animation setting and tree node (`patchWtgXml(..., addedScenarios)`). Base stays the active scenario and every Base element keeps the id it has without scenarios (the new ids are the last). **Any other difference** (another property of any asset, an asset in only one of the two, a changed pattern, curve, control, rule or option) is named in `report.scenarios[i].unsupported` and `report.notCarried`, and the scenario is left out whole. Only children of Base are written. Harness: `node dev/lpn-spike/wtg-scenario-harness.js` writes Tom's Scenario - 1 values (J1 300 to 500 gpm, pipe 2 8 to 10 in), resolves the scenario back from the file twice (its own walk up the alternatives, and the reader), and checks one kind at a time, the refusals, the no-override shape against his save, and two scenarios.
+
+**The `.wtg` for a child** (`patchWtgXml`): the child's `ScenarioSettings` row goes BEFORE Base's (TGH-1 lists 38 then 1, Tom's 11-13 save 60 then 1), its tree node right after Base's node in the one tree block that holds Base's id (the real Base id, `report.baseScenarioId`, which a saved template may number above 30); no place for either is an error, not a skip. `ComputeStatusIndicator` holds one row per scenario that has been computed (the 11-13 save: count 1 beside two scenarios; TGH-1, both computed: 2), so a child written here adds none. A scenario's name is compared without regard to case against every scenario and alternative label. Copies are read in Base's row order from the tables the Base writer's own prototype rows name, once (a 2,000-pipe, 500-junction scenario cost about 10 s of CPU in the copy before, about 1 to 2 s after).
+
+**Not proven:** that WaterGEMS opens the file and shows the overrides in Scenario - 1 (computes the same as EPANET on the scenario's `.inp`). Tom's copy is the only test; no ask has been made.
+
+## Expected for `wtg-scenario-test`, 2026-11-13 (kept out of Tom's README)
+
+`~/tom-files/2026-11-13/wtg-scenario-test/` (`node dev/lpn-spike/wtg-scenario-test.js`): the chlorine project of `ctl-composite-test` with one child, Child A (J1 demand 300 to 250 gpm, pipe 2 8 to 10 in), written by the candidate scenario writer. EPANET on the network WaterGEMS holds (pump as a node between two 1 ft pipes):
+
+| | J1 psi, hour 0 | T1 ft, hour 12, rule step 6 min | T1 ft, hour 12, rule step 1 h |
+|---|---|---|---|
+| Base | 35.67 | 11.56 | 8.75 |
+| Child A | 35.74 | 15.49 | 14.48 |
+
+**Tom's WaterGEMS read 2026-11-13: Base T1 11.56, Child A 15.49 ft at hour 12; J1 35.69 and 35.76 psi at hour 0. That is the 6 minute column, not the hourly one**: the "hourly" expectation was an inference from `2-pressure`, whose controls were simple pressure controls (EPANET tests those once per hydraulic step anyway); rules are a different mechanism and WaterGEMS runs them at EPANET's default rule step, a tenth of the hydraulic step (the `.inp` WaterGEMS exports states no Rule Timestep, and the schema has no column for one). Nothing in the file was wrong, and Base (master's export alone) agrees. Only a 6 minute step reproduces both readings (1 h 8.75 / 14.48, 30 min 10.24 / 14.62, 15 min 11.53 / 14.69, 10 min 11.55 / 15.14, 5 min 11.76 / 15.37, 1 min 11.85 / 15.59). The 0.02 psi on J1 is WaterGEMS's psi per foot of head, 0.43353 (water at 4 C, 62.43 lb/ft3) against EPANET's 0.4333: the same head gives 35.69 and 35.76. Tank Level is the depth above the tank's base elevation, as EPANET's. A first draft of Child A at 500 gpm drained T1 to empty and ran negative, so the demand is 250. The harness holds the folder's `.sqlite` to what the writer produces now.

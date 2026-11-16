@@ -53,7 +53,13 @@ async function savedHydraulics(EngCalcs, model) {
 	const nodeIds = [], linkIds = [];
 	for (let i = 1; i <= p.getCount(0); i++) { nodeIds.push(p.getNodeId(i)); }
 	for (let i = 1; i <= p.getCount(2); i++) { linkIds.push(p.getLinkId(i)); }
-	p.solveH();
+	// solveH() opened up so a full tank is held full as the bridge holds it (EngCalcs.lpnHoldFullTanks).
+	const nodeIdx = {}, pinned = {};
+	model.nodes.forEach((n) => { nodeIdx[n.id] = p.getNodeIndex(n.id); });
+	p.openH();
+	p.initH(1);
+	do { p.runH(); if (p.nextH() > 0) { EngCalcs.lpnHoldFullTanks(p, model, nodeIdx, pinned); } else { break; } } while (true);
+	p.closeH();
 	const vEnd = {};
 	model.nodes.forEach((n) => { if (n.type === 'tank') { vEnd[n.id] = p.getNodeValue(p.getNodeIndex(n.id), EN_TANKVOLUME) / FT3; } });
 	p.saveHydFile('q.hyd');

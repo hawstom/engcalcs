@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='Цей файл присвоює теги дея�
 $ec_lang['lpn_inp_drop_report']='Цей файл містить налаштування формату звіту EPANET. Звіт про розрахунок доступний у Звіти, Розрахунок, але він використовує стандартний формат EPANET, а не формат, який задають ці налаштування. Рядки зберігаються і записуються назад, якщо зберегти файл EPANET.';
 $ec_lang['lpn_inp_drop_sections']='Цей файл містить розділ, який ця сторінка взагалі не читає. Тут він ніде не використовується. Він зберігається цілим і буде записаний назад, якщо ви збережете файл EPANET.';
 $ec_lang['lpn_inp_drop_comments']='Ці рядки коментарів у шаблонах або простих керуваннях цього файлу не імпортовано, бо на цій сторінці немає місця, де їх зберігати (наприклад, між рядками одного шаблону). Кожен шаблон і кожне керування імпортовано повністю.';
-$ec_lang['lpn_inp_drop_quality_options']='Цей файл задає параметри якості води EPANET: параметр «Якість», що називає вид аналізу якості води, і два налаштування, пов’язані з хімічною речовиною, — відносну дифузійність і допуск якості. Усі три зберігаються й використовуються. Вік води, трасування джерела та хімічна речовина обчислюються тут, а обидва налаштування хімічної речовини використовуються під час розрахунку хімічної речовини. Усі вони записуються назад, якщо зберегти файл EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='Цей файл посилається на допоміжний файл: Map, який містить координати, або Hydraulics, який містить уже обчислену гідравліку. Ця сторінка не може відкрити жоден з них, тож ці рядки зберігаються як є і будуть записані назад, якщо ви збережете файл EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='Цей файл задає параметри, які ця сторінка не читає. Тут вони ніде не використовуються. Вони зберігаються і будуть записані назад, якщо ви збережете файл EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='Цей файл EPANET .net задає налаштування, для яких на цій сторінці немає елементів керування, тож їхні значення перелічено тут, а не перенесено. Усе інше перенесено. Якщо вони вам потрібні, відкрийте файл в EPANET і скористайтеся «File, Export, Network», щоб зберегти його як файл .inp, а потім імпортуйте цей файл.';
@@ -3483,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='За замовчуванням: {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Межа збіжності, якої має досягти розв’язувач, перш ніж зупиниться, вимірювана як сумарна зміна витрат від однієї ітерації до наступної, поділена на сумарну витрату в з’єднаннях. Менше число точніше, але потребує більше часу.';
 $ec_lang['lpn_settings_specific_gravity']='Питома вага';
-$ec_lang['lpn_settings_viscosity']='Відносна в\'язкість';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3492,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='Відносна в\'язкість';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='В\'язкість рідини порівняно з водою за 20 градусів Цельсія. Вона змінює відповідь лише за методом Дарсі-Вейсбаха.';
 $ec_lang['lpn_settings_trials']='Максимум ітерацій';
 $ec_lang['lpn_settings_trials_tip']='Найбільша кількість ітерацій, після якої розв’язувач зупиняється на мережі, що не збігається.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -3858,8 +3855,6 @@ $ec_lang['lpn_quality_unit_ug']='мкг/л';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Допуск якості';
 $ec_lang['lpn_quality_tolerance_tip']='Різниця концентрацій, нижче якої EPANET вважає дві сусідні порції води однією. Порожнє поле означає типове значення EPANET, 0.01.';
-$ec_lang['lpn_quality_diffusivity']='Відносна дифузійність';
-$ec_lang['lpn_quality_diffusivity_tip']='Дифузійність хімічної речовини у воді відносно хлору. Порожнє поле означає типове значення EPANET, 1.0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='Концентрація {chemical}';

@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='קובץ זה מקצה תגיות לחלק מהצ
 $ec_lang['lpn_inp_drop_report']='קובץ זה מכיל הגדרות תבנית דוח של EPANET. דוח ההרצה זמין תחת דוחות, הרצה, אך הוא משתמש בתבנית הסטנדרטית של EPANET ולא בתבנית שהגדרות אלה קובעות. השורות נשמרות ונכתבות בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inp_drop_sections']='קובץ זה מחזיק סעיף שעמוד זה אינו קורא כלל. שום דבר כאן אינו משתמש בו. הוא נשמר במלואו, והוא נכתב בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inp_drop_comments']='שורות ההערה האלה בתבניות או בבקרות הפשוטות של קובץ זה לא יובאו, מפני שלעמוד זה אין מקום לשמור אותן (למשל, בין שורותיה של תבנית אחת). כל תבנית וכל בקרה יובאו במלואן.';
-$ec_lang['lpn_inp_drop_quality_options']='קובץ זה קובע אפשרויות איכות מים של EPANET: האפשרות Quality, המציינת את סוג ניתוח איכות המים, ושתי הגדרות הקשורות לחומר כימי, Relative diffusivity ו-Quality tolerance. שלושתן נשמרות ונמצאות בשימוש. גיל המים, מעקב מקור וחומר כימי מחושבים כאן כל אחד, ושתי הגדרות החומר הכימי נמצאות בשימוש כשמריצים חומר כימי. כולן נכתבות בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='קובץ זה מפנה לקובץ עזר: Map, המחזיק קואורדינטות, או Hydraulics, המחזיק תוצאות הידראוליקה שכבר חושבו. עמוד זה אינו יכול לפתוח אף אחד מהם, כך שהשורות נשמרות כפי שהן ונכתבות בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='קובץ זה קובע אפשרויות שעמוד זה אינו קורא. שום דבר כאן אינו משתמש בהן. הן נשמרות והן נכתבות בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='קובץ .net זה של EPANET קובע הגדרות שלעמוד זה אין בקרה עליהן, כך שערכיהן מפורטים כאן במקום לעבור הלאה. כל השאר עבר. אם אתם זקוקים להן, פתחו את הקובץ ב-EPANET והשתמשו בקובץ, ייצוא, רשת כדי לשמור אותו כקובץ ‎.inp, ואז ייבאו אותו.';
@@ -3483,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='ברירת המחדל היא {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='גבול ההתכנסות שהפותר חייב להגיע אליו לפני שהוא עוצר, נמדד כשינוי הכולל בספיקה מניסיון אחד לבא אחריו, חלקי הספיקה הכוללת בקישורים. מספר קטן יותר מדויק יותר ונמשך זמן רב יותר.';
 $ec_lang['lpn_settings_specific_gravity']='צפיפות סגולית';
-$ec_lang['lpn_settings_viscosity']='צמיגות יחסית';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3492,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='צמיגות יחסית';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='הצמיגות של הנוזל בהשוואה למים ב-20 מעלות צלזיוס. היא משנה את התשובה רק תחת שיטת Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='מספר איטרציות מרבי';
 $ec_lang['lpn_settings_trials_tip']='מספר האיטרציות המרבי לפני שהפותר עוצר ברשת שאינה מתכנסת.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -3858,8 +3855,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='סבילות איכות';
 $ec_lang['lpn_quality_tolerance_tip']='הפרש הריכוז שמתחתיו EPANET מתייחס לשתי מנות מים סמוכות כאל אחת. ריק משתמש בברירת המחדל של EPANET, 0.01.';
-$ec_lang['lpn_quality_diffusivity']='דיפוזיביות יחסית';
-$ec_lang['lpn_quality_diffusivity_tip']='דיפוזיביות החומר הכימי במים, יחסית לכלור. ריק משתמש בברירת המחדל של EPANET, 1.0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='ריכוז {chemical}';
