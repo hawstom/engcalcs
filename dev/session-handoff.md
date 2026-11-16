@@ -224,7 +224,7 @@ lines rather than appending corrections.
 ### Previews, reporting, other
 
 - **Preview ports live on jasmine since 2026-10-02**: `~/webdev/worktrees/_panel/ports.conf` lists them
-  (pipe rows with what to test), `sh ~/webdev/worktrees/_panel/generate.sh` makes any missing
+  (pipe rows with a short title; test steps go in messenger.md, never there: Tom 2026-11-16), `sh ~/webdev/worktrees/_panel/generate.sh` makes any missing
   worktree, writes one Apache vhost per row and reloads Apache (passwordless via
   `/etc/sudoers.d/previews`; a crontab `@reboot` reruns it). They bind to loopback; Tom reaches them
   through SSH forwarding, so his browser sees `localhost` (secure context, and a host the Mapbox token
