@@ -27006,11 +27006,7 @@ var EngCalcs = EngCalcs || {};
 				label: pc.lpn_tool_add_text || 'Text',
 				applies: function () { return true; },
 				get: function (lb) { return effective(lb, 'text') || ''; },
-				// A Text is never left wordless: Replace to nothing is refused, as a paste is.
-				set: function (lb, v) {
-					if (!String(v).trim()) { return false; }
-					setProp(lb, 'text', v); refreshLabelContent(lb.id);
-				} },
+				set: function (lb, v) { setProp(lb, 'text', v); refreshLabelContent(lb.id); } },
 			{ key: 'allZoom', group: 'label', field: 'allZoom',
 				label: pc.lpn_field_text_all_zoom || 'Show at all zoom levels',
 				applies: function () { return true; },
