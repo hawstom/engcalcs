@@ -9426,6 +9426,7 @@ var EngCalcs = EngCalcs || {};
 			scenarioSettingHolders().forEach(function (o) {
 				if (o && !o.isBase && settingGet(o.settings, ['settings', 'velocityLimit']) !== undefined) { settingDelete(o, ['settings', 'velocityLimit']); }
 			});
+			touchTree('resetUnitBearingDefaultsFor');
 		}
 		for (group in LPN_LABEL_FIELD_UNIT) {
 			if (!Object.prototype.hasOwnProperty.call(LPN_LABEL_FIELD_UNIT, group)) { continue; }
@@ -9439,6 +9440,8 @@ var EngCalcs = EngCalcs || {};
 				}
 			}
 		}
+		// The Settings rows were built before the reset: show what it left (a limit's unit and default, the new-asset values).
+		rebuildSettingsBox();
 	}
 	// The unit selects the wizard actually left DIFFERENT from the project it was opened on --
 	// only those it can answer for (both sides must have a value) count as "changed".
@@ -61865,6 +61868,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else if (name === 'lpn_u_velocity') {
 			// The velocity warning limit is typed in this unit; a scenario's own is the same number in the same unit.
 			velocityLimitHolders().forEach(function (h) { h.velocityLimit = +(h.velocityLimit * k).toPrecision(6); n++; });
+			// A scenario's settings are read through a resolved-tree cache: the written numbers must be re-read.
+			if (n) { touchTree('convertUnitValues'); }
 		} else if (name === 'lpn_u_flow') {
 			convSetting('flowChange');   // a flow typed in this unit
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
