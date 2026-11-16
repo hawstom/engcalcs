@@ -361,5 +361,14 @@ console.log('\n--- 7. following: the DEM source, a batch in either order, a scen
 	ok('the per-scenario state survives save and reopen', b.teeFollow === true && b.followOff && Object.keys(b.followOff).length === 1, JSON.stringify(b.followOff));
 }
 
+console.log('\n--- 8. source guards from the round 9 review ---');
+{
+	const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8'), icons = fs.readFileSync(ROOT + 'lib/Icons.lib.php', 'utf8');
+	const up = +/EC_WELL_UPPER_HALF', ([\d.]+)/.exec(icons)[1], deep = +/EC_WELL_DEEP_HALF', ([\d.]+)/.exec(icons)[1];
+	const lit = 'M' + (12 - up) + ' 4V11H' + (12 - deep) + 'V21.5H' + (12 + deep) + 'V11H' + (12 + up) + 'V4Z';
+	ok('the Well silhouette fallback (a page with no icons) is the icon\'s own outline', src.indexOf("'" + lit + "'") >= 0, lit);
+	ok('the "outlet junction" tip is offered only where the outlet bears the Well\'s ID', /bearer\.group === 'node' \? pc\.lpn_well_identity_tip : undefined\);\s*tagField\(fields, bearerEl, undefined, bearer\.group === 'node'/.test(src));
+}
+
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));
 process.exit(fails ? 1 : 0);

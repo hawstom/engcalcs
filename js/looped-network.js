@@ -11913,7 +11913,7 @@ var EngCalcs = EngCalcs || {};
 	// closed along the ground line**, so the width of the upper cylinder (EC_WELL_UPPER_HALF) is one number; the literal is for a page with no icons.
 	function wellSilhouette() {
 		var ic = EngCalcs.icons && EngCalcs.icons.well, m = ic && /d="([^"]+)"/.exec(ic);
-		return m ? m[1] + 'Z' : 'M7 4V11H10.5V21.5H13.5V11H17V4Z';
+		return m ? m[1] + 'Z' : 'M7 4V11H9.75V21.5H14.25V11H17V4Z';
 	}
 	var RESERVOIR_HALF_W = 1.9878;
 	var RESERVOIR_HALF_H = 1.9878;
@@ -41380,8 +41380,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}, bearer.group);
 		clearFields(fields);
 		// A Well's Description and Tag are its outlet's (Tom, 2026-11-15: "good parsimony as long as it's documented clearly"): the box says so, as the manual does.
-		descField(fields, bearerEl, undefined, pc.lpn_well_identity_tip);
-		tagField(fields, bearerEl, undefined, pc.lpn_well_identity_tip);
+		// The tip says "outlet junction", which is true only where the outlet bears the ID; a Well saved before Round 8 is its pump's, and keeps the ordinary tips.
+		descField(fields, bearerEl, undefined, bearer.group === 'node' ? pc.lpn_well_identity_tip : undefined);
+		tagField(fields, bearerEl, undefined, bearer.group === 'node' ? pc.lpn_well_identity_tip : undefined);
 		unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 			function () { return effective(t, 'elev'); },
 			function (v) { setProp(t, 'elev', v); updateNode(t.id, true); refreshPopupIfOpen(); },
