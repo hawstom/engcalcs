@@ -30,6 +30,8 @@ exports.run = async function ({ browser, report }) {
 			// A DISABLED control is a different case for the tip rule below, so it has to come back
 			// with the buttons rather than be inferred from their names.
 			disabled: !!b.disabled,
+			// A control the strip does not draw (the player in steady state) has no tip to be read.
+			shown: b.offsetParent !== null,
 			// Only the direct text nodes: the <svg> is a child element and does not count.
 			text: [...b.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim(),
 			icons: b.querySelectorAll('svg').length
@@ -72,7 +74,7 @@ exports.run = async function ({ browser, report }) {
 		const badJoin = live.filter(b => b.title.indexOf(b.label) !== 0);
 		report.eq(badJoin.length, 0, 'every ENABLED button\'s tip begins with its name',
 			JSON.stringify(badJoin.map(b => [b.label, b.title])));
-		const off = btns.filter(b => b.disabled);
+		const off = btns.filter(b => b.disabled && b.shown);
 		report.ok(off.every(b => b.title.length > 20),
 			'and a disabled one says why it is off instead',
 			JSON.stringify(off.map(b => b.label)));
@@ -116,7 +118,8 @@ exports.run = async function ({ browser, report }) {
 			'play and the two step buttons are on the strip, with no run loaded', names.join(' | '));
 		const pickers = await a.page.evaluate(() => [...document.querySelectorAll('#lpn_toolbar select')]
 			.map(s => ({ id: s.id, name: s.getAttribute('aria-label') || '', opts: s.options.length, cap: s.style.maxWidth })));
-		report.eq(pickers.length, 2, 'and exactly two dropdowns: the step selector and the speed',
+		// Speed moved into the pop-up the chevron opens (Tom, 2026-11-14), so the strip holds the step selector alone.
+		report.eq(pickers.length, 1, 'and exactly one dropdown on the strip: the step selector',
 			JSON.stringify(pickers));
 		report.ok(pickers.every(p => p.name && p.cap),
 			'each dropdown is named and width-capped — a wide control is what got the last one removed',

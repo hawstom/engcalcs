@@ -1242,6 +1242,8 @@
 	 * time step without clicking the toolbar.
 	 */
 	EC.lpnTimeGoTo = function (t) { setTime(t); };
+	/** A press on the graph's time line takes the clock in hand: playback stops, or the next tick moves the line from under the finger. */
+	EC.lpnTimePause = function () { if (state.playing) { pause(); } };
 
 	/**
 	 * **WHAT THE PUMPS COST OVER THE RUN IN HAND, OR NULL** (Task 566; dev/pump-energy.md).
@@ -2328,7 +2330,10 @@
 		if (ui && ui.more) { ui.more.setAttribute('aria-expanded', 'false'); if (refocus) { ui.more.focus(); } }
 		document.removeEventListener('pointerdown', popOutside, true);
 		document.removeEventListener('keydown', popKey, true);
+		window.removeEventListener('resize', popResize);
 	}
+	// The pop-up is placed once, at open; a resize or a turn of the phone moves the strip out from under it.
+	function popResize() { popClose(false); }
 	function popOutside(e) {
 		if (popEl && (popEl.contains(e.target) || (ui && ui.more && ui.more.contains(e.target)))) { return; }
 		popClose(false);
@@ -2349,11 +2354,14 @@
 		ui.more.setAttribute('aria-expanded', 'true');
 		r = (ui.step || ui.more).getBoundingClientRect();
 		w = popEl.getBoundingClientRect().width;
-		left = Math.max(4, Math.min(r.left, window.innerWidth - w - 4));
+		// Hangs from the selector's start edge: its left in a left-to-right page, its right in a right-to-left one.
+		left = document.documentElement.dir === 'rtl' || document.body.dir === 'rtl' ? r.right - w : r.left;
+		left = Math.max(4, Math.min(left, window.innerWidth - w - 4));
 		popEl.style.left = left + 'px';
 		popEl.style.top = Math.round(ui.more.getBoundingClientRect().bottom + 4) + 'px';
 		document.addEventListener('pointerdown', popOutside, true);
 		document.addEventListener('keydown', popKey, true);
+		window.addEventListener('resize', popResize);
 		(popEl.querySelector('button') || popEl).focus();
 	}
 	function buildPop(S) {

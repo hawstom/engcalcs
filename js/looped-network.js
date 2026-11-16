@@ -38984,6 +38984,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (e.button !== undefined && e.button > 0) { return; }
 			e.preventDefault();
 			tsNowEnd(null);
+			if (EngCalcs.lpnTimePause) { EngCalcs.lpnTimePause(); }
 			tsNowDrag = { id: e.pointerId, host: host, last: null };
 			document.addEventListener('pointermove', tsNowMove, true);
 			document.addEventListener('pointerup', tsNowEnd, true);

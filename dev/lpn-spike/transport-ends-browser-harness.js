@@ -140,6 +140,11 @@ async function main() {
 		await s.settle(2500);
 		v = await s.page.evaluate(() => +document.getElementById('lpn_time_step').value);
 		ok('Restart lands on the first stop', v === 0, String(v));
+		// The pop-up is placed once, so a resize closes it rather than leaving it hanging where the strip was.
+		await s.page.click('#lpn_toolbar_run .lpn-time-more');
+		await s.page.setViewportSize({ width: 1100, height: 800 });
+		await s.settle(300);
+		ok('a resize closes the pop-up', !(await pop()).visible);
 		await s.context.close().catch(() => {});
 
 		// ---- the toolbar is ONE row at 1280 and 1366 (it was two) ----
@@ -236,6 +241,19 @@ async function main() {
 			if (!touch) { await s.page.mouse.click(after.x, after.y); }
 			await s.settle(500);
 			ok(tag + ': a click on the line leaves the step as it was', (await geo()).now === before2);
+			// A press on the line while the run is playing stops the playback, or the next tick moves the line from under the pointer.
+			if (!touch) {
+				await s.page.evaluate(() => { EngCalcs.lpnTimeGoTo(0); });
+				await s.page.click('#lpn_toolbar_run button[data-icon="play"], #lpn_toolbar_run button[data-icon="pause"]');
+				await s.settle(300);
+				const pg = await geo();
+				await s.page.mouse.move(pg.x, pg.y);
+				await s.page.mouse.down();
+				await s.settle(150);
+				const playingAfterPress = await s.page.evaluate(() => document.querySelector('#lpn_toolbar_run .lpn-transport-btn[aria-pressed]').getAttribute('aria-pressed'));
+				await s.page.mouse.up();
+				ok(tag + ': pressing the time line while playing stops the playback', playingAfterPress === 'false', playingAfterPress);
+			}
 			// A drag with the line off to the end clamps to the last step.
 			ok(tag + ': no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
 			await s.context.close().catch(() => {});
@@ -256,6 +274,10 @@ async function main() {
 			return sv ? getComputedStyle(sv).transform : '';
 		}), ICONS);
 		ok('RTL: Back and Forward glyphs are mirrored and Play is not', [1, 3].every((k) => /-1/.test(tf[k])) && !/-1/.test(tf[2]), tf.join(' | '));
+		await s.page.click('#lpn_toolbar_run .lpn-time-more');
+		const rp = await s.page.evaluate(() => { const q = document.getElementById('lpn_time_pop').getBoundingClientRect(), t = document.getElementById('lpn_time_step').getBoundingClientRect(); return { pr: q.right, pl: q.left, tr: t.right, vw: innerWidth }; });
+		ok('RTL: the pop-up hangs from the selector\'s right edge and stays inside the window', Math.abs(rp.pr - rp.tr) <= 2 && rp.pl >= 0, JSON.stringify(rp));
+		await s.page.keyboard.press('Escape');
 		await s.context.close().catch(() => {});
 	} finally { await browser.close(); env.stopServer(); }
 	console.log(fails ? '\ntransport-ends: ' + fails + ' FAILED' : '\ntransport-ends: all ok');
