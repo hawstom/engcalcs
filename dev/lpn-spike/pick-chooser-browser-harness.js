@@ -11,19 +11,21 @@
 //      the arrow keys and Enter choose; a Shift-held click adds the chosen element to the selection;
 //      a drag from the assembly still moves what it grabbed (and selects it); hovering a row marks
 //      that element on the map.
-//   C. Two pipes drawn over each other offer both; two coincident junctions with a Text over them offer
-//      the Text as one more row.
+//   C. Two pipes drawn over each other open no box (a pipe is never a row); two coincident junctions
+//      with a Text over them offer the Text as one more row.
 //   D. A phone (390 x 844, touch): a tap on the assembly opens the box, its rows are finger-sized
 //      (at least 44 px), a tap on a row chooses it; a tap on the junction on the pipe opens no box.
-//   G. Tom's 2026-11-15 calls: the trigger is two or more SYMBOLS (node, pump or valve glyph, Text,
-//      Shape) under the pickbox, judged on the screen, and it lists everything under it, pipes
-//      included; a press elsewhere on the map closes the box and goes through (a bare-map press
-//      clears the selection, a press on an element selects it, a right-click opens its menu); a Shape
-//      is a row ("Shape S1"). A Shape point on a junction offers both.
+//   G. Tom's 2026-11-15 and 11-16 calls: the symbols are a node, a pump or valve glyph, a Text and a
+//      Shape that is not a line, and the box opens where one the press lands on visibly overlaps
+//      another under the pickbox; no pipe and no open Shape line is ever a row; a press elsewhere on
+//      the map closes the box and goes through. A Shape point on a junction offers both.
+//   I. Round 3: eight junctions at one point give six rows; two dots that touch give a box; two
+//      separate dots and the short pipe between them give none; an open Shape line crossing a pipe
+//      gives none; a junction on a closed Shape's outline gives the junction and the Shape.
 //   E. Review fixes: a finger's tap near the right and bottom edges opens the box with no row under the
 //      press and no row answering the lift's compatibility click; a pipe a finger taps within reach of
-//      the pile is one more row; a right-click or a long press that dismisses the box opens no
-//      context menu; two stacked THICK pipes are both offered 4 px off their centreline; hovering a
+//      the pile is not a row; a right-click or a long press that dismisses the box opens no
+//      context menu; two stacked THICK pipes still open no box 4 px off their centreline; hovering a
 //      row marks exactly that element and closing clears it; a pan from bare map still clears the selection.
 // EC_SHOTS=<dir> saves pick-chooser-desktop.png and pick-chooser-phone.png there.
 //
@@ -137,8 +139,8 @@ async function main() {
 		await closeProps();
 		await click(pile);
 		ok('a click on the assembly opens the box', await chooserOpen());
-		const want = ['Junction J1', 'Junction J2', 'Junction J3', 'Pipe P2', 'Pump PU9', 'Pipe P4', 'Pipe P3'];
-		ok('...listing every element under the pickbox as its type word and ID, nodes then links, the pipes that end there too', J(await rows()) === J(want), J(await rows()));
+		const want = ['Junction J1', 'Junction J2', 'Junction J3', 'Pump PU9'];
+		ok('...listing the symbols there as their type word and ID, junctions then the pump, and no pipe', J(await rows()) === J(want), J(await rows()));
 		ok('...selecting nothing yet: the selection is as it was (the junction M)', J(await selected()) === J(['node:M']), J(await selected()));
 		const box = await page.evaluate(() => { const b = document.querySelector('.lpn-pick-chooser').getBoundingClientRect(); return { l: b.left, t: b.top, w: b.width, h: b.height }; });
 		ok('...at the pointer, wholly on screen', Math.abs(box.l - pile.x) < 40 && Math.abs(box.t - pile.y) < 40 && box.l + box.w <= 1400 && box.t + box.h <= 900, J(box));
@@ -160,10 +162,6 @@ async function main() {
 		ok('choosing Pump PU9 selects it', J(await selected()) === J(['link:PU9']), J(await selected()));
 		ok('...and opens its Properties, as a direct click would', (await popupTitle()) === 'PU9', String(await popupTitle()));
 		ok('...and the box has closed', !(await chooserOpen()));
-		await click(pile);
-		await (await rowBtn('Pipe P2')).click();
-		await S.settle(500);
-		ok('the zero-length pipe, which nothing else can reach, is chosen the same way', J(await selected()) === J(['link:P2']) && (await popupTitle()) === 'P2', J(await selected()));
 		await click(pile);
 		const focused = () => page.evaluate(() => (document.activeElement && document.activeElement.textContent || '').trim());
 		ok('the first row has the keyboard focus', (await focused()) === 'Junction J1', await focused());
@@ -220,17 +218,14 @@ async function main() {
 		ok('...and selects it, at the first frame of the drag', (await selected()).length === 1 && (await selected())[0].indexOf('node:J') === 0, J(await selected()));
 		await page.keyboard.press('Control+z'); await S.settle(500);
 
-		console.log('\nC. Two pipes drawn over each other');
+		console.log('\nC. Two pipes drawn over each other: a pipe is never a row');
 		await click({ x: 700, y: 820 });
 		const dup = await page.evaluate(() => {
 			const r = document.querySelector('#lpn_canvas .lpn-link-hit[data-link="Q1"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 		});
 		await click(dup);
-		ok('a click where two pipes coincide opens the box', await chooserOpen(), J(await rows()));
-		ok('...listing both', J(await rows()) === J(['Pipe Q1', 'Pipe Q2']), J(await rows()));
-		await (await rowBtn('Pipe Q2')).click();
-		await S.settle(500);
-		ok('...and choosing Pipe Q2 selects Q2 and opens it', J(await selected()) === J(['link:Q2']) && (await popupTitle()) === 'Q2', J(await selected()));
+		ok('a click where two pipes coincide opens no box', !(await chooserOpen()), J(await rows()));
+		ok('...and is an ordinary click: one of the pipes is selected', (await selected()).length === 1 && (await selected())[0].indexOf('link:Q') === 0, J(await selected()));
 
 		console.log('\nC2. A Text over coincident junctions is one more row');
 		await click({ x: 700, y: 820 });
@@ -314,10 +309,44 @@ async function main() {
 		const midBack = await centre('#lpn_canvas [data-node="M"]');
 		ok('Undo with the box open undoes the move', midBack && Math.abs(midBack.y - mid.y) < 3, J(midBack));
 		ok('...and closes the box, whose rows belong to the drawing that was undone', !(await chooserOpen()));
+
+		console.log('\nI. Round 3 (Tom, 2026-11-16): only symbols, only where they visibly overlap, at most six rows');
+		await click({ x: 700, y: 820 });
+		await closeProps();
+		const zc = await centre('#lpn_canvas [data-node="Z1"]');
+		await click(zc);
+		ok('eight junctions at one point open a box of at most six rows', (await rows()).length === 6, J(await rows()));
+		ok('...the six nearest, all of them from the pile', J(await rows()) === J(['Junction Z1', 'Junction Z2', 'Junction Z3', 'Junction Z4', 'Junction Z5', 'Junction Z6']), J(await rows()));
+		await page.keyboard.press('Escape'); await S.settle(200);
+		await click({ x: 700, y: 820 });
+		const o1 = await centre('#lpn_canvas [data-node="O1"]');
+		await click(o1);
+		ok('two junctions that touch as drawn, centres apart, open a box', J(await rows()) === J(['Junction O1', 'Junction O2']), J(await rows()));
+		await page.keyboard.press('Escape'); await S.settle(200);
+		await click({ x: 700, y: 820 });
+		const n1 = await centre('#lpn_canvas [data-node="N1"]'), n2 = await centre('#lpn_canvas [data-node="N2"]');
+		ok('(the separate dots N1 and N2 are drawn apart, clear of each other)', Math.hypot(n1.x - n2.x, n1.y - n2.y) > 12, J([n1, n2]));
+		await click({ x: n1.x + 3, y: n1.y });
+		ok('a click on a dot whose neighbour is a separate dot opens no box and selects the dot', !(await chooserOpen()) && J(await selected()) === J(['node:N1']), J([await rows(), await selected()]));
+		await closeProps();
+		await click({ x: 700, y: 820 });
+		await click({ x: (n1.x + n2.x) / 2, y: n1.y });
+		ok('a click on the short pipe between them opens no box (a pipe is never a row)', !(await chooserOpen()) && J(await selected()) === J(['link:NP']), J([await rows(), await selected()]));
+		await closeProps();
+		await click({ x: 700, y: 820 });
+		const cross = await page.evaluate(() => { const r = document.querySelector('#lpn_canvas .lpn-shape[data-shape="S2"] .lpn-shape-line').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+		await click(cross);
+		ok('a click where an open Shape line crosses a pipe opens no box', !(await chooserOpen()), J([cross, await rows(), await selected()]));
+		await closeProps();
+		await click({ x: 700, y: 820 });
+		const k2 = await centre('#lpn_canvas [data-node="K2"]');
+		await click(k2);
+		ok('a click on a junction on the outline of a closed Shape opens the box: the junction and the Shape', J(await rows()) === J(['Junction K2', 'Shape S3']), J(await rows()));
+		await page.keyboard.press('Escape'); await S.settle(200);
 		await S.page.close();
 
 		// =========================================================== thick pipes
-		console.log('\nE1. Two stacked THICK pipes, pressed 4 px off their centreline');
+		console.log('\nE1. Two stacked THICK pipes, pressed 4 px off their centreline: still no box');
 		const thick = JSON.parse(project); thick.settings.linkWidth = 10;
 		const W = await Session.open(browser, NAME + '-w', { viewport: { width: 1400, height: 900 } });
 		const projectKeep = project;
@@ -338,8 +367,8 @@ async function main() {
 		const sw = await W.page.evaluate(() => { const el = document.querySelector('#lpn_canvas .lpn-link-hit[data-link="Q1"]'); const m = el.getScreenCTM(); return parseFloat(getComputedStyle(el).strokeWidth) * Math.hypot(m.a, m.b); });
 		ok('the pipes are drawn thick (the grab stroke is 10 px across)', sw >= 9.5 && sw <= 10.5, String(sw));
 		await wt.click({ x: q.x, y: q.y + 3 });   // the stroke's centre is 1 px above the box's top edge: 4 px off
-		ok('a press 4 px off the centreline opens the box listing both pipes', J(await wt.rows()) === J(['Pipe Q1', 'Pipe Q2']), J(await wt.rows()));
-		await W.page.keyboard.press('Escape');
+		ok('a press 4 px off the centreline opens no box (a pipe is never a row)', !(await wt.chooserOpen()), J(await wt.rows()));
+		ok('...and selects a pipe, as an ordinary click', (await wt.selected()).length === 1, J(await wt.selected()));
 		await wt.click({ x: q.x, y: q.y + 8 });
 		ok('...and 8 px off, outside the stroke, opens no box', !(await wt.chooserOpen()));
 		await W.page.close();
@@ -361,12 +390,16 @@ async function main() {
 		await tap(tmid);
 		ok('a tap on the junction on the pipe selects it with no box', J(await t.selected()) === J(['node:M']) && !(await t.chooserOpen()), J(await t.selected()));
 		await t.closeProps();
+		const tn1 = await t.centre('#lpn_canvas [data-node="N1"]'), tn2 = await t.centre('#lpn_canvas [data-node="N2"]');
+		await tap({ x: tn1.x + 4, y: tn1.y });
+		ok('a tap between two separate dots, both inside the finger\'s reach, opens no box and selects the nearer', !(await t.chooserOpen()) && J(await t.selected()) === J(['node:N1']), J([tn1, tn2, await t.rows(), await t.selected()]));
+		await t.closeProps();
 		await tap(tpile);
 		if (!(await t.chooserOpen())) { console.log('  (debug) top elements at the pile: ' + J(await T.page.evaluate((p) => document.elementsFromPoint(p.x, p.y).slice(0, 5).map((e) => e.tagName + '.' + String(e.className && e.className.baseVal !== undefined ? e.className.baseVal : e.className).slice(0, 40)), tpile))); }
 		ok('a tap on the assembly opens the box (it stays open: the lift is not a press elsewhere)', await t.chooserOpen());
-		ok('...with the same seven rows', J(await t.rows()) === J(['Junction J1', 'Junction J2', 'Junction J3', 'Pipe P2', 'Pump PU9', 'Pipe P4', 'Pipe P3']), J(await t.rows()));
+		ok('...with the same four rows', J(await t.rows()) === J(['Junction J1', 'Junction J2', 'Junction J3', 'Pump PU9']), J(await t.rows()));
 		const heights = await T.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => Math.round(b.getBoundingClientRect().height)));
-		ok('...each row finger-sized (at least 44 px tall)', heights.length === 7 && heights.every((h) => h >= 44), J(heights));
+		ok('...each row finger-sized (at least 44 px tall)', heights.length === 4 && heights.every((h) => h >= 44), J(heights));
 		const inView = await T.page.evaluate(() => { const b = document.querySelector('.lpn-pick-chooser').getBoundingClientRect(); return b.left >= 0 && b.top >= 0 && b.right <= innerWidth && b.bottom <= innerHeight; });
 		ok('...and the box lies wholly on the screen', inView);
 		if (SHOTS) { await T.page.screenshot({ path: path.join(SHOTS, 'pick-chooser-phone.png') }); }
@@ -388,15 +421,14 @@ async function main() {
 		});
 		await tap(bareAway || { x: 195, y: 790 });
 		ok('a tap elsewhere on the map closes the box and goes through: bare map clears the selection', !(await t.chooserOpen()) && (await t.selected()).length === 0, J(await t.selected()));
-		// E2. a pipe within a finger's reach of a pile is one more row (review item 2). The pipe P6 leaves the
-		// J6/J7 pile (no pump symbol and no Text over it, as the assembly and the J4/J5 pile have).
+		// E2. a finger near the J6/J7 pile on pipe P6: the pipe is never a row.
 		const tp2 = await t.centre('#lpn_canvas [data-node="J6"]');
 		const nearP6 = { x: tp2.x, y: tp2.y + 15 };
 		await t.closeProps();
 		await tap(nearP6);
-		ok('a finger on pipe P6, 15 px from the pile, gets the pile and the pipe', J(await t.rows()) === J(['Junction J6', 'Junction J7', 'Pipe P6']), J([await t.rows(), nearP6, await T.page.evaluate((p) => document.elementsFromPoint(p.x, p.y).slice(0, 6).map((e) => e.tagName + '.' + String(e.getAttribute('class')) + '#' + (e.dataset.link || e.dataset.node || e.dataset.nodelbl || e.dataset.linklbl || e.dataset.lbl || '')), nearP6)]));
-		await (async () => { const b = await t.rowBtn('Pipe P6'); const bb = await b.boundingBox(); await tap({ x: bb.x + bb.width / 2, y: bb.y + bb.height / 2 }); })();
-		ok('...and choosing Pipe P6 selects it, which nothing could do there before', J(await t.selected()) === J(['link:P6']) && !(await t.chooserOpen()), J(await t.selected()));
+		ok('a finger on pipe P6, 15 px from the pile, gets the two junctions and no pipe', J(await t.rows()) === J(['Junction J6', 'Junction J7']), J([await t.rows(), nearP6]));
+		await (async () => { const b = await t.rowBtn('Junction J7'); const bb = await b.boundingBox(); await tap({ x: bb.x + bb.width / 2, y: bb.y + bb.height / 2 }); })();
+		ok('...and choosing Junction J7 selects it', J(await t.selected()) === J(['node:J7']) && !(await t.chooserOpen()), J(await t.selected()));
 		await t.closeProps();
 		// E3. a long press that dismisses the box opens no context menu (review item 3).
 		await tap(tpile);
@@ -416,11 +448,11 @@ async function main() {
 			await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
 			await T.settle(500);
 		};
-		const bare = await T.page.evaluate(() => { for (let y = 250; y < 330; y += 10) { for (let x = 150; x < 215; x += 10) { const el = document.elementsFromPoint(x, y)[0]; if (el && el.tagName.toLowerCase() === 'svg') { return { x, y }; } } } return null; });
+		const bare = await T.page.evaluate(() => { const isBare = (x, y) => { const el = document.elementsFromPoint(x, y)[0]; return !!el && el.tagName.toLowerCase() === 'svg'; }; const spots = []; for (let y = 250; y < 700; y += 10) { for (let x = 90; x < 330; x += 10) { spots.push({ x, y, d: Math.hypot(x - 195, y - 300) }); } } spots.sort((p, q) => p.d - q.d); for (const p of spots) { if (isBare(p.x, p.y) && isBare(p.x + 25, p.y) && isBare(p.x - 25, p.y) && isBare(p.x, p.y + 25) && isBare(p.x, p.y - 25)) { return { x: p.x, y: p.y }; } } return null; });
 		const p0 = await t.centre('#lpn_canvas [data-node="J1"]');
 		await pan(bare || { x: 195, y: 300 }, 355 - p0.x, 650 - p0.y);
 		const edge = await t.centre('#lpn_canvas [data-node="J1"]');
-		ok('the pile is now near the right and bottom edges', edge.x > 330 && edge.y > 620, J(edge));
+		ok('the pile is now near the right and bottom edges', edge.x > 330 && edge.y > 620, J([edge, p0, bare]));
 		await t.closeProps();
 		const tapFast = async (p) => {
 			await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: p.x, y: p.y, id: 1 }] });
@@ -435,7 +467,7 @@ async function main() {
 			const r = b.getBoundingClientRect(), top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
 			return { rowIsHit: top === b, n: document.querySelectorAll('.lpn-pick-chooser button').length };
 		}, edge);
-		ok('a tap near the edges opens the box', !!shield && shield.n === 7, J(shield));
+		ok('a tap near the edges opens the box', !!shield && shield.n === 4, J(shield));
 		ok('...and in the first instants no row answers a touch (the lift\'s compatibility click lands on nothing)', shield && shield.rowIsHit === false, J(shield));
 		await T.settle(600);
 		const geo = await T.page.evaluate((p) => {

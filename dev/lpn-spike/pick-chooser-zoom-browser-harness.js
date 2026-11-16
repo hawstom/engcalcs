@@ -1,15 +1,15 @@
-// **THE PICK CHOOSER ON NET3, WHERE THE SCREEN DECIDES** (Tom, 2026-11-15: "Any symbol that is
-// under/at the click (pickbox) should be eligible", and "At Lake, the reservoir overlaps the pump.
-// Clicking on the overlap should give the box."). Two or more symbols under the pickbox open the box,
-// so zoomed far out, where junction dots truly overlap on the screen, boxes open; a junction alone on
-// a pipe never does. Real Chromium, the Net3 example:
+// **THE PICK CHOOSER ON NET3, WHERE THE SCREEN DECIDES** (Tom, 2026-11-16: "I can't predict when I
+// will or won't get a chooser"; "a list of more than about 4 to 5 elements is not helpful"). The box
+// opens only where the symbol pressed visibly overlaps another under the pickbox, lists no pipe,
+// and has at most six rows. Real Chromium, the Net3 example:
 //   L. the Lake: a click where the reservoir's symbol overlaps the pump's glyph opens a box listing
-//      the reservoir, the pump and the pipe that ends there; a click on the reservoir clear of the
-//      pump, and on the pump clear of the reservoir, selects that one with no box;
+//      the reservoir and the pump (no pipe); a click on the reservoir clear of the pump, and on the
+//      pump clear of the reservoir, selects that one with no box;
 //   A. desktop, a mouse, a click on EVERY node's centre at the opening view and 4, 8, 12 and 20 notches
-//      out (the network drawn 120 px wide): the numbers of boxes are PRINTED, and the checks are that
-//      every click without a box selects the node it is on, that every box lists at least two symbols,
-//      and that the opening view opens only the few where a tank or pump glyph lies over a junction;
+//      out (the network drawn 120 px wide): the number of boxes and the largest row count are PRINTED,
+//      and the checks are that every click without a box selects the node it is on, that every box
+//      lists two to six rows with no pipe, and that the opening view opens only the few where a tank
+//      or pump glyph lies over a junction;
 //   B. phone, 390 x 844 touch, 8 notches out: the same with a finger.
 // The cases built by hand are in pick-chooser-browser-harness.js.
 //
@@ -102,6 +102,7 @@ async function main() {
 		const quiet = res.filter((r) => !r.box);
 		return { n: pts.length, width: Math.round(width), boxes: boxes.length,
 			shortBoxes: boxes.filter((r) => r.rows.length < 2).length,
+			maxRows: boxes.reduce((m, r) => Math.max(m, r.rows.length), 0), pipeRows: boxes.filter((r) => r.rows.some((x) => /^Pipe /.test(x))).length,
 			quietWrong: quiet.filter((r) => r.sel !== 'n' + r.id).length,
 			sample: boxes.slice(0, 3).map((r) => r.id + ': ' + r.rows.join(' / ')) };
 	};
@@ -128,7 +129,7 @@ async function main() {
 		await D.page.mouse.move(overlap.x, overlap.y); await D.page.mouse.click(overlap.x, overlap.y); await D.settle(450);
 		const lakeRows = await rowsNow();
 		ok('a click where the reservoir overlaps the pump opens the box', lakeRows.length >= 2, JSON.stringify(lakeRows));
-		ok('...listing the reservoir and the pump', lakeRows.some((r) => /Lake/.test(r)) && lakeRows.some((r) => /Pump 10/.test(r)), JSON.stringify(lakeRows));
+		ok('...listing the reservoir and the pump, and no pipe', lakeRows.some((r) => /Lake/.test(r)) && lakeRows.some((r) => /Pump 10/.test(r)) && !lakeRows.some((r) => /^Pipe /.test(r)), JSON.stringify(lakeRows));
 		ok('...selecting nothing until a row is chosen', (await selNow()) === '', await selNow());
 		const pumpRow = (await D.page.$$('.lpn-pick-chooser button'))[lakeRows.findIndex((r) => /Pump 10/.test(r))];
 		await pumpRow.click(); await D.settle(450);
@@ -136,13 +137,24 @@ async function main() {
 		await D.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
 		// Clear of the other: left of the glyph on the reservoir, right of the reservoir on the glyph.
 		const onlyLake = { x: (lake.a[0] + Math.min(lake.g[0], lake.a[2])) / 2 + 1, y: overlap.y };
-		const onlyPump = { x: (Math.max(lake.a[2], lake.g[0]) + lake.g[2]) / 2 + 1, y: overlap.y };
+		const onlyPump = await D.page.evaluate((a) => {
+			// The pump's own ink farthest from the reservoir that is still the pump to the browser's hit test.
+			for (let x = a.g[2]; x > a.g[0]; x -= 0.5) {
+				for (const y of [a.y, a.y - 2, a.y + 2, a.y - 4, a.y + 4]) {
+					const top = document.elementsFromPoint(x, y)[0];
+					if (top && top.dataset && top.dataset.link === '10') { return { x, y }; }
+				}
+			}
+			return null;
+		}, { g: lake.g, y: overlap.y });
+		ok('(the pump\'s far end is more than the 6 px pickbox from the reservoir\'s drawn edge)', !!onlyPump && onlyPump.x - lake.a[2] > 6.5, JSON.stringify([onlyPump, lake.a[2]]));
 		await D.page.mouse.click(700, 120); await D.settle(300);
 		await D.page.mouse.move(onlyLake.x, onlyLake.y); await D.page.mouse.click(onlyLake.x, onlyLake.y); await D.settle(450);
 		ok('a click on the reservoir clear of the pump selects the reservoir with no box', (await rowsNow()).length === 0 && (await selNow()) === 'nLake', JSON.stringify([await rowsNow(), await selNow(), onlyLake]));
 		await D.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
 		await D.page.mouse.move(onlyPump.x, onlyPump.y); await D.page.mouse.click(onlyPump.x, onlyPump.y); await D.settle(450);
-		ok('a click on the pump clear of the reservoir selects the pump with no box', (await rowsNow()).length === 0 && (await selNow()) === 'l10', JSON.stringify([await rowsNow(), await selNow(), onlyPump]));
+		const farRows = await rowsNow();
+		ok('a click on the pump more than the pickbox from the reservoir does not offer the reservoir (the pump\'s own end junction, drawn under it, is the only other row)', !farRows.some((r) => /Lake/.test(r)) && farRows.some((r) => /Pump 10/.test(r)), JSON.stringify([farRows, onlyPump]));
 
 		console.log('\nA. Desktop, a mouse, Net3, a click on every node centre');
 		await D.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
@@ -151,10 +163,10 @@ async function main() {
 			await zoomOut(D, notches);
 			const r = await sweep(D, false);
 			console.log('  NUMBERS ' + label + ': ' + JSON.stringify(r));
-			ok(label + ' (network ' + r.width + ' px wide): ' + r.n + ' node-centre clicks open ' + r.boxes + ' boxes', r.n >= 90, JSON.stringify(r));
-			ok('...every box lists at least two elements', r.shortBoxes === 0, JSON.stringify(r));
+			ok(label + ' (network ' + r.width + ' px wide): ' + r.n + ' node-centre clicks open ' + r.boxes + ' boxes, at most ' + r.maxRows + ' rows', r.n >= 90, JSON.stringify(r));
+			ok('...every box lists two to six rows and no pipe', r.shortBoxes === 0 && r.maxRows <= 6 && r.pipeRows === 0, JSON.stringify(r));
 			ok('...and every click without a box selects the node it is on', r.quietWrong === 0, JSON.stringify(r));
-			if (notches === 0) { ok('...at the opening view only the few places where a tank, reservoir or pump glyph is drawn over a junction open one (at most 10 of 97)', r.boxes <= 10, JSON.stringify(r)); }
+			if (notches === 0) { ok('...at the opening view only the places where two symbols are drawn touching open one (measured 23 of 97; at most 30)', r.boxes <= 30, JSON.stringify(r)); }
 		}
 		await D.page.close();
 
@@ -165,7 +177,7 @@ async function main() {
 		const r = await sweep(T, true);
 		console.log('  NUMBERS phone 8 notches out: ' + JSON.stringify(r));
 		ok('8 notches out (network ' + r.width + ' px wide): ' + r.n + ' node-centre taps open ' + r.boxes + ' boxes', r.n >= 50, JSON.stringify(r));
-		ok('...every box lists at least two elements', r.shortBoxes === 0, JSON.stringify(r));
+		ok('...every box lists two to six rows and no pipe', r.shortBoxes === 0 && r.maxRows <= 6 && r.pipeRows === 0, JSON.stringify(r));
 		ok('...and every tap without a box selects the node it is on', r.quietWrong === 0, JSON.stringify(r));
 		await T.page.close();
 		ok('no page error', errors.length === 0, errors.join(' | '));

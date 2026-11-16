@@ -10563,9 +10563,13 @@ var EngCalcs = EngCalcs || {};
 	// the desktop design. The ONE KNOB is still one knob -- reachPx(e) answers per press for both
 	// hands at every call site -- it is the PRECEDENCE that a finger gets and a pointer does not.
 	function touchNodeOver(cx, cy, hit) {
-		if (!nodeOutranks(hit)) { return hit; }
-		var n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX);
-		return (n && nodeEls[n.id]) ? nodeEls[n.id].circle : hit;
+		var n, onNode = !!(hit && hit.dataset && hit.dataset.node !== undefined);
+		if (!onNode && !nodeOutranks(hit)) { return hit; }
+		n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX);
+		// A finger on a node's band is still given the NEAREST node, not whichever band is drawn on top
+		// (two dots 9 px apart: a tap on the first selected the second). The chooser's own rule rests on it.
+		if (onNode && n && String(n.id) === String(hit.dataset.node)) { return hit; }
+		return (n && nodeEls[n.id] && nodeEls[n.id].circle) ? nodeEls[n.id].circle : hit;
 	}
 	function nearestNodeNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;
@@ -59999,7 +60003,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Touch only, so no pointer gesture changes at all; and ABOVE selectFromHit(), so the
 			// promoted node is what gets selected -- the pointerdown-selects rule of Task 415 stays
 			// true of a near-miss drag exactly as it is of a direct one.
-			var rawHit = t;
 			if (e.pointerType === 'touch') {
 				t = touchNodeOver(e.clientX, e.clientY, t);
 			}
@@ -60009,7 +60012,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// the tap that ends it opens the chooser (pointerup, below), and a drag from it moves what
 			// the press landed on as it always did, selecting that at the first frame of the drag
 			// (`drag.deferSel`). So a dismissed chooser has changed nothing.
-			pickPress = pickPressAt(e, t, rawHit);
+			pickPress = pickPressAt(e, t);
 			// **SHIFT ADDS, AND ADDS BY TOGGLING** (Task 266). It is how a marquee that caught one
 			// thing too many is corrected, and how a selection of three unrelated pipes is built at
 			// all -- neither of which any ring can do.
@@ -61051,24 +61054,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// coincident plain elements: *"a box asking which one (AutoCAD's Ctrl selection cycling noted,
 	// not wanted first)."* So a box, not cycling.
 	//
-	// **THE TRIGGER IS JUDGED ON THE SCREEN, BY THE PICKBOX** (Tom, 2026-11-15: *"Any symbol that
-	// is under/at the click (pickbox) should be eligible"*, and *"Otherwise if I snap to a node/point
-	// shape, there is no way thenceforth ever to select that shape except by area."*). The symbols are a
-	// node (any kind), a link drawn as a symbol (a pump or valve glyph), a Text and a Shape; the
-	// pickbox is the page's own hit test (mapHitsAt(), the browser's answer confirmed against the
-	// box each element occupies) and a Shape's reach. **TWO OR MORE SYMBOLS under it open the box**, and
-	// it lists everything under it, the pipes too. A pipe alone crossing a symbol is not a symbol
-	// under the click: a junction on a pipe still selects the junction. Zoomed far out, dots that
-	// truly overlap on the screen are two symbols under the click, so the box opens there; that is the
-	// price of being able to reach the one underneath. `dev/lpn-spike/pick-chooser-zoom-browser-harness.js`
-	// counts it on Net3.
-	//
-	// **THE OTHER CASE IS LINKS ONLY** (two pipes drawn over each other, a pump over its bypass):
-	// there is no symbol, so the screen rule says nothing, and Geom.pickCandidates() still names it in
-	// the model (the nearest pipe's foot, every pipe at that point). It also names coincident nodes and
-	// buried links, which the screen rule already counts; its rows are merged into the screen's.
-	// pickCandidatesAt() is the one door that builds the list for a press; an assembly group would map
-	// the list it returns (members to one row) and nothing else here would change.
+	// **THE BOX OPENS ONLY WHERE A PERSON CAN SEE IT COMING** (Tom, 2026-11-16: *"I can't predict when
+	// I will or won't get a chooser"*): the press lands on a symbol whose DRAWN extent touches or
+	// overlaps another symbol's. Two separate dots that both fall inside a finger's reach, without
+	// overlapping each other, are an ordinary click on the nearer. **NO LINE IS IN THE LIST**: no pipe
+	// and no Shape that is an open polyline (*"all symbols, shapes, and text, but not pipes"*); a
+	// click with only lines under it is an ordinary click, which may select a pipe. The symbols are
+	// a node (any kind), a pump or valve glyph, a Text, and a Shape that is a point or closed.
+	// **AT MOST PICK_MAX_ROWS (6) ROWS** (*"a list of more than about 4 to 5 elements is not
+	// helpful"*): the symbol nearest the press and those truly coincident with it first, then the
+	// nearest others that overlap it, by distance from the press. The reach is the pickbox's own,
+	// unchanged. Geom.pickSymbols() is the rule, pure and in screen pixels; pickItemsNear() hands it
+	// the drawn extents, from the draw code's own size helpers. pickCandidatesAt() is the one door;
+	// an assembly group would map the list it returns (members to one row) and nothing else here
+	// would change. `dev/lpn-spike/pick-chooser-zoom-browser-harness.js` counts it on Net3.
 	//
 	// **THE BOX IS THE MAP'S OWN MENU** (openMapContextMenu), so arrows, Home/End, Enter and Escape are
 	// the menu's. **A PRESS ELSEWHERE ON THE MAP CLOSES IT AND GOES THROUGH** (Tom, 2026-11-15: *"Let
@@ -61078,62 +61077,75 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// is on wears the hover mark on the map as an extra. Choosing a row selects and opens that
 	// element the way a click on it does, Shift-added when the press was Shift-held.
 	var PICK_KIND_RANK = { node: 0, link: 1, label: 2, shape: 3 };
-	// Every element whose drawing is under the pickbox at this screen point, as chooser rows, and how
-	// many of them are SYMBOLS. A pipe's line and a pump's glyph are one link (one row); the glyph is
-	// the symbol.
-	function pickScreenHits(cx, cy, touch) {
-		var rows = [], seen = {}, symbols = 0, w = screenToWorld(cx, cy);
-		function add(kind, id, symbol, distPx) {
-			var key = kind + '\u0000' + id, el;
-			if (seen[key]) {
-				if (symbol && !seen[key].symbol) { seen[key].symbol = true; symbols++; }
-				return;
-			}
-			el = kind === 'node' ? nodeById(id) : (kind === 'link' ? linkById(id) : (kind === 'shape' ? shapeById(id) : labelById(id)));
-			if (!el) { return; }
-			seen[key] = { symbol: !!symbol };
-			if (symbol) { symbols++; }
-			rows.push({ kind: kind, id: id, type: el.type, distPx: distPx || 0 });
-		}
-		mapHitsAt(cx, cy).forEach(function (h) {
-			var d = h.dataset || {}, le, n, l;
-			if (d.node !== undefined) {
-				n = nodeById(d.node);
-				if (n && nodeEls[n.id]) { add('node', n.id, true, Math.hypot(nodeDrawX(n) - w.x, nodeDrawY(n) - w.y) * state.s); }
-			} else if (d.link !== undefined && !h.classList.contains('lpn-vhandle')) {
-				l = linkById(d.link); le = l && linkEls[l.id];
-				if (le && nodeById(l.from) && nodeById(l.to)) {
-					add('link', l.id, !!le.symbolHit && h === le.symbolHit,
-						Geom.nearestFractionOnPolyline(linkPointList(l), w.x, w.y).dist * state.s);
-				}
-			} else if (d.lbl !== undefined && labelById(d.lbl)) {
-				add('label', d.lbl, true);
+	var PICK_MAX_ROWS = 6;
+	// The bounding box of a symbol's drawn silhouette, in the icon's own 24-unit frame (the box the
+	// symbol is stretched to: the silhouette is what the reader sees, the box is not).
+	function silhouetteInk(type) {
+		var cmds = String(SYMBOL_SILHOUETTE[type] || '').match(/[A-Za-z][^A-Za-z]*/g) || [],
+			x0 = 24, y0 = 24, x1 = 0, y1 = 0;
+		cmds.forEach(function (c) {
+			var v = c.slice(1).trim().split(/\s+/).filter(Boolean).map(Number), c0 = c.charAt(0), i;
+			if (c0 === 'Z') { return; }
+			for (i = 0; i < v.length; i++) {
+				if (c0 === 'H') { x0 = Math.min(x0, v[i]); x1 = Math.max(x1, v[i]); }
+				else if (c0 === 'V') { y0 = Math.min(y0, v[i]); y1 = Math.max(y1, v[i]); }
+				else if (i % 2 === 0) { x0 = Math.min(x0, v[i]); x1 = Math.max(x1, v[i]); }
+				else { y0 = Math.min(y0, v[i]); y1 = Math.max(y1, v[i]); }
 			}
 		});
-		shapeHitNear(cx, cy, touch ? TOUCH_REACH_PX : LPN_LINK_HIT_PX / 2, false, true).forEach(function (h) {
-			add('shape', h.shape.id, true);
-		});
-		return { rows: rows, symbols: symbols };
+		return x1 > x0 && y1 > y0 ? { x0: x0, y0: y0, x1: x1, y1: y1 } : { x0: 0, y0: 0, x1: 24, y1: 24 };
 	}
-	function pickCandidatesAt(cx, cy, touch) {
-		var w = screenToWorld(cx, cy), list, screen, seen = {};
-		list = Geom.pickCandidates(doc.nodes, doc.links, w.x, w.y, state.s, {
-			nodeReach: touch ? TOUCH_REACH_PX : LPN_NODE_HIT_PX / 2,
-			// The reach the browser's own hit test gives a pipe, so a press the page takes as ON a pipe
-			// is one the rule sees (a thick stroke is hit farther from its centreline).
-			linkReach: touch ? LPN_LINK_HIT_PX / 2 : Math.max(scnSetting('linkWidth'), LPN_LINK_HIT_FLOOR_PX) / 2,
-			nodeX: nodeDrawX, nodeY: nodeDrawY, linkPts: linkPointList, nodeById: nodeById,
-			nodeOk: function (n) { return !!nodeEls[n.id]; },
-			linkOk: function (l) { return !!linkEls[l.id] && !!nodeById(l.from) && !!nodeById(l.to); }
+	// Every SYMBOL the page drew, as a screen-pixel extent for Geom.pickSymbols(): a junction's disc
+	// (nodeRadius), a reservoir's or tank's box (nodeSymbolSize), a pump's or valve's drawn outline,
+	// a Text's words, a Shape that is not a line (a point, or a closed outline). Never a pipe, never
+	// an open polyline. The sizes are the draw code's own helpers, so what overlaps here is what the
+	// reader sees overlap. The press (cx, cy) bounds the scan: nothing farther than 400 px matters.
+	function pickItemsNear(cx, cy) {
+		var items = [], r = svg.getBoundingClientRect(), s = state.s || 1, near = 400, i, n, ne, l, le, lb, shp, sz, ink, px, py, b, pl, pts;
+		function sx(wx) { return r.left + state.tx + wx * s; }
+		function sy(wy) { return r.top + state.ty + wy * s; }
+		function rectOf(box) { return box.width > 0 || box.height > 0 ? { l: box.left, t: box.top, r: box.right, b: box.bottom } : null; }
+		for (i = 0; i < doc.nodes.length; i++) {
+			n = doc.nodes[i]; ne = nodeEls[n.id];
+			if (!ne) { continue; }
+			px = sx(nodeDrawX(n)); py = sy(nodeDrawY(n));
+			if (Math.abs(px - cx) > near || Math.abs(py - cy) > near) { continue; }
+			if (n.type === 'reservoir' || n.type === 'tank') {
+				sz = nodeSymbolSize(n); ink = silhouetteInk(n.type);
+				items.push({ kind: 'node', id: n.id, type: n.type, rank: 0, rect: {
+					l: px - sz.w * s / 2 + sz.w * s * ink.x0 / 24, r: px - sz.w * s / 2 + sz.w * s * ink.x1 / 24,
+					t: py - sz.h * s / 2 + sz.h * s * ink.y0 / 24, b: py - sz.h * s / 2 + sz.h * s * ink.y1 / 24 } });
+			} else {
+				items.push({ kind: 'node', id: n.id, type: n.type, rank: 0, circle: { x: px, y: py, r: nodeRadius(n) * s } });
+			}
+		}
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i]; le = linkEls[l.id];
+			if (!le || !le.symbolHit || !nodeById(l.from) || !nodeById(l.to)) { continue; }
+			pl = linkSymbolPlace(l);
+			if (!pl || Math.abs(sx(pl.x) - cx) > near || Math.abs(sy(pl.y) - cy) > near) { continue; }
+			b = rectOf(le.symbolHit.getBoundingClientRect());
+			if (b) { items.push({ kind: 'link', id: l.id, type: l.type, rank: 1, rect: b }); }
+		}
+		for (i = 0; i < (doc.labels || []).length; i++) {
+			lb = doc.labels[i]; le = labelEls[lb.id];
+			if (!le || !le.text || !hitIsVisible(le.text)) { continue; }
+			b = rectOf(le.text.getBoundingClientRect());
+			if (b) { items.push({ kind: 'label', id: lb.id, type: lb.type, rank: 2, rect: b }); }
+		}
+		docShapesRead().forEach(function (sh) {
+			shp = sh; pts = shp.pts || [];
+			if (!shapeEls[shp.id] || !pts.length || (pts.length > 1 && !shp.closed)) { return; }   // an open polyline is a line
+			items.push({ kind: 'shape', id: shp.id, type: shp.type, rank: 3,
+				outline: { pts: pts.map(function (p) { return { x: sx(p.x), y: sy(p.y) }; }), closed: !!shp.closed } });
 		});
-		screen = pickScreenHits(cx, cy, touch);
-		if (list.length < 2 && screen.symbols < 2) { return []; }
-		list.forEach(function (c) { seen[c.kind + '\u0000' + c.id] = true; });
-		screen.rows.forEach(function (c) { if (!seen[c.kind + '\u0000' + c.id]) { list.push(c); } });
-		// Nodes, then links, Texts and Shapes; each nearest first, then by id in natural order.
-		return list.map(function (c, i) { return { c: c, i: i }; }).sort(function (a, b) {
-			return (PICK_KIND_RANK[a.c.kind] - PICK_KIND_RANK[b.c.kind]) || ((a.c.distPx || 0) - (b.c.distPx || 0)) || (a.i - b.i);
-		}).map(function (o) { return o.c; });
+		return items;
+	}
+	// The chooser's rows for a press: [] when the click is ordinary, else two to PICK_MAX_ROWS rows.
+	// The reach is the pickbox's own, unchanged: a finger's 24 px, a mouse's half the node band.
+	function pickCandidatesAt(cx, cy, touch) {
+		return Geom.pickSymbols(pickItemsNear(cx, cy), cx, cy,
+			{ reach: touch ? TOUCH_REACH_PX : LPN_NODE_HIT_PX / 2, cap: PICK_MAX_ROWS });
 	}
 	// "Junction J1", "Pump 9", "Shape S1", "Text" and its first words. The type word is the one the toolbar uses.
 	function pickRowLabel(c) {
@@ -61150,31 +61162,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var pickPress = null;
 	// The press that may become a chooser: Select mode, the main button, on bare map, a junction, a
 	// pipe, a Text or a Shape (never a data label, a handle, a meter or a Shape's grip: those were pressed on purpose).
-	// `raw` is what the browser's hit test answered before a finger's node precedence replaced it.
-	function pickPressAt(e, t, raw) {
+	function pickPressAt(e, t) {
 		var list;
 		if (mode !== 'select' || (e.button !== undefined && e.button !== 0)) { return null; }
 		// A Text over a pile is one more thing the press could mean, so it may start a chooser too.
 		if (!t || (t !== svg && t.dataset.node === undefined && t.dataset.lbl === undefined && t.dataset.shape === undefined &&
 			!(t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')))) { return null; }
 		list = pickCandidatesAt(e.clientX, e.clientY, e.pointerType === 'touch');
-		// **THE ELEMENT THE BROWSER ACTUALLY HIT IS ALWAYS ONE OF THE ROWS** once there is a choice
-		// (a finger's pipe within reach of a pile was the pile's nodes and could never be selected
-		// there). A box is for "the map cannot tell", and here it cannot: the hit test says the pipe,
-		// the node precedence says the pile.
-		if (list.length >= 2) { [t, raw].forEach(function (h) { pickAddHit(list, h); }); }
 		return list.length >= 2 ? { id: e.pointerId, x: e.clientX, y: e.clientY, shift: !!e.shiftKey,
 			touch: e.pointerType === 'touch', list: list } : null;
-	}
-	function pickAddHit(list, h) {
-		var d = (h && h.dataset) || {}, kind, id, el;
-		if (d.node !== undefined) { kind = 'node'; id = d.node; }
-		else if (d.link !== undefined && !h.classList.contains('lpn-vhandle')) { kind = 'link'; id = d.link; }
-		else if (d.lbl !== undefined) { kind = 'label'; id = d.lbl; }
-		else if (d.shape !== undefined) { kind = 'shape'; id = d.shape; }
-		if (!kind || list.some(function (c) { return c.kind === kind && c.id === id; })) { return; }
-		el = kind === 'node' ? nodeById(id) : (kind === 'link' ? linkById(id) : (kind === 'shape' ? shapeById(id) : labelById(id)));
-		if (el) { list.push({ kind: kind, id: id, type: el.type }); }
 	}
 	// The row's element wears the hover mark through setHoverPreview(), the one write site, so the
 	// page's record of what is marked cannot go stale; viaLabel lights it and opens no hover card.

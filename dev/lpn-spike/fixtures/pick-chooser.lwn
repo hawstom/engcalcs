@@ -208,6 +208,162 @@
 				"y": "15.00"
 			},
 			"_initQuality": 0.5
+		},
+		{
+			"id": "Z1",
+			"type": "junction",
+			"x": 50,
+			"y": 60,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "50.00",
+				"y": "60.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "Z2",
+			"type": "junction",
+			"x": 50,
+			"y": 60,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "50.00",
+				"y": "60.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "Z3",
+			"type": "junction",
+			"x": 50,
+			"y": 60,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "50.00",
+				"y": "60.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "Z4",
+			"type": "junction",
+			"x": 50,
+			"y": 60,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "50.00",
+				"y": "60.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "Z5",
+			"type": "junction",
+			"x": 50,
+			"y": 60,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "50.00",
+				"y": "60.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "Z6",
+			"type": "junction",
+			"x": 50,
+			"y": 60,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "50.00",
+				"y": "60.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "Z7",
+			"type": "junction",
+			"x": 50,
+			"y": 60,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "50.00",
+				"y": "60.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "Z8",
+			"type": "junction",
+			"x": 50,
+			"y": 60,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "50.00",
+				"y": "60.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "N1",
+			"type": "junction",
+			"x": 32,
+			"y": 45,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "32.00",
+				"y": "45.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "N2",
+			"type": "junction",
+			"x": 37,
+			"y": 45,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "37.00",
+				"y": "45.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "O1",
+			"type": "junction",
+			"x": 70,
+			"y": 70,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "70.00",
+				"y": "70.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "O2",
+			"type": "junction",
+			"x": 71.4,
+			"y": 70,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "71.40",
+				"y": "70.00"
+			},
+			"_initQuality": 0.5
 		}
 	],
 	"links": [
@@ -328,6 +484,19 @@
 			"type": "pipe",
 			"from": "J6",
 			"to": "K2",
+			"verts": [],
+			"_diameter": 18,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "NP",
+			"type": "pipe",
+			"from": "N1",
+			"to": "N2",
 			"verts": [],
 			"_diameter": 18,
 			"_roughness": 100,
@@ -563,6 +732,42 @@
 				}
 			],
 			"closed": false
+		},
+		{
+			"id": "S2",
+			"pts": [
+				{
+					"x": 46,
+					"y": -6
+				},
+				{
+					"x": 46,
+					"y": 6
+				}
+			],
+			"closed": false
+		},
+		{
+			"id": "S3",
+			"pts": [
+				{
+					"x": 80,
+					"y": -85
+				},
+				{
+					"x": 96,
+					"y": -85
+				},
+				{
+					"x": 96,
+					"y": -75
+				},
+				{
+					"x": 80,
+					"y": -75
+				}
+			],
+			"closed": true
 		}
 	]
 }

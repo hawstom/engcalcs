@@ -201,6 +201,12 @@ function mkEl(tag, svgNS) {
       const st = this.style || {};
       const l = px(st.left), t = px(st.top), w = px(st.width), h = px(st.height);
       const L = l === null ? 0 : l, T = t === null ? 0 : t;
+      // A map <text> (a Text object, a label) is as wide as its words and sits at its own x, y: the
+      // chooser asks whether two symbols overlap, and a 1000 x 500 word covers every dot in the page.
+      if (w === null && h === null && this._tag === 'text' && this.getAttribute) {
+        const bb = this.getBBox(), tx = parseFloat(this.getAttribute('x')), ty = parseFloat(this.getAttribute('y'));
+        if (isFinite(tx) && isFinite(ty)) { return { left: tx, top: ty - bb.height, right: tx + bb.width, bottom: ty, width: bb.width, height: bb.height }; }
+      }
       const W = w === null ? 1000 : w, H = h === null ? 500 : h;
       return { left: L, top: T, right: L + W, bottom: T + H, width: W, height: H };
     },

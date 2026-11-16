@@ -906,136 +906,116 @@ EngCalcs.lpnGeom = (function () {
 	function mercY(latDeg) { return mercRadY(latDeg) * 180 / Math.PI; }
 	function mercLat(yDeg) { return mercLatFromRad(yDeg * Math.PI / 180); }
 
-	// ---- WHICH ELEMENTS A SINGLE CLICK COULD EQUALLY MEAN ---------------------------
+	// ---- WHICH SYMBOLS A SINGLE CLICK COULD EQUALLY MEAN ----------------------------
 	//
-	// Pure: the caller hands in the document's nodes and links and says how to read a position, so
-	// nothing here touches the DOM or the editor's closure. Returns the ordered candidate list for
-	// a press at world point (wx, wy), with `s` screen pixels per world unit. **AN EMPTY LIST MEANS
-	// THE PRESS IS ORDINARY** -- the browser's own hit test already names the element, and the
-	// caller changes nothing. **A LIST (always two or more) MEANS THE CLICK CANNOT TELL THEM APART**,
-	// and the caller asks the visitor which one was meant. One equally good candidate is never
-	// returned: it is not a choice.
+	// Pure, in SCREEN pixels: the caller hands in what it DREW, each item's extent as the draw code
+	// sizes it, and nothing here touches the DOM. Returns the ordered candidate list for a press at
+	// (x, y). **AN EMPTY LIST MEANS THE PRESS IS ORDINARY** (the page's own hit test names the
+	// element); **A LIST (always two or more) MEANS THE CLICK LANDED ON A SYMBOL THAT VISIBLY
+	// OVERLAPS ANOTHER**, so a person can see beforehand that a box will come (Tom, 2026-11-16: "I
+	// can't predict when I will or won't get a chooser").
 	//
-	// **AMBIGUITY IS JUDGED IN THE MODEL, NEVER ON THE SCREEN.** The pointer's pixel reach decides
-	// only WHICH LOCATION was clicked (the nodes within `nodeReach` of the press, the pipes within
-	// `linkReach`); whether elements there are one choice or several is a fact about the drawing.
-	// A screen-pixel test ("a pipe 2 px long", "nodes 1.5 px apart") is true of ordinary short pipes
-	// and close junctions the moment the view is zoomed out, and every click opened a box (Net3 at
-	// 12 notches out: 39 boxes in 97 clicks, where the plain rule gives none at any zoom). So:
-	// two things coincide when their stored positions are equal to within `eps`, which is
-	// **1e-6 of the diagonal of the nodes' own extent** unless the caller says otherwise. That is far
-	// below any real spacing (a 1 mm offset in a 1 km network is 1e-6), above floating-point noise
-	// on a coordinate that was typed, imported or shifted, and relative, so a geographic project
-	// drawn in degrees and one drawn in feet get the same answer. Zooming never changes the result.
+	// **NO LINE IS EVER AN ITEM**: not a pipe, not a Shape that is an open polyline (Tom, 2026-11-16:
+	// "all symbols, shapes, and text, but not pipes", "I also meant ... 'pipe' line"). The caller
+	// leaves them out; a click whose only candidates are lines is an ordinary click.
 	//
-	//   1. NODES. Take the nodes within `nodeReach` of the press and the nearest of them. Every one of
-	//      them at that node's position (within eps) is coincident with it. Two or more are
-	//      candidates. A single node, with other nodes or pipes about it, is the ordinary case and
-	//      is never ambiguous: a junction sitting on a pipe still selects the junction, and so does
-	//      the nearer of two close but separate junctions.
-	//   2. BURIED LINKS. A link whose whole model length is at most eps has both ends at one point and
-	//      cannot be clicked by any other route (an exploded pump or valve assembly is made of them).
-	//      One whose location is the nearest node's is a candidate, and so are its two end nodes.
-	//   3. COINCIDENT LINKS, only where no node is within `nodeReach` (a node outranks a link, as it
-	//      does everywhere else on this page). Take the links within `linkReach` of the press; the
-	//      nearest one's foot on its centreline is the point, and every link whose own foot is at that
-	//      point (within eps) lies over it: two pipes drawn over each other, a pump over its bypass.
-	// ORDER: nodes, then links, each by distance from the press and then by id in natural order
-	// (so J2 comes before J10). Text objects are the caller's to append after these.
-	//
-	// opts: nodeReach (6) and linkReach (1.5: half the drawn stroke, floored at 3 px across, the reach
-	// the browser's own hit test gives a pipe; the caller passes the live stroke), screen px; eps, in
-	// world units (default above); nodeX(n), nodeY(n), linkPts(l) -> [{x, y}], nodeOk(n), linkOk(l)
-	// and nodeById(id) read the document the way the caller draws it (default: n.x, n.y, [], always
-	// true, an index built here). Each candidate is {kind: 'node'|'link', id, type, distPx}. A caller
-	// that groups elements (an assembly) maps this list afterwards; nothing here knows about groups.
-	function pickCandidates(nodes, links, wx, wy, s, opts) {
-		var o = opts || {}, nodeReach = o.nodeReach === undefined ? 6 : o.nodeReach,
-			linkReach = o.linkReach === undefined ? 1.5 : o.linkReach, eps,
-			nx = o.nodeX || function (n) { return n.x; }, ny = o.nodeY || function (n) { return n.y; },
-			lp = o.linkPts || function () { return []; },
-			nOk = o.nodeOk || function () { return true; }, lOk = o.linkOk || function () { return true; },
-			byId = {}, near = [], find, list = [], seen = {}, i, j, n, l, pts, d, nearest = null, buried = [],
-			cands = [], first, hit, group, margin, fa, fb, x0, x1, y0, y1, px, py,
-			minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-		// nodeById(id), when the caller already holds one, saves indexing every node on every press.
-		find = o.nodeById || function (id) { return byId[id]; };
+	// An item is {kind, id, type, circle: {x, y, r}} or {..., rect: {l, t, r, b}} or {..., outline:
+	// {pts: [{x, y}], closed}} (a Shape: a point or a closed outline; an open one is dropped), screen px. Its `rank` breaks ties
+	// (a symbol over a Text over a Shape).
+	//   1. The PRIMARY is the item nearest the press whose extent is within `reach` of it (0 inside).
+	//      None: ordinary. Two separate dots that both fall within a finger's reach but do not
+	//      overlap each other are therefore ordinary: the nearer one is the primary and has no
+	//      overlapping neighbour.
+	//   2. The OTHERS are the items under the pickbox too (within `reach` of the press) whose drawn
+	//      extent overlaps the primary's. None: ordinary. So a click on a pump clear of the reservoir
+	//      it overlaps, or on the far end of a long Text, is ordinary; the box is for the overlap.
+	//   3. ORDER: items whose anchor (a circle's or rect's centre) is within `coincident` px of the
+	//      primary's first, then the rest; each by distance from the press, then rank, then id in
+	//      natural order. At most `cap` (6) rows; the primary is always the first.
+	// opts: reach (6), cap (6), coincident (1).
+	function pickSymbols(items, x, y, opts) {
+		var o = opts || {}, reach = o.reach === undefined ? 6 : o.reach, cap = o.cap === undefined ? 6 : o.cap,
+			coin = o.coincident === undefined ? 1 : o.coincident, primary = null, list = [], i, it, d;
 		function natural(a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); }
-		function addNode(m, dPx) {
-			if (seen['n' + m.id]) { return; }
-			seen['n' + m.id] = true;
-			list.push({ kind: 'node', id: m.id, type: m.type, distPx: dPx });
+		function segDist(px, py, a, b) {
+			var dx = b.x - a.x, dy = b.y - a.y, l2 = dx * dx + dy * dy, t = l2 ? ((px - a.x) * dx + (py - a.y) * dy) / l2 : 0;
+			t = Math.max(0, Math.min(1, t));
+			return Math.hypot(px - (a.x + t * dx), py - (a.y + t * dy));
 		}
-		for (i = 0; i < nodes.length; i++) {
-			n = nodes[i];
-			if (!o.nodeById) { byId[n.id] = n; }
-			px = nx(n); py = ny(n);
-			if (px < minX) { minX = px; } if (px > maxX) { maxX = px; }
-			if (py < minY) { minY = py; } if (py > maxY) { maxY = py; }
-			// A box test before the square root; every press walks every node.
-			if (Math.abs(px - wx) * s > nodeReach || Math.abs(py - wy) * s > nodeReach || !nOk(n)) { continue; }
-			d = Math.hypot(px - wx, py - wy) * s;
-			if (d > nodeReach) { continue; }
-			near.push({ n: n, d: d });
-			if (!nearest || d < nearest.d) { nearest = { n: n, d: d }; }
+		function outlineDist(g, px, py) {
+			var pts = g.pts, n = pts.length, d = Infinity, j;
+			if (n === 1) { return Math.hypot(px - pts[0].x, py - pts[0].y); }
+			for (j = 0; j + 1 < n; j++) { d = Math.min(d, segDist(px, py, pts[j], pts[j + 1])); }
+			if (g.closed && n > 2) { d = Math.min(d, segDist(px, py, pts[n - 1], pts[0])); }
+			return d;
 		}
-		eps = o.eps !== undefined ? o.eps : Math.max(1e-6 * Math.hypot(maxX - minX, maxY - minY), 1e-12);
-		function atNearest(m) {
-			return Math.hypot(nx(m) - nx(nearest.n), ny(m) - ny(nearest.n)) <= eps;
+		function rectDist(r, px, py) { return Math.hypot(Math.max(r.l - px, 0, px - r.r), Math.max(r.t - py, 0, py - r.b)); }
+		// Distance from a point to an item's drawn extent; 0 on or inside it.
+		function dist(m, px, py) {
+			if (m.circle) { return Math.max(0, Math.hypot(px - m.circle.x, py - m.circle.y) - m.circle.r); }
+			if (m.rect) { return rectDist(m.rect, px, py); }
+			return outlineDist(m.outline, px, py);
 		}
-		if (nearest) {
-			near.forEach(function (c) { if (atNearest(c.n)) { addNode(c.n, c.d); } });
-			if (list.length < 2) { list = []; seen = {}; }
+		function anchor(m) {
+			if (m.circle) { return { x: m.circle.x, y: m.circle.y }; }
+			if (m.rect) { return { x: (m.rect.l + m.rect.r) / 2, y: (m.rect.t + m.rect.b) / 2 }; }
+			return null;
 		}
-		margin = Math.max(nodeReach, linkReach) / s;
-		for (i = 0; i < links.length; i++) {
-			l = links[i];
-			if (!lOk(l)) { continue; }
-			// **A BOX FIRST, BECAUSE THIS RUNS ON EVERY SELECT PRESS** and most links are nowhere near it.
-			// The link's end nodes and its own bends bound the polyline, so a press farther than the reach
-			// from that box is farther than the reach from the line, and the line is never built.
-			fa = find(l.from); fb = find(l.to);
-			if (fa && fb) {
-				x0 = Math.min(nx(fa), nx(fb)); x1 = Math.max(nx(fa), nx(fb));
-				y0 = Math.min(ny(fa), ny(fb)); y1 = Math.max(ny(fa), ny(fb));
-				for (j = 0; l.verts && j < l.verts.length; j++) {
-					if (l.verts[j].x < x0) { x0 = l.verts[j].x; } if (l.verts[j].x > x1) { x1 = l.verts[j].x; }
-					if (l.verts[j].y < y0) { y0 = l.verts[j].y; } if (l.verts[j].y > y1) { y1 = l.verts[j].y; }
-				}
-				if (wx < x0 - margin || wx > x1 + margin || wy < y0 - margin || wy > y1 + margin) { continue; }
+		// Does a segment cross, or lie in, a rect?
+		function segInRect(a, b, r) {
+			var t0 = 0, t1 = 1, dx = b.x - a.x, dy = b.y - a.y, p = [-dx, dx, -dy, dy], q = [a.x - r.l, r.r - a.x, a.y - r.t, r.b - a.y], k, u;
+			for (k = 0; k < 4; k++) {
+				if (p[k] === 0) { if (q[k] < 0) { return false; } continue; }
+				u = q[k] / p[k];
+				if (p[k] < 0) { if (u > t1) { return false; } if (u > t0) { t0 = u; } }
+				else { if (u < t0) { return false; } if (u < t1) { t1 = u; } }
 			}
-			pts = lp(l);
-			if (!pts || pts.length < 2) { continue; }
-			if (polylineLength(pts) <= eps) {
-				// Buried: judged at the location the press chose, never at the link's own on-screen size.
-				if (nearest && fa && atNearest(fa)) { buried.push({ l: l, d: nearestFractionOnPolyline(pts, wx, wy).dist * s }); }
-			} else if (!nearest) {
-				hit = nearestFractionOnPolyline(pts, wx, wy);
-				if (hit.dist * s <= linkReach) { cands.push({ l: l, d: hit.dist * s, x: hit.x, y: hit.y }); }
+			return true;
+		}
+		function overlaps(a, b) {
+			var s, o2, c, j, pts, n;
+			if (a.outline && b.outline) { return false; }   // two Shapes are not a symbol under the click
+			if (a.outline) { s = a; o2 = b; } else if (b.outline) { s = b; o2 = a; } else { s = null; }
+			if (!s) {
+				if (a.circle && b.circle) { return Math.hypot(a.circle.x - b.circle.x, a.circle.y - b.circle.y) <= a.circle.r + b.circle.r; }
+				if (a.rect && b.rect) { return a.rect.l <= b.rect.r && b.rect.l <= a.rect.r && a.rect.t <= b.rect.b && b.rect.t <= a.rect.b; }
+				c = a.circle ? a : b;
+				return rectDist((a.circle ? b : a).rect, c.circle.x, c.circle.y) <= c.circle.r;
 			}
+			if (o2.circle) { return outlineDist(s.outline, o2.circle.x, o2.circle.y) <= o2.circle.r; }
+			pts = s.outline.pts; n = pts.length;
+			if (n === 1) { return pts[0].x >= o2.rect.l && pts[0].x <= o2.rect.r && pts[0].y >= o2.rect.t && pts[0].y <= o2.rect.b; }
+			for (j = 0; j + 1 < n; j++) { if (segInRect(pts[j], pts[j + 1], o2.rect)) { return true; } }
+			return !!(s.outline.closed && n > 2 && segInRect(pts[n - 1], pts[0], o2.rect));
 		}
-		if (buried.length) {
-			buried.forEach(function (b) {
-				for (j = 0; j < 2; j++) {
-					n = find(j ? b.l.to : b.l.from);
-					if (n && nOk(n)) { addNode(n, Math.hypot(nx(n) - wx, ny(n) - wy) * s); }
-				}
-			});
+		function order(a, b) {
+			return (b.coin - a.coin) || (a.d - b.d) || ((a.m.rank || 0) - (b.m.rank || 0)) || natural(a.m.id, b.m.id);
 		}
-		list.sort(function (a, b) { return (a.distPx - b.distPx) || natural(a.id, b.id); });
-		group = buried.map(function (b) { return { kind: 'link', id: b.l.id, type: b.l.type, distPx: b.d }; });
-		if (!nearest && cands.length) {
-			cands.sort(function (a, b) { return a.d - b.d; });
-			first = cands[0];
-			cands.forEach(function (c) {
-				if (Math.hypot(c.x - first.x, c.y - first.y) <= eps) {
-					group.push({ kind: 'link', id: c.l.id, type: c.l.type, distPx: c.d });
-				}
-			});
-			if (group.length < 2) { group = []; }
+		// A line is never an item, whoever hands it in: an open polyline (a point and a closed outline are not lines).
+		items = items.filter(function (m) { return !(m.outline && m.outline.pts.length > 1 && !m.outline.closed); });
+		for (i = 0; i < items.length; i++) {
+			it = items[i];
+			it = { m: it, d: dist(it, x, y) };
+			if (it.d > reach) { continue; }
+			if (!primary || it.d < primary.d || (it.d === primary.d && (it.m.rank || 0) < (primary.m.rank || 0))) { primary = it; }
 		}
-		group.sort(function (a, b) { return (a.distPx - b.distPx) || natural(a.id, b.id); });
-		return list.concat(group);
+		if (!primary) { return []; }
+		for (i = 0; i < items.length; i++) {
+			it = items[i];
+			if (it === primary.m || !overlaps(primary.m, it)) { continue; }
+			d = dist(it, x, y);
+			if (d <= reach) { list.push({ m: it, d: d, coin: 0 }); }
+		}
+		if (!list.length) { return []; }
+		list.push({ m: primary.m, d: primary.d, coin: 0 });
+		list.forEach(function (e) {
+			var pa = anchor(primary.m), ea = anchor(e.m);
+			e.coin = (e.m === primary.m || (pa && ea && Math.hypot(pa.x - ea.x, pa.y - ea.y) <= coin)) ? 1 : 0;
+		});
+		list.sort(order);
+		return list.slice(0, cap).map(function (e) {
+			return { kind: e.m.kind, id: e.m.id, type: e.m.type, distPx: e.d };
+		});
 	}
 
 	return {
@@ -1062,7 +1042,7 @@ EngCalcs.lpnGeom = (function () {
 		serviceLabelSpots: serviceLabelSpots,
 		rotatedLabelBox: rotatedLabelBox,
 		orientedLabelBox: orientedLabelBox,
-		pickCandidates: pickCandidates,
+		pickSymbols: pickSymbols,
 		pointToSegmentDistance: pointToSegmentDistance,
 		pointToPolylineDistance: pointToPolylineDistance,
 		buildSegmentIndex: buildSegmentIndex,
