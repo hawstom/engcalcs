@@ -547,6 +547,7 @@
 				if (pendingCurveType) { toks.typeLine = pendingCurveType; pendingCurveType = null; }
 				pendingCurveCont = { more: [], raw: [] };
 			}
+			if (section === 'PATTERNS' || section === 'CURVES') { toks.line = i + 1; }
 			if (section === 'PATTERNS' || section === 'CONTROLS') {
 				if (pendingRaw.some(function (l) { return l.trim(); })) { toks.preLines = pendingRaw; }
 				pendingRaw = [];
@@ -843,6 +844,30 @@
 				pat.multipliers.push(pv);
 			}
 		}
+
+		// **THE SAME PATTERN OR CURVE ID IN TWO SEPARATE PLACES** (Task 859). Only a hand-edited file
+		// does it. EPANET finds the pattern or curve by ID (input3.c patterndata(), curvedata():
+		// `findpattern()`, `findcurve()`) and appends the later rows to the first object, so the two
+		// runs are ONE pattern or curve; this reader does the same (patternIndex, curveRecord), and
+		// the report says so. Ids are the id and the first line of each run: "PAT1 (12, 40)".
+		function duplicateRuns(sectionRows) {
+			var runs = {}, order = [], prev = null, k, row;
+			for (k = 0; k < sectionRows.length; k++) {
+				row = sectionRows[k];
+				if (!row[0]) { continue; }
+				if (row[0] !== prev) {
+					if (!runs[row[0]]) { runs[row[0]] = []; order.push(row[0]); }
+					runs[row[0]].push(row.line);
+				}
+				prev = row[0];
+			}
+			return order.filter(function (id) { return runs[id].length > 1; })
+				.map(function (id) { return id + ' (' + runs[id].join(', ') + ')'; });
+		}
+		var dupPatterns = duplicateRuns(rawSections.PATTERNS || []),
+			dupCurves = duplicateRuns(rawSections.CURVES || []);
+		if (dupPatterns.length) { drop('duplicate-pattern-id', dupPatterns); }
+		if (dupCurves.length) { drop('duplicate-curve-id', dupCurves); }
 
 		// [TIMES] values are DURATIONS AND CLOCK TIMES, not plain numbers -- `24:00` is 86400
 		// seconds and parseFloat says 24 -- so mergeTok cannot hold their text and they keep their

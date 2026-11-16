@@ -48057,6 +48057,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// the end of a pattern row, or above a control that was itself left out. The ids are the
 			// comment lines themselves, which is the only name they have.
 			case 'comments': return pc.lpn_inp_drop_comments || 'These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.';
+			case 'duplicate-pattern-id': return pc.lpn_inp_drop_dup_pattern || 'These pattern IDs are defined in more than one place in this file. EPANET adds the later multipliers after the first, so each is one pattern, and this page does the same. The numbers after each ID are the lines where its multipliers start.';
+			case 'duplicate-curve-id': return pc.lpn_inp_drop_dup_curve || 'These curve IDs are defined in more than one place in this file. EPANET adds the later points after the first, so each is one curve, and this page does the same. The numbers after each ID are the lines where its points start.';
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.

@@ -757,5 +757,34 @@ console.log('\n--- the wizard always opens at step 1, and georefArmAsDegrees() m
 	L.georefCancel();
 }
 
+// ---- THE SAME PATTERN OR CURVE ID IN TWO SEPARATE PLACES (Task 859) ----
+// Only a hand-edited file does it; EPANET (input3.c patterndata(), curvedata()) finds the object
+// by ID and appends the later rows, so the report says one object, with the first line of each run.
+{
+	const dupInp = probeInp([
+		'[PATTERNS]', ' PA  1 2 3', ' PB  1 1', ' PA  4 5 6', ' PA  7', '',
+		'[CURVES]', ' C1  1 10', ' C2  1 5', ' C1  2 8', ''
+	]);
+	const d = EngCalcs.lpnInpParse(dupInp);
+	const lineOf = (needle) => dupInp.split('\n').findIndex((l) => l === needle) + 1;
+	const dp = d.dropped.filter((x) => x.code === 'duplicate-pattern-id')[0];
+	const dc = d.dropped.filter((x) => x.code === 'duplicate-curve-id')[0];
+	ok('a pattern ID defined in two places is reported once, with the first line of each run',
+		!!dp && dp.ids.length === 1 && dp.ids[0] === 'PA (' + lineOf(' PA  1 2 3') + ', ' + lineOf(' PA  4 5 6') + ')',
+		JSON.stringify(dp));
+	ok('...and it is still ONE pattern, the later multipliers after the first (EPANET\'s rule)',
+		d.patterns.filter((x) => x.id === 'PA').length === 1 &&
+		JSON.stringify(d.patterns.filter((x) => x.id === 'PA')[0].multipliers) === '[1,2,3,4,5,6,7]',
+		JSON.stringify(d.patterns));
+	ok('a curve ID defined in two places is reported once, with the first line of each run',
+		!!dc && dc.ids.length === 1 && dc.ids[0] === 'C1 (' + lineOf(' C1  1 10') + ', ' + lineOf(' C1  2 8') + ')',
+		JSON.stringify(dc));
+	const clean = EngCalcs.lpnInpParse(probeInp(['[PATTERNS]', ' PA  1 2', ' PA  3', ' PB  1', '', '[CURVES]', ' C1  1 10', ' C1  2 8', '']));
+	ok('rows of one ID kept together, as Net3 writes them, are NOT reported',
+		!clean.dropped.some((x) => /^duplicate-/.test(x.code)), JSON.stringify(clean.dropped.map((x) => x.code)));
+	ok('both sentences are in the English file', !!PC.lpn_inp_drop_dup_pattern && !!PC.lpn_inp_drop_dup_curve,
+		String(PC.lpn_inp_drop_dup_pattern));
+}
+
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);
