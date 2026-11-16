@@ -299,7 +299,12 @@ if (BLIND && process.env.LPN_SEAM_OVERRIDE === '1') {
 		ok('an old project that drew no plot opens with Show plot off and the default fill and lines back', S0.contourShow === false && S0.contourFill === 'smooth' && S0.contourLines === true, JSON.stringify([S0.contourShow, S0.contourFill, S0.contourLines]));
 		ok('a scenario that stated a fill turns Show plot on there, keeping its fill and the old default of no lines', blk(1).contourShow === true && blk(1).contourFill === 'bands' && blk(1).contourLines === false, JSON.stringify(blk(1)));
 		ok('a scenario that stated lines alone turns Show plot on, and gains no fill', blk(2).contourShow === true && blk(2).contourFill === '' && blk(2).contourLines === true, JSON.stringify(blk(2)));
-		ok('a scenario that stated no fill and no lines is off, with the defaults back', blk(3).contourShow === false && blk(3).contourFill === 'smooth' && blk(3).contourLines === true, JSON.stringify(blk(3)));
+		ok('a scenario that stated no fill and no lines is off and states nothing else, so it inherits', blk(3).contourShow === false && blk(3).contourFill === undefined && blk(3).contourLines === undefined, JSON.stringify(blk(3)));
+		const oldB = JSON.parse(text); delete oldB.settings.contourShow; oldB.settings.contourFill = 'bands'; oldB.settings.contourLines = true;
+		const kid = JSON.parse(JSON.stringify(oldB.scenarios.filter((x) => !x.isBase)[0])); kid.id = 'oldkid'; kid.name = 'Old kid'; kid.settings = { contourFill: '', contourLines: false }; delete kid.alternatives; oldB.scenarios.push(kid);
+		L.applySaved(L.acceptImportedText(JSON.stringify(oldB)));
+		const kb = L.getScenarios().filter((x) => x.id === 'oldkid')[0].settings;
+		ok('a child that was off under a Bands parent is off and inherits Bands', L.getSettings().contourFill === 'bands' && kb.contourShow === false && kb.contourFill === undefined, JSON.stringify([L.getSettings().contourFill, kb]));
 		const old2 = JSON.parse(text); delete old2.settings.contourShow; delete old2.settings.contourFill; old2.settings.contourLines = true;
 		L.applySaved(L.acceptImportedText(JSON.stringify(old2)));
 		const S2 = L.getSettings();

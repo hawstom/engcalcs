@@ -44723,17 +44723,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function migrateContourShow(savedSettings) {
 		var oldFill = savedSettings.contourFill === undefined ? '' : savedSettings.contourFill,
 			oldLines = savedSettings.contourLines === undefined ? false : savedSettings.contourLines;
-		function convert(block, fill, lines, show) {
-			if (!show) { block.contourShow = false; block.contourFill = 'smooth'; block.contourLines = true; }
+		function convert(block, fill, lines, show, inherits) {
+			// A block that was off states only that; its fill and lines are removed so it inherits its parent's, which the project's
+			// own block restores to the defaults.
+			if (!show && inherits) { block.contourShow = false; delete block.contourFill; delete block.contourLines; }
+			else if (!show) { block.contourShow = false; block.contourFill = 'smooth'; block.contourLines = true; }
 			else { block.contourShow = true; block.contourFill = fill; block.contourLines = lines; }
 		}
-		if (savedSettings.contourShow === undefined) { convert(settings, oldFill, oldLines, !!(oldFill || oldLines)); }
+		if (savedSettings.contourShow === undefined) { convert(settings, oldFill, oldLines, !!(oldFill || oldLines), false); }
 		scenarios.concat(doc.alternatives || [], doc.calcSets || []).forEach(function (o) {
 			var b = o && !o.isBase && plainObject(o.settings) ? o.settings : null, f, l;
 			if (!b || b.contourShow !== undefined || (b.contourFill === undefined && b.contourLines === undefined)) { return; }
 			f = b.contourFill === undefined ? oldFill : b.contourFill;
 			l = b.contourLines === undefined ? oldLines : b.contourLines;
-			convert(b, f, l, !!(f || l));
+			convert(b, f, l, !!(f || l), true);
 		});
 	}
 	function projectDisplayName(p) {
