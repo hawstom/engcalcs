@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='دا فایل ځینو جنکشنونو، پای�
 $ec_lang['lpn_inp_drop_report']='دا فایل د EPANET د راپور بڼې ټاکنې لري. د چلولو راپور په راپورونه، چلول کې شتون لري، خو دا د EPANET معیاري بڼه کاروي نه هغه بڼه چې دا ټاکنې یې ټاکي. کرښې ساتل کیږي او که تاسو EPANET فایل وساتئ بېرته لیکل کیږي.';
 $ec_lang['lpn_inp_drop_sections']='دا فایل یوه برخه لري چې دا پاڼه یې هیڅکله نه لولي. دلته هیڅ شی نه یې کاروي. بشپړه ساتل کیږي، او که تاسو EPANET فایل وساتئ، بېرته لیکل کیږي.';
 $ec_lang['lpn_inp_drop_comments']='د دې فایل په نمونو یا ساده کنترولونو کې دغه د تبصرې کرښې راننوتل نه شوې، ځکه چې دا پاڼه د هغوی د ساتلو ځای نلري (د بېلګې په توګه، د یوې نمونې د قطارونو ترمنځ). هره نمونه او هر کنترول په بشپړه توګه راننوتل.';
-$ec_lang['lpn_inp_drop_quality_options']='دا فایل د EPANET د اوبو کیفیت اختیارونه بیانوي: د کیفیت اختیار، چې د اوبو کیفیت شننې ډول نوموي، او دوه ټاکنې چې له یوې کیمیاوي مادې سره ځي، نسبي خپریدنه او د کیفیت زغم. دا درې واړه ساتل کیږي او کارول کیږي. د اوبو عمر، د سرچینې رهیابي، او یوه کیمیاوي ماده هر یو دلته محاسبه کیږي، او دوه کیمیاوي ټاکنې کارول کیږي کله چې یوه کیمیاوي ماده وچلول شي. ټول بېرته لیکل کیږي که تاسو EPANET فایل وساتئ.';
 $ec_lang['lpn_inp_drop_file_options']='دا فایل یو مرستیال فایل ته اشاره کوي: نقشه، چې همغږي لري، یا هایدرولیکس، چې دمخه حساب شوي هایدرولیکس لري. دا پاڼه هیڅ یو نشي پرانیستلی، نو کرښې لکه څنګه چې دي ساتل کیږي او که تاسو EPANET فایل وساتئ، بېرته لیکل کیږي.';
 $ec_lang['lpn_inp_drop_other_options']='دا فایل هغه اختیارونه بیانوي چې دا پاڼه یې نه لولي. دلته هیڅ شی نه یې کاروي. دوی ساتل کیږي او که تاسو EPANET فایل وساتئ، بېرته لیکل کیږي.';
 $ec_lang['lpn_inp_drop_net_options']='دا د EPANET .net فایل داسې تنظیمات بیانوي چې دا پاڼه ورته هیڅ کنترول نلري، نو د دوی ارزښتونه دلته لیست شوي دي پرځای د دې چې راولیږدول شي. هر څه بل راغلل. که تاسو ورته اړتیا لرئ، فایل په EPANET کې پرانیزئ او د فایل، صادرول، شبکه وکاروئ ترڅو یې د .inp فایل په توګه وساتئ، بیا هغه راوباسئ.';
@@ -3483,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='تلواله ارزښت {n} دی.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='د همغږیدو حد چې حل کوونکی باید مخکې له ودریدو ورته ورسیږي، د یوه آزمایښت نه بل ته د بهاو ټول بدلون په توګه اندازه شوی، چې په تړاوونو کې په ټول بهاو ویشل کیږي. کوچنۍ شمېره ډېره دقیقه ده او ډېر وخت نیسي.';
 $ec_lang['lpn_settings_specific_gravity']='ځانګړی وزن';
-$ec_lang['lpn_settings_viscosity']='نسبي غلظت';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3492,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='نسبي غلظت';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='د مایع غلظت د 20 درجو سانتي‌ګریډ اوبو سره پرتله شوی. دا یوازې د Darcy-Weisbach طریقې لاندې پایله بدلوي.';
 $ec_lang['lpn_settings_trials']='اعظمي هڅې';
 $ec_lang['lpn_settings_trials_tip']='د آزمایښتونو اعظمي شمېر مخکې له دې چې حل کوونکی په هغې شبکې کې ودریږي چې نه همغږیږي.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -3858,8 +3855,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='د کیفیت زغم';
 $ec_lang['lpn_quality_tolerance_tip']='د غلظت توپیر چې لاندې یې EPANET دوه څنګ پر څنګ د اوبو برخې یوه ګڼي. خالي د EPANET ډیفالټ 0.01 کاروي.';
-$ec_lang['lpn_quality_diffusivity']='نسبي خپریدنه';
-$ec_lang['lpn_quality_diffusivity_tip']='په اوبو کې د کیمیاوي مادې خپریدنه، د کلورین په نسبت. خالي د EPANET ډیفالټ 1.0 کاروي.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='د {chemical} غلظت';

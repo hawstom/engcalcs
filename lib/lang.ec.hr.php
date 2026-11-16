@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='Ova datoteka dodjeljuje etikete nekim čvorovima,
 $ec_lang['lpn_inp_drop_report']='Ova datoteka sadrži EPANET postavke formata izvještaja. Izvještaj pokretanja dostupan je pod Izvještaji, Pokretanje, ali koristi standardni EPANET format, a ne format koji te postavke određuju. Retci se zadržavaju i zapisuju natrag ako spremite EPANET datoteku.';
 $ec_lang['lpn_inp_drop_sections']='Ova datoteka sadrži odjeljak koji ova stranica uopće ne čita. Ovdje se ništa od toga ne koristi. Zadržava se u cijelosti i zapisuje natrag ako spremite EPANET datoteku.';
 $ec_lang['lpn_inp_drop_comments']='Ovi retci komentara u obrascima ili jednostavnim upravljanjima ove datoteke nisu uvezeni jer ova stranica nema mjesta za njihovo čuvanje (na primjer, između redaka jednog obrasca). Svaki obrazac i upravljanje uvezeni su u cijelosti.';
-$ec_lang['lpn_inp_drop_quality_options']='Ova datoteka navodi EPANET opcije kvalitete vode: opciju Quality, koja imenuje vrstu analize kvalitete vode, i dvije postavke koje idu uz kemikaliju, Relative diffusivity i Quality tolerance. Sve tri se zadržavaju i koriste. Starost vode, praćenje izvora i kemikalija izračunavaju se ovdje, a dvije postavke kemikalije koriste se kada se kemikalija pokrene. Sve se zapisuju natrag ako spremite EPANET datoteku.';
 $ec_lang['lpn_inp_drop_file_options']='Ova datoteka upućuje na pomoćnu datoteku: Map, koja sadrži koordinate, ili Hydraulics, koja sadrži već izračunatu hidrauliku. Ova stranica ne može otvoriti nijednu od njih, pa se retci zadržavaju kakvi jesu i zapisuju natrag ako spremite EPANET datoteku.';
 $ec_lang['lpn_inp_drop_other_options']='Ova datoteka navodi opcije koje ova stranica ne čita. Ovdje se ništa od toga ne koristi. Zadržavaju se i zapisuju natrag ako spremite EPANET datoteku.';
 $ec_lang['lpn_inp_drop_net_options']='Ova EPANET .net datoteka navodi postavke za koje ova stranica nema kontrolu, pa su njihove vrijednosti ovdje samo popisane, a ne prenesene. Sve ostalo je preneseno. Ako vam trebaju, otvorite datoteku u EPANET-u i upotrijebite Datoteka, Izvoz, Mreža (File, Export, Network) da je spremite kao .inp datoteku, zatim uvezite tu.';
@@ -3483,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='Zadana vrijednost je {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Granica konvergencije koju rješavač mora dosegnuti prije zaustavljanja, mjerena kao ukupna promjena protoka od jedne iteracije do sljedeće, podijeljena ukupnim protokom u vodovima. Manji broj je točniji i traje dulje.';
 $ec_lang['lpn_settings_specific_gravity']='Specifična težina';
-$ec_lang['lpn_settings_viscosity']='Relativna viskoznost';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3492,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='Relativna viskoznost';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='Viskoznost tekućine u odnosu na vodu pri 20 stupnjeva Celzijevih. Mijenja rezultat samo pri metodi Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Najveći broj iteracija';
 $ec_lang['lpn_settings_trials_tip']='Najveći broj iteracija prije nego što se rješavač zaustavi na mreži koja ne konvergira.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -3858,8 +3855,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Tolerancija kakvoće';
 $ec_lang['lpn_quality_tolerance_tip']='Razlika koncentracije ispod koje EPANET dvije susjedne količine vode tretira kao jednu. Prazno koristi EPANET-ovu zadanu vrijednost 0,01.';
-$ec_lang['lpn_quality_diffusivity']='Relativna difuznost';
-$ec_lang['lpn_quality_diffusivity_tip']='Difuzivnost kemikalije u vodi, u odnosu na klor. Prazno koristi EPANET-ovu zadanu vrijednost 1,0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='Koncentracija {chemical}';

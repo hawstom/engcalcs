@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='Berkas ini memberikan tag pada sebagian simpul, p
 $ec_lang['lpn_inp_drop_report']='Berkas ini berisi pengaturan format laporan EPANET. Laporan proses tersedia di Laporan, Proses, tetapi memakai format standar EPANET, bukan format yang ditentukan pengaturan ini. Baris-barisnya dipertahankan dan ditulis kembali jika Anda menyimpan berkas EPANET.';
 $ec_lang['lpn_inp_drop_sections']='Berkas ini menyimpan sebuah bagian yang sama sekali tidak dibaca oleh halaman ini. Tidak ada yang menggunakannya di sini. Bagian itu tetap disimpan utuh, dan akan ditulis kembali jika Anda menyimpan berkas EPANET.';
 $ec_lang['lpn_inp_drop_comments']='Baris komentar ini pada pola atau kontrol sederhana dalam berkas ini tidak diimpor, karena halaman ini tidak memiliki tempat untuk menyimpannya (misalnya di antara baris-baris satu pola). Setiap pola dan kontrol diimpor secara utuh.';
-$ec_lang['lpn_inp_drop_quality_options']='Berkas ini menyatakan opsi kualitas air EPANET: opsi Quality, yang menyebutkan jenis analisis kualitas air, serta dua pengaturan yang menyertai bahan kimia, yaitu Relative diffusivity dan Quality tolerance. Ketiganya dipertahankan dan digunakan. Usia air, penelusuran sumber, dan bahan kimia masing-masing dihitung di sini, dan kedua pengaturan bahan kimia dipakai saat bahan kimia dijalankan. Semuanya ditulis kembali jika Anda menyimpan berkas EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='Berkas ini merujuk ke berkas tambahan: Map, yang menyimpan koordinat, atau Hydraulics, yang menyimpan hidraulika yang sudah dihitung sebelumnya. Halaman ini tidak dapat membuka keduanya, sehingga barisnya dipertahankan apa adanya dan ditulis kembali jika Anda menyimpan berkas EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='Berkas ini menyatakan opsi yang tidak dibaca oleh halaman ini. Tidak ada yang menggunakannya di sini. Opsi itu tetap disimpan dan ditulis kembali jika Anda menyimpan berkas EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='Berkas .net EPANET ini menyatakan pengaturan yang tidak memiliki kendali di halaman ini, sehingga nilainya dicantumkan di sini alih-alih dibawa masuk. Semua yang lain masuk dengan baik. Jika Anda memerlukannya, buka berkas ini di EPANET dan gunakan File, Export, Network untuk menyimpannya sebagai berkas .inp, lalu impor berkas itu.';
@@ -3483,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='Nilai default adalah {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Batas konvergensi yang harus dicapai penyelesai sebelum berhenti, diukur sebagai total perubahan debit dari satu percobaan ke percobaan berikutnya, dibagi total debit pada penghubung. Angka yang lebih kecil lebih eksak dan memerlukan waktu lebih lama.';
 $ec_lang['lpn_settings_specific_gravity']='Berat jenis';
-$ec_lang['lpn_settings_viscosity']='Viskositas relatif';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3492,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='Viskositas relatif';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='Viskositas fluida dibandingkan dengan air pada 20 derajat Celsius. Ini hanya mengubah jawaban pada metode Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Percobaan maksimum';
 $ec_lang['lpn_settings_trials_tip']='Jumlah percobaan maksimum sebelum penyelesai berhenti pada jaringan yang tidak konvergen.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -3858,8 +3855,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Toleransi kualitas';
 $ec_lang['lpn_quality_tolerance_tip']='Selisih konsentrasi di bawah mana EPANET memperlakukan dua paket air yang berdampingan sebagai satu. Kosong memakai default EPANET, 0,01.';
-$ec_lang['lpn_quality_diffusivity']='Difusivitas relatif';
-$ec_lang['lpn_quality_diffusivity_tip']='Difusivitas bahan kimia dalam air, relatif terhadap klorin. Kosong memakai default EPANET, 1,0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='Konsentrasi {chemical}';
