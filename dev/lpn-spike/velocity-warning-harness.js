@@ -87,6 +87,38 @@ const FT = 0.3048, H = 3600;
 	ok('an id that is not a pipe is not named', valve === '');
 }
 
+// ---- 2b. an id that looks like a replacement pattern, and the per-run cache ---------------------------------
+{
+	setUnitSet('us'); L.reset(); openExample(L);
+	const pipeId = L.getDoc().links.filter((l) => l.type === 'pipe')[0].id;
+	const doc = L.getDoc();
+	const link = doc.links.find((l) => l.id === pipeId);
+	doc.links.push(Object.assign({}, link, { id: 'A$&B{velocity}' }));
+	const t = L.velocityNote({ velocities: { 'A$&B{velocity}': 12 * FT } });
+	doc.links.pop();
+	ok('a pipe id of "A$&B{velocity}" is written as it is', t === '⚠ Pipe A$&B{velocity} velocity is 12 ft/sec.', t);
+
+	// The per-run cache: a run's answer is kept until the run (or the unit) changes; an edit with Recalculate off
+	// does not touch it, and a new run replaces it.
+	const keep = { tok: EC.lpnTimeRunToken, fr: EC.lpnTimeRunFrames };
+	let tok = { run: 1 }, frames = [{ t: 0, velocities: { [pipeId]: 11 * FT } }, { t: 3600, velocities: { [pipeId]: 13 * FT } }];
+	EC.lpnTimeRunToken = () => tok; EC.lpnTimeRunFrames = () => frames;
+	const a = L.velocityNote({ velocities: {} });
+	ok('an extended run names the pipe at its peak and its time', a === '⚠ Pipe ' + pipeId + ' velocity is 13 ft/sec at 1:00.', a);
+	frames = [{ t: 0, velocities: { [pipeId]: 15 * FT } }];
+	ok('the same run is not re-scanned (the snapshot stands)', L.velocityNote({ velocities: {} }) === a);
+	tok = { run: 2 };
+	const b = L.velocityNote({ velocities: {} });
+	ok('a new run replaces it', b === '⚠ Pipe ' + pipeId + ' velocity is 15 ft/sec.', b);
+	setUnitSet('si');
+	const c = L.velocityNote({ velocities: {} });
+	ok('a unit change re-words it in the new unit', /m\/s|m\/sec/.test(c) && c !== b, c);
+	frames = []; tok = null;
+	ok('with no run the single solve is read', L.velocityNote({ velocities: { [pipeId]: 12 * FT } }).indexOf('⚠ Pipe ' + pipeId) === 0);
+	EC.lpnTimeRunToken = keep.tok; EC.lpnTimeRunFrames = keep.fr;
+	setUnitSet('us');
+}
+
 // ---- 3. extended-period runs in both engines ---------------------------------------------------------
 const pipe = (id, from, to, len, d) => ({ id, type: 'pipe', from, to, length: len * FT, diameter: d * 0.0254, roughness: 130, k: 0, status: 'open' });
 function repro() {

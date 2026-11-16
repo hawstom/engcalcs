@@ -89555,17 +89555,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!frames.length) { frames = [result]; }
 		peaks = EngCalcs.lpnVelocityPeaks(frames, function (id) { var l = linkById(id); return !!l && l.type === 'pipe'; });
 		shown = peaks.slice(0, EngCalcs.LPN_VELOCITY_WARN_LISTED);
+		// split/join, not .replace(): a pipe id may hold `$&`, which .replace() takes for a pattern of its own, and
+		// the id goes in LAST so that an id holding the text `{velocity}` is not filled a second time.
 		parts = shown.map(function (p) {
 			return (extended && typeof p.t === 'number'
-				? (pc.lpn_velocity_warn || '⚠ Pipe {id} velocity is {velocity} at {time}.').replace('{time}', dsTimeText(p.t))
+				? (pc.lpn_velocity_warn || '⚠ Pipe {id} velocity is {velocity} at {time}.').split('{time}').join(dsTimeText(p.t))
 				: (pc.lpn_velocity_warn_steady || '⚠ Pipe {id} velocity is {velocity}.'))
-				.replace('{id}', p.id).replace('{velocity}', ffQty(p.v, 'lpn_u_velocity'));
+				.split('{velocity}').join(ffQty(p.v, 'lpn_u_velocity')).split('{id}').join(p.id);
 		});
 		more = peaks.length - shown.length;
 		if (more > 0) {
 			parts.push((pc.lpn_velocity_warn_more || '⚠ And more pipes ({n}) above {limit}.')
-				.replace('{n}', String(more)).replace('{limit}', ffQty(EngCalcs.LPN_VELOCITY_WARN, 'lpn_u_velocity')));
+				.split('{n}').join(String(more)).split('{limit}').join(ffQty(EngCalcs.LPN_VELOCITY_WARN, 'lpn_u_velocity')));
 		}
+		ffLastNum = null;   // ffQty() leaves its last number for a table cell to pick up; none here is one
 		parts = parts.join(' ');
 		if (token) { velNoteCache = { token: token, key: key, text: parts }; }
 		return parts;
