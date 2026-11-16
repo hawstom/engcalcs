@@ -953,8 +953,9 @@ var EngCalcs = EngCalcs || {};
 		var asmBlock = !!assemblyOfNode(n.id), asmA = asmBlock ? assemblyOfNode(n.id) : null, up, at0 = nodeAt(n);
 		if (asmA && asmA.kind === 'well') {
 			// The Well's deep cylinder runs down the middle of its symbol: candidates whose leader would run over it come after every other.
-			// It is x 10.5..13.5, y 17..21.5 of the symbol's 24-unit frame (below the drawdown), centred on the node at (12, 12).
-			var wsz = nodeSymbolSize(n).w, bx0 = at0.x - wsz * 1.5 / 24 - wsz * 0.04, bx1 = at0.x + wsz * 1.5 / 24 + wsz * 0.04, by0 = at0.y + wsz * 5 / 24, by1 = at0.y + wsz * 9.5 / 24 + wsz * 0.04,
+			// It is the casing's width from the step down, and the level line's full width, in the symbol's 24-unit frame centred on the node at (12, 12): wellCasingBox().
+			var wsz = nodeSymbolSize(n).w, cb = wellCasingBox(), pad = wsz * 0.04,
+				bx0 = at0.x + wsz * (cb.x0 - 12) / 24 - pad, bx1 = at0.x + wsz * (cb.x1 - 12) / 24 + pad, by0 = at0.y + wsz * (cb.y0 - 12) / 24, by1 = at0.y + wsz * (cb.y1 - 12) / 24 + pad,
 				onPump = function (c) { var t, x, y; for (t = 0; t <= 1; t += 0.02) { x = at0.x + (c.x - at0.x) * t; y = at0.y + (c.y - at0.y) * t; if (x >= bx0 && x <= bx1 && y >= by0 && y <= by1) { return true; } } return false; };
 			up = sides.filter(function (c) { return !onPump(c); });
 			sides = up.concat(sides.filter(function (c) { return onPump(c); }));
@@ -12011,7 +12012,18 @@ var EngCalcs = EngCalcs || {};
 	// closed along the ground line**, so the width of the upper cylinder (EC_WELL_UPPER_HALF) is one number; the literal is for a page with no icons.
 	function wellSilhouette() {
 		var ic = EngCalcs.icons && EngCalcs.icons.well, m = ic && /d="([^"]+)"/.exec(ic);
-		return m ? m[1] + 'Z' : 'M7.5 4V8H10.25V21.5H13.75V8H16.5V4Z';
+		return m ? m[1] + 'Z' : 'M8.8 4V8H10V21.5H14V8H15.2V4Z';
+	}
+	// What the Well's drawing covers below the step, in the symbol's 24-unit frame, read from the icon's own paths (the first is the outline of the two cylinders, the
+	// last the level line) so a change to the Well's numbers in lib/Icons.lib.php moves it: the box a label's leader is kept off. The literal is for a page with no icons.
+	function wellCasingBox() {
+		var ic = EngCalcs.icons && EngCalcs.icons.well, ds = ic ? ic.match(/d="([^"]+)"/g) : null, o, lv;
+		if (ds && ds.length >= 2) {
+			o = ds[0].match(/-?[\d.]+/g).map(Number); lv = ds[ds.length - 1].match(/-?[\d.]+/g).map(Number);
+			// M l 4 V s H a V bottom H b V s H r V 4 ; M lx ly H rx
+			return { x0: Math.min(o[3], lv[0]), x1: Math.max(o[5], lv[2]), y0: o[2], y1: o[4] };
+		}
+		return { x0: 8, x1: 16, y0: 8, y1: 21.5 };
 	}
 	var RESERVOIR_HALF_W = 1.9878;
 	var RESERVOIR_HALF_H = 1.9878;

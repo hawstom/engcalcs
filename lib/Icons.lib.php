@@ -47,33 +47,43 @@ define('EC_ICON_OPEN_TAG', '<svg class="ec-icon" viewBox="0 0 24 24" fill="none"
 
 // **THE WELL'S UPPER CYLINDER IS ONE NUMBER** (Tom, round 6 pass: colleagues are being asked whether it should be much narrower, only a little wider
 // than the deep cylinder). Half its width in the 24-unit frame, either side of the centre line at x = 12.
-// A change here changes the toolbar icon, the map symbol and its grab shape, which JS derives from the icon's first path (wellSilhouette()).
-define('EC_WELL_UPPER_HALF', 4.5);
-// The deep cylinder's half width, and the depth where the upper cylinder ends (A4 of the 2026-11-14 proofs: a short upper hole over a long casing).
-define('EC_WELL_DEEP_HALF', 1.75);
+// A change here changes the toolbar icons, the map symbol and its grab shape, which JS derives from the icon's first path (wellSilhouette()).
+// A4 and B7 of the 2026-11-14 proofs are narrow over deep, upper half to deep half 1.6 to 1; 3.2 to 2 is that, as far as keeps the casing open at 17 px.
+define('EC_WELL_UPPER_HALF', 3.2);
+// The deep cylinder's half width, and the depth where the upper cylinder ends (A4: a short upper hole over a long casing).
+define('EC_WELL_DEEP_HALF', 2);
 define('EC_WELL_STEP', 8);
+// The water level, the y where the drawdown curves meet the casing, and how far the level line runs beyond the casing on each side.
+define('EC_WELL_LEVEL', 17);
+define('EC_WELL_LEVEL_EXT', 2);
 
 // **THE WELL'S DRAWING** (Tom's sketch of 2026-10-25, WELL, and his verdict on round 9: "We were very close to what we needed already. And I suggested A4 and B7."):
-// a ground line across the top that runs past the pit on both sides; a short, wide upper cylinder; below it a long, narrow casing with a closed bottom;
+// a ground line across the top that runs past the pit on both sides; a short, narrow upper cylinder; below it a long, narrow casing with a closed bottom;
 // the drawdown curves, which fall from the ground line's ends and meet the water level, a horizontal line at full stroke weight that crosses the casing and
 // runs a little beyond it (a hairline inside the casing vanished at 17 px, and a solid water body was refused). The FIRST path is the outline of the two
-// cylinders: JS closes it for the symbol's backdrop and grab shape. The curves start below the step, or they run into the upper hole's walls.
-function ecWellDrawing() {
+// cylinders: JS closes it for the symbol's backdrop and grab shape; the LAST is the level line. The curves start below the step, or they run into the upper
+// hole's walls. At the defaults ($cx 12, $gy 4, $k 1) it fills the 24-unit frame; the Well with tank icon draws the same thing smaller, so one set of numbers moves both.
+function ecWellDrawing($cx = 12, $gy = 4, $k = 1) {
+	$X = function ($dx) use ($cx, $k) { return round($cx + $k * ($dx - 12), 3); };
+	$Y = function ($y) use ($gy, $k) { return round($gy + $k * ($y - 4), 3); };
 	$l = 12 - EC_WELL_UPPER_HALF; $r = 12 + EC_WELL_UPPER_HALF;
 	$a = 12 - EC_WELL_DEEP_HALF; $b = 12 + EC_WELL_DEEP_HALF;
-	$s = EC_WELL_STEP; $lx = $a - 2; $rx = $b + 2;   // the level line's ends, 2 beyond the casing where the curves meet it, at y 17
-	return '<path d="M' . $l . ' 4V' . $s . 'H' . $a . 'V21.5H' . $b . 'V' . $s . 'H' . $r . 'V4"/><path d="M2 4H22"/>'
-		. '<path d="M2 12C7 12 ' . ($lx - .5) . ' 12.5 ' . $lx . ' 17M22 12C17 12 ' . ($rx + .5) . ' 12.5 ' . $rx . ' 17"/>'
-		. '<path stroke-linecap="butt" d="M' . $lx . ' 17H' . $rx . '"/>';
+	$s = EC_WELL_STEP; $ly = EC_WELL_LEVEL; $lx = $a - EC_WELL_LEVEL_EXT; $rx = $b + EC_WELL_LEVEL_EXT; $c0 = 12;
+	return '<path d="M' . $X($l) . ' ' . $Y(4) . 'V' . $Y($s) . 'H' . $X($a) . 'V' . $Y(21.5) . 'H' . $X($b) . 'V' . $Y($s) . 'H' . $X($r) . 'V' . $Y(4) . '"/>'
+		. '<path d="M' . $X(2) . ' ' . $Y(4) . 'H' . $X(22) . '"/>'
+		. '<path d="M' . $X(2) . ' ' . $Y($c0) . 'C' . $X(7) . ' ' . $Y($c0) . ' ' . $X($lx - .5) . ' ' . $Y($c0 + .5) . ' ' . $X($lx) . ' ' . $Y($ly)
+		. 'M' . $X(22) . ' ' . $Y($c0) . 'C' . $X(17) . ' ' . $Y($c0) . ' ' . $X($rx + .5) . ' ' . $Y($c0 + .5) . ' ' . $X($rx) . ' ' . $Y($ly) . '"/>'
+		. '<path stroke-linecap="butt" d="M' . $X($lx) . ' ' . $Y($ly) . 'H' . $X($rx) . '"/>';
 }
-// **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (B7 of the 2026-11-14 proofs, with the pipe low on the tank):
-// a small well on the left, a riser to a tee with a short stub, and a run to a tank standing on the ground line. The run enters the tank 2.5 units above
-// its bottom, as a ground-level tank is plumbed (a pipe drains a tank only from the bottom; Tom, round 8). The tank on legs read worse at 17 px, where the
-// legs and the pipe crowd the ground line. The well's strokes are thinner (1.3) so its casing stays open at this size.
+// **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (B7 of the 2026-11-14 proofs): the Well's own drawing at 0.55 on the left,
+// its ground line running on as the floor of a tank standing on the ground at the right, and a pipe from the well's head to the tank's bottom corner. A ground
+// tank's outlet is at its floor or a few inches above it (Mary's finding, WV 64-77-9 and WI NR 811.64; Tom, round 8: a pipe drains a tank only from the bottom),
+// so the pipe meets the floor line within a stroke. The tank on legs read worse at 17 px, where legs and pipe crowd the ground line. Strokes are 1.2 so the
+// casing stays open at this size (at 0.55 the casing is 2.2 between its wall centres).
 function ecWellTankIcon() {
-	return '<g stroke-width="1.3"><path d="M3.2 13V15.6H5.2V22.5H6.8V15.6H8.8V13"/><path d="M0.8 13H11.2"/>'
-		. '<path d="M0.8 16.2C3 16.2 3.6 16.8 3.9 18.6M11.2 16.2C9 16.2 8.4 16.8 8.1 18.6"/><path stroke-linecap="butt" d="M3.4 18.6H8.6"/></g>'
-		. '<path d="M6 13V10.5M2.5 10.5H13"/><path d="M13 13V3H22V13"/><path stroke-width="1.3" d="M11.5 13H23.5"/>';
+	$k = .55; $cx = 6.4; $gy = 13;
+	return '<g stroke-width="1.2">' . ecWellDrawing($cx, $gy, $k) . '</g>'
+		. '<path d="M' . $cx . ' ' . $gy . 'V11.6H13.6"/><path d="M13.6 ' . $gy . 'V3H22V' . $gy . 'H11.8"/>';
 }
 
 $ec_icons = array(

@@ -272,11 +272,12 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   are the ordinary fields', so the label settings govern which show. Order of the heading numbers: `WELL_HEADING_FIELDS` (Z then Q then P; he also asked
   *"Do we want to try to put Q first after the W1 ID?"*, so it is a swap if he wants it).
 - **The Properties box:** flow once, above the headings (the pump's); pressure only under the outlet. The reservoir's Pressure row is gone too.
-- **The symbol** (his sketch of 2026-10-25, WELL): a ground line, a wide upper cylinder, a narrow deep cylinder with a closed bottom below it, the drawdown
-  curves meeting the narrow one above its bottom, and (Round 8) a short horizontal water-level line across the narrow one where they meet it; the box at the
-  bottom (it read as a pump) is gone. The upper cylinder's width is
-  `EC_WELL_UPPER_HALF` in `lib/Icons.lib.php`, one line; the map symbol's grab shape is derived from the icon's first path, so one number moves all.
-  He is asking colleagues whether it should be much narrower, only a little wider than the deep one.
+- **The symbol** (his sketch of 2026-10-25, WELL; round 10 is A4 of the 2026-11-14 proofs, his pick, after he refused round 9's dark water body): a ground line,
+  a short narrow upper cylinder over a long narrow casing with a closed bottom (upper half-width to casing half-width 1.6 to 1, as in the proof), the drawdown
+  curves falling from the ground line and meeting a full-weight horizontal water-level line that crosses the casing and runs 2 units beyond it (a hairline inside
+  the casing vanished at 17 px). The box at the bottom (it read as a pump) is gone. The numbers are `EC_WELL_UPPER_HALF`, `EC_WELL_DEEP_HALF`, `EC_WELL_STEP`,
+  `EC_WELL_LEVEL` and `EC_WELL_LEVEL_EXT` in `lib/Icons.lib.php`; the map symbol's grab shape and the label-leader avoidance box are derived from the icon's
+  paths, so one number moves all. `well-symbol-browser-harness.js` rasterizes both icons at 17, 21 and 24 px and requires the level line to show.
 - **Well with tank is three points** (*"Physically and geographically, a well is a location/point with a reservoir, drawdown, and pump. Cramming a tank into
   that point makes no sense"*): the Pump button cycles Pump, Pump+, Well, Well with tank. Three presses, each prompted in the status bar: the well
   (placed as a Well is, spliced into a pipe or on open ground), the tee, the tank. The tee may be the well's own point (the pipe joining them is then a
@@ -292,8 +293,9 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
     ordinary controls; the status bar (project file) or the import report (`.inp`, code `assembly-well-tank`) says so. The one-point form's code is gone.
   - **Still open:** the pressure tank (Boyle's law; Tom's 2026-10-25 notes: total volume, pump-on and pump-off pressure, empty pressure). Only the
     open-air tank is built.
-  - **The toolbar icon** for Well with tank is `ecWellTankIcon()` in `lib/Icons.lib.php`, one small function: the well at 0.62 below a ground line with a
-    tank standing above the line (Tom: the earlier drawing put the tank underground; proofs are with him).
+  - **The toolbar icon** for Well with tank is `ecWellTankIcon()` in `lib/Icons.lib.php` (B7 of the proofs): the Well's own drawing at 0.55 on the left, its
+    ground line running on as the floor of a tank standing on the ground, and a pipe from the well's head to the tank's bottom corner, because a ground tank's
+    outlet is at its floor (Tom, round 8; state rules WV 64-77-9 and WI NR 811.64 per the market researcher). A tank on legs was drawn and read worse at 17 px.
 - **Morph** (*"I think we need to have on our checklist to ensure that Morph works with the + assemblies before we merge this."*): a Morph of ANY member
   (nodes and links of Pump+, Valve+, Well and a Well with tank's tee, tank and pipes) first separates the group as Explode does, inside the Morph's own
   undo step, then changes the type as for any element; the status bar says which group was separated; one Undo restores both. In a scenario the type

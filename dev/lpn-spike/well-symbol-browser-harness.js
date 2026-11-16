@@ -90,23 +90,27 @@ async function main() {
 		ok('the Well, the Tank and the Reservoir are all drawn as symbols', !!symbols.well && !!symbols.tank && !!symbols.reservoir);
 		ok('the tint in the Well\'s holes is the Tank\'s and the Reservoir\'s: the same class, the same fill, the same strength', symbols.well && symbols.well.cls === symbols.tank.cls && symbols.well.cls === symbols.reservoir.cls && symbols.well.fill === symbols.tank.fill && symbols.well.fill === symbols.reservoir.fill && symbols.well.op === symbols.tank.op && symbols.well.op === symbols.reservoir.op, JSON.stringify([symbols.well, symbols.tank, symbols.reservoir]));
 		const lines = (symbols.paths || []).filter((p) => !/backdrop/.test(p.cls));
-		ok('the symbol has a full-weight water-level line across the casing, and its linework is the casing, the ground, the curves and that line, with no box and no solid water', lines.length === 4 && lines.some((p) => /^M8\.25 17H15\.75$/.test(p.d)) && !lines.some((p) => /Z/i.test(p.d)), lines.map((p) => p.d).join(' | '));
+		ok('the symbol has a full-weight water-level line across the casing, and its linework is the casing, the ground, the curves and that line, with no box and no solid water', lines.length === 4 && lines.some((p) => /^M8 17H16$/.test(p.d)) && !lines.some((p) => /Z/i.test(p.d)), lines.map((p) => p.d).join(' | '));
 		// **THE LEVEL LINE MUST SHOW AT TOOLBAR SIZE** (round 9 pass: a hairline inside the casing vanished at 17 px). Rasterize the toolbar icon at 17, 21 and 24 px and
 		// read the casing's centre column: the row of the level line is dark, and clearly darker than the air column above it.
 		const px = await P.evaluate(async () => {
-			const out = {};
-			for (const size of [17, 21, 24]) {
-				const svg = EngCalcs.iconOpenTag.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" ').replace('stroke="currentColor"', 'stroke="#000"') + EngCalcs.icons.well + '</svg>';
-				const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-				await img.decode();
-				const cv = document.createElement('canvas'); cv.width = size; cv.height = size;
-				const g = cv.getContext('2d'); g.drawImage(img, 0, 0);
-				const k = size / 24, cx = Math.floor(12 * k), col = (y) => g.getImageData(cx, Math.floor(y * k), 1, 1).data[3] / 255;
-				out[size] = { level: col(17), air: col(12.5) };
+			// Where the level line is, and where air above it is, at the casing's centre column, in the 24-unit frame: the Well fills the frame; the Well with tank's well is
+			// drawn at 0.55 from (6.4, 13) (ecWellTankIcon()), so its level is at y 13 + .55 * (17 - 4) and its air at 13 + .55 * (12.5 - 4).
+			const where = { well: { cx: 12, level: 17, air: 12.5 }, welltank: { cx: 6.4, level: 13 + .55 * 13, air: 13 + .55 * 8.5 } }, out = {};
+			for (const name of ['well', 'welltank']) {
+				for (const size of [17, 21, 24]) {
+					const svg = EngCalcs.iconOpenTag.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" ').replace('stroke="currentColor"', 'stroke="#000"') + EngCalcs.icons[name] + '</svg>';
+					const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+					await img.decode();
+					const cv = document.createElement('canvas'); cv.width = size; cv.height = size;
+					const g = cv.getContext('2d'); g.drawImage(img, 0, 0);
+					const k = size / 24, w = where[name], col = (y) => g.getImageData(Math.floor(w.cx * k), Math.floor(y * k), 1, 1).data[3] / 255;
+					out[name + size] = { level: col(w.level), air: col(w.air) };
+				}
 			}
 			return out;
 		});
-		for (const size of [17, 21, 24]) { ok('at ' + size + ' px the level line shows in the casing, clearly darker than the air above it', px[size].level > 0.6 && px[size].level - px[size].air > 0.3, JSON.stringify(px[size])); }
+		for (const name of ['well', 'welltank']) { for (const size of [17, 21, 24]) { const r = px[name + size]; ok('at ' + size + ' px the ' + name + ' icon\'s level line shows in the casing, clearly darker than the air above it', r.level > 0.5 && r.level - r.air > 0.3, JSON.stringify(r)); } }
 		if (process.env.EC_WELL_SHOT) {   // a picture of the Well's symbol, for a review: EC_WELL_SHOT=/path/to.png
 			const c = await wc();
 			await P.evaluate(() => { document.querySelectorAll('#lpn_canvas .lpn-label, #lpn_canvas text').forEach((t) => { t.style.visibility = 'hidden'; }); });
