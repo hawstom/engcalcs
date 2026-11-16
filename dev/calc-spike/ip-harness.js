@@ -13,9 +13,10 @@
 //     8.3), F = 1/(m+1) + 1/(2n) + sqrt(m-1)/(6 n^2). Checked against the PUBLISHED TABLE for the
 //     m = 1.75 column -- F(2) = 0.650, F(5) = 0.469, F(10) = 0.415, F(20) = 0.389, F(100) = 0.369
 //     -- which is a reference outside this repo entirely.
-//   * FRICTION: Darcy-Weisbach h_f = f (L/d) V^2 / 2g with f from Swamee & Jain (1976),
-//     f = 0.25 / [log10( e/(3.7 d) + 5.74 / Re^0.9 )]^2, cross-checked here against the equation
-//     it approximates -- Colebrook-White, solved by fixed-point iteration.
+//   * FRICTION: Darcy-Weisbach h_f = f (L/d) V^2 / 2g with f EPANET's: 64/Re, Swamee & Jain (1976) above
+//     Re 4000, f = 0.25 / [log10( e/(3.7 d) + 5.74 / Re^0.9 )]^2, and Dunlop's cubic between 2000 and 4000
+//     (epanet-friction-ref.js, from EPANET's hydcoeffs.c). Swamee-Jain is cross-checked here against the
+//     equation it approximates -- Colebrook-White, solved by fixed-point iteration.
 //   * THE MARCH AND THE BISECTION, which are ip_'s own: the energy equation stepped reach by
 //     reach from the critical emitter back to the supply. The test that matters for an ITERATIVE
 //     calculator is not the formulas but the CONVERGENCE -- so the reported h_far is fed back
@@ -32,9 +33,10 @@
 // continuing flow is zero and the convention cannot matter. h_us, which is unambiguous, carries
 // the head bookkeeping instead.
 //
-// EVERY WORKED NETWORK HERE IS TURBULENT ON PURPOSE (Re > 4000, asserted). Between Re 2000 and
-// 4000 the page blends with a bespoke cubic that approximates nothing published, so a worked
-// example sited there would be testing an interpolation against itself.
+// THE MAIN WORKED NETWORK IS TURBULENT ON PURPOSE (Re > 4000, asserted), where Swamee-Jain is the whole
+// story. A second section runs the same network on a viscous fluid so both reaches sit between Re 2000
+// and 4000, where the page uses Dunlop's cubic as EPANET does; the reference there is EPANET's source,
+// not the page.
 //
 // MUTATIONS TRIED, all caught:
 //   1. christiansenM 1.75 -> 1.9                (the published F(n) table, and the lateral h_f)
@@ -48,6 +50,7 @@
 // Licensed under GNU GPL v3.0 or later
 
 const { loadCalculator, makeReporter } = require('./calc-page.js');
+const { epanetF } = require('./epanet-friction-ref.js');
 
 const r = makeReporter('Irrigation Pressure (ip_) worked example');
 
@@ -115,7 +118,8 @@ const REACHES = [
  * page: given a pressure head at the critical emitter, what supply pressure does the system
  * need? Everything is SI here; the caller converts.
  */
-function marchToSupply(hFarSi) {
+function marchToSupply(hFarSi, nuArg) {
+	const nu = (nuArg === undefined) ? NU : nuArg;
 	const kEmitter = (SUPPLY.qDesignGph * GPH) / Math.pow(SUPPLY.hDesignFt * FT, SUPPLY.x);
 	const rows = REACHES.map(row => ({
 		isLateral: row.isLateral, count: row.count,
@@ -135,8 +139,8 @@ function marchToSupply(hFarSi) {
 		const qUs = qDs + draw;
 		const a = Math.PI * row.d * row.d / 4;
 		const v = qUs / a;
-		const re = v * row.d / NU;
-		const f = swameeJain(re, row.e, row.d);
+		const re = v * row.d / nu;
+		const f = epanetF(re, row.e / row.d);
 		const fN = row.isLateral ? christiansen(row.count) : 1;
 		const hv = v * v / (2 * G);
 		const hf = fN * f * (row.L / row.d) * hv;
@@ -166,7 +170,7 @@ function loadWorked(overrides) {
 		q_design: SUPPLY.qDesignGph,
 		h_design: SUPPLY.hDesignFt,
 		x: (o.x === undefined ? SUPPLY.x : o.x),
-		dp_avg: 0, visc: NU, h_max_allow: '',
+		dp_avg: 0, visc: (o.visc === undefined ? NU : o.visc), h_max_allow: '',
 		se: 2, sl: 5, n_e: 10, n_l: 10, d: 0.75
 	});
 	REACHES.forEach(function (row, i) {
@@ -256,6 +260,32 @@ const linear = loadWorked({ x: 1 });
 r.close(linear.num('q_critical') / SUPPLY.qDesignGph,
 	linear.num('h_far') / SUPPLY.hDesignFt, TOL,
 	'x = 1 makes discharge proportional to pressure head');
+
+// =========================================================================================
+r.section('the transitional range: both reaches between Re 2000 and 4000, EPANET\'s friction factor');
+
+// The same network on a fluid 3.2 times as viscous as water, which puts the reaches near Re 2200 and 3700.
+// Both reaches' friction and the whole march are checked against the independent one, whose f is
+// EPANET's hydcoeffs.c frictionFactor() written out in epanet-friction-ref.js.
+(function () {
+	const nu = 3.2e-6;
+	const pg = loadWorked({ visc: nu });
+	const rf = marchToSupply(pg.num('h_far') * FT, nu);
+	r.ok(rf.rows.every(row => row.re > 2000 && row.re < 4000),
+		'both reaches are transitional, Re between 2000 and 4000',
+		rf.rows.map(row => 'Re = ' + row.re.toFixed(0)).join(', '));
+	for (let i = 0; i < REACHES.length; i += 1) {
+		nearDisplayed(pg.rowNum('hf', i), rf.rows[i].hf / FT, 3, `reach ${i}: friction loss, ft, with EPANET's f at Re ${rf.rows[i].re.toFixed(0)}`);
+		r.close(pg.rowNum('h_us', i), rf.rows[i].hUs / FT, TOL, `reach ${i}: upstream pressure head, ft`);
+	}
+	r.close(rf.hSupply / FT, SUPPLY.hSupplyFt, 1e-5,
+		'and marching forward from h_far lands on the entered supply pressure');
+	// The friction function directly, squarely at Re 3000 for the lateral's pipe.
+	const d = REACHES[1].diaIn * IN, e = REACHES[1].roughFt * FT, re = 3000;
+	const q = re * nu * Math.PI * d / 4;
+	r.close(pg.EngCalcs.ipFriction(q, d, e, nu).f, epanetF(re, e / d), 1e-9,
+		'ipFriction at Re = 3000 is EPANET\'s f', `f = ${epanetF(re, e / d).toFixed(6)}`);
+}());
 
 // =========================================================================================
 r.section('Swamee-Jain against Colebrook-White');

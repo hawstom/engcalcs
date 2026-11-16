@@ -244,6 +244,44 @@ const ROUND2 = SWEEP.concat([
 // not pass through the origin (the loss's sign is SGN(Q) of round-off, so EPANET's own answer is a
 // coin toss, 1.33 m either way). Neither has an EPANET answer to hold the built-in solver to.
 
+// ---- ROUND 3: A PBV OR A GPV RIGHT AT A RESERVOIR OR A TANK (Tom, 2026-11-14: "Yes") ---------------
+// EPANET refuses only a PRV, PSV or FCV there (project.c valvecheck(), error 219); the other types
+// were refused here as well until this round. Each case is a valve whose one end IS the fixed-head
+// node, outlet and inlet, reservoir and tank, and both engines must agree on every head and flow
+// (the audit that found it measured 94.762165 against 94.762168 m for a GPV at a reservoir).
+const tank = (id, elev, level) => ({ id, type: 'tank', elev, head: elev + level, level, minLevel: 0, maxLevel: 25, diameter: 12 });
+const GPV3 = curve([[10, 2], [25, 6], [40, 14]]);
+const ROUND3 = [
+	{ name: 'PBV straight on a reservoir outlet', want: { V: 'active' }, drop: { V: 10 },
+		model: { method: 'hw', nodes: [res('R', 100), jn('J1', 0), jn('J2', 10, 30)],
+			links: [valve('V', 'R', 'J1', 'PBV', 10), pipe('P', 'J1', 'J2', 600, 0.2)] } },
+	{ name: 'GPV straight on a reservoir outlet', want: { V: 'open' },
+		model: { method: 'hw', nodes: [res('R', 100), jn('J1', 0), jn('J2', 10, 30)],
+			links: [valve('V', 'R', 'J1', 'GPV', 0, 0.2, gpv(GPV3)), pipe('P', 'J1', 'J2', 600, 0.2)] } },
+	{ name: 'PBV straight into a reservoir', want: { V: 'active' }, drop: { V: 10 },
+		model: { method: 'hw', nodes: [res('R2', 140), jn('J1', 0, 5), res('R', 60)],
+			links: [pipe('P', 'R2', 'J1', 600, 0.2), valve('V', 'J1', 'R', 'PBV', 10)] } },
+	{ name: 'GPV straight into a reservoir', want: { V: 'open' },
+		model: { method: 'hw', nodes: [res('R2', 140), jn('J1', 0, 5), res('R', 60)],
+			links: [pipe('P', 'R2', 'J1', 600, 0.2), valve('V', 'J1', 'R', 'GPV', 0, 0.2, gpv(GPV3))] } },
+	{ name: 'PBV straight on a tank outlet', want: { V: 'active' }, drop: { V: 10 },
+		model: { method: 'hw', nodes: [tank('T', 90, 10), jn('J1', 0), jn('J2', 10, 30)],
+			links: [valve('V', 'T', 'J1', 'PBV', 10), pipe('P', 'J1', 'J2', 600, 0.2)] } },
+	{ name: 'GPV straight on a tank outlet', want: { V: 'open' },
+		model: { method: 'hw', nodes: [tank('T', 90, 10), jn('J1', 0), jn('J2', 10, 30)],
+			links: [valve('V', 'T', 'J1', 'GPV', 0, 0.2, gpv(GPV3)), pipe('P', 'J1', 'J2', 600, 0.2)] } },
+	{ name: 'PBV straight into a tank', want: { V: 'active' }, drop: { V: 8 },
+		model: { method: 'hw', nodes: [res('R', 150), jn('J1', 0, 10), tank('T', 90, 10)],
+			links: [pipe('P', 'R', 'J1', 600, 0.2), valve('V', 'J1', 'T', 'PBV', 8)] } },
+	{ name: 'GPV straight into a tank', want: { V: 'open' },
+		model: { method: 'hw', nodes: [res('R', 150), jn('J1', 0, 10), tank('T', 90, 10)],
+			links: [pipe('P', 'R', 'J1', 600, 0.2), valve('V', 'J1', 'T', 'GPV', 0, 0.2, gpv(GPV3))] } },
+	{ name: 'PBV on a reservoir, in a loop', want: { V: 'active' }, drop: { V: 15 },
+		model: { method: 'hw', nodes: [res('R', 120), jn('A', 0), jn('B', 20, 10), jn('C', 20, 25)],
+			links: [valve('V', 'R', 'A', 'PBV', 15), pipe('P2', 'A', 'B', 400, 0.2), pipe('P3', 'B', 'C', 400, 0.15),
+				pipe('P4', 'A', 'C', 900, 0.15)] } }
+];
+
 // ---- EPA's networks, with valves put in --------------------------------------------------------
 function toSolverModel(parsed) {
 	const S = parsed.scale;
@@ -373,6 +411,9 @@ async function run() {
 	console.log('-- 1b. the open/active sweep and the pre-reviewer\'s cases');
 	for (const c of ROUND2) { await compare(c); }
 
+	console.log('-- 1c. a PBV or a GPV right at a reservoir or a tank');
+	for (const c of ROUND3) { await compare(c); }
+
 	console.log('-- 2. EPA Net1 and Net3, with PBVs and GPVs put in');
 	const net1 = loadNet('Net1.inp');
 	const net3 = loadNet('Net3.inp');
@@ -426,9 +467,22 @@ async function run() {
 		ok('a GPV curve with ' + nm + ' is refused by name in both engines', named(nat) && named(epa),
 			JSON.stringify([nat.issues, epa.issues]));
 	}
-	ok('a PBV on a reservoir is still refused by name',
-		EngCalcs.lpnDiagnose({ nodes: [res('R', 50), jn('J', 0, 1)],
-			links: [valve('V', 'R', 'J', 'PBV', 20, 0.2)] }).some((i) => i.code === 'valve-on-fixed-head'));
+	ok('a PBV or a GPV on a reservoir is no longer refused (EPANET accepts both: valvecheck() is PRV, PSV and FCV only)',
+		['PBV', 'GPV'].every((vt) => !EngCalcs.lpnDiagnose({ nodes: [res('R', 50), jn('J', 0, 1)],
+			links: [valve('V', 'R', 'J', vt, 20, 0.2, vt === 'GPV' ? gpv(GPV4) : null)] }).some((i) => i.code === 'valve-on-fixed-head')));
+	// What EPANET itself refuses stays refused, by name, in both engines (error 219).
+	for (const vt of ['PRV', 'PSV', 'FCV']) {
+		for (const [where, nodes, links] of [
+			['a reservoir', [res('R', 50), jn('J', 0, 1)], [valve('V', 'R', 'J', vt, 20, 0.2)]],
+			['a tank', [tank('T', 40, 10), jn('J', 0, 1)], [valve('V', 'J', 'T', vt, 20, 0.2)]]]) {
+			const m = { method: 'hw', nodes, links };
+			const nat = EngCalcs.lpnSolve(m);
+			const epa = await EngCalcs.lpnSolveEpanet(m, { moduleUrl: MODULE_URL });
+			const named = (r) => !r.ok && (r.issues || []).some((i) => i.code === 'valve-on-fixed-head' && i.ids.join() === 'V');
+			ok('a ' + vt + ' on ' + where + ' is still refused by name in both engines', named(nat) && named(epa),
+				JSON.stringify([nat.issues, epa.issues]));
+		}
+	}
 
 	console.log('-- 4. the comparison can fail');
 	// Each of the three things this phase could get wrong, made wrong on purpose in the MODEL the

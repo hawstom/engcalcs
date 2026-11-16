@@ -580,19 +580,21 @@ EngCalcs.lpnDiagnose = function (model, options) {
 		if (EngCalcs.lpnIsFixedHead(node)) { fixed.push(node.id); }
 	}
 
-	// AN ACTIVE VALVE MAY NOT SIT DIRECTLY ON A RESERVOIR OR A TANK. This is EPANET's own rule
-	// (input error 219), and it exists because a PRV/PSV/FCV controls the pressure or flow at a
-	// node whose head is already fixed by the vessel -- two boundary conditions on one node, so
-	// there is nothing left for the valve to control. Checked for BOTH engines, because it is a
-	// fact about the drawing rather than about who solves it, and because EPANET would otherwise
-	// report it as a number with no element attached. Put a short pipe between them.
+	// A PRV, PSV OR FCV MAY NOT SIT DIRECTLY ON A RESERVOIR OR A TANK. This is EPANET's own rule
+	// (input error 219, project.c valvecheck(): `type == PRV || type == PSV || type == FCV`, a
+	// connection to a node past Njuncs), and it exists because those three control the pressure or
+	// flow at a node whose head is already fixed by the vessel -- two boundary conditions on one
+	// node, so there is nothing left for the valve to control. A PBV (a fixed drop across itself),
+	// a GPV (a head loss read off a curve) and a TCV (a minor loss) need no node of their own, so
+	// EPANET accepts them there and so does the built-in solver (Tom, 2026-11-14: "Yes", lifting the
+	// refusal). Checked for BOTH engines, because it is a fact about the drawing rather than about
+	// who solves it, and because EPANET would otherwise report it as a number with no element
+	// attached. Put a short pipe between them.
 	for (i = 0; i < model.links.length; i++) {
 		link = model.links[i];
-		// Every type but the throttle and the general purpose valve: PRV/PSV/FCV are EPANET's rule 219
-		// (project.c valvecheck), and a PBV was refused here before the native solver learnt the others,
-		// and still is. A GPV may touch a reservoir or a tank: EPANET's check does not apply to it, and a
-		// Well (Task 822) is a reservoir, a GPV for the drawdown, and the pump's suction node.
-		if (link.type !== 'valve' || ['TCV', 'GPV'].indexOf((link.valveType || 'TCV').toUpperCase()) >= 0) { continue; }
+		// Only PRV/PSV/FCV: a GPV may touch a reservoir or a tank (a Well, Task 822, is a reservoir, a GPV
+		// for the drawdown, and the pump's suction node), as a PBV and a TCV may.
+		if (link.type !== 'valve' || ['PRV', 'PSV', 'FCV'].indexOf((link.valveType || 'TCV').toUpperCase()) < 0) { continue; }
 		if ((byId[link.from] && EngCalcs.lpnIsFixedHead(byId[link.from])) ||
 			(byId[link.to] && EngCalcs.lpnIsFixedHead(byId[link.to]))) {
 			badlyPlacedValves.push(link.id);

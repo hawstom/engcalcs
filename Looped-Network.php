@@ -308,7 +308,7 @@ echoHeader("EngCalcsApp", $html_title,
 		      // and the fit must not depend on the model -- the same rule that keeps
 		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js).
 		      //
-		      // **z-index:6, MATCHING #lpn_georef_bar** (Perry's review, 2026-09-22, reported
+		      // **z-index:6, THE GEOREFERENCING BAR'S THEN** (Perry's review, 2026-09-22, reported
 		      // twice: at 390px on a fresh project, #lpn_examples_pane intercepted every press
 		      // meant for the glyph). `.lpn-examples` is `margin:0 auto;max-width:68rem` -- at
 		      // 1280px that centres it narrower than the viewport, clear of this row's left edge,
@@ -491,7 +491,7 @@ echoHeader("EngCalcsApp", $html_title,
 		      // STATIC MARKUP, filled and shown by georefRefreshBar() in looped-network.js, for the
 		      // same reason #lpn_backdrop_target_panel is static: the strings are language keys and
 		      // PHP is where those live. ?>
-		<div id="lpn_georef_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:var(--ec-bg);border:1px solid var(--ec-hue-05a);padding:6px 10px;box-shadow:var(--ec-box-shadow)">
+		<div id="lpn_georef_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:8;max-width:92%;font-size:12px;background:var(--ec-bg);border:1px solid var(--ec-hue-05a);padding:6px 10px;box-shadow:var(--ec-box-shadow)">
 			<?php // WHICH STEP YOU ARE IN, SAID OUT LOUD (Tom, 2026-08-18: "there is an uncomfortable
 			      // gray area between the described modes"). Filled by georefRefreshBar(); its text
 			      // and the Detach button's are English literals in looped-network.js until their
@@ -531,7 +531,7 @@ echoHeader("EngCalcsApp", $html_title,
 		      // this one ends by converting none, so a shared strip would be one set of buttons meaning
 		      // two opposite things. Go to and Place name search are the placement bar's own labels
 		      // reused whole, because they are the same two commands. ?>
-		<div id="lpn_mapgeo_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:var(--ec-bg);border:1px solid var(--ec-hue-05a);padding:6px 10px;box-shadow:var(--ec-box-shadow)">
+		<div id="lpn_mapgeo_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:8;max-width:92%;font-size:12px;background:var(--ec-bg);border:1px solid var(--ec-hue-05a);padding:6px 10px;box-shadow:var(--ec-box-shadow)">
 			<div id="lpn_mapgeo_step" style="margin-bottom:2px;font-weight:bold"></div>
 			<div id="lpn_mapgeo_hint" style="margin-bottom:4px"></div>
 			<?php // Its own line rather than a second sentence glued to the one above: a string
@@ -589,7 +589,7 @@ echoHeader("EngCalcsApp", $html_title,
 		      // pane cuts the canvas at will, and a control sized from the markup slid up under the
 		      // toolbar. See mapgeoPlaceDial().
 		      ?>
-		<div id="lpn_mapgeo_dial" class="d-print-none" style="display:none;position:absolute;right:12px;top:8px;z-index:6;font-size:11px;text-align:center;background:var(--ec-bg);border:1px solid var(--ec-hue-05a);padding:6px 8px;box-shadow:var(--ec-box-shadow)">
+		<div id="lpn_mapgeo_dial" class="d-print-none" style="display:none;position:absolute;right:12px;top:8px;z-index:8;font-size:11px;text-align:center;background:var(--ec-bg);border:1px solid var(--ec-hue-05a);padding:6px 8px;box-shadow:var(--ec-box-shadow)">
 			<?php // **THE NUMBER BOX AND THE READOUT SIT ABOVE THE BAR, not under it.** The bar is
 			      // as tall as the map by instruction, so anything below it is at the far end of a
 			      // 600 px control from the label that names it, and on a first-visit page the
@@ -621,17 +621,16 @@ echoHeader("EngCalcsApp", $html_title,
 		<?php // top/bottom/left/right deliberately absent -- applyLegendPosition() in
 		      // looped-network.js sets those from settings.legendPosition (Task 146 gear panel,
 		      // 2026-07-30; default now top-left, Tom 2026-09-28). ?>
-		<?php // **z-index:3, BELOW EVERY OTHER TOP-LEFT OCCUPANT** (Tom, 2026-09-28, moving the
-		      // default corner here: "I assume and hope that it has lower z-index than the
-		      // messenger history"). #lpn_map_overlay_tl -- the mode hint, the one-shot notice and
-		      // the message-log panel it opens -- carries z-index:6; #lpn_map_notice inside it is
-		      // 5; #lpn_zoom_control is 4. A legend parked in the same corner had NO z-index at all
-		      // (auto, painting as 0), so it already lost to all three by the accident of DOM order
-		      // -- this makes that an explicit, load-bearing number rather than a coincidence the
-		      // next reordering could undo. legendInsetFor() keeps the boxes from overlapping in
-		      // the ordinary case; this is what decides it on the rare frame where they still do
-		      // (a very long message list, a very long legend). ?>
-		<div id="lpn_labels_legend" style="display:none;position:absolute;z-index:3;font-size:0.9em;line-height:1.4;background:var(--ec-a-255-255-255-85);padding:4px 8px;pointer-events:none"></div>
+		<?php // **z-index:7, ABOVE EVERYTHING ELSE ON THE MAP** (Tom, 2026-11-14: *"The legends should have
+		      // higher zindex than anything on the map."*, replacing his 2026-09-28 hope that it sit
+		      // under the messenger history). #lpn_map_overlay_tl -- the mode hint, the one-shot notice
+		      // and the message-log panel -- is 6, the zoom chip 4, the footer and the examples wall
+		      // auto. The three map tools with controls of their own (the georeferencing bar, the
+		      // map-geometry bar and its dial) and the required tile credit are 8, because a legend
+		      // that hid a button or an attribution would be worse than one under a notice. The legend
+		      // takes no pointer events, so it never blocks what lies under it. The colour key carries
+		      // the SAME number (css/engcalcs.css). ?>
+		<div id="lpn_labels_legend" style="display:none;position:absolute;z-index:7;font-size:0.9em;line-height:1.4;background:var(--ec-a-255-255-255-85);padding:4px 8px;pointer-events:none"></div>
 		<?php // THE ON-MAP ZOOM CHIP (ROADMAP Task 682) -- for a visitor with no wheel and no pinch
 		      // surface: a trackpad, a trackball, a presentation remote. Fixed top-right, the same
 		      // corner the labels legend above defaults to and the one Mapbox's own NavigationControl
@@ -794,7 +793,7 @@ echoHeader("EngCalcsApp", $html_title,
 		      //
 		      // Its own corner, not a cell of #lpn_map_footer: the footer is left-packed and hidden
 		      // on print, and this has to survive both. Shown and hidden by refreshBasemapCredit(). ?>
-		<div id="lpn_basemap_credit" style="display:none;position:absolute;bottom:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;font-size:10px;line-height:1.4;background:var(--ec-a-255-255-255-85);padding:1px 5px"><!-- Required attribution, one set per tile source; js/looped-network.js shows the set whose tiles are on screen. Mapbox's terms name Mapbox and its imagery supplier as well as OpenStreetMap, so the satellite set is not a superset of the street one. --><span data-basemap-credit="osm"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></span><span data-basemap-credit="satellite" style="display:none"><!-- Mapbox's required attribution is the WORDMARK plus three links with their exact labels and URLs (ROADMAP Task 489, docs.mapbox.com/help/getting-started/attribution/). The mark is a CSS data: URI (.lpn-mapbox-logo), never an image fetched from Mapbox: no request may reach them before the visitor turns satellite on. Maxar is the imagery supplier and is credited beside them. --><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener" title="Mapbox"><span class="lpn-mapbox-logo" role="img" aria-label="Mapbox"></span></a> <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://www.maxar.com/" target="_blank" rel="noopener">© Maxar</a> <a href="https://apps.mapbox.com/feedback/" target="_blank" rel="noopener">Improve this map</a></span><span data-basemap-credit="outdoors" style="display:none"><!-- Mapbox Outdoors (Task 617): the wordmark, (c) Mapbox, (c) OpenStreetMap and Improve this map. No imagery supplier, so no Maxar. --><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener" title="Mapbox"><span class="lpn-mapbox-logo" role="img" aria-label="Mapbox"></span></a> <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://apps.mapbox.com/feedback/" target="_blank" rel="noopener">Improve this map</a></span><span data-gis-credit class="lpn-gis-credit" style="display:none"><!-- Task 720: text only, filled by js/looped-network.js from what a GIS server states about itself, or its host. --></span></div>
+		<div id="lpn_basemap_credit" style="display:none;position:absolute;bottom:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:8;font-size:10px;line-height:1.4;background:var(--ec-a-255-255-255-85);padding:1px 5px"><!-- Required attribution, one set per tile source; js/looped-network.js shows the set whose tiles are on screen. Mapbox's terms name Mapbox and its imagery supplier as well as OpenStreetMap, so the satellite set is not a superset of the street one. --><span data-basemap-credit="osm"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></span><span data-basemap-credit="satellite" style="display:none"><!-- Mapbox's required attribution is the WORDMARK plus three links with their exact labels and URLs (ROADMAP Task 489, docs.mapbox.com/help/getting-started/attribution/). The mark is a CSS data: URI (.lpn-mapbox-logo), never an image fetched from Mapbox: no request may reach them before the visitor turns satellite on. Maxar is the imagery supplier and is credited beside them. --><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener" title="Mapbox"><span class="lpn-mapbox-logo" role="img" aria-label="Mapbox"></span></a> <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://www.maxar.com/" target="_blank" rel="noopener">© Maxar</a> <a href="https://apps.mapbox.com/feedback/" target="_blank" rel="noopener">Improve this map</a></span><span data-basemap-credit="outdoors" style="display:none"><!-- Mapbox Outdoors (Task 617): the wordmark, (c) Mapbox, (c) OpenStreetMap and Improve this map. No imagery supplier, so no Maxar. --><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener" title="Mapbox"><span class="lpn-mapbox-logo" role="img" aria-label="Mapbox"></span></a> <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://apps.mapbox.com/feedback/" target="_blank" rel="noopener">Improve this map</a></span><span data-gis-credit class="lpn-gis-credit" style="display:none"><!-- Task 720: text only, filled by js/looped-network.js from what a GIS server states about itself, or its host. --></span></div>
 	</div>
 </form>
 <?php // ---- THE BOTTOM PANE (ROADMAP Task 434) ----------------------------------------------------
@@ -2844,6 +2843,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_export_flat_types: <?=json_encode($ec_lang['lpn_inp_export_flat_types'])?>,
 	lpn_inp_export_flat_fittings: <?=json_encode($ec_lang['lpn_inp_export_flat_fittings'])?>,
 	lpn_inp_export_flat_coords: <?=json_encode($ec_lang['lpn_inp_export_flat_coords'])?>,
+	lpn_inp_export_flat_label_semicolon: <?=json_encode($ec_lang['lpn_inp_export_flat_label_semicolon'])?>,
 	lpn_library_controls: <?=json_encode($ec_lang['lpn_library_controls'])?>,
 	lpn_library_controls_tip: <?=json_encode($ec_lang['lpn_library_controls_tip'])?>,
 	lpn_library_pattern_add: <?=json_encode($ec_lang['lpn_library_pattern_add'])?>,
@@ -2957,6 +2957,8 @@ EngCalcs.pageConfig = {
 		'lpn_field_tank_level',
 		'lpn_field_tank_maxlevel',
 		'lpn_field_tank_minlevel',
+		'lpn_field_tank_minvol',
+		'lpn_field_tank_overflow',
 		'lpn_field_text_all_zoom',
 		'lpn_field_text_size',
 		'lpn_field_x',
@@ -3068,6 +3070,10 @@ EngCalcs.pageConfig = {
 	lpn_field_tank_maxlevel_tip: <?=json_encode($ec_lang['lpn_field_tank_maxlevel_tip'])?>,
 	lpn_field_tank_diameter: <?=json_encode($ec_lang['lpn_field_tank_diameter'])?>,
 	lpn_field_tank_diameter_tip: <?=json_encode($ec_lang['lpn_field_tank_diameter_tip'])?>,
+	lpn_field_tank_minvol: <?=json_encode($ec_lang['lpn_field_tank_minvol'])?>,
+	lpn_field_tank_minvol_tip: <?=json_encode($ec_lang['lpn_field_tank_minvol_tip'])?>,
+	lpn_field_tank_overflow: <?=json_encode($ec_lang['lpn_field_tank_overflow'])?>,
+	lpn_field_tank_overflow_tip: <?=json_encode($ec_lang['lpn_field_tank_overflow_tip'])?>,
 	lpn_tank_head_tip: <?=json_encode($ec_lang['lpn_tank_head_tip'])?>,
 	lpn_field_diameter: <?=json_encode($ec_lang['lpn_field_diameter'])?>,
 	lpn_field_valve_type: <?=json_encode($ec_lang['lpn_field_valve_type'])?>,

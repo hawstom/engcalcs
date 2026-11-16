@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**50 still to read on master**, of 59 untranslated keys, of 3344 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**61 still to read on master**, of 70 untranslated keys, of 3353 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## Plain sentences to check  (1, 1 to read @@ NEEDS RULING)
+## Plain sentences to check  (2, 2 to read @@ NEEDS RULING)
 
 **These are your translator notes in `dev/plain-sentences.md`, not visitor wording.** Each was written
 against English that has since changed, or against a key that no longer exists. Say which: keep it
@@ -38,7 +38,14 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   *Current plain sentence:* Run: the report of the simulation run.
   @@ NEEDS RULING
 
-## lpn_  (59, 50 to read @@ NEEDS RULING)
+- **`lpn_settings_viscosity`**
+  > Viscosity
+  *Why stale:* the English changed after this entry was written
+  *Written against:* Relative viscosity
+  *Current plain sentence:* Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else.
+  @@ NEEDS RULING
+
+## lpn_  (69, 60 to read @@ NEEDS RULING)
 
 - **`lpn_diag_builtin_error`**
   > An error occurred in the built-in solver: {message}
@@ -82,11 +89,26 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 - **`lpn_export_table_scn_keeps`**
   > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
   @@ NEEDS RULING
+- **`lpn_field_tank_minvol`**
+  > Minimum volume
+  @@ NEEDS RULING
+- **`lpn_field_tank_minvol_tip`**
+  > The volume of water in the tank at its minimum depth, in the length unit cubed, for a tank with a sloped or curved bottom; 0 uses the tank diameter, and a volume curve overrides it.
+  @@ NEEDS RULING
+- **`lpn_field_tank_overflow`**
+  > Can overflow
+  @@ NEEDS RULING
+- **`lpn_field_tank_overflow_tip`**
+  > Yes lets a full tank spill what it cannot hold, so the pipe into it stays open; No closes the pipe into a full tank. Only an extended period simulation uses it.
+  @@ NEEDS RULING
 - **`lpn_file_export_item_wtg`**
   > .wtg file…
   @@ NEEDS RULING
 - **`lpn_file_export_wtg_tip`**
   > Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_label_semicolon`**
+  > Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.
   @@ NEEDS RULING
 - **`lpn_inpalt_base`**
   > The Base alternative
@@ -120,6 +142,21 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   @@ NEEDS RULING
 - **`lpn_inpalt_shared`**
   > {alternative}, also used by {scenarios}
+  @@ NEEDS RULING
+- **`lpn_ovm_push_ask`**
+  > Push override upward to {target}?
+  @@ NEEDS RULING
+- **`lpn_ovm_push_ask_cur`**
+  > Push override upward? Current value in {target}: {old}.
+  @@ NEEDS RULING
+- **`lpn_ovm_push_others`**
+  >  Scenarios that inherit it change ({n} total).
+  @@ NEEDS RULING
+- **`lpn_ovm_push_tip`**
+  > Push override upward
+  @@ NEEDS RULING
+- **`lpn_popup_boxtitle_of`**
+  > Properties: {asset}
   @@ NEEDS RULING
 - **`lpn_settings_solver`**
   > Solver
@@ -155,7 +192,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_energy_price`**
-  > Energy price, price pattern, and demand charge.
+  > An energy price pattern that the project does not define.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_lead`**
   > This export does not yet write the following:
@@ -167,7 +204,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Water quality: the analysis, reactions, sources, and tank mixing.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_rules`**
-  > Rule-based controls.
+  > Rule-based controls that are not written (rules {ids}).
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_tank_mixing`**
   > Tank mixing model (tanks {ids}). Tanks are written fully mixed.
@@ -218,11 +255,17 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Writing the .wtg project…
   @@ NEEDS RULING
 
+## u_  (1, 1 to read @@ NEEDS RULING)
+
+- **`u_millifeet`**
+  > millifeet
+  @@ NEEDS RULING
+
 ---
 
 # Strings waiting on a branch
 
-**10 still to read**, of 53 new keys across 3 unmerged branch(es).
+**60 still to read**, of 60 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -233,168 +276,198 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/desktop (`baba0f04d`) — adds no English strings
+### feat/assembly (`f8612ee89`) — 49 new, 49 to read @@ NEEDS RULING
 
-### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
+- **`lpn_assembly_down_head`**
+  > Downstream head
+  @@ NEEDS RULING
+- **`lpn_assembly_explode`**
+  > Explode
+  @@ NEEDS RULING
+- **`lpn_assembly_explode_tip`**
+  > Separate this into its two nodes and its pump, which stay in the network as ordinary elements.
+  @@ NEEDS RULING
+- **`lpn_assembly_explode_valve_tip`**
+  > Separate this into its two nodes and its valve, which stay in the network as ordinary elements.
+  @@ NEEDS RULING
+- **`lpn_assembly_explode_well_tip`**
+  > Separate this into its reservoir, drawdown valve, valve/pump node, pump, and discharge node, which stay in the network as ordinary elements.
+  @@ NEEDS RULING
+- **`lpn_assembly_explode_welltank_tip`**
+  > Separate this into its reservoir, drawdown valve, valve/pump node, pump, tee/connect node, virtual pipe, and tank, which stay in the network as ordinary elements.
+  @@ NEEDS RULING
+- **`lpn_assembly_exploded`**
+  > Separated {id} into ordinary elements. Undo restores it.
+  @@ NEEDS RULING
+- **`lpn_assembly_up_head`**
+  > Upstream head
+  @@ NEEDS RULING
+- **`lpn_diag_well_levels`**
+  > These wells need a pump-on level below the pump-off level, both between the minimum and maximum depth of the tank. Correct them in the Properties box of each well:
+  @@ NEEDS RULING
+- **`lpn_diag_well_no_curve`**
+  > These wells need a drawdown curve and a pump head curve. Choose both in the Properties box of each well:
+  @@ NEEDS RULING
+- **`lpn_field_virtual_length0`**
+  > Virtual pipe (length = 0)
+  @@ NEEDS RULING
+- **`lpn_field_virtual_tip`**
+  > A virtual pipe joins two nodes with no length, volume, travel time, velocity or head loss. Both solvers treat it as a direct connection, and the diameter, roughness, minor loss and length below are not used. Cleared, it is an ordinary pipe again.
+  @@ NEEDS RULING
+- **`lpn_field_well_pump_off`**
+  > Pump off above
+  @@ NEEDS RULING
+- **`lpn_field_well_pump_off_tip`**
+  > Tank depth above which the pump stops. It must be greater than the pump on level, and both must lie between the minimum and maximum depth of the tank.
+  @@ NEEDS RULING
+- **`lpn_field_well_pump_on`**
+  > Pump on below
+  @@ NEEDS RULING
+- **`lpn_field_well_pump_on_tip`**
+  > Tank depth below which the pump starts. Leave both blank for no automatic control. The well writes this and the pump off level as two controls on the pump, shown in the Libraries box under Controls.
+  @@ NEEDS RULING
+- **`lpn_field_well_static`**
+  > Static water level elevation
+  @@ NEEDS RULING
+- **`lpn_field_well_static_tip`**
+  > Elevation of the static water level, the groundwater surface with the pump off. The groundwater reservoir and the pump node stand at this elevation.
+  @@ NEEDS RULING
+- **`lpn_guide_prop_virtual_def`**
+  > <p>A virtual pipe joins two nodes with no length, volume, velocity or head loss. A pipe is virtual when the Virtual pipe box is ticked or when its Length is 0, and Properties then shows Virtual pipe (length = 0). The built-in solver treats it as a direct connection and reports its velocity as 0. EPANET refuses a pipe of length 0, so EPANET and an exported .inp file are given a stand-in 0.01 m long, as wide as the largest ordinary pipe in the project (1000 mm when there is none), with a ;VIRTUAL: note that reopens it as a virtual pipe here. Plain EPANET reads the stand-in as a short, wide pipe.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_prop_virtual_term`**
+  > Virtual pipes and length 0
+  @@ NEEDS RULING
+- **`lpn_inp_drop_assembly`**
+  > The file groups these pumps with nodes it does not contain, so the group was not restored. The nodes and pumps that are there came in as plain elements.
+  @@ NEEDS RULING
+- **`lpn_inp_drop_well_tank`**
+  > These are one-point wells with a tank, a form this page no longer draws. Their reservoir, drawdown valve, pump, tee, virtual pipe, and tank are kept as ordinary elements, and their pump controls as ordinary controls.
+  @@ NEEDS RULING
+- **`lpn_library_control_owned`**
+  > Written by well {id}. Change it in the Properties box of the well.
+  @@ NEEDS RULING
+- **`lpn_mode_add_pumpplus`**
+  > Mode: Add Pump+. Specify a point on the map to add a pump with its upstream and downstream nodes, or specify a pipe to split it and put the pump in it. Press Escape or switch to Select mode to stop.
+  @@ NEEDS RULING
+- **`lpn_mode_add_valveplus`**
+  > Mode: Add Valve+. Specify a point on the map to add a valve with its upstream and downstream nodes, or specify a pipe to split it and put the valve in it. Press Escape or switch to Select mode to stop.
+  @@ NEEDS RULING
+- **`lpn_mode_add_virtual`**
+  > Mode: Add Virtual Pipe. Select a start node and then an end node to connect them with a pipe that has no length, volume, velocity or head loss. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.
+  @@ NEEDS RULING
+- **`lpn_mode_add_well`**
+  > Mode: Add Well. Specify a point on the map to add a well with its groundwater reservoir, drawdown valve, pump node, pump, and discharge node, or specify a pipe to split it and put the well in it. Press Escape or switch to Select mode to stop.
+  @@ NEEDS RULING
+- **`lpn_mode_add_welltank`**
+  > Mode: Add Well with tank. Specify a point on the map for the well, or specify a pipe to split it and put the well in it. Then specify the tee and the tank. Press Escape or switch to Select mode to stop.
+  @@ NEEDS RULING
+- **`lpn_morph_exploded`**
+  > Morph separated {ids} into ordinary elements, as Explode does. Undo restores it.
+  @@ NEEDS RULING
+- **`lpn_pgraph_which`**
+  > Graph which sub-asset?
+  @@ NEEDS RULING
+- **`lpn_tool_add_pumpplus`**
+  > Pump+
+  @@ NEEDS RULING
+- **`lpn_tool_add_pumpplus_tip`**
+  > Add a pump, its upstream node, and its downstream node at one point. Specify a point on the map, or specify a pipe to split it and put the pump in it.
+  @@ NEEDS RULING
+- **`lpn_tool_add_valveplus`**
+  > Valve+
+  @@ NEEDS RULING
+- **`lpn_tool_add_valveplus_tip`**
+  > Add a valve, its upstream node, and its downstream node at one point. Specify a point on the map, or specify a pipe to split it and put the valve in it.
+  @@ NEEDS RULING
+- **`lpn_tool_add_virtual`**
+  > Virtual pipe
+  @@ NEEDS RULING
+- **`lpn_tool_add_virtual_tip`**
+  > Connect two nodes with a virtual pipe, which has no length, volume, velocity or head loss. Select a start node and then an end node.
+  @@ NEEDS RULING
+- **`lpn_tool_add_well`**
+  > Well
+  @@ NEEDS RULING
+- **`lpn_tool_add_well_tip`**
+  > Add a well: its groundwater reservoir, drawdown valve, pump node, pump, and discharge node at one point. Specify a point on the map, or specify a pipe to split it and put the well in it.
+  @@ NEEDS RULING
+- **`lpn_tool_add_welltank`**
+  > Well with tank
+  @@ NEEDS RULING
+- **`lpn_tool_add_welltank_tip`**
+  > Add a well with a tank: a well, a tee, and a tank, each at a point you specify, joined by pipes. The well's pump can be controlled by the tank level. Specify the well first, on the map or on a pipe to split it, then the tee, then the tank.
+  @@ NEEDS RULING
+- **`lpn_tool_plus_next`**
+  > Press it again for the next one: {next}.
+  @@ NEEDS RULING
+- **`lpn_well_drawdown_curve`**
+  > Drawdown curve
+  @@ NEEDS RULING
+- **`lpn_well_drawdown_curve_tip`**
+  > The curve in the Libraries box that gives the drawdown below the static water level elevation at each pumping rate. It is a head loss curve and includes the point 0, 0.
+  @@ NEEDS RULING
+- **`lpn_well_drawdown_valve`**
+  > Drawdown valve
+  @@ NEEDS RULING
+- **`lpn_well_pump_curve_tip`**
+  > The curve in the Libraries box that gives the head the pump adds at each flow, lifted from the pumping level (the static water level elevation less the drawdown). Several pumps can use the same curve, and editing it there changes all of them.
+  @@ NEEDS RULING
+- **`lpn_welltank_tank_prompt`**
+  > Now specify the tank: a tank or a point on the map. Press Escape to stop with the well and its tee.
+  @@ NEEDS RULING
+- **`lpn_welltank_tank_refused`**
+  > The tank must be a tank that is not part of another assembly. Specify the tank again.
+  @@ NEEDS RULING
+- **`lpn_welltank_tee_prompt`**
+  > Now specify the tee: a junction, a point on a pipe, or the well's own point. Press Escape to stop with the well alone.
+  @@ NEEDS RULING
+- **`lpn_welltank_tee_refused`**
+  > The tee must be a junction that is not part of another assembly. Specify the tee again.
+  @@ NEEDS RULING
 
-- **`lpn_file_import_wtg`**
-  > WaterCAD or WaterGEMS model…
-  _Ruled OK 2026-10-20._
-- **`lpn_file_import_wtg_tip`**
-  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_engine`**
-  > The SQLite reader could not be loaded, so {file} could not be opened. Check the connection and try again.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_need_sqlite`**
-  > Choose the model's .wtg.sqlite file. The .wtg file holds only how the model is displayed; it can be chosen with it.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_not_sqlite`**
-  > {file} is not a SQLite database, so it is not a WaterCAD or WaterGEMS model file. A zipped model must be unzipped first.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_not_wtg`**
-  > {file} is a SQLite database, but not a WaterCAD or WaterGEMS model.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_active_scenario`**
-  > The model was open on the scenario shown in parentheses. This project opens on Base.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_alternative_nameonly`**
-  > These alternatives were imported by name only, so that each scenario keeps its choice of them. Their values were not imported, because this page does not read that kind of data from a WaterGEMS model.
-  @@ NEEDS RULING
-- **`lpn_wtg_note_alternative_unused`**
-  > No scenario uses these alternatives. Each was imported as an alternative of its own, so that a scenario can use it.
-  @@ NEEDS RULING
-- **`lpn_wtg_note_controls_unread`**
-  > Not imported: these controls, which this page does not yet read from a WaterGEMS model. Each is shown as WaterGEMS states it.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_converted`**
-  > The database stores every number in US customary units (feet, cubic feet per second, psi). Each number was converted once to the project's units and rounded to the shortest decimal within 5 parts in 100 million, which gives back the number as it was entered.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_customer_demand`**
-  > Not imported: the customer demands at these junctions. Their base demands were imported.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_cv_closed`**
-  > These pipes have a check valve and start closed. They were imported closed.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_directed_split`**
-  > WaterGEMS models each pump and valve as a node. Each was imported as a pump or valve link between two new junctions at the node's location and elevation, as in WaterGEMS's own EPANET export. The junctions take the node's WaterGEMS ID number with the suffix -A (inlet side) or -B (outlet side), listed in parentheses. The pipe WaterGEMS designates as downstream connects to the -B junction; all other pipes at the node connect to the -A junction.
-  @@ NEEDS RULING
-- **`lpn_wtg_note_element_unread`**
-  > Not imported: these elements, of a kind this page does not model. The kind is shown in parentheses.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_emitter_unread`**
-  > Not imported: the emitter coefficients of these junctions, because the unit they are stored in is not yet confirmed.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_fireflow`**
-  > Not imported: the fire flow settings of the model. A needed fire flow stated at a junction was imported as that junction's Required fire flow; enter the rest in the fire flow window.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_gpv_curve`**
-  > These general purpose valves have no head loss curve in the file.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_id_changed`**
-  > These names are not valid EPANET IDs or repeat another name, so each was given the ID shown in parentheses.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_inactive`**
-  > These elements are inactive in the model and were imported inactive.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_link_unjoined`**
-  > Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or a pump or valve at a node with no downstream pipe or no other pipe.
-  @@ NEEDS RULING
-- **`lpn_wtg_note_no_geometry`**
-  > These nodes have no location in the file and were placed at 0, 0.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_options`**
-  > Not imported: these calculation options (demand adjustments, pressure-dependent demand, or a friction method code this page does not know). Where the model states no EPANET options, the defaults were used.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_pattern_calendar`**
-  > Not imported: the day of the week and month multipliers of these patterns.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_pattern_continuous`**
-  > These patterns are continuous in the model: the multiplier changes in a straight line between points. An EPANET pattern is stepwise, so each was written as WaterGEMS writes it for EPANET: the starting multiplier, then the value on that line at every pattern time step. WaterGEMS's own solver instead applies a continuous pattern as the average over each time step, so results will not match WaterGEMS hour by hour.
-  @@ NEEDS RULING
-- **`lpn_wtg_note_pattern_irregular`**
-  > These patterns have times that are not whole multiples of the pattern time step. Each was read at that time step.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_pattern_other`**
-  > These patterns differ from EPANET patterns in their start time, their last multiplier, or their name (EPANET applies a pattern named 1 to every demand with no pattern). Check them.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_pump_battery`**
-  > These variable speed pump batteries were imported as one pump each at relative speed 1, as WaterGEMS writes them to an EPANET file. Their lag pumps and speed control were not imported.
-  @@ NEEDS RULING
-- **`lpn_wtg_note_pump_curve`**
-  > These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. A pump with no curve cannot run in either engine, so results shown before each has a curve are not meaningful.
-  @@ NEEDS RULING
-- **`lpn_wtg_note_pump_efficiency`**
-  > Not imported: the efficiency of these pump definitions, which is neither a constant nor a list of points.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_pump_extended`**
-  > These pump curves are extended beyond their points in WaterGEMS. Only the points were imported.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_pump_vsp`**
-  > These pumps are variable-speed pumps in the model. They were imported as fixed-speed pumps.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_scenario_alternative`**
-  > These alternatives were imported with their names, each in the category shown in parentheses. An alternative holds only the values in which it differs from its parent, and each scenario uses the alternatives it uses in the model. To see them, choose Water, Scenarios, clear Basic mode, then choose Scenario manager.
-  @@ NEEDS RULING
-- **`lpn_wtg_note_scenario_category`**
-  > Not imported: the alternatives these scenarios use in categories this page has no counterpart for (for example Operational, Age, and Trace). There the scenario has the Base values.
-  @@ NEEDS RULING
-- **`lpn_wtg_note_scenario_root`**
-  > These scenarios have no parent in the model. Here every scenario descends from Base, so each was made a child of Base.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_setting_pattern`**
-  > Not imported: the setting patterns of these valves.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_srs`**
-  > The model states the spatial reference shown. Its coordinates were imported as plain x and y.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_tables_unread`**
-  > Not imported: the data in these tables of the database, which this page does not read (for example transient, fire flow, and energy cost data).
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_tank_demand`**
-  > Not imported: the demands at these tanks. An EPANET tank has no demand.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_tank_inlet`**
-  > These tanks fill through a separate inlet at the top in WaterGEMS. An EPANET tank has no such inlet, so the inlet pipe joins the tank at its base.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_tank_shape`**
-  > These tanks are not circular. Each was given the diameter of a circle of the same area, or, where the shape is not known, the diameter stored with it.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_tcv_coefficient`**
-  > These throttle control valves state a discharge coefficient rather than a minor loss coefficient. The minor loss coefficient stored with each was used.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_unconverted`**
-  > These values are stored in a unit this page does not know and were set to 0. Check them before calculating.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_unit_assumed`**
-  > The file does not state the stored unit of these fields, so the unit every example file states was assumed.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_unit_demand`**
-  > The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_unit_unknown`**
-  > Not converted: these fields, whose stored unit (shown in parentheses) this page does not know.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_units_assumed`**
-  > No .wtg file was chosen with the database, so the units the model is displayed in are not known. The project uses the units that go with the flow unit shown in parentheses. To keep the model's own units, import it again and choose both files.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_units_differ`**
-  > WaterGEMS displays these quantities in other units. Here they are in the project's units.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_note_valve_status`**
-  > The initial status of these valves was read from a code not yet confirmed in an example file.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_report_intro`**
-  > This was a WaterCAD or WaterGEMS model. Bentley publishes no description of the file, so it is read by a layout learned from example files. It was imported as a new project, from its scenario {base} and further scenarios ({n}). Compare the results with WaterGEMS before relying on them.
-  @@ NEEDS RULING
-- **`lpn_wtg_report_lead`**
-  > The list below shows what was changed on the way in, and what in the file was not imported:
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_unreadable`**
-  > {file} could not be read as a SQLite database. It may be damaged.
-  _Ruled OK 2026-10-20._
-- **`lpn_wtg_working`**
-  > Reading {file}…
-  _Ruled OK 2026-10-20._
+### feat/contour-controls (`594da4f12`) — 2 new, 2 to read @@ NEEDS RULING
 
-### feat/wtg-saves (`0c852262b`) — adds no English strings
+- **`lpn_settings_color_node_field_tip`**
+  > Colors the nodes by this property. The contour plot follows it.
+  @@ NEEDS RULING
+- **`lpn_settings_color_ramp_node_tip`**
+  > Colors the nodes, the contour plot and its key.
+  @@ NEEDS RULING
+
+### feat/label-leader-draw (`ef210af6a`) — adds no English strings
+
+### feat/library-order (`0c1d78a35`) — 8 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_guide_lib_order_none`**
+  > The order of patterns, curves, pipe types, and fittings lists never changes a run.
+  @@ NEEDS RULING
+- **`lpn_library_move_bottom`**
+  > Move to bottom
+  @@ NEEDS RULING
+- **`lpn_library_move_group`**
+  > Move the selected item
+  @@ NEEDS RULING
+- **`lpn_library_move_tip`**
+  > Moves the selected item. Click an item to select it. The order is saved with the project.
+  @@ NEEDS RULING
+- **`lpn_library_move_tip_controls`**
+  > When two controls change the same link at the same time, the control lower in the list takes effect.
+  @@ NEEDS RULING
+- **`lpn_library_move_tip_none`**
+  > The order does not change a run.
+  @@ NEEDS RULING
+- **`lpn_library_move_tip_rules`**
+  > When two rules call for conflicting actions on the same link, the rule with the higher PRIORITY takes effect, and at equal priority the rule higher in the list takes effect.
+  @@ NEEDS RULING
+- **`lpn_library_move_top`**
+  > Move to top
+  @@ NEEDS RULING
+
+### feat/pick-chooser (`bdfdf1dd1`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_pick_chooser_label`**
+  > Select one of the elements here
+  @@ NEEDS RULING
+
+### feat/wtg-scenario (`8c9752a5f`) — adds no English strings

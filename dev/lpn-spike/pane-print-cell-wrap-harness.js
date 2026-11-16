@@ -241,9 +241,23 @@ async function main() {
 		await a.page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_tanks'); if (b) { b.click(); } });
 		await a.settle(500);
 		const onScreenMixing = await a.page.evaluate(() => {
-			const sel = document.querySelector('#lpn_pane_tanks table tbody select.lpn-pane-col-mixingModel, ' +
-				'#lpn_pane_tanks table tbody tr:first-child select');
+			// By the column's own class: the first <select> in the row is no longer the Mixing model's
+			// (Can overflow is a choice column too, and sits before it).
+			const sel = document.querySelector('#lpn_pane_tanks table tbody tr:first-child td.lpn-pane-col-mixingModel select');
 			return sel ? sel.options[sel.selectedIndex].textContent : null;
+		});
+		// EVERY tank column, by its own class, as the screen shows it: a control's value or a chosen
+		// option's label, else the cell's text.
+		const screenCells = await a.page.evaluate(() => {
+			const out = {};
+			document.querySelectorAll('#lpn_pane_tanks table tbody tr:first-child td').forEach((td) => {
+				const m = /lpn-pane-col-(\S+)/.exec(td.className);
+				if (!m) { return; }
+				const sel = td.querySelector('select'), inp = td.querySelector('input');
+				out[m[1]] = sel ? sel.options[sel.selectedIndex].textContent.trim()
+					: (inp && inp.type !== 'checkbox') ? inp.value.trim() : td.textContent.trim();
+			});
+			return out;
 		});
 		await a.page.evaluate(() => { window.print = function () {}; var td = document.querySelector('#lpn_pane_body .on tbody td:not(:first-child)');
 			td.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 5, clientY: 5 }));
@@ -258,7 +272,21 @@ async function main() {
 			const td = t.querySelector('tbody tr').children[th];
 			return td ? td.textContent.trim() : null;
 		});
+		const printedCells = await a.page.evaluate(() => {
+			const t = document.getElementById('lpn_print_area').querySelector('table'), out = {};
+			const ths = [...t.querySelectorAll('thead th')], tds = [...t.querySelector('tbody tr').children];
+			ths.forEach((th, i) => { const m = /lpn-pane-col-(\S+)/.exec(th.className); if (m && tds[i]) { out[m[1]] = tds[i].textContent.trim(); } });
+			return out;
+		});
 		await a.page.emulateMedia({ media: 'screen' });
+		// Not compared: the tick (a flag the sheet writes as 1) and the source dose's two choices, which the
+		// sheet leaves blank where the screen says None (both long-standing, and neither a tank input).
+		const SKIP = { active: 1, sourceType: 1, sourcePattern: 1 };
+		const wrongCols = Object.keys(screenCells).filter((k) => !SKIP[k] && screenCells[k] !== printedCells[k] &&
+			!(parseFloat(screenCells[k]) === parseFloat(printedCells[k])));
+		ok('every Tanks column prints what the screen shows (' + Object.keys(screenCells).length + ' columns)',
+			Object.keys(screenCells).length > 10 && !wrongCols.length,
+			wrongCols.map((k) => k + ': screen=' + JSON.stringify(screenCells[k]) + ' print=' + JSON.stringify(printedCells[k])).join('; '));
 		ok('the Tanks table has a Mixing model column on screen', !!onScreenMixing, JSON.stringify(onScreenMixing));
 		ok('the Tanks table has a Mixing model column on the printed sheet', !!printedMixing, JSON.stringify(printedMixing));
 		ok('the printed Mixing model reads the same label the screen shows',

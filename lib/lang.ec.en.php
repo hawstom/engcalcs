@@ -18,6 +18,7 @@ $ec_lang['u_grade']='rise/run';
 $ec_lang['u_in2']='sq. in.';
 $ec_lang['u_inh2o']='in H2O';
 $ec_lang['u_in']='in';
+$ec_lang['u_millifeet']='millifeet';
 $ec_lang['u_knpcm2']='kN/cm^2';
 $ec_lang['u_knpm2']='kN/m^2';
 $ec_lang['u_kpa']='kPa';
@@ -937,6 +938,11 @@ $ec_lang['lpn_field_tank_maxlevel_tip']='Maximum allowable depth, measured up fr
 $ec_lang['lpn_field_tank_diameter']='Tank diameter';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_diameter_tip']='For a vertical cylinder. Same units as elevation, not pipe diameter. It sets how much water a given depth holds.';
+// EPANET's Minimum Volume and Can Overflow ([TANKS] columns 7 and 9). The volume is in the Length unit cubed.
+$ec_lang['lpn_field_tank_minvol']='Minimum volume';
+$ec_lang['lpn_field_tank_minvol_tip']='The volume of water in the tank at its minimum depth, in the length unit cubed, for a tank with a sloped or curved bottom; 0 uses the tank diameter, and a volume curve overrides it.';
+$ec_lang['lpn_field_tank_overflow']='Can overflow';
+$ec_lang['lpn_field_tank_overflow_tip']='Yes lets a full tank spill what it cannot hold, so the pipe into it stays open; No closes the pipe into a full tank. Only an extended period simulation uses it.';
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07
@@ -2471,7 +2477,7 @@ $ec_lang['lpn_inp_backdrop_attach_tip']='A web page cannot automatically open an
 $ec_lang['lpn_inp_backdrop_attached']='Attached {file}, placed where the file says it belongs.';
 $ec_lang['lpn_inp_backdrop_attached_other']='Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.';
 $ec_lang['lpn_inp_report_lead']='This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:';
-$ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.';
+$ec_lang['lpn_inp_drop_headloss']='This file names a head loss formula EPANET does not accept, so the pipe roughness numbers were kept as written and read as Hazen-Williams.';
 $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a volume curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation uses it to compute the level as the tank fills and drains. A single-period analysis is unaffected, because the water surface is at the level stated in the file. The diameter in the file is kept beside the curve and is used to draw and solve a tank with no curve.';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know what became of a valve
@@ -3754,7 +3760,7 @@ $ec_lang['lpn_settings_default_is']='The default is {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Convergence limit the solver must reach before it stops, measured as the total change in flow from one trial to the next, divided by the total flow in the links. A smaller number is more exact and takes longer.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
-$ec_lang['lpn_settings_viscosity']='Relative viscosity';
+$ec_lang['lpn_settings_viscosity']='Viscosity';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3763,7 +3769,7 @@ $ec_lang['lpn_settings_viscosity']='Relative viscosity';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.';
+$ec_lang['lpn_settings_viscosity_tip']='EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²/s for US flow units and m²/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.';
 $ec_lang['lpn_settings_trials']='Maximum trials';
 $ec_lang['lpn_settings_trials_tip']='Maximum number of trials before the solver stops on a network that does not converge.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -4628,6 +4634,7 @@ $ec_lang['lpn_inp_export_flat_lead']='The exported EPANET file is numerically eq
 $ec_lang['lpn_inp_export_flat_types']='Pipes ({n}) here refer to pipe types ({t}). In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.';
 $ec_lang['lpn_inp_export_flat_coords']='An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its positions in the project file only.';
 $ec_lang['lpn_inp_export_flat_fittings']='An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.';
+$ec_lang['lpn_inp_export_flat_label_semicolon']='Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.';
 $ec_lang['lpn_library_controls']='Controls';
 $ec_lang['lpn_library_controls_tip']='A control is one statement that opens or closes a link, or changes its setting, based on a tank water level, a node pressure, or the time.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to

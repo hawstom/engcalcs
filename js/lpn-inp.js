@@ -175,6 +175,21 @@
 		return out;
 	}
 
+	// EPANET's three head loss formulas, as the page's friction method keys.
+	var HEADLOSS_METHOD = { 'H-W': 'hw', 'D-W': 'dw', 'C-M': 'manning' };
+	EngCalcs.lpnInpHeadlossMethod = HEADLOSS_METHOD;
+
+	// The index of the first `;` that is not inside a double-quoted string, or -1.
+	function semicolonOutsideQuotes(line) {
+		var inQuote = false, k, c;
+		for (k = 0; k < line.length; k++) {
+			c = line.charAt(k);
+			if (c === '"') { inQuote = !inQuote; }
+			else if (c === ';' && !inQuote) { return k; }
+		}
+		return -1;
+	}
+
 	function num(tok, fallback) {
 		var v = parseFloat(tok);
 		return isFinite(v) ? v : (fallback === undefined ? 0 : fallback);
@@ -396,7 +411,7 @@
 			section = '',
 			rawSections = {},   // name -> array of token arrays, for the sections we read below
 			seen = {},          // name -> row count, for the ones we only count
-			i, line, semi, toks, cmt;
+			i, line, semi, toks, cmt, titleLines = [];
 
 		var markVirtual = [], markAssemblies = [];
 		var carried = {};   // section name -> the file's own lines, for every section not read below
@@ -419,7 +434,21 @@
 		}
 		for (i = 0; i < lines.length; i++) {
 			line = lines[i];
+			// **[TITLE] IS TEXT, TAKEN WHOLE** (audit 2026-11, F4): every line the file has, `;`
+			// included. EPANET's engine keeps three lines and its GUI (Uimport.pas ReadTitleData) the
+			// first as the title and the rest as notes, each as the LINE, with no comment stripped;
+			// a blank line, or one that is only a comment, is skipped by both. The page keeps all of
+			// them and writes all of them back.
+			if (section === 'TITLE' && !/^\s*\[/.test(line)) {
+				if (line.slice(0, line.indexOf(';') < 0 ? line.length : line.indexOf(';')).trim()) { titleLines.push(line); }
+				continue;
+			}
 			semi = line.indexOf(';');
+			// **A LABEL'S TEXT IS QUOTED, so a `;` inside the quotes is the text's own** (audit 2026-11,
+			// F4). EPANET itself cuts a label at its first `;` even inside the quotes (the engine's
+			// gettokens, the GUI's StripComment), so a file written by this page with a `;` in a label
+			// reads in EPANET as the shorter text; here the quoted string is kept whole.
+			if (section === 'LABELS' && semi >= 0) { semi = semicolonOutsideQuotes(line); }
 			cmt = '';
 			// **ONE SECTION'S DATA IS WRITTEN AS A COMMENT, AND IT IS [DEMANDS].** A demand
 			// CATEGORY -- the name of who is drawing this water -- is a trailing `;Elm Acres`, not
@@ -604,14 +633,14 @@
 		// `Pattern` line has always followed: writing a line that says the default is a statement
 		// the source file never made, and it would fail the byte-identity test the round trip is
 		// held to.
-		var flowKey = 'GPM', headloss = 'H-W', emitterExponent = 0.5, demandMultiplier = 1,
+		var flowKey = 'GPM', headloss = 'H-W', headlossStated = false, emitterExponent = 0.5, demandMultiplier = 1,
 			defaultPattern = null, hydraulics = {}, qualityOptions = {}, fileOptions = {}, rows, r;
 		rows = rawSections.OPTIONS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			var key = (r[0] || '').toUpperCase();
 			if (key === 'UNITS' && r[1]) { flowKey = r[1].toUpperCase(); }
-			else if (key === 'HEADLOSS' && r[1]) { headloss = r[1].toUpperCase(); }
+			else if (key === 'HEADLOSS' && r[1]) { headloss = r[1].toUpperCase(); headlossStated = true; }
 			else if (key === 'EMITTER' && r[2]) { emitterExponent = num(r[2], 0.5); hydraulics.emitterExponent = emitterExponent; }
 			// **`Demand` NAMES TWO DIFFERENT OPTIONS AND ONLY ONE OF THEM IS A NUMBER.**
 			// `Demand Multiplier 1.5` scales every demand; `Demand Model PDA` chooses EPANET 2.2's
@@ -638,7 +667,9 @@
 			// The token positions are the file's own two-word keywords: `Specific Gravity 1.0` puts
 			// the number at r[2] exactly as `Demand Multiplier` and `Emitter Exponent` do, while
 			// one-word keywords put it at r[1].
-			else if (key === 'VISCOSITY' && r[1]) { hydraulics.viscosity = num(r[1], 1); }
+			// **THE FILE'S OWN CHARACTERS RIDE WITH IT** (`Viscosity 1.10`, `Viscosity 1.1e-5`), and the value is
+			// the number as written, whichever of EPANET's two readings it has (EngCalcs.lpnFluidOptionRead).
+			else if (key === 'VISCOSITY' && r[1]) { hydraulics.viscosity = mergeTok(hydraulics, 'viscosity', r[1], num(r[1], 1)); }
 			else if (key === 'SPECIFIC' && r[2]) { hydraulics.specificGravity = num(r[2], 1); }
 			else if (key === 'TRIALS' && r[1]) { hydraulics.trials = num(r[1], 40); }
 			else if (key === 'ACCURACY' && r[1]) { hydraulics.accuracy = num(r[1], 0.001); }
@@ -764,13 +795,14 @@
 			pressSI = us ? PSI_M : 1,       // file PRESSURE unit -> m of water (emitters, PRV/PSV)
 			qSI = fu.toSI;
 
-		// The page computes Hazen-Williams and has no control for anything else yet, so a D-W or
-		// C-M file would import roughness numbers that are then read as a
-		// Hazen-Williams C. The numbers are kept AS WRITTEN rather than converted into a fake C --
-		// converting would destroy the file's own data to produce an answer that is still wrong --
-		// and the caller is told, loudly, that the results will not match the source until the
-		// friction-method control ships.
-		if (headloss !== 'H-W') { drop('headloss-formula', [], headloss); }
+		// **THE HEAD LOSS FORMULA IS THE FILE'S** (audit 2026-11, F1). The page computes all three of
+		// EPANET's (H-W, D-W, C-M) in both engines, so docFromInp() takes the method from
+		// `headloss` below and a supported word is no difference at all. The roughness numbers
+		// cross as written and are read in EPANET's own unit for that formula: a C for H-W, a
+		// Manning n for C-M, and for D-W millimetres in an SI file and MILLIFEET in a US one
+		// (EPANET 2.2 manual, Network Data). Only a word EPANET itself refuses (its error 213) is
+		// still reported, and the roughness is then read as H-W's C.
+		if (!HEADLOSS_METHOD[headloss]) { drop('headloss-formula', [], headloss); }
 
 		// ---- [PATTERNS] and [TIMES] (ROADMAP Tasks 248.01, 248.02) ----
 		//
@@ -1036,6 +1068,20 @@
 			mergeTok(tn, 'minLevel', r[3], tn.minLevel);
 			mergeTok(tn, 'maxLevel', r[4], tn.maxLevel);
 			mergeTok(tn, 'diameter', r[5], tn.diameter);
+			// **MinVol (column 7) AND Overflow (column 9) ARE THE FILE'S** (audit 2026-11, F2). They
+			// were read past in silence and the row came back out as `... 0`. MinVol is a volume in
+			// the file's length unit cubed, kept with its own characters like every number here;
+			// Overflow is kept as the word the file wrote (`YES`, `no`) because it is carried, never
+			// computed with, and the ninth column cannot be written without the eighth, so a `*`
+			// placed there is remembered as the file wrote it. Both engines read them from the model
+			// (js/lpn-epanet.js, js/lpn-native-run.js), which docs' assembleModel() fills.
+			if (r[6] !== undefined && isFinite(parseFloat(r[6]))) {
+				tn.minVol = mergeTok(tn, 'minVol', r[6], num(r[6]));
+			}
+			if (r[8] !== undefined && r[8] !== '') {
+				tn.overflow = r[8];
+				if (r[7] === '*' || r[7] === '0') { tn.volColumn = r[7]; }
+			}
 			// A VOLUME CURVE makes the tank non-cylindrical, and this page holds only a diameter.
 			// The level -> head relationship a steady-state solve uses is unaffected (the surface is
 			// still Elev + InitLvl), so the imported network solves identically; what is lost is how
@@ -1680,9 +1726,7 @@
 			backdrop.offset = backdropOffset || [0, 0];
 		}
 
-		var title = '';
-		rows = rawSections.TITLE || [];
-		if (rows.length) { title = rows[0].join(' '); }
+		var title = titleLines.length ? titleLines[0] : '';
 
 		// **AN EFFICIENCY CURVE IS A LIBRARY CURVE LIKE ANY OTHER** (Task 586). [ENERGY] is a
 		// carried section, so the pumps' `EFFIC` rows are read back out of it here -- but only to
@@ -1707,6 +1751,8 @@
 		return {
 			ok: true,
 			title: title,
+			// Every title line, each whole (EPANET's own reader keeps three, its GUI all of them).
+			titleLines: titleLines,
 			flowUnits: flowKey,
 			unitSystem: fu.system,
 			lengthUnit: us ? 'ft' : 'm',
@@ -1715,6 +1761,12 @@
 			// keeps a second copy of these constants.
 			scale: { len: lenSI, dia: diaSI, head: headSI, press: pressSI, flow: qSI },
 			headloss: headloss,
+			// Whether [OPTIONS] said it at all: a file that does not leaves the project's formula unstated
+			// (EPANET's own default, H-W, and a Settings row that reads "(default)").
+			headlossStated: headlossStated,
+			// The unit EPANET reads a D-W roughness in for this file (millifeet in a US file,
+			// millimetres in an SI one); null for the two dimensionless formulas.
+			roughnessUnit: headloss === 'D-W' ? (us ? 'millifeet' : 'mm') : null,
 			emitterExponent: emitterExponent,
 			// Every [OPTIONS] key this file stated that is not the flow unit, the head-loss formula
 			// or the default pattern -- sparse, so absent is "the file did not say" (Task 553).
@@ -1898,6 +1950,30 @@
 		}
 		if (!sys) { sys = (lengthUnit === 'ft' || diameterUnit === 'in') ? 'us' : 'si'; }
 		return FILE_UNITS[sys].press;
+	};
+
+	/**
+	 * **VISCOSITY AND DIFFUSIVITY, READ AS EPANET READS THEM** (EPANET 2.2 input1.c adjustdata(),
+	 * measured on the vendored engine). A value above the threshold (1e-3 for Viscosity, 1e-4 for
+	 * Diffusivity) is RELATIVE: that many times EPANET's own default (1.1e-5 ft2/s and 1.3e-8
+	 * ft2/s). At or below it the value is ABSOLUTE, in the file's own system: ft2/s for a US flow
+	 * keyword, m2/s for an SI one. Zero is "not stated", EPANET's default.
+	 *
+	 * Returns the RELATIVE number, which is the one form both engines take: the built-in solver
+	 * multiplies it into the default, and the EPANET bridge writes it into a file whose own system
+	 * does not matter for a relative value. The file's own number is never changed; this reads it.
+	 * `flowUnit`, `lengthUnit` and `diameterUnit` are the project's, decided the way the writer
+	 * decides which system a file is in.
+	 */
+	var FLUID_OPTIONS = { viscosity: { limit: 1e-3, ft2s: 1.1e-5 }, diffusivity: { limit: 1e-4, ft2s: 1.3e-8 } };
+	EngCalcs.lpnFluidOptionRead = function (kind, value, flowUnit, lengthUnit, diameterUnit) {
+		var o = FLUID_OPTIONS[kind], kw, sys = null;
+		if (!o || typeof value !== 'number' || !(value > 0) || value > o.limit) { return value; }
+		for (kw in FLOW_KEYWORD_UNIT) {
+			if (FLOW_KEYWORD_UNIT[kw] === flowUnit) { sys = FLOW_UNITS[kw].system; break; }
+		}
+		if (!sys) { sys = (lengthUnit === 'ft' || diameterUnit === 'in') ? 'us' : 'si'; }
+		return (sys === 'us' ? value : value / (FT * FT)) / o.ft2s;
 	};
 
 	/**
@@ -2803,7 +2879,7 @@
 		}
 		LPN_OPT_LINES.forEach(function (pair) {
 			if (h[pair[0]] === undefined || h[pair[0]] === null) { return; }
-			out += row([pair[1], String(h[pair[0]])]) + '\n';
+			out += row([pair[1], typeof h[pair[0]] === 'number' ? EngCalcs.lpnNumText(h, pair[0], h[pair[0]]) : String(h[pair[0]])]) + '\n';
 		});
 		// **PRESSURE-DRIVEN ANALYSIS** (Task 762), EPANET's own order, sparse like every line above.
 		// The pressures are stored in the project's pressure unit; `pressNum` writes them in the
@@ -2856,7 +2932,7 @@
 		opts = opts || {};
 		// The properties a document stores under their own name rather than an underscore, which
 		// every one became overridable as (Tom, 2026-10-12; LPN_BARE_PROP in js/looped-network.js).
-		var BARE = { elev: 1, bottomElev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, mixingModel: 1, mixingFraction: 1,
+		var BARE = { elev: 1, bottomElev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, minVolume: 1, overflow: 1, mixingModel: 1, mixingFraction: 1,
 			headPattern: 1, speed: 1, speedPattern: 1 };
 		// A caller's resolver written before then reads `_prop` only; a bare one it cannot find is
 		// read off the element, which is what Base holds.
@@ -2927,6 +3003,16 @@
 			if (ff === undefined || fp === ff) { return { same: true, mul: 1 }; }
 			diff('unit-converted', [], what + ': ' + projUnit + ' -> ' + fileUnit);
 			return { same: false, mul: ff / fp };
+		}
+		// **D-W ROUGHNESS IS A LENGTH IN EPANET'S OWN UNIT** (EPANET 2.2 manual, Network Data):
+		// millimetres in an SI file, MILLIFEET in a US one. Both are units the Roughness selector
+		// offers, so a project whose selector shows the file's unit passes its characters through
+		// and any other unit converts, said once. H-W's C and C-M's n are dimensionless and pass
+		// through. A document saved before the selector existed has no unit to convert from; it is
+		// written as stored, as it always was.
+		var cRough = { same: true, mul: 1 };
+		if ((doc.settings || {}).method === 'dw' && units.lpn_u_roughness) {
+			cRough = converter(units.lpn_u_roughness, sys === 'si' ? 'mm' : 'millifeet', 'roughness');
 		}
 		var cLen = converter(units.lpn_u_length, fileU.len, 'length'),
 			cDia = converter(units.lpn_u_diameter, fileU.dia, 'diameter'),
@@ -3074,10 +3160,16 @@
 					n(cHead, nd, 'minLevel', eff(nd, 'minLevel') || 0),
 					n(cHead, nd, 'maxLevel', eff(nd, 'maxLevel') || 0),
 					n(cLen, nd, 'tankDiameter', eff(nd, 'tankDiameter') || 0),
-					'0'];
+					// MinVol, as the file wrote it (a volume: the length unit cubed). Absent is EPANET's
+					// own 0, "no separate minimum volume".
+					(typeof eff(nd, 'minVolume') === 'number' && isFinite(eff(nd, 'minVolume')))
+						? n(cLen.same ? PLAIN : { same: false, mul: Math.pow(cLen.mul, 3) }, nd, 'minVolume', eff(nd, 'minVolume')) : '0'];
 				if (eff(nd, 'volCurve')) {
 					tankRow.push(String(eff(nd, 'volCurve')));
+				} else if (eff(nd, 'overflow')) {
+					tankRow.push(nd.volColumn || '*');   // the eighth column stands aside for the ninth
 				}
+				if (eff(nd, 'overflow')) { tankRow.push(String(eff(nd, 'overflow'))); }
 				tanks.push(row(tankRow) + descOf(nd));
 			} else {
 				// **THE PATTERN COLUMN IS THE JUNCTION'S OWN OR NOTHING** (Task 423). A blank column
@@ -3268,7 +3360,7 @@
 					pipes.push(row([lk.id, lk.from, lk.to,
 						n(cLen, lk, '_length', eff(lk, 'length') || 0),
 						dia,
-						n(PLAIN, lk, '_roughness', eff(lk, 'roughness') || 0),
+						n(cRough, lk, '_roughness', eff(lk, 'roughness') || 0),
 						minorLossText(lk),
 						pipeStatus]) + descOf(lk));
 				}
@@ -3354,6 +3446,9 @@
 				diff('label-quote-replaced', [lb.id]);
 				text = text.replace(/"/g, "'");
 			}
+			// EPANET cuts a Text at its first `;`, quotes or not (the engine's gettokens, the GUI's
+			// StripComment). It is written whole, as it always was; the receipt says what EPANET will do.
+			if (text.indexOf(';') >= 0) { diff('label-semicolon', [lb.id]); }
 			labelRows.push(row([n(PLAIN, lb, 'x', px), n(PLAIN, lb, 'y', py), '"' + text + '"']
 				.concat(lb.anchorNode && anchor ? [lb.anchorNode] : [])));
 		}
@@ -3748,13 +3843,6 @@
 		}
 		var method = settings.method || 'hw',
 			headloss = { hw: 'H-W', dw: 'D-W', manning: 'C-M' }[method] || 'H-W';
-		if (method !== 'hw') {
-			// EPANET's D-W roughness is in millifeet (US) or millimetres (SI), and its C-M roughness
-			// is Manning's n. This page's roughness field is neither reliably -- it holds what the
-			// user typed in whatever the roughness selector shows. Written as stored, and said out
-			// loud, because converting it would be inventing a number.
-			diff('roughness-method', [], headloss);
-		}
 		// **[CURVES] IS THE LIBRARY, WRITTEN IN THE DOCUMENT'S OWN ORDER** (Task 586).
 		//
 		// **EACH AXIS TAKES THE CONVERTER ITS KIND NAMES.** A head, efficiency or head-loss curve's
@@ -3800,7 +3888,16 @@
 			return out ? out + '\n' : '';
 		}
 		var title = opts.title !== undefined ? opts.title : ((doc.project && doc.project.name) || '');
-		var inp = '[TITLE]\n' + String(title).replace(/[\r\n]+/g, ' ') + '\n\n' +
+		// **THE FILE'S OWN TITLE LINES GO BACK OUT, while the project still has the name it was
+		// opened under** (audit 2026-11, F4): the carried text speaks for that name and no other, so
+		// a project the user renamed is titled by its new name, as it always was. A `;` is part of a
+		// title line; EPANET reads the line whole.
+		var inpTitle = (doc.project && doc.project.inpTitle) || null,
+			titleOut = (opts.title === undefined && inpTitle && inpTitle.lines && inpTitle.lines.length &&
+				inpTitle.name === (doc.project && doc.project.name))
+				? inpTitle.lines.map(String).join('\n')
+				: String(title).replace(/[\r\n]+/g, ' ');
+		var inp = '[TITLE]\n' + titleOut + '\n\n' +
 			// [JUNCTIONS] is written even when empty: it is one of the three sections lpnInpParse()
 			// tests for to decide the text is an `.inp` at all.
 			'[JUNCTIONS]\n' + (junctions.length ? junctions.join('\n') + '\n' : '') + '\n' +
