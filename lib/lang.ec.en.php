@@ -781,6 +781,8 @@ $ec_lang['lpn_pane_paste_bad_cell']='Row {row}: {text} is not a valid {col}.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
 $ec_lang['lpn_pane_paste_text_no_position']='Row {row}: a new Text needs both {first} and {second}.';
+// A pasted row for a new Text that states no words.
+$ec_lang['lpn_pane_paste_text_no_words']='Row {row}: a new Text needs its words.';
 // {id} is what the Text table's own Attached to cell named.
 $ec_lang['lpn_pane_paste_no_anchor']='Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.';
 $ec_lang['lpn_pane_paste_customer_no_position']='Row {row}: a new Customer needs both {first} and {second}.';

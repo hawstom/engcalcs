@@ -3283,9 +3283,6 @@
 		for (i = 0; i < (doc.labels || []).length; i++) {
 			lb = doc.labels[i];
 			if (!isActive(lb)) { continue; }
-			// A Text with no words (one caught mid-placement) draws nothing and is never written.
-			var et0 = eff(lb, 'text');
-			if (!String(et0 === undefined || et0 === null ? (lb._text || '') : et0).trim()) { continue; }
 			var anchor = lb.anchorNode ? nodeById[lb.anchorNode] : null;
 			if (!anchor && lb.anchorLink) {
 				// REPORTED WHETHER OR NOT THE POINT RESOLVES: the attachment is lost from the file

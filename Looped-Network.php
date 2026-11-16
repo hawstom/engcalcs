@@ -2186,6 +2186,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_paste_same_ends: <?=json_encode($ec_lang['lpn_pane_paste_same_ends'])?>,
 	lpn_pane_paste_bad_cell: <?=json_encode($ec_lang['lpn_pane_paste_bad_cell'])?>,
 	lpn_pane_paste_text_no_position: <?=json_encode($ec_lang['lpn_pane_paste_text_no_position'])?>,
+	lpn_pane_paste_text_no_words: <?=json_encode($ec_lang['lpn_pane_paste_text_no_words'])?>,
 	lpn_pane_paste_no_anchor: <?=json_encode($ec_lang['lpn_pane_paste_no_anchor'])?>,
 	lpn_pane_paste_customer_no_position: <?=json_encode($ec_lang['lpn_pane_paste_customer_no_position'])?>,
 	lpn_pane_paste_shape_no_points: <?=json_encode($ec_lang['lpn_pane_paste_shape_no_points'])?>,

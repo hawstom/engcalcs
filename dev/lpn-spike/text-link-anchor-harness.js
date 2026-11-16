@@ -33,7 +33,7 @@ require(ROOT + 'js/lpn-inp.js');
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
-	"\t\taddNode: addNode, addLink: addLink, addText: function (x, y, n, a, id) { var lb = addText(x, y, n, a, id); lb._text = 'Text'; buildDom(); return lb; }, buildDom: buildDom,\n" +
+	"\t\taddNode: addNode, addLink: addLink, addText: function (x, y, n, a, id) { var lb = addText(x, y, n, a, id); setProp(lb, 'text', 'Text'); refreshLabelContent(lb.id); return lb; }, buildDom: buildDom,\n" +
 	"\t\tlabelById: labelById, linkById: linkById,\n" +
 	"\t\tdeleteLink: deleteLink, deleteNode: deleteNode,\n" +
 	"\t\tserializeProject: serializeProject, applySaved: applySaved,\n" +
@@ -332,12 +332,6 @@ console.log('\n--- 10. the `.inp` export reports the attachment rather than faki
 		JSON.stringify(out.differences));
 	const nodeRow = rows.find(r => /J1\s*$/.test(r));
 	ok('a NODE-anchored Text still names its node, unchanged', !!nodeRow, nodeRow);
-	// A Text with no words (one caught mid-placement, Task 854) is never written.
-	const blank = L.addText(60, -60, null, null);
-	blank._text = '';
-	const out2 = EngCalcs.lpnExportInp(L.serializeProject(), {});
-	const rows2 = out2.inp.split('\n').filter(r => /"/.test(r) && !/^\s*;/.test(r));
-	ok('an empty Text is never written to the .inp', rows2.length === rows.length && !rows2.some(r => /""/.test(r)), JSON.stringify(rows2));
 }
 
 // ================================================================================================

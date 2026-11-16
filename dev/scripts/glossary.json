@@ -4741,7 +4741,7 @@
                 "this page's Label, the annotation the page generates from asset data (label-sym-sally)",
                 "the general sense of any written text on the page"
             ],
-            "context": "This suite's Text: the user's own map note. EPANET's [LABELS] section. Keys: lpn_tool_add_text, lpn_new_text, see key_concepts.json.",
+            "context": "This suite's Text: the user's own map note. EPANET's [LABELS] section. Keys: lpn_tool_add_text, see key_concepts.json.",
             "translation_notes": "Created 2026-09-29 (ROADMAP Task 737) as a concept record. Translations empty on purpose: the next sprint fills them from the definition, and its write-back records what each language chose. Every language must give this concept a word that no neighbouring concept (Label, Text, Tag, Description) shares.",
             "translations": {
                 "en": "Text",

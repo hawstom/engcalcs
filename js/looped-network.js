@@ -34770,6 +34770,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// offset is not stated anywhere a copy can read (the position cells go plain there), so it
 			// is born at zero offset -- attached, at the anchor's own point, same as spec §2 leaves a
 			// blank cell at the default a drawn element is born with.
+			// **A TEXT ALWAYS HAS WORDS** (Task 854): a row stating none is refused, by row, like every
+			// other row that cannot be made, rather than born as a blank, unclickable Text.
+			if (!err && spec.group === 'label' && !String(txt('text')).trim()) {
+				err = panePasteSay('lpn_pane_paste_text_no_words', 'Row {row}: a new Text needs its words.', row);
+			}
 			if (!err && spec.group === 'label') {
 				var anchorTxt = txt('anchor'), anchorNodeEl, anchorLinkEl;
 				if (anchorTxt) {
@@ -34906,6 +34911,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				plan.anchorNode || plan.anchorLink ? 0 : inwardY(plan.yv),
 				plan.anchorNode || null, plan.anchorLink ? { link: plan.anchorLink, t: 0.5 } : null, plan.id);
 			if (el.anchorNode || el.anchorLink) { el.x = 0; el.y = 0; updateLabelGeometry(el.id); }
+			// The words go to Base itself (as a drawn Text's first words do, writeTextWords()), so a Text
+			// pasted in a scenario is never wordless in the Base record it is born inactive in.
+			plan.writes = plan.writes.filter(function (w) {
+				if (w.c.key !== 'text') { return true; }
+				el._text = w.v;   // base-write: a new Text's first words
+				return false;
+			});
+			textLabelRelayout(el.id);
 		} else if (spec.group === 'shape') {
 			el = { id: plan.id, pts: plan.pts, closed: false };
 			addShapeToDoc(el);
@@ -40733,7 +40746,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A newly-added Text was never actually persisted (Task 146 Phase 1 gap, found while
 		// wiring the text-edit popup, 2026-07-30) -- addNode()/addLink() reach saveToStorage()
 		// via scheduleSolve(); a Text never triggers a solve, so nothing else was saving it.
-		saveToStorage();
+		// A Text born with no words is not saved: it is either about to be typed (the editor holds it
+		// out of the project until it has words) or about to be given words by its caller.
+		if (lb._text) { saveToStorage(); }
 		// **AND IT WAS NOT IN THE TABLE EITHER, FOR THE SAME REASON AND THE SAME ONE LINE SHORT**
 		// (Tom, 2026-09-08: *"Adding a text doesn't immediately add to the Text table. I have to
 		// change tabs and back to see the new text."*). Every other add reaches the open pane
@@ -43157,7 +43172,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var out = {
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
 			v: openDocVersion, project: project, scenarios: scenarios,
-			nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
+			nodes: doc.nodes, links: doc.links, labels: savedLabels(), nextId: nextId,
 			// **THE CUSTOMERS** (Task 247). Modelling data, and therefore the project's, on exactly
 			// the argument the curve and pipe-type libraries below are: a junction's demand means
 			// nothing without the meters lumped into it. A document that has none writes an empty
@@ -77776,11 +77791,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// nothing left to click, so it could never be reached again. Blank (or only spaces and new lines)
 	// is a delete, through deleteElement(), the Delete key's own door: one undo step, and inside a
 	// scenario it excludes the Text from that scenario exactly as Delete does. Returns 'deleted'.
-	function writeTextWords(lb, value, noSnapshot) {
+	// The Text the in-place editor is holding while its first words are being typed: it is on the map
+	// and in the document, but not yet part of the project (Task 854), so no save, reload or tab
+	// close can store a Text with no words. Words typed and not yet committed are lost with it,
+	// as an uncommitted edit of any Text is.
+	function savedLabels() {
+		var ed = textEditor;
+		if (!ed || !ed.fresh) { return doc.labels; }
+		return doc.labels.filter(function (lb) { return lb.id !== ed.id; });
+	}
+	// `fresh`: the first words of a Text just placed. They are written to Base itself, whichever
+	// scenario is showing: a Text drawn in a scenario is born inactive in Base, and that record has
+	// to carry the words too, or switching it on there (or a parent listing it) shows a Text with
+	// none. The scenario then inherits them, so no override is made for what was only ever typed once.
+	function writeTextWords(lb, value, fresh) {
 		if (!lb || value === effective(lb, 'text')) { return false; }
 		if (!String(value).trim()) { deleteElement('label', lb.id); return 'deleted'; }
-		if (!noSnapshot) { saveUndoSnapshot(); }
-		setProp(lb, 'text', value);
+		if (!fresh) { saveUndoSnapshot(); }
+		if (fresh) { lb._text = value; }   // base-write: a new Text's first words, so its Base record is never wordless
+		else { setProp(lb, 'text', value); }
 		afterPropertyEdit(lb);
 		return true;
 	}
@@ -77842,7 +77871,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ta.style.fontWeight = textLabelWeight(lb);
 		ta.style.textAlign = fx === 0 ? 'left' : fx === 1 ? 'right' : 'center';
 		document.body.appendChild(ta);
-		ed = textEditor = { id: labelId, ta: ta, fresh: !!fresh, opened: Date.now(), orig: ta.value,
+		ed = textEditor = { id: labelId, ta: ta, fresh: !!fresh, opened: Date.now(),
 			// The step the placement took, so a placement taken back takes its step back too.
 			placeSnap: fresh ? undoStack[undoStack.length - 1] : null, winW: layoutWidth(),
 			ax: s.x, ay: s.y, fx: fx, fy: fy, ang: ang, done: false };
@@ -77912,8 +77941,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ta.select();
 		return true;
 	}
-	// `commit`: true writes the words, false cancels, 'leave' writes them unless this is a new Text
-	// still holding its untouched placeholder, which is then taken back.
+	// `commit`: true writes the words, false cancels. A new Text with no words is taken back either way.
+
 	function closeTextEditor(commit) {
 		var ed = textEditor, lb, le, done;
 		if (!ed || ed.done) { return; }
@@ -77928,7 +77957,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (le && le.text) { le.text.style.visibility = ''; }
 		if (ed.ta.parentNode) { ed.ta.parentNode.removeChild(ed.ta); }
 		if (!lb) { return; }
-		if (ed.fresh && (!commit || (commit === 'leave' && ed.ta.value === ed.orig) || !ed.ta.value.trim())) {
+		if (ed.fresh && (!commit || !ed.ta.value.trim())) {
 			takeBackNewText(ed);
 			return;
 		}

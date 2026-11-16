@@ -51,8 +51,8 @@ function ok(label, cond, detail) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
 }
 
-async function open(Session, browser, url, name) {
-	const a = await Session.open(browser, name, { viewport: { width: 1400, height: 900 } });
+async function open(Session, browser, url, name, extra) {
+	const a = await Session.open(browser, name, Object.assign({ viewport: { width: 1400, height: 900 } }, extra || {}));
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
 	await a.goto(url);
 	await a.answerTrainingPanel().catch(() => {});
@@ -143,7 +143,7 @@ async function main() {
 		ed = await h.editor();
 		texts = await h.mapTexts();
 		ok('a press on the map with nothing typed takes that Text away and places the next',
-			!!ed && ed.value === '' && texts.length === 1 && (await h.storedTexts()).length === 1, JSON.stringify(texts));
+			!!ed && ed.value === '' && texts.length === 1 && (await h.storedTexts()).length === 0, JSON.stringify(texts));   // the open, empty one is not in the saved project
 		await P.keyboard.press('Escape');
 		await h.settle(300);
 		ok('Esc on that empty Text takes it away: nothing on the map, nothing saved',
@@ -495,9 +495,63 @@ async function main() {
 		await k.P.keyboard.press('Control+Enter');
 		await k.settle(400);
 		sd = await k.stored();
-		ok('a Text given words in the scenario keeps them there: Base holds it inactive and empty',
-			sd.labels.length === 1 && sd.labels[0]._text === '' && sd.labels[0]._active === false &&
-			JSON.stringify(sd).includes('Booster'), JSON.stringify(sd.labels));
+		ok('a Text given words in the scenario carries them in Base too (inactive there), with no override made',
+			sd.labels.length === 1 && sd.labels[0]._text === 'Booster' && sd.labels[0]._active === false &&
+			!JSON.stringify(sd.scenarios).includes('Booster'), JSON.stringify(sd.labels));
+
+		console.log('\n12. Mid-edit, a Text with no words is not in the saved project');
+		await c2.toolbarClick(await c2.lang('lpn_tool_add_text'));
+		await k.settle(200);
+		const sp3 = await k.canvasPoint(0.7, 0.7);
+		await k.P.mouse.click(sp3.x, sp3.y);
+		await k.settle(300);
+		await k.P.keyboard.type('Half typed');
+		await k.P.evaluate(() => { window.dispatchEvent(new Event('pagehide')); document.dispatchEvent(new Event('visibilitychange')); });
+		sd = await k.stored();
+		ok('with the editor open (empty or half typed) the saved project holds only the finished Text',
+			sd.labels.length === 1 && sd.labels[0]._text === 'Booster', JSON.stringify(sd.labels));
+		await k.P.keyboard.press('Escape');
+		await k.settle(300);
+		await c2.toolbarClick(await c2.lang('lpn_tool_select'));
+
+		console.log('\n13. Pasting new rows into the Text table: a row with no words refuses the paste, by row');
+		const c3 = await open(Session, browser, 'Looped-Network.php', NAME + '-paste', { permissions: ['clipboard-read', 'clipboard-write'] });
+		const m = helpers(c3);
+		// One Text first, so the Text table has a tab and a heading row to paste under.
+		await c3.toolbarClick(await c3.lang('lpn_tool_add_text'));
+		await m.settle(200);
+		const sp4 = await m.canvasPoint(0.3, 0.3);
+		await m.P.mouse.click(sp4.x, sp4.y);
+		await m.settle(300);
+		await m.P.keyboard.type('Seed');
+		await m.P.keyboard.press('Control+Enter');
+		await m.settle(300);
+		await c3.toolbarClick(await c3.lang('lpn_tool_select'));
+		await m.settle(300);
+		const paneOpen = await m.P.evaluate(() => { const p = document.getElementById('lpn_pane'); return !!p && p.offsetParent !== null && getComputedStyle(p).display !== 'none' && !p.classList.contains('lpn-pane-shut'); });
+		if (!paneOpen) { await c3.toolbarClick(await c3.lang('lpn_pane_toggle')); await m.settle(400); }
+		await m.P.click('#lpn_pane_tab_text');
+		await m.settle(400);
+		const heads = await m.P.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_text thead th')).map((t) => (t.textContent || '').trim()));
+		const idH = await c3.lang('lpn_field_id'), txH = await c3.lang('lpn_tool_add_text');
+		const rowOf = (id, words) => heads.map((hd) => hd === idH ? id : hd === txH ? words : /^(X|Easting)/i.test(hd) ? '100' : /^(Y|Northing)/i.test(hd) ? '200' : '').join('\t');
+		await m.P.evaluate((t) => navigator.clipboard.writeText(t), rowOf('W1', '') + '\n' + rowOf('W2', 'Hello'));
+		const idCell = await m.P.evaluate(() => {
+			const td = Array.from(document.querySelectorAll('#lpn_pane_text tbody td')).find((t) => t._lpnPaneKey === 'id');
+			if (!td) { return null; }
+			const r = td.getBoundingClientRect();
+			return { x: r.left + Math.min(10, r.width / 2), y: r.top + r.height / 2 };
+		});
+		await m.P.mouse.click(idCell.x, idCell.y);
+		await m.settle(200);
+		await m.P.keyboard.press('Control+Shift+V');
+		await m.settle(700);
+		let pt = await m.storedTexts();
+		if (pt.length === 1) { await m.P.keyboard.press('Control+V'); await m.settle(700); pt = await m.storedTexts(); }
+		ok('the paste is refused as every paste with an unmakeable row is: no wordless Text is made', pt.length === 1 && pt[0]._text === 'Seed', JSON.stringify(pt) + ' ' + JSON.stringify(heads));
+		const note = await c3.notice();
+		ok('the paste says the other row needs its words', note.indexOf((await c3.lang('lpn_pane_paste_text_no_words')).replace('{row}', '1')) >= 0, note);
+		await c3.close();
 		await c2.close();
 	} catch (e) {
 		ok('harness ran to the end', false, e && e.stack);
