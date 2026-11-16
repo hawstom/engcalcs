@@ -636,6 +636,43 @@ SEALED_CASES.push(...[[20, 30], [10, 25]].map(([d, mx]) => ({
 		m.nodes.find((n) => n.id === 'J').elev = 0.5;
 		return m;
 	})(), reaches: 'max', sealed: 'P2' })));
+// The same tanks on HIGH ground, where a head in metres has a coarser last bit and the metres/feet round trip through
+// the engine's own units can undo a hold that is too thin (a tank standing at 1000 m, 3000 m and 5000 m).
+[1000, 3000, 5000].forEach((E) => [[10, 25], [20, 30], [40, 30], [80, 25], [30, 20], [60, 27]].forEach(([d, mx]) => {
+	SEALED_CASES.push({
+		name: `full tank takes no water in: ${d} ft tank, ${mx} ft limit, ground at ${E} m, 48 h`,
+		model: (() => {
+			const m = lineWithTank({ level: 20 * FT_M, min: 0, max: mx * FT_M, dia: d * FT_M, q: 0.001, rHead: 80 + E });
+			const t = m.nodes.find((n) => n.type === 'tank');
+			t.elev = E; t.ground = E; t.head = E + t.level;
+			m.nodes.find((n) => n.id === 'J').elev = E + 0.5;
+			return m;
+		})(), reaches: 'max', sealed: 'P2' });
+}));
+// A tank that fills, drains and fills AGAIN (the hold must not stop it refilling to its real maximum), a tank that starts full on
+// high ground, and a tank on a volume curve at its limit.
+[[4.8768, 3], [5, 3], [4.572, 3], [4.9, 4]].forEach(([mx, lv]) => {
+	SEALED_CASES.push({
+		name: `full tank takes no water in: fills, drains and refills, limit ${mx} m, starts at ${lv} m`,
+		model: lineWithTank({ level: lv, min: 0.5, max: mx, dia: 18, q: 30, rHead: 66 }),
+		reaches: 'max', moves: 'T', minSwing: 0.5 });
+});
+[1000, 3000].forEach((E) => [[20, 30], [10, 25], [30, 20]].forEach(([d, mx]) => {
+	SEALED_CASES.push({
+		name: `full tank takes no water in: ${d} ft tank starts full at ${mx} ft, ground at ${E} m, 48 h`,
+		model: (() => {
+			const m = lineWithTank({ level: mx * FT_M, min: 0, max: mx * FT_M, dia: d * FT_M, q: 0.001, rHead: 80 + E });
+			const t = m.nodes.find((n) => n.type === 'tank');
+			t.elev = E; t.ground = E; t.head = E + t.level;
+			m.nodes.find((n) => n.id === 'J').elev = E + 0.5;
+			return m;
+		})(), reaches: 'max', sealed: 'P2' });
+}));
+[3.5, 7.62, 9.144, 12].forEach((mx) => {
+	SEALED_CASES.push({
+		name: `full tank takes no water in: volume-curve tank, limit ${mx} m, 48 h`,
+		model: onCurve(lineWithTank({ level: 2, min: 0.5, max: mx, dia: 18, q: 0.001 }), NARROW), reaches: 'max', sealed: 'P2' });
+});
 const MODULE_URL = 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
 
 async function compare(c) {
