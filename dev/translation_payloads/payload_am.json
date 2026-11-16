@@ -2,8 +2,8 @@
     "meta": {
         "language": "am",
         "expected_key_count": 3353,
-        "delta_key_count": 98,
-        "english_changed_key_count": 28,
+        "delta_key_count": 101,
+        "english_changed_key_count": 26,
         "exempt_key_count": 43,
         "exempt_keys": [
             "u_imgd",
@@ -75,7 +75,7 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ፍሰት\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ሄድ\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ሄድ ኪሳራ\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: ክፍል\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ጥቃቅን (አካባቢያዊ) ኪሳራ\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: ፍላጎት\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ግፊት\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: የግንኙነት\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ነባሪ\n- solver or the part that works out the answer\n    English: solver\n    Your language: ፈታች\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ታንክ\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: ቫልቭ\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: የራሱ ዋጋዎች\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ደንበኛ\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: ምልክት\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ስዕል\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ፍሰት\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ሄድ\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ሄድ ኪሳራ\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: ክፍል\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ጥቃቅን (አካባቢያዊ) ኪሳራ\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: ፍላጎት\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ግፊት\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: የግንኙነት\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ነባሪ\n- solver or the part that works out the answer\n    English: solver\n    Your language: ፈታች\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ታንክ\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: ቫልቭ\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: የራሱ ዋጋዎች\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ደንበኛ\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: ምልክት\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ስዕል\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "u_millifeet": "millifeet",
         "lpn_field_tank_minvol": "Minimum volume",
@@ -131,6 +131,7 @@
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
         "lpn_inp_drop_headloss": "This file names a head loss formula EPANET does not accept, so the pipe roughness numbers were kept as written and read as Hazen-Williams.",
         "lpn_inp_drop_report": "This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.",
+        "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.",
         "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
         "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
         "lpn_inpalt_heading": "Alternative for {category}",
@@ -159,6 +160,8 @@
         "lpn_time_run_report": "Solver (run) report",
         "lpn_time_run_report_tip": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
         "lpn_settings_solver": "Solver",
+        "lpn_quality_diffusivity": "Diffusivity",
+        "lpn_quality_diffusivity_tip": "EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²\/s for US flow units and m²\/s for SI flow units. Blank uses the EPANET default of 1.0.",
         "lpn_reports_epanet": "Solver (run)",
         "lpn_inp_export_flat_label_semicolon": "Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.",
         "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure.",
@@ -231,6 +234,7 @@
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
         "lpn_inp_drop_headloss": "This file names a head loss formula EPANET does not accept, so the pipe roughness numbers were kept as written and read as Hazen-Williams.",
         "lpn_inp_drop_report": "This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.",
+        "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.",
         "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
         "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
         "lpn_inpalt_heading": "Alternative for {category}",
@@ -259,6 +263,8 @@
         "lpn_time_run_report": "Solver (run) report",
         "lpn_time_run_report_tip": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
         "lpn_settings_solver": "Solver",
+        "lpn_quality_diffusivity": "Diffusivity",
+        "lpn_quality_diffusivity_tip": "EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²\/s for US flow units and m²\/s for SI flow units. Blank uses the EPANET default of 1.0.",
         "lpn_reports_epanet": "Solver (run)",
         "lpn_inp_export_flat_label_semicolon": "Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.",
         "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure.",
@@ -1162,6 +1168,22 @@
                 }
             }
         },
+        "lpn_inp_drop_quality_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_comments",
+                    "value": "በዚህ ፋይል ስርዓቶች ወይም ቀላል መቆጣጠሪያዎች ውስጥ ያሉ እነዚህ የአስተያየት መስመሮች አልገቡም፣ ምክንያቱም ይህ ገጽ የሚያስቀምጥበት ቦታ የለውም (ለምሳሌ በአንድ ስርዓት ረድፎች መካከል)። ሁሉም ስርዓቶችና መቆጣጠሪያዎች ሙሉ በሙሉ ገብተዋል።",
+                    "english": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_file_options",
+                    "value": "ይህ ፋይል ተጨማሪ ፋይል ይጠቅሳል፦ መጋጠሚያዎችን የያዘ Map፣ ወይም አስቀድሞ የተሰላ ሃይድሮሊክስ የያዘ Hydraulics። ይህ ገጽ የትኛውንም መክፈት ስለማይችል፣ መስመሮቹ እንዳሉ ይያዛሉ፣ የEPANET ፋይል ካስቀመጡም ይመለሳሉ።",
+                    "english": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file."
+                }
+            }
+        },
         "lpn_inpalt_lead": {
             "reason": "missing",
             "current_value": null,
@@ -1419,8 +1441,8 @@
             }
         },
         "lpn_settings_viscosity": {
-            "reason": "english_changed",
-            "current_value": "አንጻራዊ ቪስኮሲቲ",
+            "reason": "missing",
+            "current_value": null,
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_settings_specific_gravity",
@@ -1428,25 +1450,24 @@
                     "english": "Specific gravity"
                 },
                 "next_translated": {
-                    "key": "lpn_settings_viscosity_tip",
-                    "value": "የፈሳሹ ቪስኮሲቲ በ20 ዲግሪ ሴልስየስ ካለው ውሃ ጋር ሲነጻጸር። መልሱን የሚቀይረው በዳርሲ-ዌይስባክ ዘዴ ስር ብቻ ነው።",
-                    "english": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method."
+                    "key": "lpn_settings_trials",
+                    "value": "ከፍተኛ ሙከራዎች",
+                    "english": "Maximum trials"
                 }
             },
             "tip": {
                 "key": "lpn_settings_viscosity_tip",
-                "english": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
-                "value": "የፈሳሹ ቪስኮሲቲ በ20 ዲግሪ ሴልስየስ ካለው ውሃ ጋር ሲነጻጸር። መልሱን የሚቀይረው በዳርሲ-ዌይስባክ ዘዴ ስር ብቻ ነው።"
+                "english": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method."
             }
         },
         "lpn_settings_viscosity_tip": {
-            "reason": "english_changed",
-            "current_value": "የፈሳሹ ቪስኮሲቲ በ20 ዲግሪ ሴልስየስ ካለው ውሃ ጋር ሲነጻጸር። መልሱን የሚቀይረው በዳርሲ-ዌይስባክ ዘዴ ስር ብቻ ነው።",
+            "reason": "missing",
+            "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_viscosity",
-                    "value": "አንጻራዊ ቪስኮሲቲ",
-                    "english": "Viscosity"
+                    "key": "lpn_settings_specific_gravity",
+                    "value": "ልዩ ስበት",
+                    "english": "Specific gravity"
                 },
                 "next_translated": {
                     "key": "lpn_settings_trials",
@@ -1456,8 +1477,7 @@
             },
             "label": {
                 "key": "lpn_settings_viscosity",
-                "english": "Viscosity",
-                "value": "አንጻራዊ ቪስኮሲቲ"
+                "english": "Viscosity"
             }
         },
         "lpn_settings_engine_native": {
@@ -1638,6 +1658,46 @@
                     "value": "የውሃ ጥራት",
                     "english": "Quality"
                 }
+            }
+        },
+        "lpn_quality_diffusivity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_tolerance_tip",
+                    "value": "EPANET ሁለት የተጎራበቱ የውሃ ክፍሎችን እንደ አንድ የሚቆጥርበት በታች ያለው የክምችት ልዩነት። ባዶ የEPANET ነባሪ 0.01ን ይጠቀማል።",
+                    "english": "Concentration difference below which EPANET treats two adjoining parcels of water as one. Blank uses the EPANET default of 0.01."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_named_concentration",
+                    "value": "{chemical} ክምችት",
+                    "english": "{chemical} concentration"
+                }
+            },
+            "tip": {
+                "key": "lpn_quality_diffusivity_tip",
+                "english": "EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²\/s for US flow units and m²\/s for SI flow units. Blank uses the EPANET default of 1.0."
+            }
+        },
+        "lpn_quality_diffusivity_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_tolerance_tip",
+                    "value": "EPANET ሁለት የተጎራበቱ የውሃ ክፍሎችን እንደ አንድ የሚቆጥርበት በታች ያለው የክምችት ልዩነት። ባዶ የEPANET ነባሪ 0.01ን ይጠቀማል።",
+                    "english": "Concentration difference below which EPANET treats two adjoining parcels of water as one. Blank uses the EPANET default of 0.01."
+                },
+                "next_translated": {
+                    "key": "lpn_quality_named_concentration",
+                    "value": "{chemical} ክምችት",
+                    "english": "{chemical} concentration"
+                }
+            },
+            "label": {
+                "key": "lpn_quality_diffusivity",
+                "english": "Diffusivity"
             }
         },
         "lpn_reports_epanet": {

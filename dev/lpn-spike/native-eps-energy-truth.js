@@ -60,7 +60,15 @@ async function truth(EngCalcs, model, wantReport) {
 	WS.writeFile('e.inp', built.inp);
 	p.open('e.inp', 'e.rpt', 'e.out');
 	if (wantReport) { p.setReport('ENERGY YES'); p.setReport('SUMMARY NO'); }
-	p.solveH();
+	// solveH() is openH(), initH(SAVE), runH()/nextH() to the end and closeH(); the loop is opened up so a full tank
+	// is held full as the bridge holds it (EngCalcs.lpnHoldFullTanks: OWA-EPANET 2.3.5 leaves a hair-under-full tank open to inflow).
+	const nodeIdx = {};
+	model.nodes.forEach((n) => { nodeIdx[n.id] = p.getNodeIndex(n.id); });
+	const pinned = {};
+	p.openH();
+	p.initH(1);
+	do { p.runH(); if (p.nextH() > 0) { EngCalcs.lpnHoldFullTanks(p, model, nodeIdx, pinned); } else { break; } } while (true);
+	p.closeH();
 	p.saveH();
 	if (wantReport) { p.report(); }
 	p.close();
