@@ -12011,7 +12011,7 @@ var EngCalcs = EngCalcs || {};
 	// closed along the ground line**, so the width of the upper cylinder (EC_WELL_UPPER_HALF) is one number; the literal is for a page with no icons.
 	function wellSilhouette() {
 		var ic = EngCalcs.icons && EngCalcs.icons.well, m = ic && /d="([^"]+)"/.exec(ic);
-		return m ? m[1] + 'Z' : 'M7 4V11H9V21.5H15V11H17V4Z';
+		return m ? m[1] + 'Z' : 'M7.5 4V8H10.25V21.5H13.75V8H16.5V4Z';
 	}
 	var RESERVOIR_HALF_W = 1.9878;
 	var RESERVOIR_HALF_H = 1.9878;
@@ -41190,16 +41190,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pid = tapLinkId(t); pipe = pid ? linkById(pid) : null;
 				if (pipe && pipe.type === 'pipe' && inBaseScenario() && wellTankNotOurs(a, pipe.id) && nodeById(pipe.from) && nodeById(pipe.to)) {
 					r = breakPipeAtPoint(pipe, 'junction', w.x, w.y, null); tee = r.node;
-					// **A TEE THE WELL TOOL PLACES FOLLOWS THE WELL, ON A PIPE AS ON OPEN GROUND** (Tom, 2026-11-15: "You mean placed on open ground? OK."): the split pipe's new junction takes the Well's elevation
-					// and follows it until its own is typed, and likewise not under the DEM. Only an existing junction pressed as the tee, whose elevation was already the user's, does not.
-					if (!elevSourceIsDem()) { if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } teeFollows = true; }   // base-write: construction
 				} else {
 					tee = addNode('junction', w.x, w.y);
-					// **OPEN GROUND TAKES THE WELL'S ELEVATION AND FOLLOWS IT, UNLESS THE ELEVATION SOURCE IS THE DEM** (reviewer, 2026-11-14): then its ground is its own, the
-					// fill reads it, and it does not follow (follow applies only to a value typed or carried from the Well, never to one the DEM reads). The value written is
-					// the Well's BASE elevation, the one a node is born with in Base; a scenario's override of it is that scenario's and reaches the followers through setProp().
-					if (!elevSourceIsDem()) { if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } teeFollows = true; }   // base-write: construction
 				}
+				// **A TEE THE WELL TOOL PLACES FOLLOWS THE WELL, ON A PIPE AS ON OPEN GROUND** (Tom, 2026-11-15: "You mean placed on open ground? OK."; and on a pipe: "no strong
+				// case either way. Do what's most elegant on the back end."): one rule for both, below the split. The new junction takes the Well's BASE elevation, the one a node is
+				// born with in Base, and follows it until its own is typed; not under the DEM, where its ground is its own, the fill reads it, and it does not follow. A scenario's override of the
+				// Well's elevation reaches the followers through setProp(). Only an existing junction pressed as the tee, whose elevation was already the user's, does not.
+				if (!elevSourceIsDem()) { if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } teeFollows = true; }   // base-write: construction
 			}
 			wellTankPending.tee = tee.id; wellTankPending.stage = 'tank'; wellTankPending.teeFollow = teeFollows;
 			wellTankPending.pipe1 = wellTankPipe(wellOut.id, tee.id).id;

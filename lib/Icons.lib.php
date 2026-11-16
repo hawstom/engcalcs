@@ -46,30 +46,34 @@ define('EC_ICON_OPEN_TAG', '<svg class="ec-icon" viewBox="0 0 24 24" fill="none"
 	. ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">');
 
 // **THE WELL'S UPPER CYLINDER IS ONE NUMBER** (Tom, round 6 pass: colleagues are being asked whether it should be much narrower, only a little wider
-// than the deep cylinder). Half its width in the 24-unit frame, either side of the centre line at x = 12; the deep cylinder is 1.5 either side.
+// than the deep cylinder). Half its width in the 24-unit frame, either side of the centre line at x = 12.
 // A change here changes the toolbar icon, the map symbol and its grab shape, which JS derives from the icon's first path (wellSilhouette()).
-define('EC_WELL_UPPER_HALF', 5);
-// The deep cylinder's half width: wide enough that the air above the water stays a clear white column at 17 to 24 px (round 9: at 1.5 the hole filled solid, at 2.25 the level line smudged into the floor at icon size).
-define('EC_WELL_DEEP_HALF', 3);
+define('EC_WELL_UPPER_HALF', 4.5);
+// The deep cylinder's half width, and the depth where the upper cylinder ends (A4 of the 2026-11-14 proofs: a short upper hole over a long casing).
+define('EC_WELL_DEEP_HALF', 1.75);
+define('EC_WELL_STEP', 8);
 
-// **THE WELL'S DRAWING** (Tom's sketch of 2026-10-25, WELL, and his notes from the round 6 pass): a ground line across the top that runs past the pit on both
-// sides; a wide upper cylinder; below it a narrow, deep cylinder with a closed bottom; the drawdown curves, which fall from the ground line's
-// ends to meet the narrow cylinder above its bottom. Two holes are drilled and nothing is wider at the bottom. A short horizontal line across the
-// narrow hole where the curves meet it is the water level (Tom, round 7 pass: "There should be no box. But I think there should be a water level
-// horizontal line in the hole"). The FIRST path is the outline of the two cylinders: JS closes it for the symbol's backdrop and grab shape.
+// **THE WELL'S DRAWING** (Tom's sketch of 2026-10-25, WELL, and his verdict on round 9: "We were very close to what we needed already. And I suggested A4 and B7."):
+// a ground line across the top that runs past the pit on both sides; a short, wide upper cylinder; below it a long, narrow casing with a closed bottom;
+// the drawdown curves, which fall from the ground line's ends and meet the water level, a horizontal line at full stroke weight that crosses the casing and
+// runs a little beyond it (a hairline inside the casing vanished at 17 px, and a solid water body was refused). The FIRST path is the outline of the two
+// cylinders: JS closes it for the symbol's backdrop and grab shape. The curves start below the step, or they run into the upper hole's walls.
 function ecWellDrawing() {
 	$l = 12 - EC_WELL_UPPER_HALF; $r = 12 + EC_WELL_UPPER_HALF;
 	$a = 12 - EC_WELL_DEEP_HALF; $b = 12 + EC_WELL_DEEP_HALF;
-	// The water is the last path: solid from its surface (the level, y 16.5) to the floor, so it reads as water at icon size where a hairline across a narrow hole read as a box.
-	return '<path d="M' . $l . ' 4V11H' . $a . 'V21.5H' . $b . 'V11H' . $r . 'V4"/><path d="M2 4H22"/>'
-		. '<path d="M2 12C6 12 ' . ($a - 1.5) . ' 12.4 ' . $a . ' 14.2M22 12C18 12 ' . ($b + 1.5) . ' 12.4 ' . $b . ' 14.2"/>'
-		. '<path fill="currentColor" stroke="none" d="M' . $a . ' 16.5H' . $b . 'V21.5H' . $a . 'Z"/>';
+	$s = EC_WELL_STEP; $lx = $a - 2; $rx = $b + 2;   // the level line's ends, 2 beyond the casing where the curves meet it, at y 17
+	return '<path d="M' . $l . ' 4V' . $s . 'H' . $a . 'V21.5H' . $b . 'V' . $s . 'H' . $r . 'V4"/><path d="M2 4H22"/>'
+		. '<path d="M2 12C7 12 ' . ($lx - .5) . ' 12.5 ' . $lx . ' 17M22 12C17 12 ' . ($rx + .5) . ' 12.5 ' . $rx . ' 17"/>'
+		. '<path stroke-linecap="butt" d="M' . $lx . ' 17H' . $rx . '"/>';
 }
-// **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (Tom, round 6 pass: the earlier one drew the tank underground):
-// the well's drawing at 0.62 hanging from a ground line, with a tank standing ABOVE that line beside it. Strokes keep their width.
+// **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (B7 of the 2026-11-14 proofs, with the pipe low on the tank):
+// a small well on the left, a riser to a tee with a short stub, and a run to a tank standing on the ground line. The run enters the tank 2.5 units above
+// its bottom, as a ground-level tank is plumbed (a pipe drains a tank only from the bottom; Tom, round 8). The tank on legs read worse at 17 px, where the
+// legs and the pipe crowd the ground line. The well's strokes are thinner (1.3) so its casing stays open at this size.
 function ecWellTankIcon() {
-	$well = str_replace('<path ', '<path vector-effect="non-scaling-stroke" stroke-width="1.2" ', ecWellDrawing());   // thinner strokes: at this scale the air column would close at 2
-	return '<g transform="translate(-0.74 8.52) scale(.62)">' . $well . '</g><path d="M0.5 11H23.5"/><path d="M15 4H22V11H15Z"/>';
+	return '<g stroke-width="1.3"><path d="M3.2 13V15.6H5.2V22.5H6.8V15.6H8.8V13"/><path d="M0.8 13H11.2"/>'
+		. '<path d="M0.8 16.2C3 16.2 3.6 16.8 3.9 18.6M11.2 16.2C9 16.2 8.4 16.8 8.1 18.6"/><path stroke-linecap="butt" d="M3.4 18.6H8.6"/></g>'
+		. '<path d="M6 13V10.5M2.5 10.5H13"/><path d="M13 13V3H22V13"/><path stroke-width="1.3" d="M11.5 13H23.5"/>';
 }
 
 $ec_icons = array(

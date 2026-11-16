@@ -90,7 +90,23 @@ async function main() {
 		ok('the Well, the Tank and the Reservoir are all drawn as symbols', !!symbols.well && !!symbols.tank && !!symbols.reservoir);
 		ok('the tint in the Well\'s holes is the Tank\'s and the Reservoir\'s: the same class, the same fill, the same strength', symbols.well && symbols.well.cls === symbols.tank.cls && symbols.well.cls === symbols.reservoir.cls && symbols.well.fill === symbols.tank.fill && symbols.well.fill === symbols.reservoir.fill && symbols.well.op === symbols.tank.op && symbols.well.op === symbols.reservoir.op, JSON.stringify([symbols.well, symbols.tank, symbols.reservoir]));
 		const lines = (symbols.paths || []).filter((p) => !/backdrop/.test(p.cls));
-		ok('the symbol has the water in the narrow hole, level at its top, and its linework is the casing, the ground, the curves and that water, with no box', lines.length === 4 && lines.some((p) => /^M9 16\.5H15V21\.5H9Z$/.test(p.d)) && lines.filter((p) => /Z/i.test(p.d)).length === 1, lines.map((p) => p.d).join(' | '));
+		ok('the symbol has a full-weight water-level line across the casing, and its linework is the casing, the ground, the curves and that line, with no box and no solid water', lines.length === 4 && lines.some((p) => /^M8\.25 17H15\.75$/.test(p.d)) && !lines.some((p) => /Z/i.test(p.d)), lines.map((p) => p.d).join(' | '));
+		// **THE LEVEL LINE MUST SHOW AT TOOLBAR SIZE** (round 9 pass: a hairline inside the casing vanished at 17 px). Rasterize the toolbar icon at 17, 21 and 24 px and
+		// read the casing's centre column: the row of the level line is dark, and clearly darker than the air column above it.
+		const px = await P.evaluate(async () => {
+			const out = {};
+			for (const size of [17, 21, 24]) {
+				const svg = EngCalcs.iconOpenTag.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" ').replace('stroke="currentColor"', 'stroke="#000"') + EngCalcs.icons.well + '</svg>';
+				const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+				await img.decode();
+				const cv = document.createElement('canvas'); cv.width = size; cv.height = size;
+				const g = cv.getContext('2d'); g.drawImage(img, 0, 0);
+				const k = size / 24, cx = Math.floor(12 * k), col = (y) => g.getImageData(cx, Math.floor(y * k), 1, 1).data[3] / 255;
+				out[size] = { level: col(17), air: col(12.5) };
+			}
+			return out;
+		});
+		for (const size of [17, 21, 24]) { ok('at ' + size + ' px the level line shows in the casing, clearly darker than the air above it', px[size].level > 0.6 && px[size].level - px[size].air > 0.3, JSON.stringify(px[size])); }
 		if (process.env.EC_WELL_SHOT) {   // a picture of the Well's symbol, for a review: EC_WELL_SHOT=/path/to.png
 			const c = await wc();
 			await P.evaluate(() => { document.querySelectorAll('#lpn_canvas .lpn-label, #lpn_canvas text').forEach((t) => { t.style.visibility = 'hidden'; }); });
