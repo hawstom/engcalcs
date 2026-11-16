@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**88 open tasks.** Next (100): 6 · Soon (75): 14 · Someday (50): 32 · Maybe (25): 17 · Parked (5): 19
+**90 open tasks.** Next (100): 8 · Soon (75): 14 · Someday (50): 32 · Maybe (25): 17 · Parked (5): 19
 
-## 100 — Next (6)
+## 100 — Next (8)
 
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
@@ -17,6 +17,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 858 — Contour plot controls that say what is plotted.
 - Task 859 — Libraries: Move to top, up, down and bottom buttons.
 - Task 861 — A chooser when one click hits several elements.
+- Task 863 — Slim the run transport; step the run on the graph.
+- Task 864 — Warn when a pipe's velocity is unreasonable.
 
 ## 75 — Soon (14)
 
@@ -30,10 +32,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
 - Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 - Task 823 — Starter examples a new user can build from.
-- Task 851 — Net1's legend box covers the Tank label on a phone.
 - ! Task 854 — A Text drawn in a scenario starts empty and vanishes if left empty.
 - Task 857 — A Volume unit in Settings for tank volumes.
 - Task 860 — Controls that differ by scenario.
+- Task 865 — Element for what is on the map, asset for the owned thing.
 
 ## 50 — Someday (32)
 
@@ -116,5 +118,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-80 of 88 titles are within 4–12 words. `!` marks the rest;
+82 of 90 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='يعيّن هذا الملف وسوماً لبع�
 $ec_lang['lpn_inp_drop_report']='يحتوي هذا الملف على إعدادات تنسيق تقرير EPANET. يتوفر تقرير التشغيل في التقارير، التشغيل، لكنه يستخدم تنسيق EPANET القياسي لا التنسيق الذي تحدده هذه الإعدادات. تُحفظ السطور وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
 $ec_lang['lpn_inp_drop_sections']='يحمل هذا الملف قسماً لا تقرأه هذه الصفحة إطلاقاً. لا يُستخدم شيء هنا منه. يُحفظ كاملاً، ويُكتب مرة أخرى إذا حفظت ملف EPANET.';
 $ec_lang['lpn_inp_drop_comments']='لم تُستورد سطور التعليق هذه في الأنماط أو عناصر التحكم البسيطة في هذا الملف، لأن هذه الصفحة لا تملك مكاناً لحفظها (مثلاً بين صفوف نمط واحد). استُوردت كل الأنماط وعناصر التحكم كاملة.';
-$ec_lang['lpn_inp_drop_quality_options']='يذكر هذا الملف خيارات جودة المياه في EPANET: خيار Quality، الذي يسمّي نوع تحليل جودة المياه، وإعدادين يتعلقان بمادة كيميائية، هما الانتشارية النسبية وسماحية الجودة. تُحفظ الثلاثة كلها وتُستخدم. يُحسب هنا كل من عمر الماء وتتبع المصدر ومادة كيميائية، ويُستخدم إعدادا المادة الكيميائية عند تشغيل مادة كيميائية. تُكتب جميعها مرة أخرى إذا حفظت ملف EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='يشير هذا الملف إلى ملف مساعد: Map، الذي يحمل الإحداثيات، أو Hydraulics، الذي يحمل حسابات هيدروليكية سبق حسابها. لا تستطيع هذه الصفحة فتح أي منهما، فتُحفظ السطور كما هي وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='يذكر هذا الملف خيارات لا تقرأها هذه الصفحة. لا يُستخدم شيء هنا منها. تُحفظ وتُكتب مرة أخرى إذا حفظت ملف EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='يذكر ملف EPANET ‎.net هذا إعدادات لا تملك هذه الصفحة عنصر تحكم لها، فتُعرض قيمها هنا بدلاً من نقلها. جاء كل شيء آخر. إذا احتجتها، افتح الملف في EPANET واستخدم File، Export، Network لحفظه كملف ‎.inp، ثم استورد ذلك الملف.';
@@ -3483,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='الافتراضي هو {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='حد التقارب الذي يجب أن يبلغه الحلّال قبل أن يتوقف، ويُقاس بالتغير الكلي في التدفق من محاولة إلى التالية مقسوماً على التدفق الكلي في الروابط. الرقم الأصغر أدق ويستغرق وقتاً أطول.';
 $ec_lang['lpn_settings_specific_gravity']='الكثافة النوعية';
-$ec_lang['lpn_settings_viscosity']='اللزوجة النسبية';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3492,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='اللزوجة النسبية';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='لزوجة السائل مقارنة بالماء عند 20 درجة مئوية. لا تغيّر الإجابة إلا في طريقة دارسي-فايسباخ.';
 $ec_lang['lpn_settings_trials']='أقصى عدد للمحاولات';
 $ec_lang['lpn_settings_trials_tip']='أقصى عدد من المحاولات قبل أن يتوقف الحلّال في شبكة لا تتقارب.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -3858,8 +3855,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='سماحية الجودة';
 $ec_lang['lpn_quality_tolerance_tip']='فرق التركيز الذي يعامل EPANET دونه كتلتين متجاورتين من الماء ككتلة واحدة. تستخدم القيمة الفارغة القيمة الافتراضية في EPANET وهي 0.01.';
-$ec_lang['lpn_quality_diffusivity']='الانتشارية النسبية';
-$ec_lang['lpn_quality_diffusivity_tip']='انتشارية المادة الكيميائية في الماء، نسبةً إلى الكلور. تستخدم القيمة الفارغة القيمة الافتراضية في EPANET وهي 1.0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='تركيز {chemical}';

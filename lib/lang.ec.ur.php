@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='اس فائل میں کچھ جنکشنز، پائ
 $ec_lang['lpn_inp_drop_report']='اس فائل میں EPANET کی رپورٹ کے فارمیٹ کی ترتیبات ہیں۔ رن رپورٹ رپورٹس، رن کے تحت دستیاب ہے، لیکن یہ ان ترتیبات کے بیان کردہ فارمیٹ کے بجائے معیاری EPANET فارمیٹ استعمال کرتی ہے۔ یہ سطریں محفوظ رکھی جاتی ہیں اور اگر آپ EPANET فائل محفوظ کریں تو واپس لکھی جاتی ہیں۔';
 $ec_lang['lpn_inp_drop_sections']='اس فائل میں ایک حصہ ایسا ہے جسے یہ صفحہ بالکل نہیں پڑھتا۔ یہاں اس کا کوئی استعمال نہیں۔ یہ پورا محفوظ رکھا جاتا ہے، اور اگر آپ EPANET فائل محفوظ کریں تو یہ واپس لکھا جاتا ہے۔';
 $ec_lang['lpn_inp_drop_comments']='اس فائل کے پیٹرنز یا سادہ کنٹرولز میں موجود یہ تبصرے کی سطریں درآمد نہیں کی گئیں، کیونکہ اس صفحے میں انہیں رکھنے کی جگہ نہیں ہے (مثلاً ایک پیٹرن کی قطاروں کے درمیان)۔ ہر پیٹرن اور کنٹرول مکمل درآمد کیا گیا۔';
-$ec_lang['lpn_inp_drop_quality_options']='اس فائل میں EPANET کے پانی کے معیار کے اختیارات درج ہیں: Quality اختیار، جو پانی کے معیار کے تجزیے کی قسم کا نام بتاتا ہے، اور کیمیکل کے ساتھ چلنے والی دو ترتیبات، Relative diffusivity اور Quality tolerance۔ تینوں محفوظ رکھی اور استعمال کی جاتی ہیں۔ پانی کی عمر، سورس ٹریس اور کیمیکل ہر ایک یہاں نکالا جاتا ہے، اور کیمیکل چلانے پر دونوں کیمیکل ترتیبات استعمال ہوتی ہیں۔ اگر آپ EPANET فائل محفوظ کریں تو یہ سب واپس لکھی جاتی ہیں۔';
 $ec_lang['lpn_inp_drop_file_options']='اس فائل میں ایک ضمنی فائل کا حوالہ ہے: Map، جس میں احداثیات ہوتے ہیں، یا Hydraulics، جس میں پہلے سے نکالی گئی ہائیڈرالکس ہوتی ہے۔ یہ صفحہ ان میں سے کوئی نہیں کھول سکتا، اس لیے یہ سطریں جیسی ہیں ویسی ہی محفوظ رکھی جاتی ہیں اور اگر آپ EPANET فائل محفوظ کریں تو واپس لکھی جاتی ہیں۔';
 $ec_lang['lpn_inp_drop_other_options']='اس فائل میں ایسے اختیارات درج ہیں جو یہ صفحہ نہیں پڑھتا۔ یہاں ان کا کوئی استعمال نہیں۔ وہ محفوظ رکھے جاتے ہیں اور اگر آپ EPANET فائل محفوظ کریں تو واپس لکھے جاتے ہیں۔';
 $ec_lang['lpn_inp_drop_net_options']='اس EPANET .net فائل میں ایسی ترتیبات درج ہیں جن کے لیے اس صفحے پر کوئی کنٹرول نہیں، اس لیے ان کی قدریں یہاں فہرست کی گئی ہیں بجائے اس کے کہ منتقل کی جائیں۔ باقی سب کچھ منتقل ہو گیا۔ اگر آپ کو ان کی ضرورت ہو تو فائل کو EPANET میں کھولیں اور File، Export، Network استعمال کر کے اسے .inp فائل کے طور پر محفوظ کریں، پھر اسے درآمد کریں۔';
@@ -3483,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='پہلے سے مقررہ قدر {n} ہے۔'
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='ہم آہنگی کی وہ حد جس تک حل کار کو رکنے سے پہلے پہنچنا ہے، جو ایک کوشش سے اگلی تک بہاؤ میں کل تبدیلی کو لنکس میں کل بہاؤ سے تقسیم کر کے ناپی جاتی ہے۔ چھوٹا عدد زیادہ درست ہے اور زیادہ وقت لیتا ہے۔';
 $ec_lang['lpn_settings_specific_gravity']='مخصوص کثافت';
-$ec_lang['lpn_settings_viscosity']='نسبتی چپکاؤ';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3492,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='نسبتی چپکاؤ';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='20 ڈگری سیلسیس پر پانی کے مقابلے میں سیال کا چپکاؤ۔ یہ صرف Darcy-Weisbach طریقے کے تحت جواب بدلتا ہے۔';
 $ec_lang['lpn_settings_trials']='زیادہ سے زیادہ کوششیں';
 $ec_lang['lpn_settings_trials_tip']='ایسے نیٹ ورک پر جو ہم آہنگ نہیں ہوتا، حل کار کے رکنے سے پہلے کوششوں کی زیادہ سے زیادہ تعداد۔';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -3858,8 +3855,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='معیار کی رواداری';
 $ec_lang['lpn_quality_tolerance_tip']='ارتکاز کا وہ فرق جس سے کم ہونے پر EPANET پانی کے دو ملحقہ پارسلوں کو ایک سمجھتا ہے۔ خالی چھوڑنے پر EPANET کی ڈیفالٹ 0.01 استعمال ہوتی ہے۔';
-$ec_lang['lpn_quality_diffusivity']='نسبتی پھیلاؤ پذیری';
-$ec_lang['lpn_quality_diffusivity_tip']='پانی میں کیمیکل کی نفوذ پذیری، کلورین کے مقابلے میں۔ خالی چھوڑنے پر EPANET کی ڈیفالٹ 1.0 استعمال ہوتی ہے۔';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='{chemical} ارتکاز';
