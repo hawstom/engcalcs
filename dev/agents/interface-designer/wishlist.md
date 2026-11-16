@@ -588,3 +588,6 @@ The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), 
 - (2026-10-29) One `pointer:coarse` token block (row height, hit areas) so no box re-decides its phone sizes. Tag: SPECULATION.
 
 - (2026-11-06) **Properties titles itself by the asset**: "Valve V12", "Pipes (2)", "Pump+ P3", live through Morph; second choice "Properties: Valve V12". Tom asked. `properties-asset-2026-11-06.md`. Tag: OBSERVED on today's title; SPECULATION on EPANET's caption.
+
+- (2026-11-14) **Slim the transport to a clock plus Back, Play, Forward; Restart, End and speed go into a popover on the clock.** Small. Measured: gets the 1366 and 1280 laptop toolbar back to one row (canvas top 151 to 118 px) and halves the phone row. See `time-controls-2026-11-14.md`. Tag: OBSERVED on the numbers, SPECULATION on the popover's discoverability.
+- (2026-11-14) **Click or drag the `now` line on the Time series graph to seek.** Small to medium; a second door to the clock, zero toolbar cost. Tag: OBSERVED that the line exists, SPECULATION that people will try it.

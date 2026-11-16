@@ -5276,6 +5276,7 @@ var EngCalcs = EngCalcs || {};
 		// if we raise this tank" or "what if this pump runs at 90 percent" is exactly a scenario's
 		// question. Stored bare, as the file and EPANET name them: see LPN_BARE_PROP.
 			elev: true, bottomElev: true, minLevel: true, maxLevel: true, tankDiameter: true, volCurve: true,
+			minVolume: true, overflow: true,
 			mixingModel: true, mixingFraction: true, headPattern: true,
 		// `demands` is a junction's WHOLE DEMAND BREAKDOWN -- every row's base, pattern and
 		// description -- as ONE property (R-369; Tom, 2026-09-28: *"Add a demand category in a
@@ -5350,6 +5351,7 @@ var EngCalcs = EngCalcs || {};
 	// that is not marked `// base-write:`.
 	// A Text's own look is stored bare too, as it always was (`sizeMult`, `align`...).
 	var LPN_BARE_PROP = { x: true, y: true, elev: true, bottomElev: true, minLevel: true, maxLevel: true, tankDiameter: true, volCurve: true,
+		minVolume: true, overflow: true,
 		mixingModel: true, mixingFraction: true, headPattern: true, speed: true, speedPattern: true,
 		sizeMult: true, align: true, valign: true, bold: true, rot: true, allZoom: true };
 	// **WHERE BASE KEEPS A JUNCTION'S `demands`** (R-369): row 0 is `_demand` plus two of these
@@ -6157,6 +6159,7 @@ var EngCalcs = EngCalcs || {};
 			// mixing model we place with the rest of water quality; a reservoir's head pattern goes
 			// with the head it varies.
 			elev: 'physical', bottomElev: 'physical', minLevel: 'physical', maxLevel: 'physical', tankDiameter: 'physical', volCurve: 'physical',
+			minVolume: 'physical', overflow: 'physical',
 			headPattern: 'physical',
 			mixingModel: 'constituent', mixingFraction: 'constituent' },
 		link: { diameter: 'physical', roughness: 'physical', k: 'physical', length: 'physical',
@@ -8038,7 +8041,7 @@ var EngCalcs = EngCalcs || {};
 	// the .inp readers' carried text, import markers and staging; then keys that are stale, or
 	// migrated and deleted by applySaved().
 	[null, ['customProps', 'fileOptions',
-		'sources', 'mixing', 'tags', 'reactions.tank', 'energy.effic',
+		'sources', 'mixing', 'tags', 'reactions.tank', 'energy.effic', 'hydraulics.tok',
 		'sectionsOpen', 'mapHeight', 'fileAutosaveSeconds', 'colorRamp', 'colorClasses', 'colorReverse',
 		'colorThematic', 'colorFrozenBreaks', 'basemapFilter', 'kmDefault', 'labelReadabilityBias']]
 	].forEach(function (g) {
@@ -9020,6 +9023,16 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', prop: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return effective(n, 'tankDiameter'); }, set: function (n, v) { n.tankDiameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** ([TANKS] columns 7 and 9). The volume is a number
+			// in the Length unit cubed; Can overflow is a YES/NO choice on the same `choices` door the
+			// mixing model uses, the codes being EPANET's own words.
+			{ key: 'minVolume', group: 'node', field: 'minVolume', prop: 'minVolume', label: pc.lpn_field_tank_minvol || 'Minimum volume',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return effective(n, 'minVolume'); }, set: function (n, v) { n.minVolume = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			{ key: 'overflow', group: 'node', field: 'overflow', prop: 'overflow', choices: ['YES', 'NO'],
+				label: pc.lpn_field_tank_overflow || 'Can overflow',
+				applies: function (n) { return n.type === 'tank'; },
+				get: function (n) { return tankOverflowWord(n); }, set: function (n, v) { n.overflow = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **THE MIXING MODEL, A FOUR-WAY CHOICE**, on the same `choices` door `status` uses
 			// above. The CODES are the internal EPANET tokens and are never translated, so a saved
 			// query keeps reading in every language -- but the WORDS a person picks from are the
@@ -9463,6 +9476,24 @@ var EngCalcs = EngCalcs || {};
 		try { return !!(window.matchMedia && window.matchMedia('(max-width: 640px)').matches); }
 		catch (e) { return false; }
 	}
+	// **NO LEGEND IS SHOWN WHEN A PROJECT OPENS ON A PHONE** (Tom, 2026-11-14: *"On a phone, we should
+	// never have the legends shown by default on any example or for any reason."* -- Task 851, Net1's
+	// legend lay over its Tank label). The map is a quarter as wide and a legend is a fifth of it.
+	// Two legends, so two holds: the Labels legend (`legendPosition`) and the colour key
+	// (`colorLegendPosition`). A hold lasts for one project's time on screen and is SESSION STATE
+	// ONLY: nothing is stored on the device, and the project's own setting is never rewritten, so a
+	// project saved on a phone keeps the corner it had (CLAUDE.md: write back what came in). The
+	// Settings dropdown of a held legend reads None; choosing a corner there releases that legend.
+	// Opening or creating another project holds them again (holdLegendsOnPhone(), called by every
+	// project arrival that is a switch). Read through legendPositionNow(), never scnSetting().
+	var legendsHeld = { legendPosition: smallScreen(), colorLegendPosition: smallScreen() };
+	function holdLegendsOnPhone() {
+		var small = smallScreen();
+		legendsHeld = { legendPosition: small, colorLegendPosition: small };
+	}
+	function legendPositionNow(member) { return legendsHeld[member] ? 'off' : scnSetting(member); }
+	// What a legend's own dropdown shows: None while it is held, whatever the project's setting says.
+	function legendPositionShown(member) { return legendsHeld[member] ? 'off' : settings[member]; }
 
 	// Gear/settings panel -- like labelSettings, a VIEW/preference object, not network content:
 	// persisted to localStorage as a sibling key, deliberately NOT part of the undo-snapshotted
@@ -12166,7 +12197,11 @@ var EngCalcs = EngCalcs || {};
 			// not a nicety: it is EPANET's parcel-merging tolerance and it decides how much of the
 			// concentration profile survives the transport (dev/lpn-spike/reaction-anchor-harness.js).
 			out.tolerance = numOrUndef(qo.tolerance);
+			// Relative above 1e-4, absolute (ft2/s US, m2/s SI) at or below, as EPANET reads it.
 			out.diffusivity = numOrUndef(qo.diffusivity);
+			if (typeof out.diffusivity === 'number') {
+				out.diffusivity = EngCalcs.lpnFluidOptionRead('diffusivity', out.diffusivity, unitKey('lpn_u_flow'), unitKey('lpn_u_length'), unitKey('lpn_u_diameter'));
+			}
 		}
 		// **EPANET-MSX (Task 717)**: the species shown is a choice of what to LOOK at, not of what
 		// to run -- every species in the `.msx` runs. '' means the file's first species.
@@ -12804,6 +12839,15 @@ var EngCalcs = EngCalcs || {};
 	// A volume is shown in the LENGTH unit cubed (cubic feet or cubic metres, which is what EPANET
 	// pairs with its length): the factor and the mark come from the one LENGTH selector.
 	function tankVolumeFactor() { var f = unitFactor('lpn_u_length'); return f * f * f; }
+	// A tank's Can overflow as EPANET's own word. The file's spelling is kept in storage (`yes`, `NO`),
+	// because it is carried and never computed with; this is how every venue reads it. Absent is NO.
+	function tankOverflowWord(n) { return /^y/i.test(String(effective(n, 'overflow') || '')) ? 'YES' : 'NO'; }
+	// What a venue writes: EPANET's two words. Writing the word the file already spells that way
+	// keeps its characters, so editing a tank to the value it already had changes nothing.
+	function tankOverflowWrite(n, word) {
+		if (tankOverflowWord(n) === word && effective(n, 'overflow')) { return; }
+		setProp(n, 'overflow', word);
+	}
 	function tankVolumeUnitText() {
 		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_length');
 		if (k === 'ft') { return pc.u_ft3 || 'ft^3'; }
@@ -13400,7 +13444,7 @@ var EngCalcs = EngCalcs || {};
 				box.appendChild(note);
 			}
 		});
-		box.style.display = (any && !galleryIsUp() && !legendIsOff(scnSetting('colorLegendPosition'))) ? '' : 'none';
+		box.style.display = (any && !galleryIsUp() && !legendIsOff(legendPositionNow('colorLegendPosition'))) ? '' : 'none';
 		applyColorLegendPosition();
 	}
 	// Both legends are placed by one function, so neither can be positioned without the other's
@@ -24033,6 +24077,8 @@ var EngCalcs = EngCalcs || {};
 			['minLevel', 'lpn_field_tank_minlevel', 'Lowest water depth'],
 			['maxLevel', 'lpn_field_tank_maxlevel', 'Highest water depth'],
 			['tankDiameter', 'lpn_field_tank_diameter', 'Tank diameter'],
+			['minVolume', 'lpn_field_tank_minvol', 'Minimum volume'],
+			['overflow', 'lpn_field_tank_overflow', 'Can overflow'],
 			['mixingModel', 'lpn_mixing_model', 'Mixing model'],
 			['mixingFraction', 'lpn_mixing_fraction', 'Mixing fraction']
 		];
@@ -24107,7 +24153,7 @@ var EngCalcs = EngCalcs || {};
 				} else if (key === 'emitter') {
 					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
 				} else if (key === 'level' || key === 'minLevel' || key === 'maxLevel' || key === 'depth' || key === 'volume'
-						|| key === 'bottomElev' || key === 'tankDiameter' || key === 'mixingModel' || key === 'mixingFraction') {
+						|| key === 'bottomElev' || key === 'tankDiameter' || key === 'minVolume' || key === 'overflow' || key === 'mixingModel' || key === 'mixingFraction') {
 					if (d.group !== 'node' || (d.type && d.type !== 'tank')) { return; }
 				} else if (key === 'speed' || key === 'energyPrice' || key === 'energyPattern') {
 					if (d.group !== 'link' || (d.type && d.type !== 'pump')) { return; }
@@ -24749,6 +24795,14 @@ var EngCalcs = EngCalcs || {};
 			if (cand.group !== 'node' || cand.el.type !== 'tank') { return undefined; }
 			var tankVal = prop === 'bottomElev' ? tankBottom(cand.el) : effective(cand.el, prop);
 			return (typeof tankVal === 'number' && isFinite(tankVal)) ? tankVal : undefined;
+		}
+		// **MINIMUM VOLUME AND CAN OVERFLOW** (a volume in the Length unit cubed; EPANET's YES/NO).
+		if (prop === 'minVolume') {
+			var mv = (cand.group === 'node' && cand.el.type === 'tank') ? effective(cand.el, 'minVolume') : undefined;
+			return (typeof mv === 'number' && isFinite(mv)) ? mv : undefined;
+		}
+		if (prop === 'overflow') {
+			return (cand.group === 'node' && cand.el.type === 'tank') ? tankOverflowWord(cand.el) : undefined;
 		}
 		// **THE MIXING MODEL, AS THE TOKEN THE DOCUMENT STORES** -- 'MIXED' is the standing
 		// default, exactly as the table's own get() answers it.
@@ -29025,7 +29079,8 @@ var EngCalcs = EngCalcs || {};
 		// acknowledgement is a licence obligation on the catalogue rather than on either picker. So
 		// the two stand under Map appearance, where the sizes and the other legend already are.
 setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
-			positionSelect(settings.colorLegendPosition, function (v) {
+			positionSelect(legendPositionShown('colorLegendPosition'), function (v) {
+				legendsHeld.colorLegendPosition = false;
 				settings.colorLegendPosition = v;
 				// The RENDER, for the same reason the labels legend's dropdown calls its own: only the
 				// render knows whether there is a key to bring back after Off.
@@ -30317,6 +30372,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter',
 						get: function (n) { return effective(n, 'tankDiameter'); },
 						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
+					// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** (audit 2026-11). The volume is in the
+					// Length unit cubed, so its heading names that, as the Available volume column does.
+					(function () {
+						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume',
+							get: function (n) { return effective(n, 'minVolume'); },
+							set: function (n, v) { setProp(n, 'minVolume', v); updateNode(n.id, true); } };
+						c.unitText = tankVolumeUnitText;
+						return c;
+					}()),
+					{ key: 'overflow', label: 'lpn_field_tank_overflow', em: 3.5, prop: 'overflow',
+						choices: function () {
+							var pc = EngCalcs.pageConfig || {};
+							return [['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']];
+						},
+						get: function (n) { return tankOverflowWord(n); },
+						set: function (n, v) { tankOverflowWrite(n, v); updateNode(n.id, true); } },
 					// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), the twin of the pipe pair:
 					// water sits in a tank far longer than it sits in any main, so this is where a
 					// residual is actually lost. A bulk rate, in the same 1/day.
@@ -40802,6 +40873,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				label: pc.lpn_field_tank_maxlevel_short || 'Maximum depth' },
 			{ types: ['tank'], keys: ['tankDiameter'], props: ['tankDiameter'], unit: 'lpn_u_length',
 				label: pc.lpn_field_tank_diameter || 'Tank diameter' },
+			{ types: ['tank'], keys: ['minVolume'], props: ['minVolume'], unitText: tankVolumeUnitText, label: pc.lpn_field_tank_minvol || 'Minimum volume' },
+			{ types: ['tank'], keys: ['overflow'], props: ['overflow'], none: ['NO', 'no', 'No'], label: pc.lpn_field_tank_overflow || 'Can overflow' },
 			{ types: ['tank'], keys: ['volCurve'], props: ['volCurve'], label: pc.lpn_curve_kind_volume || 'Tank volume' },
 			{ types: ['tank'], keys: ['mixingModel'], props: ['mixingModel'], none: ['MIXED'], label: pc.lpn_mixing_model || 'Mixing model' },
 			{ types: ['tank'], keys: ['mixingFraction'], props: ['mixingFraction'], label: pc.lpn_mixing_fraction || 'Mixing fraction' },
@@ -44905,6 +44978,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		applySaved(doc2);
 		propClip = null;   // copied properties belong to the project they were copied from
 		clearUndo();
+		holdLegendsOnPhone();
 		refreshAllFromDocument();
 		return true;
 	}
@@ -44977,6 +45051,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		library.openId = id;
 		clearUndo();
 		saveToStorage();
+		holdLegendsOnPhone();
 		refreshAllFromDocument();
 		// AFTER the refresh, not before: refreshAllFromDocument() schedules a solve, and that solve
 		// calls saveToStorage(), which recomputes `dirty` against the baseline. Stamping first would
@@ -47053,11 +47128,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 */
 	function inpFlatteningLines(differences) {
 		var pc = EngCalcs.pageConfig || {}, types = null, fittings = null, custs = null, coords = null, said = [],
-			offCust = null, offNames = [];
+			offCust = null, offNames = [], semis = null;
 		(differences || []).forEach(function (d) {
 			if (d.code === 'pipe-type-flattened') { types = d; }
 			if (d.code === 'fittings-flattened') { fittings = d; }
 			if (d.code === 'node-coords-scenario') { coords = d; }
+			if (d.code === 'label-semicolon') { semis = d; }
 			// **AND THE CUSTOMERS** (Task 247), which is a THIRD sentence rather than a widening of
 			// either above it, on this function's own rule: a pipe type loses its indirection, a
 			// fittings list loses its itemisation, and a customer loses its PLACE. One sentence
@@ -47085,6 +47161,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (coords) {
 			said.push((pc.lpn_inp_export_flat_coords || 'An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its positions in the project file only.')
 				.replace('{n}', String(coords.ids.length)));
+		}
+		if (semis) {
+			said.push((pc.lpn_inp_export_flat_label_semicolon || 'Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.')
+				.replace('{n}', String(semis.ids.length)));
 		}
 		if (fittings) {
 			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
@@ -47197,6 +47277,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		library.projects.push({ id: id, name: project.name, updated: Date.now() });
 		clearUndo();
 		saveToStorage();
+		holdLegendsOnPhone();
 		refreshAllFromDocument();
 		// Says where the user landed, the same way discardProject() does: a project appearing on
 		// screen that was not there a moment ago wants narration.
@@ -47292,7 +47373,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var LPN_INP_FLOW_SAME = { GPM: 1, MGD: 1, IMGD: 1, CFS: 1, AFD: 1, LPS: 1, LPM: 1, MLD: 1, CMH: 1, CMD: 1 };
 	function inpUnitSelections(parsed) {
 		var us = parsed.unitSystem === 'us';
-		return {
+		var sel = {
 			lpn_u_length: us ? 'ft' : 'm',
 			lpn_u_elevhead: us ? 'fth2o' : 'mh2o',
 			lpn_u_pressure: us ? 'psi' : 'mh2o',
@@ -47301,6 +47382,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_u_velocity: us ? 'ftps' : 'mps'
 			// No lpn_u_gradient: head-loss gradient is dimensionless and an .inp does not name one.
 		};
+		// **A D-W FILE'S ROUGHNESS IS IN EPANET'S OWN UNIT** (audit 2026-11, F1): millimetres in an
+		// SI file, millifeet in a US one. The Roughness selector offers both, so it moves onto the
+		// file's unit and the file's digits are the digits stored.
+		if (parsed.roughnessUnit) { sel.lpn_u_roughness = parsed.roughnessUnit; }
+		return sel;
 	}
 
 
@@ -47351,7 +47437,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A tank's [TANKS] Elevation is its BASE, so the file's characters ride with `bottomElev`.
 		LPN_INP_TOK_TANK = {
 			elev: 'bottomElev', level: '_level', minLevel: 'minLevel', maxLevel: 'maxLevel',
-			diameter: 'tankDiameter', x: 'x', y: 'y'
+			diameter: 'tankDiameter', minVol: 'minVolume', x: 'x', y: 'y'
 		},
 		LPN_INP_TOK_LINK = {
 			length: '_length', diameter: '_diameter', roughness: '_roughness', k: '_k',
@@ -47447,8 +47533,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					_level: n.level,
 					minLevel: n.minLevel,
 					maxLevel: n.maxLevel,
-					tankDiameter: n.diameter
+					tankDiameter: n.diameter,
+					minVolume: n.minVol
 				}, LPN_INP_TOK_TANK);
+				// **MinVol AND Overflow, THE FILE'S OWN** (audit 2026-11, F2), on the same limb as the
+				// vessel's geometry. Present only where the file stated them. MinVol is in the length
+				// unit cubed, as the file wrote it; Overflow is the file's word. Nothing on the page
+				// edits either; both engines are handed them by assembleModel().
+				if (n.overflow) { tk.overflow = n.overflow; }   // base-write: an imported document is born in Base
+				if (n.volColumn) { tk.volColumn = n.volColumn; }
 				// The ground starts as the same number in the same characters, so a DXF or GeoJSON
 				// written straight after import states it as the file did.
 				// Rebuilt rather than added to, so the bag reads in the order a migrated v11 project's
@@ -47602,12 +47695,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// gets {0, 0} and nothing moves.
 		return rebaseDocument({
 			v: LPN_STORAGE_VERSION,
-			project: geo
+			project: (function () {
 				// Written only when geographic, the same rule newProject() follows: an absent key is
 				// the grid default, and saying 'grid' out loud would put a word in every file that
 				// has always meant itself by saying nothing.
-				? { name: name, activeScenario: 'base', coords: LPN_COORDS_GEO }
-				: { name: name, activeScenario: 'base' },
+				var pr = geo ? { name: name, activeScenario: 'base', coords: LPN_COORDS_GEO } : { name: name, activeScenario: 'base' };
+				// **THE FILE'S [TITLE], EVERY LINE, KEPT BESIDE THE NAME IT ARRIVED UNDER** (audit
+				// 2026-11, F4). The project is named by the file; the title is text the file states
+				// and goes back out as written for as long as the name is unchanged.
+				if (parsed.titleLines && parsed.titleLines.length) { pr.inpTitle = { name: name, lines: parsed.titleLines.slice() }; }
+				return pr;
+			}()),
 			// **A LAT/LON DOCUMENT IS NEVER REBASED**, which is why the origin is stated here rather
 			// than chosen: rebaseDocument() exists for survey coordinates in the hundreds of
 			// thousands, and degrees start from zero by definition. georefStart() writes the same
@@ -47628,6 +47726,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// here. Sparse, so a file stating none leaves the new project stating none.
 			settings: (function () {
 				var s = JSON.parse(JSON.stringify(settings));
+				// **THE FRICTION METHOD IS THE FILE'S, NEVER THE OPEN PROJECT'S** (audit 2026-11, F1).
+				// [OPTIONS] Headloss says which formula the roughness numbers are written for; a
+				// file that says nothing is EPANET's own default, H-W. The numbers stay exactly as
+				// written. D-W roughness is millimetres in an SI file and millifeet in a US one; the
+				// Roughness selector is moved onto that unit (inpUnitSelections).
+				var fileMethod = LPN_INP_UPDATE_METHOD[String(parsed.headloss || 'H-W').toUpperCase()] || 'hw';
+				if (fileMethod !== (s.method || 'hw') || fileMethod === 'dw') {
+					// The default for the NEXT pipe follows the method, as it does when the method is
+					// switched (switchMethod()); existing pipes are the file's and are never touched.
+					s.defaults = s.defaults || {};
+					s.defaults.roughness = defaultRoughnessFor(fileMethod, fileMethod === 'dw' ? parsed.roughnessUnit : null);
+				}
+				if (parsed.headlossStated === false) { delete s.method; } else { s.method = fileMethod; }
 				s.hydraulics = parsed.hydraulics || {};
 				s.qualityOptions = parsed.qualityOptions || {};
 				s.fileOptions = parsed.fileOptions || {};
@@ -47860,7 +47971,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function inpDropText(code) {
 		var pc = EngCalcs.pageConfig || {};
 		switch (code) {
-			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.';
+			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file names a head loss formula EPANET does not accept, so the pipe roughness numbers were kept as written and read as Hazen-Williams.';
 			// 'tanks' and 'links-on-tanks' are gone (Task 248): tanks are imported now, so neither
 			// case can be reported. The lang keys are retired with them.
 			// The fallback is kept in step with the key on purpose: it is what a page whose
@@ -48306,6 +48417,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			out.push((pc.lpn_inpup_unit_row || '{family}: the file uses {file} and this project uses {project}.')
 				.replace('{family}', names[u]).replace('{file}', inpUnitOptionText(u, want[u])).replace('{project}', inpUnitOptionText(u, have[u])));
 		});
+		// A Darcy-Weisbach file's roughness unit (millimetres or millifeet) against the project's,
+		// where both are Darcy-Weisbach.
+		if (fm === 'dw' && frictionMethod() === 'dw' && want.lpn_u_roughness !== undefined && have.lpn_u_roughness !== want.lpn_u_roughness) {
+			out.push((pc.lpn_inpup_unit_row || '{family}: the file uses {file} and this project uses {project}.')
+				.replace('{family}', pc.lpn_field_roughness || 'Roughness').replace('{file}', inpUnitOptionText('lpn_u_roughness', want.lpn_u_roughness))
+				.replace('{project}', inpUnitOptionText('lpn_u_roughness', have.lpn_u_roughness)));
+		}
 		out.unitRows = out.length;
 		if (fm !== frictionMethod()) {
 			out.push((pc.lpn_inpup_method_row || 'Head loss formula: the file uses {file} and this project uses {project}.')
@@ -52823,6 +52941,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var d = readDocument(projectKey(landed.id));
 				if (d) { applySaved(d); }
 				clearUndo();
+				holdLegendsOnPhone();
 				refreshAllFromDocument();
 				setNotice((pc.lpn_status_closed_opened || 'Closed {closed}. Now showing {opened}.')
 					.replace('{closed}', goneName)
@@ -61482,7 +61601,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// that actually now owns the number, or a Length change would rescale a field this dialog
 		// never mentioned.
 		if (name === 'lpn_u_length') {
-			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter'];
+			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter',
+				pc.lpn_field_tank_minvol || 'Minimum volume'];
 		}
 		if (name === 'lpn_u_diameter') { return [pc.lpn_field_diameter || 'Diameter']; }
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
@@ -61570,6 +61690,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// rescale it and an Elevation/Head change must leave it alone, both now true below.
 			doc.nodes.forEach(function (nd) { conv(nd, 'tankDiameter'); });
 			convOverrides('tankDiameter');
+			// **MINIMUM VOLUME IS THE LENGTH UNIT CUBED**, so it moves by the cube of the length factor.
+			(function () {
+				var k1 = k;
+				k = k1 * k1 * k1;
+				doc.nodes.forEach(function (nd) { conv(nd, 'minVolume'); });
+				convOverrides('minVolume');
+				k = k1;
+			}());
 		} else if (name === 'lpn_u_diameter') {
 			doc.links.forEach(function (l) { conv(l, '_diameter'); });
 			convOverrides('diameter');
@@ -61999,9 +62127,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// pipe, per the Default inputs section's own "future, not retroactive" rule.
 	// C = 130 and n = 0.013 are dimensionless. e = 0.0015 m (0.15 mm, commercial steel) is a
 	// length, so it is scaled into the displayed unit exactly as niceDefault() does.
-	function defaultRoughnessFor(method) {
+	// `unit` names the roughness unit the default is for (an imported file's, which the selector is
+	// about to show); absent, the selector's own.
+	function defaultRoughnessFor(method, unit) {
 		if (method === 'manning') { return 0.013; }
-		if (method === 'dw') { return +(0.0015 * unitFactor('lpn_u_roughness')).toPrecision(3); }
+		if (method === 'dw') {
+			var f = (unit && EngCalcs.unitFactors && EngCalcs.unitFactors[unit]) || unitFactor('lpn_u_roughness');
+			return +(0.0015 * f).toPrecision(3);
+		}
 		return 130;
 	}
 	// ---- A ⚠ BESIDE AN UNREASONABLE STORED VALUE (dev/value-warning.md) -----------------------
@@ -62993,7 +63126,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// chrome the placement never touches. `labelsFullyHidden()`, not `dataLabelsHidden`, is
 		// the read that keeps that exclusion true.
 		box.style.display = (any && !galleryIsUp() && !labelsFullyHidden(state.s) &&
-			!legendIsOff(scnSetting('legendPosition'))) ? '' : 'none';
+			!legendIsOff(legendPositionNow('legendPosition'))) ? '' : 'none';
 		applyLegendPosition();
 	}
 	// There is no toggleLabelsPopup() any more. Labels moved to the Visibility panel (Task 427) and
@@ -63411,8 +63544,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!wrap || !wrap.getBoundingClientRect) { return; }
 		wr = wrap.getBoundingClientRect();
 		boxes = [
-			{ el: document.getElementById('lpn_labels_legend'), pos: scnSetting('legendPosition') },
-			{ el: colorLegendBox, pos: scnSetting('colorLegendPosition') }
+			{ el: document.getElementById('lpn_labels_legend'), pos: legendPositionNow('legendPosition') },
+			{ el: colorLegendBox, pos: legendPositionNow('colorLegendPosition') }
 		];
 		// Before first layout the wrapper has no box, and a dodge computed from a zero-height map
 		// would be arithmetic on nothing. The corners are still applied; only the dodge waits.
@@ -65312,10 +65445,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var legendSelect = document.createElement('select');
 		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');
-			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === settings.legendPosition) { opt.selected = true; }
+			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === legendPositionShown('legendPosition')) { opt.selected = true; }
 			legendSelect.appendChild(opt);
 		});
 		legendSelect.addEventListener('change', function () {
+			legendsHeld.legendPosition = false;
 			settings.legendPosition = legendSelect.value;
 			// The RENDER, not applyLegendPosition(): picking a corner again after Off has to bring the
 			// box back, and only the render knows whether there is anything to bring back.
@@ -65785,7 +65919,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		hydNumberRow('specificGravity', 'lpn_settings_specific_gravity', 'Specific gravity',
 			'', 1);
-		hydNumberRow('viscosity', 'lpn_settings_viscosity', 'Relative viscosity',
+		hydNumberRow('viscosity', 'lpn_settings_viscosity', 'Viscosity',
 			'lpn_settings_viscosity_tip', 1);
 		hydNumberRow('emitterExponent', 'lpn_settings_emitter_exponent', 'Emitter exponent',
 			'lpn_settings_emitter_exponent_tip', 0.5);
@@ -73549,7 +73683,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		reservoir: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', '#coords', 'lpn_field_head', 'lpn_field_head_pattern',
 			'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|', '#qresult', '#notes'],
 		tank: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', 'lpn_field_tank_base_elev', 'lpn_field_tank_diameter',
-			'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
+			'lpn_field_tank_minvol', 'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', 'lpn_field_tank_overflow', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
 			'lpn_mixing_model', 'lpn_mixing_fraction', 'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|',
 			'lpn_field_head', 'lpn_result_pressure', 'lpn_result_depth', 'lpn_result_tank_volume', '#qresult', '#notes'],
 		pipe: ['lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_pipetype', 'lpn_field_diameter',
@@ -75992,6 +76126,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				function () { return effective(n, 'tankDiameter'); },
 				function (v) { setProp(n, 'tankDiameter', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
+			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is in the Length unit cubed, as the
+			// Available volume below it is; blank is EPANET's 0, "use the diameter".
+			numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')',
+				effective(n, 'minVolume'),
+				function (v) { setProp(n, 'minVolume', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_minvol_tip, { el: n, prop: 'minVolume' });
+			selectFieldPlain(fields, pc.lpn_field_tank_overflow || 'Can overflow',
+				[['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']],
+				tankOverflowWord(n),
+				function (v) { tankOverflowWrite(n, v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_overflow_tip);
 			// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), shown on the same terms as the
 			// pipe pair: only while a chemical is being tracked, blank-capable because blank means
 			// "use the coefficient set for the whole network", and written through setProp()
@@ -77549,7 +77694,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		roughness: 'lpn_field_roughness_tip', km: 'lpn_field_km_short_tip', length: 'lpn_field_length_slope_tip', diameter: 'lpn_field_pipetype_tip', typeId: 'lpn_field_pipetype_tip',
 		fittingsId: 'lpn_field_fittings_tip', axis1: 'lpn_field_coord_tip', axis2: 'lpn_field_coord_tip', allZoom: 'lpn_field_text_all_zoom_tip', anchor: 'lpn_field_text_attached_tip',
 		bottomElev: 'lpn_field_tank_base_elev_tip', level: 'lpn_field_tank_level_short_tip', minLevel: 'lpn_field_tank_minlevel_short_tip', maxLevel: 'lpn_field_tank_maxlevel_short_tip',
-		tankDiameter: 'lpn_field_tank_diameter_tip', demand: 'lpn_demand_tip', fireFlow: 'lpn_ff_required_node_tip', initQuality: 'lpn_quality_initial_tip',
+		tankDiameter: 'lpn_field_tank_diameter_tip', minVolume: 'lpn_field_tank_minvol_tip', overflow: 'lpn_field_tank_overflow_tip', demand: 'lpn_demand_tip', fireFlow: 'lpn_ff_required_node_tip', initQuality: 'lpn_quality_initial_tip',
 		sourceType: 'lpn_source_type_tip', sourceQuality: 'lpn_source_quality_tip', sourcePattern: 'lpn_source_pattern_tip', mixingModel: 'lpn_mixing_model_tip', mixingFraction: 'lpn_mixing_fraction_tip',
 		curveId: 'lpn_pump_curve_source_tip', efficCurveId: 'lpn_pump_effic_curve_tip', energyPrice: 'lpn_energy_price_tip', energyPattern: 'lpn_energy_price_pattern_tip'   // the pump's curves, price and price pattern carry the `?` one pump's Properties gives them
 	};
@@ -79742,7 +79887,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					diameter: toSI(effective(n, 'tankDiameter') || 0, 'lpn_u_length'),
 					// The volume curve's NAME as this scenario states it; js/lpn-time.js attaches the
 					// curve's points (overridable since 2026-10-12, so the document's name is not enough).
-					volCurveName: effective(n, 'volCurve') || null
+					volCurveName: effective(n, 'volCurve') || null,
+					// **THE FILE'S MinVol AND Overflow** (audit 2026-11, F2), for both engines: MinVol in
+					// cubic metres (the length unit cubed), Overflow as a flag. Absent where the file
+					// stated none, so a tank drawn here is built exactly as before.
+					minVolume: (typeof effective(n, 'minVolume') === 'number' && effective(n, 'minVolume') > 0)
+						? effective(n, 'minVolume') * Math.pow(toSI(1, 'lpn_u_length'), 3) : undefined,
+					overflow: (effective(n, 'overflow') && /^y/i.test(String(effective(n, 'overflow')))) ? true : undefined
 				};
 			}
 			return n.type === 'reservoir'
@@ -79999,6 +80150,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// js/lpn-epanet.js folds these into the same warnings array a dropped control uses, so
 			// there is one place a reader looks for "what did we ignore" and one message design.
 			ruleWarnings: ruleWarningsOut };
+		// **VISCOSITY AS EPANET READS IT** (audit 2026-11): above 1e-3 the option is relative, at or
+		// below it an absolute kinematic viscosity in the file's own system (ft2/s US, m2/s SI). Both
+		// engines are handed the RELATIVE number (the bridge writes it, the built-in solver
+		// multiplies it into the default), so an absolute one is turned into it here. The base is
+		// EPANET's own default, read from js/PipeHydraulics.lib.js where it is defined once.
+		if (typeof hyd.viscosity === 'number') {
+			var relVisc = EngCalcs.lpnFluidOptionRead('viscosity', hyd.viscosity, unitKey('lpn_u_flow'), unitKey('lpn_u_length'), unitKey('lpn_u_diameter'));
+			if (relVisc !== hyd.viscosity) {
+				model.visc = (EngCalcs.EPANET_VISCOS || 1.1e-5 * 0.3048 * 0.3048) * relVisc;
+				model.hydraulics.viscosity = relVisc;
+			}
+		}
 		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
 		// file the model is exactly the pre-Task-248 one and the page solves one instant.
 		if (EngCalcs.lpnTimeAttach) { EngCalcs.lpnTimeAttach(model); }

@@ -5,6 +5,9 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0u. Read the Bentley threads on Time Browser and GIS-IDs, and the one-sentence WaterGEMS docking answer (2026-11-14)
+Bentley Communities redirects to a login, so every complaint and the skeletonization/GIS-ID guidance was read as search snippets only. Whoever holds a login can paste three threads (Time Browser default, colour coding not following the slider, Keeping a Hydraulic Model in Sync with a GIS) and say whether the Time Browser docks. Also still unread: InfoWater's own vocabulary page, Synergi and InfoWorks time controls. Cost: half an hour of someone with access.
+
 ## 0t. Check the Well assembly's recommended connection with one EPANET run, and find one real small-system schematic (2026-11-09)
 Q1's tee recommendation (pump to tee node, tank on a short branch, system on the tee) follows from reading hydstatus.c tankstatus(), but I ran nothing. Cost: one tiny .inp with a full tank on pump->T->pipe vs pump->J with T on a branch; an hour. Also: nobody has counted how many small community systems use each piping layout (SDWIS may not record it); one state's sanitary-survey sample would settle "most common". And the Ten States text itself was not opened: pull the pump, pressure-tank and storage sections before anyone quotes a sizing number.
 

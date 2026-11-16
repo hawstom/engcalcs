@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 3347,
-        "delta_key_count": 89,
-        "english_changed_key_count": 25,
+        "expected_key_count": 3353,
+        "delta_key_count": 98,
+        "english_changed_key_count": 28,
         "exempt_key_count": 67,
         "exempt_keys": [
             "calc_units_us",
@@ -77,7 +77,8 @@
         "out_of_scope_key_count": 9,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
-            "lpn"
+            "lpn",
+            "u"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -100,6 +101,11 @@
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
     "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: portata\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: carico\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: perdita di carico\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: tratto\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: perdita di carico concentrata\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: Richiesta\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Pressione\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: collegamento\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: predefinito\n- solver or the part that works out the answer\n    English: solver\n    Your language: risolutore\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Vasca\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Valvola\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Valori personalizzati\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Cliente\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figura\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
+        "u_millifeet": "millifeet",
+        "lpn_field_tank_minvol": "Minimum volume",
+        "lpn_field_tank_minvol_tip": "The volume of water in the tank at its minimum depth, in the length unit cubed, for a tank with a sloped or curved bottom; 0 uses the tank diameter, and a volume curve overrides it.",
+        "lpn_field_tank_overflow": "Can overflow",
+        "lpn_field_tank_overflow_tip": "Yes lets a full tank spill what it cannot hold, so the pipe into it stays open; No closes the pipe into a full tank. Only an extended period simulation uses it.",
         "lpn_popup_boxtitle_of": "Properties: {asset}",
         "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario has the solid dot and the arrow described below at its left, and they work as they do in Properties. Its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. An arrow over the solid dot pushes the override upward: click it, and after a confirmation that names where the value goes, it is cleared here and entered in the parent scenario. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is what Clear restores, as in Clear restores 18 in, the value in Base. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
@@ -147,6 +153,7 @@
         "lpn_wtg_export_left_out": "Not written: {items}",
         "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run in an extended period simulation by the solver selected in Settings.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inp_drop_headloss": "This file names a head loss formula EPANET does not accept, so the pipe roughness numbers were kept as written and read as Hazen-Williams.",
         "lpn_inp_drop_report": "This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.",
         "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
         "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
@@ -164,6 +171,8 @@
         "lpn_engine_unavailable_why": "The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.",
         "lpn_engine_needed_failed_why": "The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}",
+        "lpn_settings_viscosity": "Viscosity",
+        "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_settings_engine_native": "Use the built-in solver",
         "lpn_settings_engine_native_tip": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.",
@@ -175,6 +184,7 @@
         "lpn_time_run_report_tip": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
         "lpn_settings_solver": "Solver",
         "lpn_reports_epanet": "Solver (run)",
+        "lpn_inp_export_flat_label_semicolon": "Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.",
         "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure.",
         "lpn_engine_native_used": "Solved with the built-in solver.",
         "lpn_engine_epanet_used": "Solved with the EPANET solver.",
@@ -191,6 +201,11 @@
         "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}"
     },
     "keys": {
+        "u_millifeet": "millifeet",
+        "lpn_field_tank_minvol": "Minimum volume",
+        "lpn_field_tank_minvol_tip": "The volume of water in the tank at its minimum depth, in the length unit cubed, for a tank with a sloped or curved bottom; 0 uses the tank diameter, and a volume curve overrides it.",
+        "lpn_field_tank_overflow": "Can overflow",
+        "lpn_field_tank_overflow_tip": "Yes lets a full tank spill what it cannot hold, so the pipe into it stays open; No closes the pipe into a full tank. Only an extended period simulation uses it.",
         "lpn_popup_boxtitle_of": "Properties: {asset}",
         "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario has the solid dot and the arrow described below at its left, and they work as they do in Properties. Its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. An arrow over the solid dot pushes the override upward: click it, and after a confirmation that names where the value goes, it is cleared here and entered in the parent scenario. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is what Clear restores, as in Clear restores 18 in, the value in Base. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
@@ -238,6 +253,7 @@
         "lpn_wtg_export_left_out": "Not written: {items}",
         "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run in an extended period simulation by the solver selected in Settings.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inp_drop_headloss": "This file names a head loss formula EPANET does not accept, so the pipe roughness numbers were kept as written and read as Hazen-Williams.",
         "lpn_inp_drop_report": "This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.",
         "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
         "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
@@ -255,6 +271,8 @@
         "lpn_engine_unavailable_why": "The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.",
         "lpn_engine_needed_failed_why": "The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}",
+        "lpn_settings_viscosity": "Viscosity",
+        "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_settings_engine_native": "Use the built-in solver",
         "lpn_settings_engine_native_tip": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.",
@@ -266,6 +284,7 @@
         "lpn_time_run_report_tip": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
         "lpn_settings_solver": "Solver",
         "lpn_reports_epanet": "Solver (run)",
+        "lpn_inp_export_flat_label_semicolon": "Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.",
         "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure.",
         "lpn_engine_native_used": "Solved with the built-in solver.",
         "lpn_engine_epanet_used": "Solved with the EPANET solver.",
@@ -282,6 +301,102 @@
         "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}"
     },
     "key_context": {
+        "u_millifeet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "u_in",
+                    "value": "poll",
+                    "english": "in"
+                },
+                "next_translated": {
+                    "key": "u_imgd",
+                    "value": "Mgal imp\/g",
+                    "english": "IMGD"
+                }
+            }
+        },
+        "lpn_field_tank_minvol": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_tank_diameter_tip",
+                    "value": "Larghezza della vasca da un lato all'altro. È espressa nelle stesse unità della quota, non in quelle del diametro delle tubazioni. Determina quanta acqua contiene una data profondità.",
+                    "english": "For a vertical cylinder. Same units as elevation, not pipe diameter. It sets how much water a given depth holds."
+                },
+                "next_translated": {
+                    "key": "lpn_tank_head_tip",
+                    "value": "Quota della superficie dell'acqua nella vasca: la quota del fondo più la profondità dell'acqua.",
+                    "english": "Water surface elevation in the tank: the base elevation plus the water depth."
+                }
+            },
+            "tip": {
+                "key": "lpn_field_tank_minvol_tip",
+                "english": "The volume of water in the tank at its minimum depth, in the length unit cubed, for a tank with a sloped or curved bottom; 0 uses the tank diameter, and a volume curve overrides it."
+            }
+        },
+        "lpn_field_tank_minvol_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_tank_diameter_tip",
+                    "value": "Larghezza della vasca da un lato all'altro. È espressa nelle stesse unità della quota, non in quelle del diametro delle tubazioni. Determina quanta acqua contiene una data profondità.",
+                    "english": "For a vertical cylinder. Same units as elevation, not pipe diameter. It sets how much water a given depth holds."
+                },
+                "next_translated": {
+                    "key": "lpn_tank_head_tip",
+                    "value": "Quota della superficie dell'acqua nella vasca: la quota del fondo più la profondità dell'acqua.",
+                    "english": "Water surface elevation in the tank: the base elevation plus the water depth."
+                }
+            },
+            "label": {
+                "key": "lpn_field_tank_minvol",
+                "english": "Minimum volume"
+            }
+        },
+        "lpn_field_tank_overflow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_tank_diameter_tip",
+                    "value": "Larghezza della vasca da un lato all'altro. È espressa nelle stesse unità della quota, non in quelle del diametro delle tubazioni. Determina quanta acqua contiene una data profondità.",
+                    "english": "For a vertical cylinder. Same units as elevation, not pipe diameter. It sets how much water a given depth holds."
+                },
+                "next_translated": {
+                    "key": "lpn_tank_head_tip",
+                    "value": "Quota della superficie dell'acqua nella vasca: la quota del fondo più la profondità dell'acqua.",
+                    "english": "Water surface elevation in the tank: the base elevation plus the water depth."
+                }
+            },
+            "tip": {
+                "key": "lpn_field_tank_overflow_tip",
+                "english": "Yes lets a full tank spill what it cannot hold, so the pipe into it stays open; No closes the pipe into a full tank. Only an extended period simulation uses it."
+            }
+        },
+        "lpn_field_tank_overflow_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_tank_diameter_tip",
+                    "value": "Larghezza della vasca da un lato all'altro. È espressa nelle stesse unità della quota, non in quelle del diametro delle tubazioni. Determina quanta acqua contiene una data profondità.",
+                    "english": "For a vertical cylinder. Same units as elevation, not pipe diameter. It sets how much water a given depth holds."
+                },
+                "next_translated": {
+                    "key": "lpn_tank_head_tip",
+                    "value": "Quota della superficie dell'acqua nella vasca: la quota del fondo più la profondità dell'acqua.",
+                    "english": "Water surface elevation in the tank: the base elevation plus the water depth."
+                }
+            },
+            "label": {
+                "key": "lpn_field_tank_overflow",
+                "english": "Can overflow"
+            }
+        },
         "lpn_popup_boxtitle_of": {
             "reason": "missing",
             "current_value": null,
@@ -1039,6 +1154,22 @@
                 }
             }
         },
+        "lpn_inp_drop_headloss": {
+            "reason": "english_changed",
+            "current_value": "Questo file non usa la formula di Hazen-Williams. Questa pagina calcola con Hazen-Williams, quindi i valori di scabrezza delle tubazioni sono stati mantenuti esattamente come scritti, ma i risultati qui non corrisponderanno a quelli di EPANET.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_report_lead",
+                    "value": "Questa pagina non usa tutte le funzioni di EPANET, ma nessun dato del file viene scartato. L'elenco seguente mostra i dati del file che sono conservati ma non usati, e le modifiche apportate durante l'importazione:",
+                    "english": "This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_tank_curve",
+                    "value": "Queste vasche non hanno pareti verticali: il file ne indica la forma come curva del volume. La curva è conservata nella finestra Librerie, la vasca continua a farvi riferimento, e una simulazione estesa nel tempo la usa per calcolare il livello mentre la vasca si riempie e si svuota. Un'analisi a periodo singolo non ne risente, perché la superficie dell'acqua è al livello indicato nel file. Il diametro nel file è conservato accanto alla curva ed è usato per disegnare e risolvere una vasca senza curva.",
+                    "english": "These tanks are not straight-sided: the file gives their shape as a volume curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation uses it to compute the level as the tank fills and drains. A single-period analysis is unaffected, because the water surface is at the level stated in the file. The diameter in the file is kept beside the curve and is used to draw and solve a tank with no curve."
+                }
+            }
+        },
         "lpn_inp_drop_report": {
             "reason": "english_changed",
             "current_value": "Questo file contiene impostazioni di formato del rapporto di EPANET. Il rapporto della simulazione è disponibile in Rapporti, Calcolo, ma usa il formato standard di EPANET invece di quello specificato da queste impostazioni. Le righe sono conservate e sono riscritte se salvi un file EPANET.",
@@ -1311,6 +1442,48 @@
                 }
             }
         },
+        "lpn_settings_viscosity": {
+            "reason": "english_changed",
+            "current_value": "Viscosità relativa",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_specific_gravity",
+                    "value": "Densità relativa",
+                    "english": "Specific gravity"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_viscosity_tip",
+                    "value": "La viscosità del fluido rispetto a quella dell'acqua a 20 gradi Celsius. Cambia la risposta solo con il metodo Darcy-Weisbach.",
+                    "english": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method."
+                }
+            },
+            "tip": {
+                "key": "lpn_settings_viscosity_tip",
+                "english": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
+                "value": "La viscosità del fluido rispetto a quella dell'acqua a 20 gradi Celsius. Cambia la risposta solo con il metodo Darcy-Weisbach."
+            }
+        },
+        "lpn_settings_viscosity_tip": {
+            "reason": "english_changed",
+            "current_value": "La viscosità del fluido rispetto a quella dell'acqua a 20 gradi Celsius. Cambia la risposta solo con il metodo Darcy-Weisbach.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_viscosity",
+                    "value": "Viscosità relativa",
+                    "english": "Viscosity"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_trials",
+                    "value": "Tentativi massimi",
+                    "english": "Maximum trials"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_viscosity",
+                "english": "Viscosity",
+                "value": "Viscosità relativa"
+            }
+        },
         "lpn_settings_engine_native": {
             "reason": "english_changed",
             "current_value": "Usa il risolutore integrato quando possibile",
@@ -1504,6 +1677,22 @@
                     "key": "lpn_energy_title",
                     "value": "Pompe: rapporto sull'energia",
                     "english": "Pump energy report"
+                }
+            }
+        },
+        "lpn_inp_export_flat_label_semicolon": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_flat_fittings",
+                    "value": "Un file EPANET non può contenere l'elenco di gomiti, valvole e raccordi a T del tuo file di progetto. Il coefficiente di perdita minore delle tubazioni qui ({n}) è ottenuto sommando un elenco di raccordi. Il totale entra nel file esattamente com'è, quindi nulla cambia nelle risposte.",
+                    "english": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Controlli",
+                    "english": "Controls"
                 }
             }
         },
@@ -1738,6 +1927,7 @@
         }
     },
     "key_plain": {
+        "lpn_settings_viscosity": "Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else.",
         "lpn_reports_epanet": "Run: the report of the simulation run."
     },
     "key_notes": {
