@@ -61,6 +61,15 @@ function uuid() {
 // ---------------------------------------------------------------------------------------------
 const GPM_TO_CFS = 0.22280092967190634 / 100;
 const IN_TO_FT = 1 / 12;
+// ONE PLACE for what a Base element and a child scenario's override both state (Task 749): the pipe's diameter and a junction's
+// demand row, with the unit conversion and the column each is stored in. The Base writer and the scenario writer both read these.
+const PIPE_DIAMETER = { table: 'IdahoPipe_Physical_Data', column: 'Physical_PipeDiameter', toStored: (inches) => inches * IN_TO_FT };
+const DEMAND_FLOW = { table: 'IdahoDemandNode_Demand_DemandCollection', column: 'DemandCollection_BaseFlow', toStored: (gpm, mult) => gpm * (mult === undefined ? 1 : mult) * GPM_TO_CFS };
+// A junction's demand rows, in the order it states them (row 0 is its own demand, the rest are `extraDemands`); a row that
+// states no flow is not written. The writer and scenarioOverrides() must agree on this list, so there is one.
+function demandRowsOf(n) {
+	return [{ base: n.demand, pattern: n.demandPattern }].concat(n.extraDemands || []).filter((d) => d.base);
+}
 const EPOCH_2000 = 946684800;            // 2000-01-01 00:00 UTC, the template's own analysis start
 
 function smartLabel(label) {
@@ -280,6 +289,8 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	db.run("UPDATE sqlite_sequence SET seq = " + keptMax + " WHERE name = 'HMIModelingElement'");
 	db.run('UPDATE HMIDomainDataSet SET ActiveScenarioID = (SELECT MIN(ScenarioID) FROM HMIScenario WHERE IsDeleted = 0)');
 	report.removedChildScenarios = childScen; report.removedChildAlternatives = childAlts;
+	// Base is the scenario with no parent; a saved template may number it above 30. The .wtg patch needs the real number.
+	report.baseScenarioId = rowsOf(db, 'SELECT MIN(ScenarioID) AS s FROM HMIScenario WHERE ParentID IS NULL AND IsDeleted = 0')[0].s;
 
 	// ---- ids and labels ----
 	let nextId = keptMax + 1;
@@ -491,7 +502,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const demandMult = (dmRaw !== undefined && isFinite(Number(dmRaw))) ? Number(dmRaw) : 1;
 	report.demandMultiplier = demandMult;
 	function demandRows(n) {
-		return [{ base: n.demand, pattern: n.demandPattern }].concat(n.extraDemands || []).filter((d) => d.base).map((d) => ({ base: d.base * demandMult, pattern: d.pattern }));
+		return demandRowsOf(n).map((d) => ({ base: d.base * demandMult, pattern: d.pattern }));
 	}
 	nodes.forEach((n) => {
 		const id = newId(); elId['n:' + n.id] = id;
@@ -511,7 +522,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				const row = Object.assign({}, demandProtoRow);
 				delete row.ItemID;
 				row.DomainElementID = id; row.AlternativeID = altOfType[20];
-				row.DemandCollection_BaseFlow = d.base * GPM_TO_CFS;
+				row[DEMAND_FLOW.column] = DEMAND_FLOW.toStored(d.base);
 				row.DemandCollection_DemandPattern = pat ? patId[pat] : null;
 				insert(db, 'IdahoDemandNode_Demand_DemandCollection', row);
 			});
@@ -572,7 +583,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			BaseLink_HmiDataSetGeometry_Data: { HMIGeometry: wkbLine(pts), HMIGeometryScaledLength: polyLength(pts) },
 			BaseLink_Physical_Data: { Physical_IsUserDefinedLength: 1, Physical_UserDefinedLength: lengthFt },
 			IdahoPipe_Physical_Data: {
-				Physical_PipeDiameter: diaIn * IN_TO_FT, Physical_HazenWilliamsC: C,
+				[PIPE_DIAMETER.column]: PIPE_DIAMETER.toStored(diaIn), Physical_HazenWilliamsC: C,
 				Physical_CompositeMinorLoss: minorK, Physical_CalculatedMinorLossCoefficient: minorK,
 				Physical_HasCheckValve: checkValve ? 1 : 0
 			},
@@ -962,6 +973,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// Each states a guess at a column or a code that no saved project has ever shown (dev/wtg-export.md, "Candidates under test").
 	// The page never passes it, so the shipped export and its list of what is not written do not change until
 	// WaterGEMS has confirmed a candidate.
+	const scenTally = { scenarios: 0, alts: {} };
 	if (opts.candidate) { writeCandidates(opts.candidate); }
 	function writeCandidates(cand) {
 		const secs = parsed.inpSections || {};
@@ -986,6 +998,121 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				report.candidateWritten = (report.candidateWritten || 0) + 1;
 			});
 		}
+	}
+
+	// ---- CHILD SCENARIOS (candidate, Task 749, 2026-11-13): `opts.candidate.scenarios` = [{ name, parsed | inp }], each the
+	// project scenario's resolved network read as the Base's is (lpnInpParse of lpnExportInp with that scenario's resolver),
+	// a child of Base. Written only when every difference from Base is a pipe diameter or a junction's demand rows' base
+	// flows (the two a saved pair shows; scenarioOverrides() names the rest and the scenario is then left out whole).
+	// Structure OBSERVED (dev/wtg-export.md, "Child scenarios"): an HMIScenario row with ParentID Base; per alternative type
+	// an HMIScenarioAlternative row, IsLocal 0 naming Base's alternative, or IsLocal 1 naming a child alternative (an
+	// HMIAlternative row with ParentID the Base alternative and Level 2) that holds, for each element edited, ALL that element's
+	// rows of that alternative's tables, edited; an element with no row there takes Base's. Ten calculation-option rows,
+	// IsLocal 0. One QBATDefinition support element (type 1000) comes with the first child scenario. ----
+	function writeScenarios(list) {
+		const baseScen = rowsOf(db, 'SELECT MIN(ScenarioID) AS s FROM HMIScenario WHERE ParentID IS NULL AND IsDeleted = 0')[0].s;
+		// The Physical (4) and Demand (20) alternatives of Base, as every Base element already states them.
+		const physAlt = altOfType[4], demandAlt = altOfType[20];
+		// The tables an element of that kind holds rows in for that alternative, worked out ONCE from the prototype rows the
+		// Base writer clones (not every table of the schema, and not per override). Each is read in Base's own order
+		// (ItemID where it has one, else the row order), so a copy keeps the order of Base's rows, which a demand override
+		// is matched by.
+		const copyPlan = (protoRows, alt) => {
+			const seen = {}, out = [];
+			(protoRows || []).forEach((pr) => {
+				if (pr.key !== 'DomainElementID' || !pr.row || pr.row.AlternativeID !== alt || seen[pr.table]) { return; }
+				seen[pr.table] = 1;
+				const noRowid = rowsOf(db, "SELECT 1 AS x FROM sqlite_master WHERE name = ? AND sql LIKE '%WITHOUT ROWID%'", [pr.table]).length > 0;
+				out.push({ table: pr.table, st: db.prepare('SELECT * FROM "' + pr.table + '" WHERE DomainElementID = ? AND AlternativeID = ?' + ('ItemID' in pr.row ? ' ORDER BY ItemID' : noRowid ? '' : ' ORDER BY rowid')) });
+			});
+			return out;
+		};
+		const plans = {};
+		plans[physAlt] = copyPlan(proto.pipe, physAlt);
+		plans[demandAlt] = copyPlan(proto.junction, demandAlt);
+		const typeOfAlt = { };
+		typeOfAlt[physAlt] = 4; typeOfAlt[demandAlt] = 20;
+		// Names are compared without regard to case, against every scenario AND every alternative label the project holds.
+		const taken = {};
+		rowsOf(db, 'SELECT Label FROM HMIModelingElement WHERE ElementType IN (1, 2)').forEach((r) => { taken[String(r.Label).toLowerCase()] = 1; });
+		report.scenarios = [];
+		let qbat = false;
+		function copyRows(e, from, to) {
+			(plans[from] || []).forEach((pl) => {
+				const rows = [];
+				pl.st.bind([e, from]);
+				while (pl.st.step()) { rows.push(pl.st.getAsObject()); }
+				pl.st.reset();
+				rows.forEach((r) => { delete r.ItemID; r.AlternativeID = to; insert(db, pl.table, r); });
+			});
+		}
+		list.forEach((s) => {
+			const name = String((s && s.name) || '').trim(), rec = { name: name, written: false };
+			report.scenarios.push(rec);
+			if (!name || taken[name.toLowerCase()]) { rec.reason = 'name'; lost('scenario "' + name + '" not written: its name is empty, or already used by a scenario or an alternative (capitals do not tell names apart)'); return; }
+			if (s.parent !== undefined && s.parent !== null && s.parent !== '') { rec.reason = 'nested'; lost('scenario ' + name + ' not written: only children of Base are written'); return; }
+			const sp = s.parsed || (s.inp ? EngCalcs.lpnInpParse(s.inp) : null);
+			if (!sp || sp.ok === false) { rec.reason = 'unreadable'; lost('scenario ' + name + ' not written: its network could not be read'); return; }
+			const ov = scenarioOverrides(parsed, sp);
+			if (ov.unsupported.length) {
+				rec.reason = 'unsupported'; rec.unsupported = ov.unsupported;
+				lost('scenario ' + name + ' not written, it overrides what this writer does not store: ' + ov.unsupported.map((u) => u.what + ' (' + u.ids.slice(0, 6).join(', ') + (u.ids.length > 6 ? ', ...' : '') + ')').join('; '));
+				return;
+			}
+			// The row each override edits must be one the template's elements hold, or the edit would land on nothing.
+			const holds = (alt, table) => !!alt && (plans[alt] || []).some((pl) => pl.table === table);
+			if ((ov.diameters.length && !holds(physAlt, PIPE_DIAMETER.table)) || (ov.demands.length && !holds(demandAlt, DEMAND_FLOW.table))) {
+				rec.reason = 'layout'; lost('scenario ' + name + ' not written: the saved project holds no ' + (ov.diameters.length && !holds(physAlt, PIPE_DIAMETER.table) ? PIPE_DIAMETER.table : DEMAND_FLOW.table) + ' rows to copy');
+				return;
+			}
+			taken[name.toLowerCase()] = 1;
+			if (!qbat) {
+				const qid = newId();
+				supportElement(qid, 1000, '', '');
+				db.run('UPDATE HMIModelingElement SET SmartLabel = NULL WHERE ElementID = ?', [qid]);
+				insert(db, 'QBATDefinition', { SupportElementID: qid, QBATDefinition_HMIActiveTopologyAlternative: altOfType[3], QBATDefinition_HMIActiveTopologyIncludeConnectedNodes: 1, HMIActiveTopologyMode: 0, HMIActiveTopologyQueriesCount: 0 });
+				qbat = true;
+			}
+			const local = {};
+			function childAlt(parentAlt) {
+				const id = newId(), type = typeOfAlt[parentAlt];
+				modeling(id, 1, name);
+				insert(db, 'HMIAlternative', { AlternativeID: id, ParentID: parentAlt, AlternativeTypeID: type, IsDeleted: 0, DomainDataSetID: 1, Level: 2 });
+				scenTally.alts[type] = (scenTally.alts[type] || 0) + 1;
+				local[parentAlt] = id;
+				return id;
+			}
+			const pAlt = ov.diameters.length ? childAlt(physAlt) : null, dAlt = ov.demands.length ? childAlt(demandAlt) : null;
+			const sid = newId();
+			modeling(sid, 2, name);
+			insert(db, 'HMIScenario', { ScenarioID: sid, ParentID: baseScen, IsDeleted: 0, DomainDataSetID: 1 });
+			rowsOf(db, 'SELECT AlternativeTypeID AS t, AlternativeID AS a FROM HMIScenarioAlternative WHERE ScenarioID = ?', [baseScen]).forEach((r) => {
+				const mine = local[r.a];
+				insert(db, 'HMIScenarioAlternative', { ScenarioID: sid, AlternativeTypeID: r.t, AlternativeID: mine || r.a, IsLocal: mine ? 1 : 0 });
+			});
+			rowsOf(db, 'SELECT NumericalEngineTypeID AS n, CalculationOptionsID AS c FROM HMIScenarioCalculationOptions WHERE ScenarioID = ?', [baseScen]).forEach((r) => {
+				insert(db, 'HMIScenarioCalculationOptions', { ScenarioID: sid, NumericalEngineTypeID: r.n, CalculationOptionsID: r.c, IsLocal: 0 });
+			});
+			ov.diameters.forEach((d) => {
+				const e = pipeElId[d.id];
+				copyRows(e, physAlt, pAlt);
+				db.run('UPDATE ' + PIPE_DIAMETER.table + ' SET ' + PIPE_DIAMETER.column + ' = ? WHERE DomainElementID = ? AND AlternativeID = ?', [PIPE_DIAMETER.toStored(d.inches), e, pAlt]);
+			});
+			ov.demands.forEach((d) => {
+				const e = elId['n:' + d.id];
+				copyRows(e, demandAlt, dAlt);
+				const items = rowsOf(db, 'SELECT ItemID FROM ' + DEMAND_FLOW.table + ' WHERE DomainElementID = ? AND AlternativeID = ? ORDER BY ItemID', [e, dAlt]);
+				items.forEach((it, i) => {
+					db.run('UPDATE ' + DEMAND_FLOW.table + ' SET ' + DEMAND_FLOW.column + ' = ? WHERE ItemID = ?', [DEMAND_FLOW.toStored(d.bases[i], demandMult), it.ItemID]);
+				});
+			});
+			scenTally.scenarios++;
+			rec.written = true; rec.id = sid; rec.pipeDiameters = ov.diameters.length; rec.junctionDemands = ov.demands.length;
+			(report.addedScenarios = report.addedScenarios || []).push(sid);
+			carried('scenario ' + name + ' (child of Base): ' + ov.diameters.length + ' pipe diameter' + (ov.diameters.length === 1 ? '' : 's') + ', ' + ov.demands.length + ' junction demand' + (ov.demands.length === 1 ? '' : 's') + ' overridden');
+			report.candidateWritten = (report.candidateWritten || 0) + 1;
+		});
+		Object.keys(plans).forEach((a) => { plans[a].forEach((pl) => { pl.st.free(); }); });
 	}
 
 	// ---- AN AGE OR TRACE RUN: written on the page's path (Tom's round 3, 2026-11-03). He saw Age and Trace R in the
@@ -1116,11 +1243,18 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		+ 'EpaNetEngine_LiquidSpecificGravity = ?, EpaNetEngine_LiquidKinematicViscosity = ?' + (hasExtra ? ', EpaNetEngine_ExtraIterations = 10' : ''),
 		[EPOCH_2000 + (T.startClock || 0), sg, 1.1e-5 * visc]);
 
+	// ---- child scenarios last, so every Base element keeps the id it has with none ----
+	if (opts.candidate && opts.candidate.scenarios) { writeScenarios(opts.candidate.scenarios); }
+
 	// ---- counts, dataset notes ----
 	db.run('UPDATE HMIElementTypeCount SET Count = 0 WHERE ElementType IN (3,4)');
 	Object.keys(live).forEach((k) => { db.run('UPDATE HMIElementTypeCount SET Count = ? WHERE ElementType = 3 AND ElementTypeID = ?', [live[k], Number(k)]); });
 	Object.keys(supportLive).forEach((k) => { db.run('UPDATE HMIElementTypeCount SET Count = ? WHERE ElementType = 4 AND ElementTypeID = ?', [supportLive[k], Number(k)]); });
 	db.run('UPDATE HMIElementTypeCount SET Count = 1 WHERE ElementType IN (1,2) AND Count > 1');
+	if (scenTally.scenarios) {
+		db.run('UPDATE HMIElementTypeCount SET Count = ? WHERE ElementType = 2 AND ElementTypeID = 0', [1 + scenTally.scenarios]);
+		Object.keys(scenTally.alts).forEach((k) => { db.run('UPDATE HMIElementTypeCount SET Count = Count + ? WHERE ElementType = 1 AND ElementTypeID = ?', [scenTally.alts[k], Number(k)]); });
+	}
 	// A new project identity, so WaterGEMS does not take this for the saved project it was made from.
 	db.run('UPDATE HMIDomainDataSet SET Name = ?, Notes = ?, Guid = randomblob(16)', [opts.name || 'Net3', String(parsed.title || '').trim()]);
 
@@ -1151,7 +1285,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 function symbolMultiplier(extentFt) {
 	return Math.max(1, Math.round((extentFt || 0) / 500));
 }
-function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives, extentFt) {
+function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives, extentFt, addedScenarios) {
 	const eol = text.indexOf('\r\n') >= 0 ? '\r\n' : '\n';
 	const lines = text.split(eol);
 	const gone = new Set(removedScenarios.map(String)), goneAlt = new Set(removedAlternatives.map(String));
@@ -1164,7 +1298,28 @@ function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives, 
 		out.push(ln.replace(/ScenarioId="(\d+)"(?= \/>)/g, (all, id) => gone.has(id) ? 'ScenarioId="' + keepScenario + '"' : all));
 	});
 	let t = out.join(eol);
-	// Counts that follow what was removed.
+	// A child scenario written beside Base: the animation setting row and the tree node a saved project has for it
+	// (Tom's saves of 2026-10-21 and 2026-11-13 added these two, and the project options' active scenario, to the .wtg).
+	// A saved project lists the child's animation setting BEFORE Base's (TGH-1: 38 then 1; the 11-13 save: 60 then 1), so
+	// the new rows go first, in scenario order. The tree node goes right after Base's (`keepScenario`, the scenario with no
+	// parent, which a saved template may number above 30) in the one tree block that holds Base's node. A .wtg that has no
+	// place for either is an error, never a silent skip.
+	if (addedScenarios && addedScenarios.length) {
+		let placed = false;
+		t = t.replace(/(<ScenarioAnimationSettingStorageElement ScenarioCount="\d+">)/, (all) => { placed = true; return all + addedScenarios.map((id) => eol + '    <ScenarioSettings ScenarioID="' + id + '" TimeStepIndex="0" IncrementIndex="0" />').join(''); });
+		if (!placed) { throw new Error('The .wtg has no scenario animation settings block to add the child scenarios to.'); }
+		placed = false;
+		const baseNode = new RegExp('<Node Identifier="' + keepScenario + '" IsGuid="false" IsInt="true" />');
+		t = t.replace(/<TreeExpandedStateManager Count="\d+">[\s\S]*?<\/TreeExpandedStateManager>/g, (block) => {
+			if (placed || !baseNode.test(block)) { return block; }
+			placed = true;
+			return block.replace(baseNode, (all) => all + addedScenarios.map((id) => eol + '    <Node Identifier="' + id + '" IsGuid="false" IsInt="true" />').join(''));
+		});
+		if (!placed) { throw new Error('The .wtg has no tree node for the Base scenario (' + keepScenario + '), so the child scenarios cannot be placed under it.'); }
+	}
+	// Counts that follow what was removed. ComputeStatusIndicator holds one row per scenario that HAS BEEN COMPUTED (the 11-13
+	// save, a child never computed: ScenarioCount 1 beside two scenarios; TGH-1, both computed: 2), so a child written here,
+	// which has no results, adds none and the count stays the number of rows.
 	t = t.replace(/<ComputeStatusIndicator ScenarioCount="\d+"/, '<ComputeStatusIndicator ScenarioCount="' + (t.match(/<Scenario ScenarioId=/g) || []).length + '"');
 	t = t.replace(/<ScenarioAnimationSettingStorageElement ScenarioCount="\d+"/, '<ScenarioAnimationSettingStorageElement ScenarioCount="' + (t.match(/<ScenarioSettings /g) || []).length + '"');
 	t = t.replace(/<TreeExpandedStateManager Count="\d+">([\s\S]*?)<\/TreeExpandedStateManager>/g, (all, body) => {
@@ -1346,6 +1501,58 @@ function energyNotWritten(lines, patternIds) {
 		const key = f.slice(0, -1).join(' ').toLowerCase(), val = f[f.length - 1];
 		return /pattern/.test(key) && !(patternIds || []).includes(val);
 	});
+}
+
+/**
+ * What a project scenario overrides, as this writer can store it (candidate; dev/wtg-export.md, "Child scenarios").
+ * Both arguments are the lpnInpParse() of a network: Base's, and the scenario's resolved values written as Base's are.
+ * Returns { diameters: [{ id, inches }], demands: [{ id, bases: [gpm, ...] }], unsupported: [{ what, ids }] }.
+ * The two supported kinds: a pipe's diameter, and the base flows of a junction's demand rows (the same rows, the same
+ * patterns). Every other difference, an asset in one network only, any other property of any asset, any other part
+ * of the file, is named in `unsupported`, and the caller leaves the scenario out whole.
+ */
+function scenarioOverrides(base, scen) {
+	const out = { diameters: [], demands: [], unsupported: [] }, bad = {};
+	const flag = (what, id) => { (bad[what] = bad[what] || []).push(id); };
+	const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+	const without = (o, drop) => { const c = {}; Object.keys(o).forEach((k) => { if (k !== 'tok' && drop.indexOf(k) < 0) { c[k] = o[k]; } }); return c; };
+	const rowsOfNode = demandRowsOf;
+	function each(a, b, test) {
+		const bm = {}, sm = {};
+		(a || []).forEach((x) => { bm[x.id] = x; });
+		(b || []).forEach((x) => { sm[x.id] = x; });
+		Object.keys(bm).forEach((id) => { if (!sm[id]) { flag('asset only in Base', id); } });
+		Object.keys(sm).forEach((id) => { if (!bm[id]) { flag('asset only in the scenario', id); } });
+		Object.keys(bm).forEach((id) => { if (sm[id]) { test(bm[id], sm[id]); } });
+	}
+	function keysDiffer(label, id, x, y) {
+		Object.keys(Object.assign({}, x, y)).forEach((k) => { if (!same(x[k], y[k])) { flag(label + ' ' + k, id); } });
+	}
+	each(base.nodes, scen.nodes, (a, b) => {
+		if (a.type !== 'junction' || b.type !== 'junction') { keysDiffer(a.type, a.id, without(a, []), without(b, [])); return; }
+		const ra = rowsOfNode(a), rb = rowsOfNode(b);
+		const norm = (n) => Object.assign(without(n, ['demand', 'extraDemands']), { extra: (n.extraDemands || []).map((d) => without(d, ['base'])) });
+		keysDiffer('junction', a.id, norm(a), norm(b));
+		if (ra.length !== rb.length || ra.some((d, i) => (d.pattern || null) !== (rb[i].pattern || null))) { flag('junction demand rows (number or pattern)', a.id); return; }
+		if (ra.some((d, i) => d.base !== rb[i].base)) { out.demands.push({ id: a.id, bases: rb.map((d) => d.base) }); }
+	});
+	each(base.links, scen.links, (a, b) => {
+		if (a.type === 'pipe' && b.type === 'pipe') {
+			keysDiffer('pipe', a.id, without(a, ['diameter']), without(b, ['diameter']));
+			if (a.diameter !== b.diameter) { out.diameters.push({ id: a.id, inches: b.diameter }); }
+		} else {
+			// A pump states no diameter; the .inp reader lends it the largest pipe's at its ends (js/lpn-inp.js), which is no override.
+			const drop = a.type === 'pump' ? ['diameter'] : [];
+			keysDiffer(a.type, a.id, without(a, drop), without(b, drop));
+		}
+	});
+	const SKIP = { nodes: 1, links: 1, title: 1, dropped: 1, ok: 1 };
+	Object.keys(Object.assign({}, base, scen)).forEach((k) => {
+		if (SKIP[k] || same(base[k], scen[k])) { return; }
+		flag('file part ' + k, '');
+	});
+	out.unsupported = Object.keys(bad).map((w) => ({ what: w, ids: bad[w].filter((x) => x !== '') }));
+	return out;
 }
 
 function plan(doc, opts) {
@@ -1530,7 +1737,7 @@ async function build(planned, o) {
 	if (R.integrity !== 'ok' || R.foreignKeyViolations) {
 		throw fail('integrity', 'The file written failed its own integrity check (' + R.integrity + ', ' + R.foreignKeyViolations + ' foreign key violations), so it was not offered.', null, 'integrity');
 	}
-	const wtg = patchWtgXml(o.wtg, R.removedChildScenarios, 1, R.removedChildAlternatives, R.extentFt);
+	const wtg = patchWtgXml(o.wtg, R.removedChildScenarios, R.baseScenarioId || 1, R.removedChildAlternatives, R.extentFt, R.addedScenarios);
 	return { sqlite: out.bytes, wtg: wtg, report: R };
 }
 
@@ -1541,6 +1748,6 @@ EngCalcs.lpnWtgExportSetEngine = function (initSqlJs, wasmBinary) { injected = {
 EngCalcs.lpnWtgExportTestedSchemas = TESTED_SCHEMAS.slice();
 // For the spike's command line and harness (dev/lpn-spike/wtg-export.js): the pieces under the page.
 EngCalcs.lpnWtgExportInternals = { writeWtg: writeWtg, patchWtgXml: patchWtgXml, symbolMultiplier: symbolMultiplier, smartLabel: smartLabel,
-	referenceSchedule: referenceSchedule, GPM_TO_CFS: GPM_TO_CFS, carriableRules: carriableRules, energyNotWritten: energyNotWritten };
+	referenceSchedule: referenceSchedule, GPM_TO_CFS: GPM_TO_CFS, carriableRules: carriableRules, energyNotWritten: energyNotWritten, scenarioOverrides: scenarioOverrides };
 
 }(typeof globalThis !== 'undefined' ? globalThis : this));
