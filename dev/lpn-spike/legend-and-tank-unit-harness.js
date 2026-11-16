@@ -1,9 +1,9 @@
 // TWO INDEPENDENT DEFECTS, ONE FILE BECAUSE BOTH CAME OUT OF THE SAME REVIEW PASS. Run with:
 //   node dev/lpn-spike/legend-and-tank-unit-harness.js
 //
-// PART 1 -- THE NODE LABELS LEGEND'S CORNER AND STACKING (Tom, 2026-09-28: "New project: Put Node
-// labels legend at top left. And I assume and hope that it has lower z-index than the messenger
-// history"). This is a SETTING (settings.legendPosition, in the Settings box's Symbology/Map
+// PART 1 -- THE NODE LABELS LEGEND'S CORNER (Tom, 2026-09-28: "New project: Put Node labels legend
+// at top left.") AND ITS STACKING (his 2026-11-14 call: above everything on the map, replacing the
+// 2026-09-28 hope that it lay under the messenger history). This is a SETTING (settings.legendPosition, in the Settings box's Symbology/Map
 // appearance group), not a hardcoded position, so what moved is its DEFAULT for a brand-new
 // project -- and Tom asked, in the same breath, that the robustness of that be checked rather than
 // assumed:
@@ -77,15 +77,22 @@ console.log('\n0. THE STACKING ORDER, READ AT THE SOURCE');
 	ok('.lpn-color-legend carries a z-index', !!mColorLegend, css.match(/\.lpn-color-legend\s*\{[^}]*\}/));
 	const zColorLegend = mColorLegend ? +mColorLegend[1] : null;
 
-	// #lpn_map_overlay_tl is the column the message-log BUTTON and PANEL both live in (see
-	// Looped-Network.php's own comment above #lpn_msglog_panel: "A CHILD OF THIS COLUMN"), so its
-	// z-index is what stands for "the messenger history" here.
-	ok('the labels legend is BELOW the message-log column (Tom: lower z-index than the messenger history)',
-		typeof zLegend === 'number' && typeof zOverlayTl === 'number' && zLegend < zOverlayTl,
-		zLegend + ' vs ' + zOverlayTl);
-	ok('...and below the one-shot notice that also lives there', zLegend < zNotice, zLegend + ' vs ' + zNotice);
-	ok('...and below the on-map zoom chip, the other permanent top-left/top-right occupant',
-		zLegend < zZoom, zLegend + ' vs ' + zZoom);
+	// **A LEGEND IS ABOVE EVERYTHING ON THE MAP** (Tom, 2026-11-14: "The legends should have higher
+	// zindex than anything on the map."), which reverses his 2026-09-28 hope that it sit under the
+	// messenger history. #lpn_map_overlay_tl is the column the message-log button and panel live in.
+	// The tile credit (required attribution) and the georeferencing tools (controls a legend must not
+	// hide) are the stated exceptions and stay above it.
+	const zCredit = zIndexOf(php, 'id="lpn_basemap_credit"');
+	const zGeoref = zIndexOf(php, 'id="lpn_georef_bar"');
+	const zMapgeo = zIndexOf(php, 'id="lpn_mapgeo_bar"');
+	const zDial = zIndexOf(php, 'id="lpn_mapgeo_dial"');
+	ok('the labels legend is ABOVE the message-log column',
+		typeof zLegend === 'number' && typeof zOverlayTl === 'number' && zLegend > zOverlayTl, zLegend + ' vs ' + zOverlayTl);
+	ok('...and above the one-shot notice that also lives there', zLegend > zNotice, zLegend + ' vs ' + zNotice);
+	ok('...and above the on-map zoom chip', zLegend > zZoom, zLegend + ' vs ' + zZoom);
+	ok('...and below the required tile credit (a legend never hides an attribution)', zLegend < zCredit, zLegend + ' vs ' + zCredit);
+	ok('...and below the georeferencing bar, the map-geometry bar and its dial',
+		zLegend < zGeoref && zLegend < zMapgeo && zLegend < zDial, zLegend + ' vs ' + [zGeoref, zMapgeo, zDial]);
 	ok('the colour key (which can share the same corner) carries the SAME number as the labels legend',
 		zColorLegend === zLegend, zColorLegend + ' vs ' + zLegend);
 }

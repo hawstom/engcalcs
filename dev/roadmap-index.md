@@ -7,14 +7,15 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**85 open tasks.** Next (100): 4 · Soon (75): 14 · Someday (50): 31 · Maybe (25): 17 · Parked (5): 19
+**87 open tasks.** Next (100): 5 · Soon (75): 14 · Someday (50): 32 · Maybe (25): 17 · Parked (5): 19
 
-## 100 — Next (4)
+## 100 — Next (5)
 
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
-- Task 858 — Contour plot follows project Node colors settings.
+- Task 858 — Contour plot controls that say what is plotted.
+- Task 861 — A chooser when one click hits several elements.
 
 ## 75 — Soon (14)
 
@@ -33,7 +34,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 857 — A Volume unit in Settings for tank volumes.
 - Task 860 — Controls that differ by scenario.
 
-## 50 — Someday (31)
+## 50 — Someday (32)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -66,6 +67,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 832 — Compare Google Docs' Help menu with ours.
 - Task 850 — A master Demands table, one row per demand.
 - Task 856 — A map inset that zooms one spot on its own.
+- Task 862 — Place a whole spreadsheet of customer meters at once.
 
 ## 25 — Maybe (17)
 
@@ -113,5 +115,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-77 of 85 titles are within 4–12 words. `!` marks the rest;
+79 of 87 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
