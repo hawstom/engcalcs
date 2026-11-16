@@ -581,6 +581,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	q('lpn_contour_labels').checked = true; fireEl(q('lpn_contour_labels'), 'change');
 	q('lpn_contour_lines').checked = false; fireEl(q('lpn_contour_lines'), 'change');
 	check(layerOf('lpn-contour-fill').length === 0 && layerOf('lpn-contour-line').length === 0 && layerOf('lpn-contour-label').length === 0, 'fill None and lines off: nothing is drawn');
+	check(L.contourStats() === null && L.contourField() === null, '...and nothing is computed either: no corridor field, no stats line');
 	q('lpn_contour_lines').checked = true; fireEl(q('lpn_contour_lines'), 'change');
 	q('lpn_contour_fill').value = 'smooth'; fireEl(q('lpn_contour_fill'), 'change');
 	q('lpn_contour_opacity').value = '60'; fireEl(q('lpn_contour_opacity'), 'change');

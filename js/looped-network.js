@@ -13799,7 +13799,8 @@ var EngCalcs = EngCalcs || {};
 	function refreshContour() {
 		var C = EngCalcs.lpnContour, field = contourFieldOf();
 		contourStats = null;
-		if (!C || !contourIsOn() || !field || !svg) { clearContour(); contourField = null; return; }
+		// Show plot on with Fill None and lines off draws nothing, so nothing is computed either.
+		if (!C || !contourIsOn() || !field || !svg || !(contourFillMode() || scnSetting('contourLines'))) { clearContour(); contourField = null; return; }
 		var layer = contourLayerEl();
 		if (!layer) { return; }
 		var t0 = contourNow(), dem = contourTerrainWanted();
@@ -14060,17 +14061,13 @@ var EngCalcs = EngCalcs || {};
 		var box = contourBoxEl();
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
-	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines), then opens the box where it is tuned
-	// or turned off. The plot spreads Color nodes by, which this never writes (Tom, 2026-10-29); with No color the box says
+	// THE MENU ROW: checks Show plot (it changes no other setting: the plot is drawn as the box has Fill and the lines set),
+	// then opens the box where it is tuned or turned off. The plot spreads Color nodes by, which this never writes (Tom, 2026-10-29); with No color the box says
 	// there is nothing to plot.
 	// Graphs > Contour turns the contour on in the open scenario: through the Settings box's seam.
 	function showContour() {
 		throughSettingSeam(function () {
-			if (!contourIsOn()) {
-				settings.contourShow = true;
-				// Nothing to draw with both off: the menu row's promise is a plot, so it brings the default one back.
-				if (!contourFillMode() && !settings.contourLines) { settings.contourFill = 'smooth'; settings.contourLines = true; }
-			}
+			settings.contourShow = true;
 			refreshValueColors(); saveToStorage(); syncColorControls();
 		});
 		openContourBox();
@@ -14173,17 +14170,20 @@ var EngCalcs = EngCalcs || {};
 		// **THE STANDING LINE** names what the plot follows, always, with Node colors a way into Settings there. With No
 		// color there is no property to plot: a second line says so, and nothing turns colors on (Tom, 2026-10-29).
 		var stand = document.createElement('div'), link = document.createElement('a'), tpl = pc.lpn_contour_follows || 'Follows project "{link}" settings.', at = tpl.indexOf('{link}');
+		// A translation that lost the placeholder falls back to the English sentence, so the link is always there.
+		if (at < 0) { tpl = 'Follows project "{link}" settings.'; at = tpl.indexOf('{link}'); }
 		stand.className = 'lpn-contour-box-note'; stand.id = 'lpn_contour_follows';
 		link.href = '#'; link.id = 'lpn_contour_follows_link';
 		link.textContent = pc.lpn_settings_sym_node_colors || 'Node colors';
 		link.addEventListener('click', function (e) { e.preventDefault(); openSettingsBox('nodeColors'); });
-		stand.appendChild(document.createTextNode(at < 0 ? tpl : tpl.slice(0, at)));
-		if (at >= 0) { stand.appendChild(link); stand.appendChild(document.createTextNode(tpl.slice(at + 6))); }
+		stand.appendChild(document.createTextNode(tpl.slice(0, at)));
+		stand.appendChild(link);
+		stand.appendChild(document.createTextNode(tpl.slice(at + 6)));
 		body.appendChild(stand);
 		if (!contourFieldOf()) {
 			var none = document.createElement('div');
 			none.className = 'lpn-contour-box-note'; none.id = 'lpn_contour_none_note';
-			none.textContent = pc.lpn_contour_none_note || 'Nothing to plot: Color nodes by is No color.';
+			none.textContent = pc.lpn_contour_none_note || 'Nothing to plot: "Color nodes by" is set to "No color".';
 			body.appendChild(none);
 		}
 		row(pc.lpn_contour_show || 'Show plot', check('lpn_contour_show', contourIsOn(), function (on) {
@@ -44584,6 +44584,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (savedSettings.symbolCapMultiple === undefined) { savedSettings.symbolCapMultiple = 0.5; }
 		if (savedSettings.symbolCapPercentile === undefined) { savedSettings.symbolCapPercentile = 20; }
 		settings = Object.assign(defaultSettings(), savedSettings);
+		migrateContourShow(savedSettings);
 		// **A PROJECT SAVED BEFORE `Quality` WAS INTERPRETED STILL CARRIES ONLY THE TOKEN**, and it
 		// must not come back as "no analysis": it would then export a file missing a line its source
 		// stated, which is the one thing the carry existed to prevent. So the token is interpreted
@@ -44652,8 +44653,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// labels at all, not labels past some particular width, so the state that reproduces the
 		// screen they left is the one this keeps. The old flag is then DELETED so nothing can later
 		// read a stale one and disagree with the map.
-		// **A PROJECT SAVED BEFORE "Show plot" HAD ITS OWN SETTING** drew the plot while its fill or its lines were on.
-		if (savedSettings.contourShow === undefined) { settings.contourShow = !!(savedSettings.contourFill || savedSettings.contourLines); }
 		if (savedSettings.colorThematic) { settings.labelMaxWidth = 0; }
 		delete settings.colorThematic;
 		// **NOTHING CHANGES COLOUR WHEN AN OLD PROJECT IS OPENED.** The colour scheme, the class
@@ -44715,6 +44714,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A project's name is real, stored data from the moment it is created -- assigned by
 	// newProject(), never substituted at display time. The fallback below is a can't-happen path kept
 	// so a hand-edited index cannot render a nameless tab; initLibrary() names every blank on sight.
+	// **A PROJECT SAVED BEFORE "Show plot" HAD ITS OWN SETTING** drew the plot while its fill or its lines were on (a fill of
+	// None with lines off meant "plot off"), and its defaults were fill None, lines off. This reads what the file STATES,
+	// with those old defaults for what it omits, and writes the new design's equivalent: contourShow says on or off; a plot
+	// that was off gets the default fill and lines back, so that checking Show plot later draws something; a plot that was
+	// on keeps the fill and lines the file had. The project's own block, then every scenario's, alternative's and
+	// calculation set's block (the walk repointScenarioSetting() makes) that states a fill or lines.
+	function migrateContourShow(savedSettings) {
+		var oldFill = savedSettings.contourFill === undefined ? '' : savedSettings.contourFill,
+			oldLines = savedSettings.contourLines === undefined ? false : savedSettings.contourLines;
+		function convert(block, fill, lines, show) {
+			if (!show) { block.contourShow = false; block.contourFill = 'smooth'; block.contourLines = true; }
+			else { block.contourShow = true; block.contourFill = fill; block.contourLines = lines; }
+		}
+		if (savedSettings.contourShow === undefined) { convert(settings, oldFill, oldLines, !!(oldFill || oldLines)); }
+		scenarios.concat(doc.alternatives || [], doc.calcSets || []).forEach(function (o) {
+			var b = o && !o.isBase && plainObject(o.settings) ? o.settings : null, f, l;
+			if (!b || b.contourShow !== undefined || (b.contourFill === undefined && b.contourLines === undefined)) { return; }
+			f = b.contourFill === undefined ? oldFill : b.contourFill;
+			l = b.contourLines === undefined ? oldLines : b.contourLines;
+			convert(b, f, l, !!(f || l));
+		});
+	}
 	function projectDisplayName(p) {
 		return (p && p.name) ? p.name : nextProjectName();
 	}
