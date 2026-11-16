@@ -912,122 +912,162 @@ EngCalcs.lpnGeom = (function () {
 	// sizes it, and nothing here touches the DOM. Returns the ordered candidate list for a press at
 	// (x, y). **AN EMPTY LIST MEANS THE PRESS IS ORDINARY** (the page's own hit test names the
 	// element); **A LIST (always two or more) MEANS THE CLICK LANDED ON A SYMBOL THAT VISIBLY
-	// OVERLAPS ANOTHER**, so a person can see beforehand that a box will come (Tom, 2026-11-16: "I
-	// can't predict when I will or won't get a chooser").
+	// OVERLAPS ANOTHER (by at least 0.4 of the smaller one's width)**, so a person can see
+	// beforehand that a box will come (Tom, 2026-11-16: "I can't predict when I will or won't get a
+	// chooser").
 	//
 	// **NO LINE IS EVER AN ITEM**: not a pipe, not a Shape that is an open polyline (Tom, 2026-11-16:
-	// "all symbols, shapes, and text, but not pipes", "I also meant ... 'pipe' line"). The caller
-	// leaves them out; a click whose only candidates are lines is an ordinary click.
+	// "all symbols, shapes, and text, but not pipes", "I also meant ... 'pipe' line"). The one
+	// exception is the caller's, and it is not a line on the screen: a pipe drawn shorter than its end
+	// symbols is a point, handed in as a circle (an exploded assembly's zero-length pipe).
 	//
-	// An item is {kind, id, type, circle: {x, y, r}} or {..., rect: {l, t, r, b}} or {..., outline:
-	// {pts: [{x, y}], closed}} (a Shape: a point or a closed outline; an open one is dropped), screen px. Its `rank` breaks ties
-	// (a symbol over a Text over a Shape).
+	// An item is {kind, id, type, rank, soft?, and one extent}: circle {x, y, r}; rect {l, t, r, b};
+	// quad {cx, cy, hw, hh, ux, uy} (a rect rotated, u the unit vector of its x axis: a pump glyph); or
+	// outline {pts: [{x, y}], closed} (a Shape: a point or a closed outline; an open one is dropped).
+	// `rank` breaks ties (a symbol over a Text over a Shape).
 	//   1. The PRIMARY is the item nearest the press whose extent is within `reach` of it (0 inside).
 	//      None: ordinary. Two separate dots that both fall within a finger's reach but do not
 	//      overlap each other are therefore ordinary: the nearer one is the primary and has no
 	//      overlapping neighbour.
-	//      "Overlap" is deep: the depth of one into the other is at least 0.4 of the smaller symbol's width.
 	//   2. The OTHERS are the items under the pickbox too (within `reach` of the press) whose drawn
 	//      extent overlaps the primary's. None: ordinary. So a click on a pump clear of the reservoir
 	//      it overlaps, or on the far end of a long Text, is ordinary; the box is for the overlap.
-	//   3. ORDER: items whose anchor (a circle's or rect's centre) is within `coincident` px of the
-	//      primary's first, then the rest; each by distance from the press, then rank, then id in
-	//      natural order. At most `cap` (6) rows; the primary is always the first.
+	//   3. ORDER: the primary FIRST AND NEVER CUT; then items whose anchor (a circle's, rect's or
+	//      quad's centre) is within `coincident` px of the primary's, then the rest; each by distance
+	//      from the press, then rank, then id in natural order. At most `cap` (6) rows.
 	// opts: reach (6), cap (6), coincident (1), deep (0.4).
+	//
+	// "Overlap" is deep: the depth of one into the other is at least `deep` (0.4, and not 0.5 because
+	// Net3's Lake and pump 10, which Tom named as overlapping, share 0.43 of the reservoir's drawn
+	// height and no more) of the smaller symbol's width, so two dots merely touching or grazing are
+	// not an overlap. Exactly coincident symbols always are. A line (a Shape's outline) has no width:
+	// it overlaps a dot it passes within half a radius of the centre, or a box it crosses once the box
+	// is shrunk by a quarter of its smaller side.
+	function pickRectDist(r, px, py) { return Math.hypot(Math.max(r.l - px, 0, px - r.r), Math.max(r.t - py, 0, py - r.b)); }
+	function pickQuadLocal(q, px, py) {
+		var dx = px - q.cx, dy = py - q.cy;
+		return { x: dx * q.ux + dy * q.uy, y: -dx * q.uy + dy * q.ux };
+	}
+	function pickQuadRect(q) { return { l: -q.hw, t: -q.hh, r: q.hw, b: q.hh }; }
+	function pickOutlinePts(g) { return g.closed && g.pts.length > 2 ? g.pts.concat([g.pts[0]]) : g.pts; }
+	// Distance in screen px from a point to an item's drawn extent; 0 on or inside it.
+	function pickExtentDistance(m, px, py) {
+		var q;
+		if (m.circle) { return Math.max(0, Math.hypot(px - m.circle.x, py - m.circle.y) - m.circle.r); }
+		if (m.rect) { return pickRectDist(m.rect, px, py); }
+		if (m.quad) { q = pickQuadLocal(m.quad, px, py); return pickRectDist(pickQuadRect(m.quad), q.x, q.y); }
+		return pointToPolylineDistance(pickOutlinePts(m.outline), px, py);
+	}
+	function pickAnchor(m) {
+		if (m.circle) { return { x: m.circle.x, y: m.circle.y }; }
+		if (m.rect) { return { x: (m.rect.l + m.rect.r) / 2, y: (m.rect.t + m.rect.b) / 2 }; }
+		if (m.quad) { return { x: m.quad.cx, y: m.quad.cy }; }
+		return null;
+	}
+	function pickCorners(m) {
+		var r = m.rect, q = m.quad, ax, ay;
+		if (r) { return [{ x: r.l, y: r.t }, { x: r.r, y: r.t }, { x: r.r, y: r.b }, { x: r.l, y: r.b }]; }
+		ax = q.ux; ay = q.uy;
+		return [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(function (c) {
+			var lx = c[0] * q.hw, ly = c[1] * q.hh;
+			return { x: q.cx + lx * ax - ly * ay, y: q.cy + lx * ay + ly * ax };
+		});
+	}
+	function pickMinSide(m) {
+		if (m.rect) { return Math.min(m.rect.r - m.rect.l, m.rect.b - m.rect.t); }
+		return 2 * Math.min(m.quad.hw, m.quad.hh);
+	}
+	// The depth two convex boxes sit in one another (separating-axis: the least overlap on any edge normal).
+	function pickBoxDepth(a, b) {
+		var ca = pickCorners(a), cb = pickCorners(b), depth = Infinity, k, i, p, axes = [];
+		[ca, cb].forEach(function (c) {
+			for (i = 0; i < 2; i++) { axes.push({ x: -(c[i + 1].y - c[i].y), y: c[i + 1].x - c[i].x }); }
+		});
+		for (k = 0; k < axes.length; k++) {
+			var len = Math.hypot(axes[k].x, axes[k].y) || 1, lo = [Infinity, Infinity], hi = [-Infinity, -Infinity];
+			[ca, cb].forEach(function (c, j) {
+				for (p = 0; p < 4; p++) {
+					var v = (c[p].x * axes[k].x + c[p].y * axes[k].y) / len;
+					if (v < lo[j]) { lo[j] = v; } if (v > hi[j]) { hi[j] = v; }
+				}
+			});
+			depth = Math.min(depth, Math.min(hi[0], hi[1]) - Math.max(lo[0], lo[1]));
+			if (depth <= 0) { return 0; }
+		}
+		return depth;
+	}
+	// Does a segment cross, or lie in, a rect?
+	function pickSegInRect(a, b, r) {
+		var t0 = 0, t1 = 1, dx = b.x - a.x, dy = b.y - a.y, p = [-dx, dx, -dy, dy], q = [a.x - r.l, r.r - a.x, a.y - r.t, r.b - a.y], k, u;
+		for (k = 0; k < 4; k++) {
+			if (p[k] === 0) { if (q[k] < 0) { return false; } continue; }
+			u = q[k] / p[k];
+			if (p[k] < 0) { if (u > t1) { return false; } if (u > t0) { t0 = u; } }
+			else { if (u < t0) { return false; } if (u < t1) { t1 = u; } }
+		}
+		return true;
+	}
+	function pickOverlaps(a, b, deep) {
+		var s, o2, c, j, pts, rc, loc, shrunk, k, qr;
+		if (a.outline && b.outline) { return false; }   // two Shapes are not a symbol under the click
+		if (a.outline || b.outline) {
+			s = a.outline ? a : b; o2 = a.outline ? b : a;
+			if (o2.circle) { return pointToPolylineDistance(pickOutlinePts(s.outline), o2.circle.x, o2.circle.y) <= o2.circle.r / 2; }
+			pts = s.outline.pts;
+			if (o2.quad) {
+				rc = pickQuadRect(o2.quad);
+				pts = pts.map(function (p) { return pickQuadLocal(o2.quad, p.x, p.y); });
+			} else { rc = o2.rect; }
+			k = Math.min(rc.r - rc.l, rc.b - rc.t) / 4;
+			shrunk = { l: rc.l + k, t: rc.t + k, r: rc.r - k, b: rc.b - k };
+			if (pts.length === 1) { return pts[0].x >= shrunk.l && pts[0].x <= shrunk.r && pts[0].y >= shrunk.t && pts[0].y <= shrunk.b; }
+			pts = s.outline.closed && pts.length > 2 ? pts.concat([pts[0]]) : pts;
+			for (j = 0; j + 1 < pts.length; j++) { if (pickSegInRect(pts[j], pts[j + 1], shrunk)) { return true; } }
+			return false;
+		}
+		if (a.circle && b.circle) {
+			return Math.hypot(a.circle.x - b.circle.x, a.circle.y - b.circle.y) <= a.circle.r + b.circle.r - 2 * deep * Math.min(a.circle.r, b.circle.r);
+		}
+		if (a.circle || b.circle) {
+			c = a.circle ? a : b; o2 = a.circle ? b : a;
+			if (o2.quad) { loc = pickQuadLocal(o2.quad, c.circle.x, c.circle.y); qr = pickQuadRect(o2.quad); return pickRectDist(qr, loc.x, loc.y) <= c.circle.r - deep * Math.min(2 * c.circle.r, pickMinSide(o2)); }
+			return pickRectDist(o2.rect, c.circle.x, c.circle.y) <= c.circle.r - deep * Math.min(2 * c.circle.r, pickMinSide(o2));
+		}
+		if (a.rect && b.rect) {
+			return Math.min(a.rect.r, b.rect.r) - Math.max(a.rect.l, b.rect.l) >= deep * Math.min(a.rect.r - a.rect.l, b.rect.r - b.rect.l) &&
+				Math.min(a.rect.b, b.rect.b) - Math.max(a.rect.t, b.rect.t) >= deep * Math.min(a.rect.b - a.rect.t, b.rect.b - b.rect.t);
+		}
+		return pickBoxDepth(a, b) >= deep * Math.min(pickMinSide(a), pickMinSide(b));
+	}
 	function pickSymbols(items, x, y, opts) {
 		var o = opts || {}, reach = o.reach === undefined ? 6 : o.reach, cap = o.cap === undefined ? 6 : o.cap,
-			coin = o.coincident === undefined ? 1 : o.coincident, primary = null, list = [], i, it, d;
+			coin = o.coincident === undefined ? 1 : o.coincident, deep = o.deep === undefined ? 0.4 : o.deep,
+			primary = null, list = [], i, it, d, pa;
 		function natural(a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); }
-		function segDist(px, py, a, b) {
-			var dx = b.x - a.x, dy = b.y - a.y, l2 = dx * dx + dy * dy, t = l2 ? ((px - a.x) * dx + (py - a.y) * dy) / l2 : 0;
-			t = Math.max(0, Math.min(1, t));
-			return Math.hypot(px - (a.x + t * dx), py - (a.y + t * dy));
-		}
-		function outlineDist(g, px, py) {
-			var pts = g.pts, n = pts.length, d = Infinity, j;
-			if (n === 1) { return Math.hypot(px - pts[0].x, py - pts[0].y); }
-			for (j = 0; j + 1 < n; j++) { d = Math.min(d, segDist(px, py, pts[j], pts[j + 1])); }
-			if (g.closed && n > 2) { d = Math.min(d, segDist(px, py, pts[n - 1], pts[0])); }
-			return d;
-		}
-		function rectDist(r, px, py) { return Math.hypot(Math.max(r.l - px, 0, px - r.r), Math.max(r.t - py, 0, py - r.b)); }
-		// Distance from a point to an item's drawn extent; 0 on or inside it.
-		function dist(m, px, py) {
-			if (m.circle) { return Math.max(0, Math.hypot(px - m.circle.x, py - m.circle.y) - m.circle.r); }
-			if (m.rect) { return rectDist(m.rect, px, py); }
-			return outlineDist(m.outline, px, py);
-		}
-		function anchor(m) {
-			if (m.circle) { return { x: m.circle.x, y: m.circle.y }; }
-			if (m.rect) { return { x: (m.rect.l + m.rect.r) / 2, y: (m.rect.t + m.rect.b) / 2 }; }
-			return null;
-		}
-		// Does a segment cross, or lie in, a rect?
-		function segInRect(a, b, r) {
-			var t0 = 0, t1 = 1, dx = b.x - a.x, dy = b.y - a.y, p = [-dx, dx, -dy, dy], q = [a.x - r.l, r.r - a.x, a.y - r.t, r.b - a.y], k, u;
-			for (k = 0; k < 4; k++) {
-				if (p[k] === 0) { if (q[k] < 0) { return false; } continue; }
-				u = q[k] / p[k];
-				if (p[k] < 0) { if (u > t1) { return false; } if (u > t0) { t0 = u; } }
-				else { if (u < t0) { return false; } if (u < t1) { t1 = u; } }
-			}
-			return true;
-		}
-		// Overlap DEEP enough to see: the depth of one into the other is at least DEEP (0.4) of the
-		// smaller symbol's width, so two dots merely touching (or grazing) are not an overlap. 0.4 and
-		// not 0.5 because Net3's Lake and pump 10, which Tom named as overlapping, share 0.43 of the
-		// reservoir's drawn height and no more. Exactly
-		// coincident symbols always are. A line (a Shape's outline) has no width: it overlaps a dot it
-		// passes within half a radius of the centre, or a box it crosses once the box is shrunk by a
-		// quarter of its smaller side.
-		var DEEP = o.deep === undefined ? 0.4 : o.deep;
-		function shrink(r, k) { return { l: r.l + k, t: r.t + k, r: r.r - k, b: r.b - k }; }
-		function overlaps(a, b) {
-			var s, o2, c, j, pts, n, rc, k;
-			if (a.outline && b.outline) { return false; }   // two Shapes are not a symbol under the click
-			if (a.outline) { s = a; o2 = b; } else if (b.outline) { s = b; o2 = a; } else { s = null; }
-			if (!s) {
-				if (a.circle && b.circle) { return Math.hypot(a.circle.x - b.circle.x, a.circle.y - b.circle.y) <= a.circle.r + b.circle.r - 2 * DEEP * Math.min(a.circle.r, b.circle.r); }
-				if (a.rect && b.rect) {
-					return Math.min(a.rect.r, b.rect.r) - Math.max(a.rect.l, b.rect.l) >= DEEP * Math.min(a.rect.r - a.rect.l, b.rect.r - b.rect.l) &&
-						Math.min(a.rect.b, b.rect.b) - Math.max(a.rect.t, b.rect.t) >= DEEP * Math.min(a.rect.b - a.rect.t, b.rect.b - b.rect.t);
-				}
-				c = a.circle ? a : b; rc = (a.circle ? b : a).rect;
-				return rectDist(rc, c.circle.x, c.circle.y) <= c.circle.r - DEEP * Math.min(2 * c.circle.r, rc.r - rc.l, rc.b - rc.t);
-			}
-			if (o2.circle) { return outlineDist(s.outline, o2.circle.x, o2.circle.y) <= o2.circle.r / 2; }
-			k = Math.min(o2.rect.r - o2.rect.l, o2.rect.b - o2.rect.t) / 4;
-			rc = shrink(o2.rect, k);
-			pts = s.outline.pts; n = pts.length;
-			if (n === 1) { return pts[0].x >= rc.l && pts[0].x <= rc.r && pts[0].y >= rc.t && pts[0].y <= rc.b; }
-			for (j = 0; j + 1 < n; j++) { if (segInRect(pts[j], pts[j + 1], rc)) { return true; } }
-			return !!(s.outline.closed && n > 2 && segInRect(pts[n - 1], pts[0], rc));
-		}
 		function order(a, b) {
 			return (b.coin - a.coin) || (a.d - b.d) || ((a.m.rank || 0) - (b.m.rank || 0)) || natural(a.m.id, b.m.id);
 		}
 		// A line is never an item, whoever hands it in: an open polyline (a point and a closed outline are not lines).
 		items = items.filter(function (m) { return !(m.outline && m.outline.pts.length > 1 && !m.outline.closed); });
 		for (i = 0; i < items.length; i++) {
-			it = items[i];
-			it = { m: it, d: dist(it, x, y) };
+			it = { m: items[i], d: pickExtentDistance(items[i], x, y) };
 			if (it.d > reach) { continue; }
-			if (!primary || it.d < primary.d || (it.d === primary.d && (it.m.rank || 0) < (primary.m.rank || 0))) { primary = it; }
+			if (!primary || order({ m: it.m, d: it.d, coin: 0 }, { m: primary.m, d: primary.d, coin: 0 }) < 0) { primary = it; }
 		}
 		if (!primary) { return []; }
+		pa = pickAnchor(primary.m);
 		for (i = 0; i < items.length; i++) {
 			it = items[i];
-			if (it === primary.m || !overlaps(primary.m, it)) { continue; }
-			d = dist(it, x, y);
-			if (d <= reach) { list.push({ m: it, d: d, coin: 0 }); }
+			if (it === primary.m || !pickOverlaps(primary.m, it, deep)) { continue; }
+			d = pickExtentDistance(it, x, y);
+			if (d <= reach) {
+				list.push({ m: it, d: d, coin: (pa && pickAnchor(it) && Math.hypot(pa.x - pickAnchor(it).x, pa.y - pickAnchor(it).y) <= coin) ? 1 : 0 });
+			}
 		}
-		if (!list.length) { return []; }
-		list.push({ m: primary.m, d: primary.d, coin: 0 });
-		list.forEach(function (e) {
-			var pa = anchor(primary.m), ea = anchor(e.m);
-			e.coin = (e.m === primary.m || (pa && ea && Math.hypot(pa.x - ea.x, pa.y - ea.y) <= coin)) ? 1 : 0;
-		});
+		// An item flagged `soft` (a pipe drawn as a point) is a row but never the reason for a box.
+		if (!list.length || (primary.m.soft ? 0 : 1) + list.filter(function (e) { return !e.m.soft; }).length < 2) { return []; }
 		list.sort(order);
+		list.unshift({ m: primary.m, d: primary.d });
 		return list.slice(0, cap).map(function (e) {
 			return { kind: e.m.kind, id: e.m.id, type: e.m.type, distPx: e.d };
 		});
@@ -1058,6 +1098,8 @@ EngCalcs.lpnGeom = (function () {
 		rotatedLabelBox: rotatedLabelBox,
 		orientedLabelBox: orientedLabelBox,
 		pickSymbols: pickSymbols,
+		pickExtentDistance: pickExtentDistance,
+		pickOverlaps: pickOverlaps,
 		pointToSegmentDistance: pointToSegmentDistance,
 		pointToPolylineDistance: pointToPolylineDistance,
 		buildSegmentIndex: buildSegmentIndex,

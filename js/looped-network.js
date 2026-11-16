@@ -10563,13 +10563,25 @@ var EngCalcs = EngCalcs || {};
 	// the desktop design. The ONE KNOB is still one knob -- reachPx(e) answers per press for both
 	// hands at every call site -- it is the PRECEDENCE that a finger gets and a pointer does not.
 	function touchNodeOver(cx, cy, hit) {
-		var n, onNode = !!(hit && hit.dataset && hit.dataset.node !== undefined);
-		if (!onNode && !nodeOutranks(hit)) { return hit; }
+		var n, hn, best = null, bestPx = Infinity, i, d, w;
+		if (hit && hit.dataset && hit.dataset.node !== undefined) {
+			// A node's band was hit. Where the press is on that node's own ink it stays; where it is not
+			// but IS on another node's ink (a band drawn on top of a neighbour's centre), the finger
+			// meant the one under it, the nearest centre if several.
+			hn = nodeById(hit.dataset.node);
+			if (!hn || nodeInkDistPx(hn, cx, cy) === 0) { return hit; }
+			w = screenToWorld(cx, cy);
+			for (i = 0; i < doc.nodes.length; i++) {
+				n = doc.nodes[i];
+				if (!nodeEls[n.id] || !nodeEls[n.id].circle || nodeInkDistPx(n, cx, cy) !== 0) { continue; }
+				d = Math.hypot(nodeDrawX(n) - w.x, nodeDrawY(n) - w.y);
+				if (d < bestPx) { best = n; bestPx = d; }
+			}
+			return best ? nodeEls[best.id].circle : hit;
+		}
+		if (!nodeOutranks(hit)) { return hit; }
 		n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX);
-		// A finger on a node's band is still given the NEAREST node, not whichever band is drawn on top
-		// (two dots 9 px apart: a tap on the first selected the second). The chooser's own rule rests on it.
-		if (onNode && n && String(n.id) === String(hit.dataset.node)) { return hit; }
-		return (n && nodeEls[n.id] && nodeEls[n.id].circle) ? nodeEls[n.id].circle : hit;
+		return (n && nodeEls[n.id]) ? nodeEls[n.id].circle : hit;
 	}
 	function nearestNodeNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;
@@ -10821,11 +10833,7 @@ var EngCalcs = EngCalcs || {};
 			s = list[i]; n = s.pts.length;
 			if (!shapeEls[s.id] || !n) { continue; }
 			if (n === 1) { d = Math.hypot(s.pts[0].x - w.x, s.pts[0].y - w.y); }
-			else {
-				d = Infinity;
-				for (j = 0; j + 1 < n; j++) { d = Math.min(d, distToSegment(w, s.pts[j], s.pts[j + 1])); }
-				if (s.closed) { d = Math.min(d, distToSegment(w, s.pts[n - 1], s.pts[0])); }
-			}
+			else { d = Geom.pointToPolylineDistance(s.closed ? s.pts.concat([s.pts[0]]) : s.pts, w.x, w.y); }
 			if (all) { if (d <= tolW) { out.push({ shape: s, pidx: -1 }); } continue; }
 			if (d <= bestD) { best = { shape: s, pidx: -1 }; bestD = d; }
 		}
@@ -16858,12 +16866,7 @@ var EngCalcs = EngCalcs || {};
 		updateLinkGeometry(linkId);
 		scheduleSolve();
 	}
-	function distToSegment(p, a, b) {
-		var dx = b.x - a.x, dy = b.y - a.y, len2 = dx * dx + dy * dy,
-			t = len2 ? ((p.x - a.x) * dx + (p.y - a.y) * dy) / len2 : 0;
-		t = Math.max(0, Math.min(1, t));
-		return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
-	}
+	function distToSegment(p, a, b) { return Geom.pointToSegmentDistance(p.x, p.y, a.x, a.y, b.x, b.y); }
 	// **EVERY SVG ELEMENT ONE LINK OWNS, TORN DOWN IN ONE PLACE** (Tom, 2026-09-01: *"left zombie
 	// labels on the map on the phone and PC. Their size no longer scales. They don't move. I can't
 	// drag them. But I can use them to edit their pipe. Bad, bad, bad."*).
@@ -61055,11 +61058,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// not wanted first)."* So a box, not cycling.
 	//
 	// **THE BOX OPENS ONLY WHERE A PERSON CAN SEE IT COMING** (Tom, 2026-11-16: *"I can't predict when
-	// I will or won't get a chooser"*): the press lands on a symbol whose DRAWN extent touches or
-	// overlaps another symbol's. Two separate dots that both fall inside a finger's reach, without
+	// I will or won't get a chooser"*): the press lands on a symbol whose DRAWN extent overlaps
+	// another symbol's by at least 0.4 of the smaller one's width. Two separate dots that both fall inside a finger's reach, without
 	// overlapping each other, are an ordinary click on the nearer. **NO LINE IS IN THE LIST**: no pipe
 	// and no Shape that is an open polyline (*"all symbols, shapes, and text, but not pipes"*); a
-	// click with only lines under it is an ordinary click, which may select a pipe. The symbols are
+	// click with only lines under it is an ordinary click, which may select a pipe. The one pipe that
+	// is a row is a point: its two end symbols drawn deeply on top of one another (an exploded
+	// assembly's zero-length pipe); two pipes drawn exactly over each other cannot be reached by a click.
+	// The element the browser itself hit (never a plain pipe) is always one of the rows. The symbols are
 	// a node (any kind), a pump or valve glyph, a Text, and a Shape that is a point or closed.
 	// **AT MOST PICK_MAX_ROWS (6) ROWS** (*"a list of more than about 4 to 5 elements is not
 	// helpful"*): the symbol nearest the press and those truly coincident with it first, then the
@@ -61078,74 +61084,104 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// element the way a click on it does, Shift-added when the press was Shift-held.
 	var PICK_KIND_RANK = { node: 0, link: 1, label: 2, shape: 3 };
 	var PICK_MAX_ROWS = 6;
-	// The bounding box of a symbol's drawn silhouette, in the icon's own 24-unit frame (the box the
-	// symbol is stretched to: the silhouette is what the reader sees, the box is not).
-	function silhouetteInk(type) {
-		var cmds = String(SYMBOL_SILHOUETTE[type] || '').match(/[A-Za-z][^A-Za-z]*/g) || [],
-			x0 = 24, y0 = 24, x1 = 0, y1 = 0;
-		cmds.forEach(function (c) {
-			var v = c.slice(1).trim().split(/\s+/).filter(Boolean).map(Number), c0 = c.charAt(0), i;
-			if (c0 === 'Z') { return; }
-			for (i = 0; i < v.length; i++) {
-				if (c0 === 'H') { x0 = Math.min(x0, v[i]); x1 = Math.max(x1, v[i]); }
-				else if (c0 === 'V') { y0 = Math.min(y0, v[i]); y1 = Math.max(y1, v[i]); }
-				else if (i % 2 === 0) { x0 = Math.min(x0, v[i]); x1 = Math.max(x1, v[i]); }
-				else { y0 = Math.min(y0, v[i]); y1 = Math.max(y1, v[i]); }
-			}
-		});
-		return x1 > x0 && y1 > y0 ? { x0: x0, y0: y0, x1: x1, y1: y1 } : { x0: 0, y0: 0, x1: 24, y1: 24 };
+	// The bounding box of each symbol's drawn silhouette in the icon's own 24-unit frame (the box the
+	// symbol is stretched to is bigger: the silhouette is what the reader sees). Read off
+	// SYMBOL_SILHOUETTE above: reservoir M3.5 5.5H20.5L12 20Z, tank M4 6.5H20V17.5H4Z, the pump's
+	// casing (a circle of 6 about 9,13) and tail, the valve's two triangles.
+	var SYMBOL_INK = {
+		reservoir: { x0: 3.5, y0: 5.5, x1: 20.5, y1: 20 }, tank: { x0: 4, y0: 6.5, x1: 20, y1: 17.5 },
+		pump: { x0: 3, y0: 7, x1: 22.5, y1: 19 }, valve: { x0: 3, y0: 3, x1: 21, y1: 21 }
+	};
+	// A node's drawn extent in client px, centred at (px, py): a junction's disc (nodeRadius), a
+	// reservoir's or tank's silhouette (nodeSymbolSize and SYMBOL_INK).
+	function pickNodeItem(n, s, px, py) {
+		var sz, ink, k;
+		if (n.type === 'reservoir' || n.type === 'tank') {
+			sz = nodeSymbolSize(n); ink = SYMBOL_INK[n.type];
+			return { kind: 'node', id: n.id, type: n.type, rank: PICK_KIND_RANK.node, rect: {
+				l: px - sz.w * s / 2 + sz.w * s * ink.x0 / SYMBOL_VIEWBOX, r: px - sz.w * s / 2 + sz.w * s * ink.x1 / SYMBOL_VIEWBOX,
+				t: py - sz.h * s / 2 + sz.h * s * ink.y0 / SYMBOL_VIEWBOX, b: py - sz.h * s / 2 + sz.h * s * ink.y1 / SYMBOL_VIEWBOX } };
+		}
+		k = nodeRadius(n) * s;
+		return { kind: 'node', id: n.id, type: n.type, rank: PICK_KIND_RANK.node, circle: { x: px, y: py, r: k } };
 	}
-	// Every SYMBOL the page drew, as a screen-pixel extent for Geom.pickSymbols(): a junction's disc
-	// (nodeRadius), a reservoir's or tank's box (nodeSymbolSize), a pump's or valve's drawn outline,
-	// a Text's words, a Shape that is not a line (a point, or a closed outline). Never a pipe, never
-	// an open polyline. The sizes are the draw code's own helpers, so what overlaps here is what the
-	// reader sees overlap. The press (cx, cy) bounds the scan: nothing farther than 400 px matters.
-	function pickItemsNear(cx, cy) {
-		var items = [], r = svg.getBoundingClientRect(), s = state.s || 1, near = 400, i, n, ne, l, le, lb, shp, sz, ink, px, py, b, pl, pts;
+	// A pump's or valve's glyph: its silhouette's box, turned with the glyph (place, angle and flip as
+	// positionPumpSymbol() writes them), centred where the casing is, not where the pipe's midpoint is.
+	function pickGlyphItem(l, pl, s, px, py) {
+		var k = pumpSymbolSize(l.type) * s / SYMBOL_VIEWBOX, ink = SYMBOL_INK[l.type], a = pl.angle * Math.PI / 180,
+			ux = Math.cos(a), uy = Math.sin(a), ox = ((ink.x0 + ink.x1) / 2 - SYMBOL_VIEWBOX / 2) * k,
+			oy = ((ink.y0 + ink.y1) / 2 - SYMBOL_VIEWBOX / 2) * k * (pl.flip ? -1 : 1);
+		return { kind: 'link', id: l.id, type: l.type, rank: PICK_KIND_RANK.link, quad: {
+			cx: px + ox * ux - oy * uy, cy: py + ox * uy + oy * ux, hw: (ink.x1 - ink.x0) * k / 2, hh: (ink.y1 - ink.y0) * k / 2, ux: ux, uy: uy } };
+	}
+	// A node's distance in client px from a press to its drawn extent (0 on the ink).
+	function nodeInkDistPx(n, cx, cy) {
+		var r = svg.getBoundingClientRect(), s = state.s || 1;
+		return Geom.pickExtentDistance(pickNodeItem(n, s, r.left + state.tx + nodeDrawX(n) * s, r.top + state.ty + nodeDrawY(n) * s), cx, cy);
+	}
+	// Every SYMBOL the page drew near a press, as a client-px extent for Geom.pickSymbols(): a
+	// junction's disc, a reservoir's or tank's silhouette, a pump's or valve's turned glyph, a Text's
+	// words, a Shape that is a point or closed. Never a pipe and never an open polyline, with ONE
+	// exception that is not a line on the screen: **a pipe whose two end symbols are drawn deeply on
+	// top of one another is a point**, and is a circle at its midpoint (an exploded assembly's zero-length pipe, which no
+	// click could otherwise reach). The sizes are the draw code's own helpers, so what overlaps here
+	// is what the reader sees overlap. Every kind is bounded by the press, `reach` and the largest
+	// symbol before anything is measured.
+	function pickItemsNear(cx, cy, reach) {
+		var items = [], r = svg.getBoundingClientRect(), s = state.s || 1, i, n, ne, l, le, lb, shp, px, py, b, pl, pts, fa, fb, len, qx, qy,
+			big = Math.max(pumpSymbolSize('pump'), nodeSymbolSize({ type: 'tank' }).w, nodeSymbolSize({ type: 'reservoir' }).w, 2 * JUNCTION_R * symbolFactor()) * s,
+			near = reach + big, textNear = reach + 600;
 		function sx(wx) { return r.left + state.tx + wx * s; }
 		function sy(wy) { return r.top + state.ty + wy * s; }
 		function rectOf(box) { return box.width > 0 || box.height > 0 ? { l: box.left, t: box.top, r: box.right, b: box.bottom } : null; }
+		function inNear(x, y, w) { return Math.abs(x - cx) <= w && Math.abs(y - cy) <= w; }
 		for (i = 0; i < doc.nodes.length; i++) {
 			n = doc.nodes[i]; ne = nodeEls[n.id];
 			if (!ne) { continue; }
 			px = sx(nodeDrawX(n)); py = sy(nodeDrawY(n));
-			if (Math.abs(px - cx) > near || Math.abs(py - cy) > near) { continue; }
-			if (n.type === 'reservoir' || n.type === 'tank') {
-				sz = nodeSymbolSize(n); ink = silhouetteInk(n.type);
-				items.push({ kind: 'node', id: n.id, type: n.type, rank: 0, rect: {
-					l: px - sz.w * s / 2 + sz.w * s * ink.x0 / 24, r: px - sz.w * s / 2 + sz.w * s * ink.x1 / 24,
-					t: py - sz.h * s / 2 + sz.h * s * ink.y0 / 24, b: py - sz.h * s / 2 + sz.h * s * ink.y1 / 24 } });
-			} else {
-				items.push({ kind: 'node', id: n.id, type: n.type, rank: 0, circle: { x: px, y: py, r: nodeRadius(n) * s } });
-			}
+			if (inNear(px, py, near)) { items.push(pickNodeItem(n, s, px, py)); }
 		}
 		for (i = 0; i < doc.links.length; i++) {
-			l = doc.links[i]; le = linkEls[l.id];
-			if (!le || !le.symbolHit || !nodeById(l.from) || !nodeById(l.to)) { continue; }
-			pl = linkSymbolPlace(l);
-			if (!pl || Math.abs(sx(pl.x) - cx) > near || Math.abs(sy(pl.y) - cy) > near) { continue; }
-			b = rectOf(le.symbolHit.getBoundingClientRect());
-			if (b) { items.push({ kind: 'link', id: l.id, type: l.type, rank: 1, rect: b }); }
+			l = doc.links[i]; le = linkEls[l.id]; fa = nodeById(l.from); fb = nodeById(l.to);
+			if (!le || !fa || !fb) { continue; }
+			if (le.symbolHit) {
+				pl = linkSymbolPlace(l);
+				if (pl && inNear(sx(pl.x), sy(pl.y), near)) { items.push(pickGlyphItem(l, pl, s, sx(pl.x), sy(pl.y))); }
+				continue;
+			}
+			if (!inNear(sx(nodeDrawX(fa)), sy(nodeDrawY(fa)), near + 2 * nodeRadius(fa) * s)) { continue; }
+			pts = linkPointList(l);
+			len = Geom.polylineLength(pts) * s;
+			// A visible line is never a row. A pipe is a point when its two end symbols are drawn deeply
+			// on top of one another (the pipe cannot be seen between them).
+			if (!Geom.pickOverlaps(pickNodeItem(fa, s, sx(nodeDrawX(fa)), sy(nodeDrawY(fa))), pickNodeItem(fb, s, sx(nodeDrawX(fb)), sy(nodeDrawY(fb))), 0.4)) { continue; }
+			pl = Geom.pointAlongPolyline(pts, 0.5); qx = sx(pl.x); qy = sy(pl.y);
+			if (inNear(qx, qy, near)) { items.push({ kind: 'link', id: l.id, type: l.type, rank: PICK_KIND_RANK.link, soft: true, circle: { x: qx, y: qy, r: Math.max(len / 2, 0.5) } }); }
 		}
 		for (i = 0; i < (doc.labels || []).length; i++) {
 			lb = doc.labels[i]; le = labelEls[lb.id];
 			if (!le || !le.text || !hitIsVisible(le.text)) { continue; }
+			pl = textLabelPoint(lb);
+			if (!pl || !inNear(sx(pl.x), sy(pl.y), textNear)) { continue; }
 			b = rectOf(le.text.getBoundingClientRect());
-			if (b) { items.push({ kind: 'label', id: lb.id, type: lb.type, rank: 2, rect: b }); }
+			if (b) { items.push({ kind: 'label', id: lb.id, type: lb.type, rank: PICK_KIND_RANK.label, rect: b }); }
 		}
 		docShapesRead().forEach(function (sh) {
+			var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
 			shp = sh; pts = shp.pts || [];
 			if (!shapeEls[shp.id] || !pts.length || (pts.length > 1 && !shp.closed)) { return; }   // an open polyline is a line
-			items.push({ kind: 'shape', id: shp.id, type: shp.type, rank: 3,
-				outline: { pts: pts.map(function (p) { return { x: sx(p.x), y: sy(p.y) }; }), closed: !!shp.closed } });
+			pts = pts.map(function (p) { return { x: sx(p.x), y: sy(p.y) }; });
+			pts.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); });
+			if (cx < x0 - reach || cx > x1 + reach || cy < y0 - reach || cy > y1 + reach) { return; }
+			items.push({ kind: 'shape', id: shp.id, type: shp.type, rank: PICK_KIND_RANK.shape, outline: { pts: pts, closed: !!shp.closed } });
 		});
 		return items;
 	}
 	// The chooser's rows for a press: [] when the click is ordinary, else two to PICK_MAX_ROWS rows.
 	// The reach is the pickbox's own, unchanged: a finger's 24 px, a mouse's half the node band.
 	function pickCandidatesAt(cx, cy, touch) {
-		return Geom.pickSymbols(pickItemsNear(cx, cy), cx, cy,
-			{ reach: touch ? TOUCH_REACH_PX : LPN_NODE_HIT_PX / 2, cap: PICK_MAX_ROWS });
+		var reach = touch ? TOUCH_REACH_PX : LPN_NODE_HIT_PX / 2;
+		return Geom.pickSymbols(pickItemsNear(cx, cy, reach), cx, cy, { reach: reach, cap: PICK_MAX_ROWS });
 	}
 	// "Junction J1", "Pump 9", "Shape S1", "Text" and its first words. The type word is the one the toolbar uses.
 	function pickRowLabel(c) {
@@ -61169,8 +61205,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!t || (t !== svg && t.dataset.node === undefined && t.dataset.lbl === undefined && t.dataset.shape === undefined &&
 			!(t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')))) { return null; }
 		list = pickCandidatesAt(e.clientX, e.clientY, e.pointerType === 'touch');
+		// **THE ELEMENT THE BROWSER ACTUALLY HIT IS ALWAYS ONE OF THE ROWS** once there is a choice, so
+		// a box never hides what a plain click would have selected. A plain pipe is not offered (a line).
+		if (list.length >= 2) { pickEnsureHit(list, t); }
 		return list.length >= 2 ? { id: e.pointerId, x: e.clientX, y: e.clientY, shift: !!e.shiftKey,
 			touch: e.pointerType === 'touch', list: list } : null;
+	}
+	function pickEnsureHit(list, h) {
+		var d = (h && h.dataset) || {}, kind, id, el, sh;
+		if (d.node !== undefined) { kind = 'node'; id = d.node; }
+		else if (d.link !== undefined && h.classList.contains('lpn-link-symbol-hit')) { kind = 'link'; id = d.link; }
+		else if (d.lbl !== undefined) { kind = 'label'; id = d.lbl; }
+		else if (d.shape !== undefined) { sh = shapeById(d.shape); if (sh && (sh.pts.length === 1 || sh.closed)) { kind = 'shape'; id = d.shape; } }
+		if (!kind || list.some(function (c) { return c.kind === kind && c.id === id; })) { return; }
+		el = kind === 'node' ? nodeById(id) : (kind === 'link' ? linkById(id) : (kind === 'shape' ? shapeById(id) : labelById(id)));
+		if (!el) { return; }
+		if (list.length >= PICK_MAX_ROWS) { list.pop(); }
+		list.push({ kind: kind, id: id, type: el.type });
 	}
 	// The row's element wears the hover mark through setHoverPreview(), the one write site, so the
 	// page's record of what is marked cannot go stale; viaLabel lights it and opens no hover card.

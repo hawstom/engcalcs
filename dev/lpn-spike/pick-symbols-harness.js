@@ -67,6 +67,26 @@ console.log('\n--- at most six rows, coincident first, by distance from the pres
 	same('the cap can be changed', pick(pile, 0, 0, { cap: 3 }).length, 3);
 }
 
+console.log('\n--- a pipe drawn as a point is a row, never the reason for a box ---');
+{
+	const buried = { kind: 'link', id: 'P2', type: 'pipe', rank: 1, soft: true, circle: { x: 0, y: 0, r: 0.5 } };
+	same('a dot with only a buried pipe on it: no box', pick([dot('A', 0, 0), buried], 0, 0), []);
+	same('two coincident dots and the buried pipe between them: all three', pick([dot('A', 0, 0), dot('B', 0, 0), buried], 0, 0), ['node:A', 'node:B', 'link:P2']);
+}
+
+console.log('\n--- a rotated pump glyph, and the primary is never cut ---');
+{
+	const pump = (ux, uy) => ({ kind: 'link', id: 'PU', type: 'pump', rank: 1, quad: { cx: 0, cy: 0, hw: 10, hh: 5, ux, uy } });
+	same('a dot on the end of a horizontal pump glyph', pick([pump(1, 0), dot('A', 8, 0)], 6, 0), ['node:A', 'link:PU']);
+	same('...but not beside it, where its axis-aligned box would claim it (the glyph turned 90 degrees)', pick([pump(0, 1), dot('A', 8, 0)], 6, 0), []);
+	same('...and on its turned end', pick([pump(0, 1), dot('A', 0, 8)], 0, 6), ['node:A', 'link:PU']);
+	const pile = [dot('P', 4, 0)];
+	for (let i = 1; i <= 8; i++) { pile.push(dot('Z' + i, 0, 0)); }
+	const got = pick(pile, 6, 0);
+	same('a pile past six keeps the symbol nearest the press first', got[0], 'node:P');
+	same('...and stops at six', got.length, 6);
+}
+
 console.log('\n--- the pickbox reach is the caller\'s ---');
 same('a dot 10 px away is not under a 6 px mouse pickbox', pick([dot('A', 0, 0, 3), dot('B', 0, 0, 3)], 10, 0, { reach: 6 }), []);
 same('...but is under a 24 px finger', pick([dot('A', 0, 0, 3), dot('B', 0, 0, 3)], 10, 0, { reach: 24 }), ['node:A', 'node:B']);

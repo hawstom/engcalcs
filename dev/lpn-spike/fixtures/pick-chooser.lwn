@@ -390,6 +390,35 @@
 				"y": "52.00"
 			},
 			"_initQuality": 0.5
+		},
+		{
+			"id": "TK",
+			"type": "tank",
+			"x": 80,
+			"y": 22,
+			"elev": 131.9,
+			"_level": 13.1,
+			"minLevel": 0.1,
+			"maxLevel": 32.1,
+			"tankDiameter": 85,
+			"tok": {
+				"x": "80.00",
+				"y": "22.00"
+			},
+			"minVolume": 0
+		},
+		{
+			"id": "TJ",
+			"type": "junction",
+			"x": 85.5,
+			"y": 22,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "85.50",
+				"y": "22.00"
+			},
+			"_initQuality": 0.5
 		}
 	],
 	"links": [
