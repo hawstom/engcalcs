@@ -274,9 +274,10 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **The Properties box:** flow once, above the headings (the pump's); pressure only under the outlet. The reservoir's Pressure row is gone too.
 - **The symbol** (his sketch of 2026-10-25, WELL; round 10 is A4 of the 2026-11-14 proofs, his pick, after he refused round 9's dark water body): a ground line,
   a short narrow upper cylinder over a long narrow casing with a closed bottom (upper half-width to casing half-width 1.6 to 1, as in the proof), the drawdown
-  curves falling from the ground line and meeting a full-weight horizontal water-level line that crosses the casing and runs 2 units beyond it (a hairline inside
-  the casing vanished at 17 px). The box at the bottom (it read as a pump) is gone. The numbers are `EC_WELL_UPPER_HALF`, `EC_WELL_DEEP_HALF`, `EC_WELL_STEP`,
-  `EC_WELL_LEVEL` and `EC_WELL_LEVEL_EXT` in `lib/Icons.lib.php`; the map symbol's grab shape and the label-leader avoidance box are derived from the icon's
+  curves falling from the ground line to meet the casing walls at the water level, and a full-weight horizontal water-level line inside the casing (a hairline
+  vanished at 17 px; a line running beyond the casing read as a flange). On the map the curves and the level line carry `ec-water` and take a lighter tint of the
+  symbol's ink, as the proof draws them blue. The box at the bottom (it read as a pump) is gone. The numbers are `EC_WELL_UPPER_HALF`, `EC_WELL_DEEP_HALF`, `EC_WELL_STEP`,
+  and `EC_WELL_LEVEL` in `lib/Icons.lib.php`; the map symbol's grab shape and the label-leader avoidance box are derived from the icon's
   paths, so one number moves all. `well-symbol-browser-harness.js` rasterizes both icons at 17, 21 and 24 px and requires the level line to show.
 - **Well with tank is three points** (*"Physically and geographically, a well is a location/point with a reservoir, drawdown, and pump. Cramming a tank into
   that point makes no sense"*): the Pump button cycles Pump, Pump+, Well, Well with tank. Three presses, each prompted in the status bar: the well
