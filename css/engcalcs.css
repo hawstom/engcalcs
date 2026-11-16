@@ -3060,7 +3060,7 @@ html[lang="zh"] .ec-welcome {
    nothing in it is hover-only. Text is clipped at the window's edge, never ellipsised. */
 #lpn_time_pop { position: fixed; z-index: 1850; box-sizing: border-box; max-width: calc(100vw - 8px); overflow: hidden;
 	background: var(--ec-bg); border: 1px solid var(--ec-border-strong); border-radius: 4px; padding: 4px 0;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, .25); }
+	box-shadow: var(--ec-box-shadow); }
 #lpn_time_pop[hidden] { display: none; }
 .lpn-time-pop-row { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 36px; text-align: start; background: none; border: 0;
 	font: inherit; padding: 4px 14px 4px 10px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: clip; color: inherit; }
@@ -7453,7 +7453,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-ts-now { stroke: var(--ec-gray-888); stroke-width: 1; stroke-dasharray: 3, 3; }
 /* The time line is a handle: a wide transparent stroke over it takes the press (a finger cannot hit 1 px), and the
    browser may not take the gesture for a scroll. */
-.lpn-ts-now-hit { stroke: transparent; stroke-width: 24px; fill: none; pointer-events: stroke; cursor: ew-resize; touch-action: none; }
+.lpn-ts-now-hit { stroke: transparent; stroke-width: 24px; fill: none; pointer-events: visible; cursor: ew-resize; touch-action: none; }
 /* The two pull-downs sit on the control row's baseline with the chips and the buttons, so they take
    the row's own type size rather than the browser's default form size. */
 .lpn-ts-pick { font: inherit; font-size: .95em; max-width: 12em; }

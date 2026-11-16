@@ -2360,7 +2360,8 @@
 		var old = document.getElementById('lpn_time_pop'), row;
 		if (old) { old.parentNode.removeChild(old); }
 		popClose(false);
-		popEl = el('div', { id: 'lpn_time_pop', role: 'group', 'aria-label': S.more });
+		popEl = el('div', { role: 'group', 'aria-label': S.more });
+		popEl.id = 'lpn_time_pop';
 		popEl.hidden = true;
 		function item(icon, label, fn) {
 			var b = el('button', { type: 'button', 'data-icon': icon }), ic = EC.iconEl && EC.iconEl(icon);
@@ -2377,7 +2378,8 @@
 		// about this minute, not about the project.
 		row = el('label', { 'class': 'lpn-time-pop-speed' });
 		row.appendChild(el('span', {}, S.speed));
-		ui.speed = el('select', { id: 'lpn_time_speed', 'class': 'form-select form-select-sm lpn-time-picker', 'aria-label': S.speed });
+		ui.speed = el('select', { 'class': 'form-select form-select-sm lpn-time-picker', 'aria-label': S.speed });
+		ui.speed.id = 'lpn_time_speed';
 		[[0.5, '0.5x'], [1, '1x'], [2, '2x'], [4, '4x']].forEach(function (o) {
 			ui.speed.appendChild(el('option', { value: String(o[0]) }, o[1]));
 		});
