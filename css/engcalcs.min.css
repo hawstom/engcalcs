@@ -3563,6 +3563,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-ts-line { fill: none; stroke-width: 1.5; stroke-linejoin: round; }
 .lpn-ts-dot { stroke: none; }
 .lpn-ts-now { stroke: var(--ec-gray-888); stroke-width: 1; stroke-dasharray: 3, 3; }
+.lpn-ts-now-hit { stroke: transparent; stroke-width: 24px; fill: none; pointer-events: stroke; cursor: ew-resize; touch-action: none; }
 .lpn-ts-pick { font: inherit; font-size: .95em; max-width: 12em; }
 .lpn-ts-swatch {
 	display: inline-block; width: 1.1em; height: 0; margin-right: .35em;
