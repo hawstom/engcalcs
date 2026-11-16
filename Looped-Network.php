@@ -2127,6 +2127,7 @@ EngCalcs.pageConfig = {
 	lpn_field_well_static_tip: <?=json_encode($ec_lang['lpn_field_well_static_tip'])?>,
 	lpn_well_drawdown_curve: <?=json_encode($ec_lang['lpn_well_drawdown_curve'])?>,
 	lpn_well_drawdown_curve_tip: <?=json_encode($ec_lang['lpn_well_drawdown_curve_tip'])?>,
+	lpn_well_identity_tip: <?=json_encode($ec_lang['lpn_well_identity_tip'])?>,
 	lpn_well_pump_curve_tip: <?=json_encode($ec_lang['lpn_well_pump_curve_tip'])?>,
 	lpn_assembly_explode_well_tip: <?=json_encode($ec_lang['lpn_assembly_explode_well_tip'])?>,
 	lpn_assembly_explode_welltank_tip: <?=json_encode($ec_lang['lpn_assembly_explode_welltank_tip'])?>,

@@ -240,6 +240,19 @@ console.log('\n--- 4. a Well with tank: the tee and the tank follow the Well\'s 
 	const b = doc2.assemblies[0];
 	L.setProp(L.nodeById('W1'), 'elev', 90);
 	ok('an existing junction and an existing tank pressed as the tee and the tank are not followers', !b.teeFollow && !b.tankFollow && jx.elev === 33 && tk.elev === 44, [jx.elev, tk.elev].join());
+	// A tee pressed on an existing pipe splits it, and is the Well's own placing: it takes the Well's elevation and follows it until its own is typed (Tom, 2026-11-15).
+	const doc3 = fresh();
+	const p1 = L.addNode('junction', 100, 400), p2 = L.addNode('junction', 700, 400); p1.elev = 10; p2.elev = 20;
+	const pp = L.addLink('pipe', p1.id, p2.id, []);
+	L.setMode('add-welltank'); press(200, 150); press(400, 400, { dataset: { link: pp.id }, classList: { contains: function () { return false; } } }); press(600, 150);
+	L.setMode('select');
+	const c = doc3.assemblies[0], well3 = L.nodeById('W1'), tee3 = c.tee && L.nodeById(c.tee);
+	ok('a tee pressed on an existing pipe splits it and takes the Well\'s elevation, following it', !!tee3 && tee3.id !== p1.id && tee3.id !== p2.id && tee3.elev === well3.elev && c.teeFollow === true, JSON.stringify([c.tee, tee3 && tee3.elev, well3.elev, c.teeFollow]));
+	L.setProp(well3, 'elev', 321);
+	ok('and the Well\'s next elevation moves that tee', tee3.elev === 321, String(tee3 && tee3.elev));
+	L.setProp(tee3, 'elev', 55);
+	L.setProp(well3, 'elev', 400);
+	ok('until the user types the tee\'s own elevation, which stays', tee3.elev === 55 && c.teeFollow === undefined, [tee3.elev, c.teeFollow].join());
 }
 
 console.log('\n--- 5. group IDs are unique across every group ---');
