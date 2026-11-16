@@ -133,13 +133,11 @@
 	// below (consts.h, input1.c). Two things then depend on that arithmetic and not on physics:
 	//   1. a litre per second is 1/28.317 cfs while a cubic foot is 28.3168466 L, so a tank's volume
 	//      moves 5.6e-6 faster than exact SI says (about a tenth of a millimetre over a 20 m swing);
-	//   2. whether a tank AT ITS MAXIMUM is full is decided by `head >= Hmax` on a head rebuilt from
-	//      the volume (hydraul.c tankgrade), and that comparison goes either way in the last bit. A
-	//      full tank whose rebuilt head lands a hair under Hmax is NOT closed to inflow by EPANET
-	//      (hydstatus.c tankstatus), so it keeps taking water at its limit. Measured on a 10 m tank
-	//      with a 12 m limit; a 3 m limit on the same tank went the other way. The built-in solver
-	//      is handed the answer to that comparison as a level just under the limit, so both engines
-	//      shut the same links.
+	//   2. whether a tank AT ITS MAXIMUM is full. OWA-EPANET 2.3.5 decides it by `head >= Hmax` on a head
+	//      rebuilt from the volume (hydraul.c tankgrade), which lands one ulp under Hmax for some tanks, so
+	//      its tankstatus() left the pipe into a full tank open and water kept entering it. Neither engine
+	//      copies that now: this loop calls a tank full when its volume has reached the maximum
+	//      (solverLevel()), and js/lpn-epanet.js pins the engine's tank to its limit (pinFullTanks()).
 	// The emptiness test cannot go the other way: a snapped-empty head is Hmin + 0.
 	var FT = 0.3048,                       // m per ft            (MperFT)
 		FT3 = FT * FT * FT,                // m3 per ft3          (Ucf[VOLUME], input1.c)
@@ -2559,7 +2557,12 @@
 	// would call the tank full or empty, and otherwise a level kept a hair inside the limits.
 	function solverLevel(tk) {
 		var n = tk.node, lvl = (tk.h - tk.El) * FT;
-		if (tk.h >= tk.Hmax) { return n.maxLevel; }
+		// A tank is FULL when its volume has reached the maximum, not when a head rebuilt from that volume lands
+		// at or above the limit: hydraul.c tankgrade() puts the rebuilt head one ulp under Hmax for some tanks
+		// (a 10 ft tank with a 25 ft limit, a 20 ft one with 30), and OWA-EPANET 2.3.5's tankstatus() then
+		// leaves the link into a full tank open, so water kept entering a tank at its limit. EPANET's own
+		// 2.2.0 tolerates Htol and its development branch tests the volume; this loop does the same.
+		if (tk.h >= tk.Hmax || (tk.V >= tk.Vmax && !n.overflow)) { return n.maxLevel; }
 		// hydraul.c tanklevels() clamps a draining tank to Vmin only when it is a full second of flow below,
 		// so a tank can sit a hair BELOW its minimum, and tankstatus() still calls it empty. EPANET solves with
 		// that head, not the limit.
