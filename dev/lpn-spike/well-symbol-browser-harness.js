@@ -98,8 +98,8 @@ async function main() {
 		// read the casing's centre column: the row of the level line is dark, and clearly darker than the air column above it.
 		const px = await P.evaluate(async () => {
 			// Where the level line is, and where air above it is, at the casing's centre column, in the 24-unit frame: the Well fills the frame; the Well with tank's well is
-			// drawn at 0.55 from (6.4, 13) (ecWellTankIcon()), so its level is at y 13 + .55 * (17 - 4) and its air at 13 + .55 * (12.5 - 4).
-			const where = { well: { cx: 12, level: 17, air: 12.5 }, welltank: { cx: 6.4, level: 13 + .55 * 13, air: 13 + .55 * 8.5 } }, out = {};
+			// drawn at 0.55 from (6.4, 13.5) (ecWellTankIcon()), so its level is at y 13.5 + .55 * (17 - 4) and its air at 13.5 + .55 * (12.5 - 4).
+			const where = { well: { cx: 12, level: 17, air: 12.5 }, welltank: { cx: 6.4, level: 13.5 + .55 * 13, air: 13.5 + .55 * 8.5 } }, out = {};
 			for (const name of ['well', 'welltank']) {
 				for (const size of [17, 21, 24]) {
 					const svg = EngCalcs.iconOpenTag.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" ').replace('stroke="currentColor"', 'stroke="#000"') + EngCalcs.icons[name] + '</svg>';

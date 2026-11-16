@@ -294,9 +294,10 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
     ordinary controls; the status bar (project file) or the import report (`.inp`, code `assembly-well-tank`) says so. The one-point form's code is gone.
   - **Still open:** the pressure tank (Boyle's law; Tom's 2026-10-25 notes: total volume, pump-on and pump-off pressure, empty pressure). Only the
     open-air tank is built.
-  - **The toolbar icon** for Well with tank is `ecWellTankIcon()` in `lib/Icons.lib.php` (B7 of the proofs): the Well's own drawing at 0.55 on the left, its
-    ground line running on as the floor of a tank standing on the ground, and a pipe from the well's head to the tank's bottom corner, because a ground tank's
-    outlet is at its floor (Tom, round 8; state rules WV 64-77-9 and WI NR 811.64 per the market researcher). A tank on legs was drawn and read worse at 17 px.
+  - **The toolbar icon** for Well with tank is `ecWellTankIcon()` in `lib/Icons.lib.php` (B7 of the proofs, Tom's pick): the Well's own drawing at 0.55 under a ground
+    line, a riser to a tee, a capped stub to the left, and the run to a wide, flat, rounded tank (2 to 1). The tank is raised until its floor is the run's height, so the
+    run enters at its bottom corner, because a ground tank's outlet is at its floor (Tom, round 8; state rules WV 64-77-9 and WI NR 811.64 per the market researcher).
+    Short legs down to the ground line were drawn (`$legs`) and crowd the icon at 17 px, so the tank stands without them.
 - **Morph** (*"I think we need to have on our checklist to ensure that Morph works with the + assemblies before we merge this."*): a Morph of ANY member
   (nodes and links of Pump+, Valve+, Well and a Well with tank's tee, tank and pipes) first separates the group as Explode does, inside the Morph's own
   undo step, then changes the type as for any element; the status bar says which group was separated; one Undo restores both. In a scenario the type
