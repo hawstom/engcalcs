@@ -106,7 +106,7 @@ console.log('\n-- the time transport on the strip --');
 	const mount = strip(fnBody(t, 'EC.lpnTimeMountToolbar'));
 	// Five controls, the set Tom named: play/pause, speed, step back, step forward, step selector.
 	report(/ui\.prev =/.test(mount) && /ui\.play =/.test(mount) && /ui\.next =/.test(mount) &&
-		/ui\.step =/.test(mount) && /ui\.speed =/.test(mount), 'all five controls are built');
+		/ui\.step =/.test(mount) && /ui\.more =/.test(mount), 'the strip controls are built (the speed selector is in the pop-up, buildPop)');
 	// **AND RUN, WHICH IS NOT ONE OF THEM** (Task 248, 2026-08-19). The other five change which
 	// moment you are looking at; this one works the moments out. It goes through the same btn()
 	// helper, so it reaches the Help guide through js/looped-network.js's own setIconLabel like
@@ -139,7 +139,7 @@ console.log('\n-- the time transport on the strip --');
 	// nowhere else.
 	report(!/PENDING_ICONS|registerPendingIcons/.test(t),
 		'js/lpn-time.js registers no icon of its own — the PHP set is the only source');
-	['play', 'pause', 'step-back', 'step-fwd'].forEach(function (name) {
+	['play', 'pause', 'step-back', 'step-fwd', 'chevron-down'].forEach(function (name) {
 		report(new RegExp("'" + name + "'\\s*=>").test(icons), name + ' is in lib/Icons.lib.php', '');
 	});
 }

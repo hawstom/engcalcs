@@ -440,6 +440,10 @@ $ec_icons = array(
 	// 16px instead of closing into a bar.
 	'run'        => '<path d="M13 2L4 14h6l-1 8 9-12h-6z" fill="currentColor" stroke="none"/>',
 
+	// MORE TIME CONTROLS: a down chevron on the button beside the time selector, which opens the
+	// pop-up holding Restart, End and Speed. A chevron says "something opens below" and nothing else.
+	'chevron-down' => '<path d="M6 9.5l6 6 6-6"/>',
+
 	// LIBRARIES: an open book (ROADMAP Task 462). A REAL OBJECT, and the one every library sign in
 	// the world is drawn as -- two page blocks meeting at a spine.
 	// The three books on a shelf that shipped first are gone: at 16 px their 3-unit widths and

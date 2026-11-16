@@ -90,11 +90,11 @@ L.wireToolbar();
 
 const toolbar = document.getElementById('lpn_toolbar');
 const step = find(toolbar, 'lpn_time_step');
-const speed = find(toolbar, 'lpn_time_speed');
+const speed = find(document.body, 'lpn_time_speed');
 
 console.log('\n--- 1. the strip as it is BORN, over the empty startup document ---');
 ok('the step selector is on the toolbar', !!step);
-ok('the speed selector is on the toolbar', !!speed);
+ok('the speed selector is in the time pop-up, which hangs off the chevron beside the selector', !!speed);
 ok('one moment, so the step selector holds one row', step.children.length === 1,
 	step.children.length + ' rows');
 ok('...and the player controls are disabled, which is the honest state here', step.disabled);
@@ -124,7 +124,7 @@ ok('...and the tip no longer says the project has no extended period simulation'
 
 // The three transport buttons, by the class css/engcalcs.css exempts from the icon-only styling.
 const players = buttons(toolbar).filter((b) => String(b['class'] || '').indexOf('lpn-transport-btn') >= 0);
-ok('all five player buttons are on the strip', players.length === 5, players.length + ' buttons');
+ok('the strip holds four transport buttons: More time controls, Back, Play, Forward', players.length === 4, players.length + ' buttons');
 ok('...and none of them is disabled on a 24-hour project', players.every((b) => !b.disabled));
 ok('...and none of them carries the no-period sentence',
 	players.every((b) => b.title !== PC.lpn_time_no_period));

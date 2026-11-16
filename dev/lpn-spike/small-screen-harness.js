@@ -429,7 +429,7 @@ console.log('\n--- 3. the toolbar keeps the transport and nothing else ---');
 	(function walk(n) { if (n.tag === 'button') { buttons.push(n); } n.children.forEach(walk); }(toolbar));
 	ok('the real toolbar was built and has its whole strip', buttons.length >= 20, buttons.length + ' buttons');
 	const transport = buttons.filter((b) => b.cls.indexOf('lpn-transport-btn') >= 0);
-	ok('...including exactly the five player controls', transport.length === 5,
+	ok('...including exactly the four player controls (the pop-up chevron, Back, Play, Forward)', transport.length === 4,
 		transport.map((b) => b.el.getAttribute('aria-label')).join(', '));
 	transport.forEach((b) => {
 		const nm = b.el.getAttribute('aria-label');
@@ -452,7 +452,7 @@ console.log('\n--- 3. the toolbar keeps the transport and nothing else ---');
 	// is the literal shape of what Tom asked to hide.
 	const selects = [];
 	(function walk(n) { if (n.tag === 'select') { selects.push(n); } n.children.forEach(walk); }(toolbar));
-	ok('both time selectors survive', selects.length === 2 &&
+	ok('the time selector survives (Speed moved into the pop-up)', selects.length === 1 &&
 		selects.every((s) => !hiddenAt(RULES, s, SMALL, DOC_IDS)),
 		selects.map((s) => s.id).join(', '));
 	ok('...and the step selector is live on Net3',

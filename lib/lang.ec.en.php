@@ -4017,6 +4017,7 @@ $ec_lang['lpn_time_run_report_tip']='The text report of the last run: the networ
 
 $ec_lang['lpn_time_speed']='Speed';
 $ec_lang['lpn_time_speed_tip']='Playback speed';
+$ec_lang['lpn_time_more']='More time controls';
 
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,

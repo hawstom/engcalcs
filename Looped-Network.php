@@ -2702,6 +2702,7 @@ EngCalcs.pageConfig = {
 	lpn_popup_none: <?=json_encode($ec_lang['lpn_popup_none'])?>,
 	lpn_time_speed: <?=json_encode($ec_lang['lpn_time_speed'])?>,
 	lpn_time_speed_tip: <?=json_encode($ec_lang['lpn_time_speed_tip'])?>,
+	lpn_time_more: <?=json_encode($ec_lang['lpn_time_more'])?>,
 <?php   // The Settings box (Task 441). Four of its five strings are borrowed from controls that
         // already existed and are supplied elsewhere in this block; these are the ones it added. ?>
 	lpn_settings_search: <?=json_encode($ec_lang['lpn_settings_search'])?>,

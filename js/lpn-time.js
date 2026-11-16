@@ -493,6 +493,7 @@
 		return {
 			speed: pageConfig.lpn_time_speed,
 			speedTip: pageConfig.lpn_time_speed_tip,
+			more: pageConfig.lpn_time_more || 'More time controls',
 			duration: pageConfig.lpn_time_duration || 'Total run time',
 			hydraulicStep: pageConfig.lpn_time_hyd_step || 'Hydraulic time step',
 			scnOverrides: pageConfig.lpn_time_scn_overrides || 'Scenario overrides:',
@@ -2291,34 +2292,101 @@
 		// took the button away. A row that vanished too would leave the question unanswerable.
 		// display, not removal, so renderPanel() can put it back without rebuilding the strip.
 		syncRunButton();
-		// **RESTART AND END** (a tester; Tom, 2026-10-05: "tight real estate on the toolbar. But it's
-		// important. Maybe the buttons can be smaller"). First and last reporting time, through
-		// setTime() like every other move, so a project with no frames asks for its run the same way.
-		// Their names are the lpn_time_first / lpn_time_last strings, which existed unused.
-		ui.first = btn('restart', S.first, function () { var st = stepTimes(); setTime(st[0]); }, null, true);
-		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); }, null, true);
-		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } }, S.playTip, true);
-		ui.next = btn('step-fwd', S.next, function () { stepBy(1); }, null, true);
-		ui.last = btn('end', S.last, function () { var st = stepTimes(); setTime(st[st.length - 1]); }, null, true);
-		// **THE STEP SELECTOR IS THE ONLY CONTROL THAT SAYS WHICH MOMENT IS SHOWING.** The slider in
-		// the pane is gone rather than mirrored here: two controls for one current step are two
-		// controls that can disagree, and only one of them is on screen when the pane is shut.
+		// **THE STRIP IS THE CLOCK, BACK, PLAY AND FORWARD** (Tom, 2026-11-14, on Ida's measurement:
+		// the seven controls were 322 px and pushed Find and the pane toggle onto a second toolbar
+		// row at 1280 and 1366). The selector stays on the strip because people complain about not
+		// knowing WHICH time is shown. Restart, End and Speed moved into the pop-up the chevron beside
+		// the selector opens; nothing about them changed but the door. Restart and End still go
+		// through setTime() like every other move (a tester; Tom, 2026-10-05).
 		ui.step = picker('lpn_time_step', S.slider, S.slider, '8.5rem', 5);
 		ui.step.addEventListener('change', function () {
 			var stops = stepTimes(), i = parseInt(ui.step.value, 10) || 0;
 			if (ui.step.value === 'stat') { showStatistic(); return; }
 			setTime(stops[Math.min(stops.length - 1, Math.max(0, i))]);
 		});
+		ui.more = btn('chevron-down', S.more, function () { if (popIsOpen()) { popClose(true); } else { popOpen(); } }, null, true);
+		ui.more.className += ' lpn-time-more';
+		ui.more.setAttribute('aria-haspopup', 'true');
+		ui.more.setAttribute('aria-expanded', 'false');
+		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); }, null, true);
+		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } }, S.playTip, true);
+		ui.next = btn('step-fwd', S.next, function () { stepBy(1); }, null, true);
+		buildPop(S);
+		renderTransport();
+	};
+
+	// **THE POP-UP: RESTART, END AND SPEED, in words.** A row is a labelled button, not an icon with a
+	// tip, because a phone has no hover. It hangs from the chevron, is clipped (no ellipsis) at the
+	// window's edge, closes on Escape, on a press anywhere else, and when Tab leaves it, and hands
+	// focus back to the chevron. It is appended to <body>, not the toolbar, so the strip's own
+	// overflow and stacking never clip it; it holds no state, so a rebuild of the strip replaces it.
+	var popEl = null;
+	function popIsOpen() { return !!popEl && !popEl.hidden; }
+	function popClose(refocus) {
+		if (!popEl || popEl.hidden) { return; }
+		popEl.hidden = true;
+		if (ui && ui.more) { ui.more.setAttribute('aria-expanded', 'false'); if (refocus) { ui.more.focus(); } }
+		document.removeEventListener('pointerdown', popOutside, true);
+		document.removeEventListener('keydown', popKey, true);
+	}
+	function popOutside(e) {
+		if (popEl && (popEl.contains(e.target) || (ui && ui.more && ui.more.contains(e.target)))) { return; }
+		popClose(false);
+	}
+	function popKey(e) {
+		var items, at;
+		if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); popClose(true); return; }
+		if (e.key === 'Tab' && popEl) {
+			items = popEl.querySelectorAll('button, select');
+			at = document.activeElement;
+			if (items.length && ((!e.shiftKey && at === items[items.length - 1]) || (e.shiftKey && at === items[0]))) { popClose(true); }
+		}
+	}
+	function popOpen() {
+		var r, w, left;
+		if (!popEl || !ui || !ui.more) { return; }
+		popEl.hidden = false;
+		ui.more.setAttribute('aria-expanded', 'true');
+		r = (ui.step || ui.more).getBoundingClientRect();
+		w = popEl.getBoundingClientRect().width;
+		left = Math.max(4, Math.min(r.left, window.innerWidth - w - 4));
+		popEl.style.left = left + 'px';
+		popEl.style.top = Math.round(ui.more.getBoundingClientRect().bottom + 4) + 'px';
+		document.addEventListener('pointerdown', popOutside, true);
+		document.addEventListener('keydown', popKey, true);
+		(popEl.querySelector('button') || popEl).focus();
+	}
+	function buildPop(S) {
+		var old = document.getElementById('lpn_time_pop'), row;
+		if (old) { old.parentNode.removeChild(old); }
+		popClose(false);
+		popEl = el('div', { id: 'lpn_time_pop', role: 'group', 'aria-label': S.more });
+		popEl.hidden = true;
+		function item(icon, label, fn) {
+			var b = el('button', { type: 'button', 'data-icon': icon }), ic = EC.iconEl && EC.iconEl(icon);
+			b.className = 'lpn-time-pop-row';
+			if (ic) { b.appendChild(ic); }
+			b.appendChild(el('span', {}, label));
+			b.addEventListener('click', function () { fn(); popClose(true); });
+			popEl.appendChild(b);
+			return b;
+		}
+		ui.first = item('restart', S.first, function () { var st = stepTimes(); setTime(st[0]); });
+		ui.last = item('end', S.last, function () { var st = stepTimes(); setTime(st[st.length - 1]); });
 		// Playback speed only, and it is not stored anywhere: how fast you like to watch is a fact
 		// about this minute, not about the project.
-		ui.speed = picker('lpn_time_speed', S.speed, S.speedTip, '4.5rem', 3);
+		row = el('label', { 'class': 'lpn-time-pop-speed' });
+		row.appendChild(el('span', {}, S.speed));
+		ui.speed = el('select', { id: 'lpn_time_speed', 'class': 'form-select form-select-sm lpn-time-picker', 'aria-label': S.speed });
 		[[0.5, '0.5x'], [1, '1x'], [2, '2x'], [4, '4x']].forEach(function (o) {
 			ui.speed.appendChild(el('option', { value: String(o[0]) }, o[1]));
 		});
 		ui.speed.value = String(state.speed);
 		ui.speed.addEventListener('change', function () { setSpeed(parseFloat(ui.speed.value)); });
-		renderTransport();
-	};
+		row.appendChild(ui.speed);
+		popEl.appendChild(row);
+		document.body.appendChild(popEl);
+	}
 
 	function renderTransport() {
 		var stops, labels, clocks, sig, i, statLabel, stoppedStat;
@@ -2374,11 +2442,12 @@
 		// rides the tip of the Project > Calculate menu row (js/looped-network.js), the one place left
 		// that is always there.
 		var inert = stops.length < 2;
-		[ui.first, ui.prev, ui.play, ui.next, ui.last, ui.step, ui.speed].forEach(function (c) {
+		[ui.more, ui.prev, ui.play, ui.next, ui.step].forEach(function (c) {
 			if (!c) { return; }
 			c.disabled = inert;
 			c.style.display = inert ? 'none' : '';
 		});
+		if (inert) { popClose(false); }
 		// The group wears a divider; with nothing visible in it the divider would mark nothing.
 		if (ui.run && ui.run.parentNode) {
 			ui.run.parentNode.style.display = (inert && ui.run.style.display === 'none') ? 'none' : '';
