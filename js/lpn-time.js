@@ -2306,7 +2306,7 @@
 			if (ui.step.value === 'stat') { showStatistic(); return; }
 			setTime(stops[Math.min(stops.length - 1, Math.max(0, i))]);
 		});
-		ui.more = btn('chevron-down', S.more, function () { if (popIsOpen()) { popClose(true); } else { popOpen(); } }, null, true);
+		ui.more = btn('sliders', S.more, function () { if (popIsOpen()) { popClose(true); } else { popOpen(); } }, null, true);
 		ui.more.className += ' lpn-time-more';
 		ui.more.setAttribute('aria-haspopup', 'true');
 		ui.more.setAttribute('aria-expanded', 'false');
@@ -2333,7 +2333,12 @@
 		window.removeEventListener('resize', popResize);
 	}
 	// The pop-up is placed once, at open; a resize or a turn of the phone moves the strip out from under it.
-	function popResize() { popClose(false); }
+	function popResize() {
+		// A phone's address bar sliding away resizes the HEIGHT only; the pop-up stays. A turn of the phone or
+		// a window resized sideways changes the width, and the strip has moved out from under it.
+		if (popW !== window.innerWidth) { popClose(false); }
+	}
+	var popW = 0;
 	function popOutside(e) {
 		if (popEl && (popEl.contains(e.target) || (ui && ui.more && ui.more.contains(e.target)))) { return; }
 		popClose(false);
@@ -2361,6 +2366,7 @@
 		popEl.style.top = Math.round(ui.more.getBoundingClientRect().bottom + 4) + 'px';
 		document.addEventListener('pointerdown', popOutside, true);
 		document.addEventListener('keydown', popKey, true);
+		popW = window.innerWidth;
 		window.addEventListener('resize', popResize);
 		(popEl.querySelector('button') || popEl).focus();
 	}

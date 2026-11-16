@@ -3054,7 +3054,7 @@ html[lang="zh"] .ec-welcome {
 #lpn_toolbar_run > .lpn-transport-btn + .lpn-transport-btn { margin-inline-start: -1px; }
 /* THE CHEVRON BESIDE THE TIME SELECTOR opens the pop-up of Restart, End and Speed. It sits flush against the
    selector (it belongs to it) and the player's own 6 px gap goes between it and Back. */
-#lpn_toolbar_run > .lpn-time-more { margin-inline-start: 0; padding: 2px 1px; }
+#lpn_toolbar_run > .lpn-time-more { margin-inline-start: 2px; padding: 2px 1px; }
 #lpn_toolbar_run > .lpn-time-more + .lpn-transport-btn { margin-inline-start: 6px; }
 /* The pop-up is in <body>, above the movable boxes and at the menus' own height; every row is a word, so
    nothing in it is hover-only. Text is clipped at the window's edge, never ellipsised. */
@@ -6930,7 +6930,8 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	   edge, so the bolt's neighbour and the two selectors sit flush with no gap. */
 	html:has(#lpn_canvas) #lpn_toolbar_run > .lpn-run-btn + .lpn-transport-btn,
 	html:has(#lpn_canvas) #lpn_toolbar_run > select { margin-inline-start: 0; }
-	html:has(#lpn_canvas) #lpn_toolbar_run > .lpn-time-more + .lpn-transport-btn { margin-inline-start: 4px; }
+	html:has(#lpn_canvas) #lpn_toolbar_run > .lpn-time-more { margin-inline-start: 3px; }
+	html:has(#lpn_canvas) #lpn_toolbar_run > .lpn-time-more + .lpn-transport-btn { margin-inline-start: 8px; }
 
 	/* 4. THE MENU BAR DROPS TO ICONS. The word is a <span class="lpn-menubar-word"> that
 	   buildMenuBar() builds for this rule to reach; the accessible name is on the button as an

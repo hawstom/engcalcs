@@ -139,7 +139,7 @@ console.log('\n-- the time transport on the strip --');
 	// nowhere else.
 	report(!/PENDING_ICONS|registerPendingIcons/.test(t),
 		'js/lpn-time.js registers no icon of its own — the PHP set is the only source');
-	['play', 'pause', 'step-back', 'step-fwd', 'chevron-down'].forEach(function (name) {
+	['play', 'pause', 'step-back', 'step-fwd', 'sliders'].forEach(function (name) {
 		report(new RegExp("'" + name + "'\\s*=>").test(icons), name + ' is in lib/Icons.lib.php', '');
 	});
 }

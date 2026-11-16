@@ -38945,9 +38945,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE CHART IS REDRAWN ON EVERY STEP, SO THE DRAG LIVES ON THE DOCUMENT**, not on the line that was
 	// pressed: that line is replaced under the pointer by the redraw this very seek causes. What the move
 	// needs to know (the drawn svg, its axis, its frames) is kept per host and refreshed by every redraw.
-	var tsNowCtx = (typeof WeakMap === 'function') ? new WeakMap() : null, tsNowDrag = null;
+	var tsNowCtx = (typeof WeakMap === 'function') ? new WeakMap() : null, tsNowCtxById = {}, tsNowDrag = null;
+	// **A CHART'S CONTAINER CAN BE REPLACED BY ITS OWN REDRAW** (the Properties box builds a new one every
+	// time), so what the drag holds is the container's id when it has one, and the container itself when
+	// it does not (a map bubble's persists). Each redraw re-registers under the same key.
+	function tsNowKey(host) { return host.id || host; }
+	function tsNowGet(key) { return typeof key === 'string' ? tsNowCtxById[key] : tsNowCtx.get(key); }
 	function tsNowSeek(e) {
-		var c = tsNowDrag && tsNowCtx.get(tsNowDrag.host), pt, p, hrs, best = null, i;
+		var c = tsNowDrag && tsNowGet(tsNowDrag.key), pt, p, hrs, best = null, i;
 		if (!c || !c.svg.isConnected || !c.svg.getScreenCTM || !EngCalcs.lpnTimeGoTo) { return; }
 		pt = c.svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
 		p = pt.matrixTransform(c.svg.getScreenCTM().inverse());
@@ -38974,7 +38979,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function tsNowHandle(host, svg, x, box, xB, frames) {
 		var hit;
 		if (!tsNowCtx) { return; }
-		tsNowCtx.set(host, { svg: svg, box: box, xB: xB, frames: frames });
+		if (host.id) { tsNowCtxById[host.id] = { svg: svg, box: box, xB: xB, frames: frames }; } else { tsNowCtx.set(host, { svg: svg, box: box, xB: xB, frames: frames }); }
 		hit = el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-ts-now-hit' }, svg);
 		// **`touch-action` IS NOT HONOURED ON AN SVG SHAPE** (measured: a sideways finger drag from the line
 		// took the browser's swipe-back and left the page), so the finger's touchstart is claimed here too.
@@ -38985,7 +38990,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			e.preventDefault();
 			tsNowEnd(null);
 			if (EngCalcs.lpnTimePause) { EngCalcs.lpnTimePause(); }
-			tsNowDrag = { id: e.pointerId, host: host, last: null };
+			tsNowDrag = { id: e.pointerId, key: tsNowKey(host), last: null };
 			document.addEventListener('pointermove', tsNowMove, true);
 			document.addEventListener('pointerup', tsNowEnd, true);
 			document.addEventListener('pointercancel', tsNowEnd, true);

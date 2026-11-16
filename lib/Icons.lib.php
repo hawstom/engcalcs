@@ -440,9 +440,9 @@ $ec_icons = array(
 	// 16px instead of closing into a bar.
 	'run'        => '<path d="M13 2L4 14h6l-1 8 9-12h-6z" fill="currentColor" stroke="none"/>',
 
-	// MORE TIME CONTROLS: a down chevron on the button beside the time selector, which opens the
-	// pop-up holding Restart, End and Speed. A chevron says "something opens below" and nothing else.
-	'chevron-down' => '<path d="M6 9.5l6 6 6-6"/>',
+	// MORE TIME CONTROLS: two slider lines with a knob each, on the button beside the time selector, which
+	// opens the pop-up holding Restart, End and Speed. Not a chevron: beside a drop-down it read as a second one.
+	'sliders'    => '<path d="M4 8h16M4 16h16"/><circle cx="9" cy="8" r="2.2" fill="currentColor"/><circle cx="15" cy="16" r="2.2" fill="currentColor"/>',
 
 	// LIBRARIES: an open book (ROADMAP Task 462). A REAL OBJECT, and the one every library sign in
 	// the world is drawn as -- two page blocks meeting at a spine.

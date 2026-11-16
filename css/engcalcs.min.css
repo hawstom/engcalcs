@@ -1705,7 +1705,7 @@ html[lang="zh"] .ec-welcome {
 #lpn_toolbar_run > * + * { margin-inline-start: 6px; }
 #lpn_toolbar_run > .lpn-transport-btn { border-radius: 0; }
 #lpn_toolbar_run > .lpn-transport-btn + .lpn-transport-btn { margin-inline-start: -1px; }
-#lpn_toolbar_run > .lpn-time-more { margin-inline-start: 0; padding: 2px 1px; }
+#lpn_toolbar_run > .lpn-time-more { margin-inline-start: 2px; padding: 2px 1px; }
 #lpn_toolbar_run > .lpn-time-more + .lpn-transport-btn { margin-inline-start: 6px; }
 #lpn_time_pop { position: fixed; z-index: 1850; box-sizing: border-box; max-width: calc(100vw - 8px); overflow: hidden;
 	background: var(--ec-bg); border: 1px solid var(--ec-border-strong); border-radius: 4px; padding: 4px 0;
@@ -3384,7 +3384,8 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	html:has(#lpn_canvas) #lpn_toolbar_run .lpn-run-btn { padding: 2px 3px; }
 	html:has(#lpn_canvas) #lpn_toolbar_run > .lpn-run-btn + .lpn-transport-btn,
 	html:has(#lpn_canvas) #lpn_toolbar_run > select { margin-inline-start: 0; }
-	html:has(#lpn_canvas) #lpn_toolbar_run > .lpn-time-more + .lpn-transport-btn { margin-inline-start: 4px; }
+	html:has(#lpn_canvas) #lpn_toolbar_run > .lpn-time-more { margin-inline-start: 3px; }
+	html:has(#lpn_canvas) #lpn_toolbar_run > .lpn-time-more + .lpn-transport-btn { margin-inline-start: 8px; }
 	html:has(#lpn_canvas) .lpn-menubar-word { display: none; }
 	html:has(#lpn_canvas) .lpn-menubar-item { padding: 3px 6px; }
 	html:has(#lpn_canvas) .lpn-menubar-item > .ec-icon { margin-inline-end: 0; vertical-align: middle; }

@@ -27,7 +27,7 @@ function ok(name, cond, extra) {
 	if (!cond) { fails++; }
 	console.log((cond ? '  ok   ' : '  FAIL ') + name + (extra === undefined ? '' : '   ' + extra));
 }
-const ICONS = ['chevron-down', 'step-back', 'play', 'step-fwd'];
+const ICONS = ['sliders', 'step-back', 'play', 'step-fwd'];
 // What the browser drew in the run group: each player button's box, the selects, the group itself.
 function read(page) {
 	return page.evaluate((icons) => {
@@ -96,9 +96,9 @@ async function main() {
 		ok('Net1: Restart, End and Speed are not on the strip', await s.page.evaluate(() => !document.querySelector('#lpn_toolbar button[data-icon="restart"], #lpn_toolbar button[data-icon="end"], #lpn_toolbar #lpn_time_speed')));
 		const order = ICONS.map((i) => r.rects[i].l);
 		ok('Net1: order is chevron, Back, Play, Forward (left to right)', order.every((v, k) => k === 0 || v > order[k - 1]), order.map(Math.round).join(','));
-		ok('Net1: the chevron sits flush against the time selector', await s.page.evaluate(() => {
-			const a = document.getElementById('lpn_time_step').getBoundingClientRect(), b = document.querySelector('#lpn_toolbar_run .lpn-time-more').getBoundingClientRect();
-			return Math.abs(b.left - a.right) <= 2;
+		ok('Net1: the button sits close to the time selector (gap under 8 px) and further from Back than from the selector', await s.page.evaluate(() => {
+			const a = document.getElementById('lpn_time_step').getBoundingClientRect(), b = document.querySelector('#lpn_toolbar_run .lpn-time-more').getBoundingClientRect(), c = document.querySelector('#lpn_toolbar_run button[data-icon="step-back"]').getBoundingClientRect();
+			return b.left - a.right >= 2 && b.left - a.right < 8 && c.left - b.right > b.left - a.right;
 		}));
 		ok('Net1: the run group is on one row', !r.wrapped);
 		// ---- the pop-up, clicked through the way a person does ----
@@ -116,6 +116,16 @@ async function main() {
 		ok('chevron click opens the pop-up, says so, and puts focus inside', pp.visible && pp.expanded === 'true' && pp.focusInPop, JSON.stringify(pp));
 		ok('the pop-up is words, not bare icons: Restart, End and Speed rows', pp.rows.length === 3 && pp.rows.every((x) => x.length > 2), pp.rows.join(' | '));
 		ok('the pop-up is clipped, never ellipsised, and stays inside the window', pp.clip && pp.l >= 0 && pp.r <= pp.vw && pp.b <= pp.vh);
+		// A phone's address bar sliding away changes the height only: the pop-up stays. A change of width closes it.
+		await s.page.setViewportSize({ width: 1400, height: 800 });
+		await s.settle(300);
+		ok('a height-only resize leaves the pop-up open', (await pop()).visible);
+		await s.page.setViewportSize({ width: 1380, height: 800 });
+		await s.settle(300);
+		ok('a change of width closes the pop-up', !(await pop()).visible);
+		await s.page.setViewportSize({ width: 1400, height: 900 });
+		await s.settle(300);
+		await s.page.click('#lpn_toolbar_run .lpn-time-more');
 		await s.page.keyboard.press('Escape');
 		pp = await pop();
 		ok('Escape closes the pop-up and returns focus to the chevron', !pp.visible && pp.expanded === 'false' && pp.focusOnChevron);
@@ -253,6 +263,51 @@ async function main() {
 				const playingAfterPress = await s.page.evaluate(() => document.querySelector('#lpn_toolbar_run .lpn-transport-btn[aria-pressed]').getAttribute('aria-pressed'));
 				await s.page.mouse.up();
 				ok(tag + ': pressing the time line while playing stops the playback', playingAfterPress === 'false', playingAfterPress);
+			}
+			// ---- the same drag on the other charts that carry the line ----
+			// The Properties box builds a NEW chart container on every redraw, so the drag has to find the live one
+			// (Perry, 2026-11-15: it stayed at 0:00). Then a graph bubble on the map.
+			const dragOn = async (sel, name) => {
+				await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, frames[0]);
+				await s.settle(700);
+				await s.page.evaluate((q) => { const e = document.querySelector(q); if (e) { e.scrollIntoView({ block: 'center' }); } }, sel + ' .lpn-ts-now-hit');
+				await s.settle(300);
+				const geoOn = () => s.page.evaluate((q) => {
+					const h = document.querySelector(q + ' .lpn-ts-now-hit'), f = document.querySelector(q + ' .lpn-profile-frame');
+					if (!h || !f) { return null; }
+					const a1 = h.getBoundingClientRect(), b1 = f.getBoundingClientRect();
+					return { x: a1.left + a1.width / 2, y: a1.top + a1.height / 2, left: b1.left, right: b1.right, now: EngCalcs.lpnTimeNow() };
+				}, sel);
+				const g2 = await geoOn();
+				ok(tag + ': ' + name + ' draws a time line', !!g2);
+				if (!g2) { return; }
+				const ax = g2.left + (g2.right - g2.left) * 0.6, pth = [];
+				for (let k = 1; k <= 12; k++) { pth.push(g2.x + (ax - g2.x) * k / 12); }
+				if (!touch) {
+					await s.page.mouse.move(g2.x, g2.y); await s.page.mouse.down();
+					for (const x of pth) { await s.page.mouse.move(x, g2.y); await s.settle(60); }
+					await s.page.mouse.up();
+				} else {
+					const cdp2 = await s.context.newCDPSession(s.page);
+					await cdp2.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: g2.x, y: g2.y }] });
+					for (const x of pth) { await cdp2.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: g2.y }] }); await s.settle(60); }
+					await cdp2.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+				}
+				await s.settle(800);
+				const g3 = await geoOn();
+				ok(tag + ': dragging the time line in ' + name + ' steps the run to a reporting step', g3 && g3.now > g2.now && frames.indexOf(g3.now) >= 0, g2.now + ' -> ' + (g3 && g3.now));
+			};
+			await dragOn('#lpn_pgraph_chart', 'the Properties box graph');
+			await s.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c && c.offsetParent) { c.click(); } });
+			await s.settle(300);
+			if (!touch) {
+				const pt = await s.page.evaluate(() => { const r = document.querySelector('#lpn_canvas [data-node="10"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+				await s.page.mouse.click(pt.x, pt.y, { button: 'right' });
+				await s.settle(400);
+				const lbl = await s.lang('lpn_tsb_menu');
+				await s.page.evaluate((l) => { Array.from(document.querySelectorAll('.lpn-pane-ctxmenu button')).filter((x) => x.textContent.trim() === l)[0].click(); }, lbl);
+				await s.settle(800);
+				await dragOn('.lpn-tsb .lpn-tsb-chart', 'a graph bubble on the map');
 			}
 			// A drag with the line off to the end clamps to the last step.
 			ok(tag + ': no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
