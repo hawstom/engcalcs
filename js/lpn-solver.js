@@ -355,6 +355,30 @@ EngCalcs.lpnSolveSPD = function (A, b) {
 //
 // The caller passes a resolved `head` for both types (see assembleModel() in looped-network.js),
 // so nothing below has to know how a tank's head is built from its bottom elevation and level.
+// **THE VELOCITY A RUN WARNS ABOUT** (Task 864; Tom, 2026-11-15: "add a warning like 'Pipe XX velocity is YY at
+// time ZZ:ZZ'"). 10 ft/s, the criterion the fire flow design check already opens on (Tom, 2026-08-30: "I would
+// have used 10 (3 m/s)"). It is a constant: no project setting holds a velocity limit, and the fire flow box's own
+// 'Highest velocity allowed' is a per-analysis question, not a modelling one.
+EngCalcs.LPN_VELOCITY_WARN = 10 * 0.3048;   // m/s
+EngCalcs.LPN_VELOCITY_WARN_LISTED = 10;     // the fastest this many are named; the rest are counted
+// Every pipe whose velocity exceeds `limit` (m/s) in any frame, fastest first, each with the largest velocity it
+// reaches and the first time it reaches it. `frames` are results ({velocities, t}); a single solve is one frame
+// with no `t`. `isPipe(id)` keeps valves and pumps out. Pure.
+EngCalcs.lpnVelocityPeaks = function (frames, isPipe, limit) {
+	var best = {}, out = [], i, id, v, f, lim = typeof limit === 'number' ? limit : EngCalcs.LPN_VELOCITY_WARN;
+	for (i = 0; i < (frames || []).length; i++) {
+		f = frames[i];
+		for (id in (f && f.velocities) || {}) {
+			v = f.velocities[id];
+			if (!(v > lim) || (isPipe && !isPipe(id))) { continue; }
+			if (!best[id] || v > best[id].v) { best[id] = { id: id, v: v, t: f.t }; }
+		}
+	}
+	for (id in best) { out.push(best[id]); }
+	out.sort(function (a, b) { return b.v - a.v; });
+	return out;
+};
+
 EngCalcs.lpnIsFixedHead = function (node) {
 	return node.type === 'reservoir' || node.type === 'tank';
 };

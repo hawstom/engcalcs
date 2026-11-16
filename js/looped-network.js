@@ -82314,7 +82314,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		if (n === 0) { return ''; }
 		return ((EngCalcs.pageConfig || {}).lpn_roughness_method_note ||
-			'\u26a0 Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.')
+			'⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.')
 			.replace('{method}', frictionMethodLabel()).replace('{n}', String(n));
 	}
 	// A status line with the standing notes beneath it, unless already there.
@@ -89540,6 +89540,36 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return out;
 	}
 
+	// **FAST PIPES, NAMED** (Task 864). One sentence per pipe whose velocity passes EngCalcs.LPN_VELOCITY_WARN in any
+	// reporting step of the run (or in the one solve), each giving that pipe's largest velocity and when it occurs; the
+	// fastest ten, and a count of the rest. Scrubbing the transport re-asks every frame, so the answer is kept
+	// until the run in hand is replaced.
+	var velNoteCache = { token: null, key: '', text: '' };
+	function velocityNote(result) {
+		var pc = EngCalcs.pageConfig || {}, token = EngCalcs.lpnTimeRunToken ? EngCalcs.lpnTimeRunToken() : null,
+			frames, peaks, shown, key, extended, parts, more;
+		key = unitLabel('lpn_u_velocity');
+		if (token && velNoteCache.token === token && velNoteCache.key === key) { return velNoteCache.text; }
+		frames = token && EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		extended = frames.length > 1;
+		if (!frames.length) { frames = [result]; }
+		peaks = EngCalcs.lpnVelocityPeaks(frames, function (id) { var l = linkById(id); return !!l && l.type === 'pipe'; });
+		shown = peaks.slice(0, EngCalcs.LPN_VELOCITY_WARN_LISTED);
+		parts = shown.map(function (p) {
+			return (extended && typeof p.t === 'number'
+				? (pc.lpn_velocity_warn || '⚠ Pipe {id} velocity is {velocity} at {time}.').replace('{time}', dsTimeText(p.t))
+				: (pc.lpn_velocity_warn_steady || '⚠ Pipe {id} velocity is {velocity}.'))
+				.replace('{id}', p.id).replace('{velocity}', ffQty(p.v, 'lpn_u_velocity'));
+		});
+		more = peaks.length - shown.length;
+		if (more > 0) {
+			parts.push((pc.lpn_velocity_warn_more || '⚠ And more pipes ({n}) above {limit}.')
+				.replace('{n}', String(more)).replace('{limit}', ffQty(EngCalcs.LPN_VELOCITY_WARN, 'lpn_u_velocity')));
+		}
+		parts = parts.join(' ');
+		if (token) { velNoteCache = { token: token, key: key, text: parts }; }
+		return parts;
+	}
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
 		tsbRefresh();
@@ -89689,7 +89719,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([result.stoppedNote || '', notConvergedNote, engineRouteNote, pdaNote, omittedNote, roughnessNote,
+		setStatus([result.stoppedNote || '', notConvergedNote, engineRouteNote, pdaNote, omittedNote, roughnessNote, velocityNote(result),
 			// A one-point GPV curve, read as a line through the origin (EngCalcs.lpnGpvCurveProblem),
 			// said whichever engine answered: both give it the code.
 			droppedNote('gpv-one-point', 'lpn_gpv_one_point_note',
