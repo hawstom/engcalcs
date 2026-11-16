@@ -25,7 +25,7 @@ const { EXAMPLE_EXPORTS, openExample } = require(R + 'example-fixture.js');
 const fs = require('fs');
 
 const L = loadLoopedNetwork(EXAMPLE_EXPORTS +
-	"\t\tvelocityNote: velocityNote, serialize: serializeProject, getSettings: function () { return settings; },\n\t\tvelocityLimitDefaultText: velocityLimitDefaultText, resetUnitBearingDefaultsFor: resetUnitBearingDefaultsFor,\n\t\tconvertUnitValues: convertUnitValues, assembleModel: assembleModel, getDoc: function () { return doc; },\n" +
+	"\t\tvelocityNote: velocityNote, serialize: serializeProject, getSettings: function () { return settings; },\n\t\tvelocityLimitDefaultText: velocityLimitDefaultText, resetUnitBearingDefaultsFor: resetUnitBearingDefaultsFor,\n\t\tconvertUnitValues: convertUnitValues, getScenarios: function () { return scenarios; },\n\t\tsettingRowParse: settingRowParse, velocityLimitChanged: velocityLimitChanged, unitChangeNeedsDialog: unitChangeNeedsDialog, assembleModel: assembleModel, getDoc: function () { return doc; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, defaultSettings: defaultSettings,\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
@@ -120,18 +120,45 @@ const FT = 0.3048, H = 3600;
 	// SI: default 3 m/s, the number typed is read in m/s
 	setUnitSet('si'); L.reset(); openExample(L, 'si');
 	const sids = L.getDoc().links.filter((l) => l.type === 'pipe').map((l) => l.id);
-	ok('SI default is 3 m/s', L.velocityLimitDefaultText() === '3 m/s', L.velocityLimitDefaultText());
+	ok('SI default is 3.05 m/s, as the fire flow box shows the same criterion', L.velocityLimitDefaultText() === '3.05 m/s', L.velocityLimitDefaultText());
 	const sv = { [sids[0]]: 3.5, [sids[1]]: 2.9, [sids[2]]: 3.2 };
 	const st = L.velocityNote({ velocities: sv });
 	console.log('   ' + st);
-	ok('SI: 3.5 m/s named, the 3.2 counted, the 2.9 not; the limit is stated in m/s',
-		/^⚠ Pipe .* velocity is 3\.5 m\/s\. ⚠ And more pipes \(1\) above 3 m\/s\.$/.test(st), st);
+	ok('SI: 3.5 m/s named, the 3.2 counted, the 2.9 not; the limit is stated as 3.05 m/s',
+		/^⚠ Pipe .* velocity is 3\.5 m\/s\. ⚠ And more pipes \(1\) above 3\.05 m\/s\.$/.test(st), st);
 	L.getSettings().velocityLimit = 3.3;
 	ok('SI: a typed 3.3 means 3.3 m/s', /^⚠ Pipe \S+ velocity is 3\.5 m\/s\.$/.test(L.velocityNote({ velocities: sv })), L.velocityNote({ velocities: sv }));
 	// a unit change reinterprets, never converts; the Destructive path rewrites it
 	L.getSettings().velocityLimit = 3.3;
 	L.convertUnitValues('lpn_u_velocity', 1 / 0.3048);
 	ok('converting the unit (the Destructive choice) rewrites the typed limit: 3.3 m/s is 10.8268 ft/s', Math.abs(L.getSettings().velocityLimit - 3.3 / 0.3048) < 1e-4, L.getSettings().velocityLimit);
+	// a scenario's own limit (stored at .settings.settings), a stored alternative's and a calculation set's
+	{
+		const D = L.getDoc(), sc = L.getScenarios();
+		L.getSettings().velocityLimit = undefined;
+		const own = { id: 'SX', name: 'X', settings: { settings: { velocityLimit: 2 } } };
+		const alt = { id: 'AX', name: 'A', settings: { settings: { velocityLimit: 4 } } };
+		const cs = { id: 'CX', name: 'C', settings: { settings: { velocityLimit: 5 } } };
+		sc.push(own); D.alternatives = [alt]; D.calcSets = [cs];
+		ok('a limit held only by a scenario, an alternative and a calculation set is counted, so the unit question is asked',
+			L.convertUnitValues('lpn_u_velocity', 1) === 3 && L.unitChangeNeedsDialog('lpn_u_velocity'));
+		L.convertUnitValues('lpn_u_velocity', 2);
+		ok('...and Destructive converts all three', own.settings.settings.velocityLimit === 4 && alt.settings.settings.velocityLimit === 8 && cs.settings.settings.velocityLimit === 10);
+		L.getSettings().velocityLimit = 12;
+		L.resetUnitBearingDefaultsFor(['lpn_u_velocity']);
+		ok('a new project in another velocity unit clears the scenario, alternative and calculation set limits too',
+			L.getSettings().velocityLimit === undefined && own.settings === undefined && alt.settings === undefined && cs.settings === undefined);
+		sc.pop(); D.alternatives = []; D.calcSets = [];
+	}
+	// the Settings table refuses what the box refuses
+	{
+		const row = { path: ['settings', 'velocityLimit'], kind: 'auto' };
+		ok('table row: a number of zero or more is taken', L.settingRowParse(row, '2.5').ok && L.settingRowParse(row, '0').v === 0);
+		ok('table row: negative and non-numeric are refused', !L.settingRowParse(row, '-1').ok && !L.settingRowParse(row, 'fast').ok);
+		ok('table row: blank inherits', L.settingRowParse(row, '').ok && L.settingRowParse(row, '').v === null);
+	}
+	// changing the limit starts no solve: with no run in hand it does nothing at all
+	ok('a limit change with no run in hand is a no-op, not a solve', (() => { try { L.velocityLimitChanged(); return true; } catch (e) { return false; } })());
 	// a new project in another velocity unit does not carry the old number
 	L.getSettings().velocityLimit = 12;
 	L.resetUnitBearingDefaultsFor(['lpn_u_velocity']);

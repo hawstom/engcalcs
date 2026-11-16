@@ -5341,7 +5341,7 @@ $ec_lang['lpn_velocity_warn']='⚠ Pipe {id} velocity is {velocity} at {time}.';
 $ec_lang['lpn_velocity_warn_steady']='⚠ Pipe {id} velocity is {velocity}.';
 $ec_lang['lpn_velocity_warn_more']='⚠ And more pipes ({n}) above {limit}.';
 $ec_lang['lpn_settings_velocity_limit']='Velocity warning limit';
-$ec_lang['lpn_settings_velocity_limit_tip']='The velocity above which a run names the fastest pipe and counts the other pipes also over the limit. Blank uses the default. Zero means no velocity warning.';
+$ec_lang['lpn_settings_velocity_limit_tip']='The velocity above which a run reports the fastest pipe and how many other pipes also exceed it. Blank uses the default. Zero turns the warning off.';
 $ec_lang['lpn_diag_pda_pressures']='Required pressure must be greater than Minimum pressure. Change one of them in Settings.';
 $ec_lang['lpn_inp_drop_pressure_unit']='This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
 

@@ -8360,9 +8360,11 @@ var EngCalcs = EngCalcs || {};
 	// scenario's own block, a stored alternative, a calculation set -- at once. Only a stated value
 	// moves; an inherited one follows its parent. `to` null (a delete) CLEARS the holder's own value,
 	// so the scenario inherits again, rather than holding "none" over its parent.
+	// Every holder of a scenario's settings block: each scenario, stored alternative and calculation set.
+	function scenarioSettingHolders() { return scenarios.concat(doc.alternatives || [], doc.calcSets || []); }
 	function repointScenarioSetting(path, was, to) {
 		var p = settingPath(path);
-		scenarios.concat(doc.alternatives || [], doc.calcSets || []).forEach(function (o) {
+		scenarioSettingHolders().forEach(function (o) {
 			var node = o && !o.isBase ? o.settings : null, i;
 			if (settingGet(node, p) !== was) { return; }
 			touchTree('repointScenarioSetting');
@@ -9419,7 +9421,12 @@ var EngCalcs = EngCalcs || {};
 		seedDefaultInputs();
 		if (set.lpn_u_length) { labelSettings.customerMaxWidth = defaultLabelSettings().customerMaxWidth; }
 		// A velocity limit typed in the old unit would read as another number in the new one: blank is the default for the unit.
-		if (set.lpn_u_velocity) { delete settings.velocityLimit; }
+		if (set.lpn_u_velocity) {
+			delete settings.velocityLimit;
+			scenarioSettingHolders().forEach(function (o) {
+				if (o && !o.isBase && settingGet(o.settings, ['settings', 'velocityLimit']) !== undefined) { settingDelete(o, ['settings', 'velocityLimit']); }
+			});
+		}
 		for (group in LPN_LABEL_FIELD_UNIT) {
 			if (!Object.prototype.hasOwnProperty.call(LPN_LABEL_FIELD_UNIT, group)) { continue; }
 			for (field in LPN_LABEL_FIELD_UNIT[group]) {
@@ -32626,6 +32633,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return { ok: false };
 		}
 		if (u && t.length > u.length && t.slice(-u.length) === u) { t = t.slice(0, -u.length).trim(); }
+		// The same rule the Settings box holds this limit to: blank inherits, otherwise zero or more.
+		if (row.path.join('.') === 'settings.velocityLimit') {
+			if (t === '') { return { ok: true, v: null }; }
+			return velocityLimitValid(+t) ? { ok: true, v: +t } : { ok: false };
+		}
 		switch (row.kind) {
 			case 'time':
 				if (!EngCalcs.lpnParseTime || t === '') { return { ok: false }; }
@@ -61852,9 +61864,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		} else if (name === 'lpn_u_velocity') {
 			// The velocity warning limit is typed in this unit; a scenario's own is the same number in the same unit.
-			[settings].concat((scenarios || []).map(function (sc) { return sc && sc.settings; })).forEach(function (h) {
-				if (h && typeof h.velocityLimit === 'number') { h.velocityLimit = +(h.velocityLimit * k).toPrecision(6); n++; }
-			});
+			velocityLimitHolders().forEach(function (h) { h.velocityLimit = +(h.velocityLimit * k).toPrecision(6); n++; });
 		} else if (name === 'lpn_u_flow') {
 			convSetting('flowChange');   // a flow typed in this unit
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
@@ -62043,6 +62053,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// decimals count that just followed the unit shows its new number in an open panel.
 		refreshUseUnitsBoxes();
 		refreshLabelNumberBoxes();
+		// The velocity warning row names its unit and its default in the label and tip, both fixed when the box was built.
+		rebuildSettingsBox();
 		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
 		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
 		// costs nothing and a future input to the cap might not be so lucky.
@@ -65767,7 +65779,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// max-day into the document.
 			// ONE HOME NOW: the box's seam (withSetboxView(), setboxEditEnd()) sends a scenario's edit to
 			// the scenario, the demand multiplier included, and shows the value the scenario uses.
-			var home = function () { return settings.hydraulics || (settings.hydraulics = {}); };
+			// `o.top` is a setting that lives on `settings` itself, not among the [OPTIONS] in `settings.hydraulics`.
+			var home = function () { return o.top ? settings : (settings.hydraulics || (settings.hydraulics = {})); };
 			input.value = home()[key] === undefined ? '' : String(home()[key]);
 			input.addEventListener('change', function () {
 				var t = input.value.trim(), h = home();
@@ -65781,6 +65794,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				else { input.value = h[key] === undefined ? '' : String(h[key]); return; }
 				if (o.perScenario) { touchTree('demandMultiplier'); }
 				if (key === 'emitterExponent') { settings.emitterExponent = settings.hydraulics[key] === undefined ? 0.5 : settings.hydraulics[key]; }
+				if (o.onChange) { saveToStorage(); o.onChange(); return; }
 				// The scenario menu shows an override COUNT beside every name, and this row can now
 				// change it. Refreshed here rather than left to the next scenario switch, so the
 				// badge is never one edit behind what the box says.
@@ -65812,7 +65826,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tipText = (tipText ? tipText + ' ' : '')
 					+ (pc.lpn_settings_default_is || 'The default is {n}.').replace('{n}', String(dflt));
 			}
-			setboxTag(row(compBody, labelText, input, tipText), [['settings', 'hydraulics', key]].concat(key === 'emitterExponent' ? [['settings', 'emitterExponent']] : []));
+			setboxTag(row(compBody, labelText, input, tipText), [o.top ? ['settings', key] : ['settings', 'hydraulics', key]].concat(key === 'emitterExponent' ? [['settings', 'emitterExponent']] : []));
 		}
 		if (!settings.hydraulics) { settings.hydraulics = {}; }
 		// **THE TWO SWITCHES COME FIRST UNDER Hydraulics, and Tom put them there** (2026-09-05:
@@ -66045,22 +66059,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		hydNumberRow('dampLimit', 'lpn_settings_damp_limit', 'Damping starts at',
 			'lpn_settings_damp_limit_tip', 0, { allowZero: true });
 		// **THE VELOCITY WARNING LIMIT** (Task 864; Tom: "Yes", a project setting). Not an EPANET option, so it
-		// lives at `settings.velocityLimit`, never in `hydraulics` (which the .inp exporter writes out). A number
-		// typed in the project's velocity unit; BLANK is the default for that unit, ZERO is no warning.
-		var velLimitInput = document.createElement('input');
-		velLimitInput.type = 'number'; velLimitInput.step = 'any';
-		velLimitInput.value = typeof settings.velocityLimit === 'number' ? String(settings.velocityLimit) : '';
-		velLimitInput.addEventListener('change', function () {
-			var t = velLimitInput.value.trim();
-			if (t === '') { delete settings.velocityLimit; }
-			else if (isFinite(+t) && +t >= 0) { settings.velocityLimit = +t; }
-			else { velLimitInput.value = typeof settings.velocityLimit === 'number' ? String(settings.velocityLimit) : ''; return; }
-			saveToStorage();
-			scheduleSolve();
-		});
-		setboxTag(row(compBody, (pc.lpn_settings_velocity_limit || 'Velocity warning limit') + ' (' + unitSymbol('lpn_u_velocity') + ')',
-			velLimitInput, (pc.lpn_settings_velocity_limit_tip || 'The velocity above which a run names the fastest pipe and counts the other pipes also over the limit. Blank uses the default. Zero means no velocity warning.')
-				+ ' ' + (pc.lpn_settings_default_is || 'The default is {n}.').replace('{n}', velocityLimitDefaultText())), [['settings', 'velocityLimit']]);
+		// lives at `settings.velocityLimit` (`top`), never in `hydraulics` (which the .inp exporter writes out). A number
+		// typed in the project's velocity unit; BLANK is the default for that unit, ZERO is no warning. A change
+		// re-reads the run in hand and starts no solve (velocityLimitChanged()).
+		hydNumberRow('velocityLimit', 'lpn_settings_velocity_limit', 'Velocity warning limit',
+			'lpn_settings_velocity_limit_tip', velocityLimitDefaultText(),
+			{ allowZero: true, unitOf: 'lpn_u_velocity', top: true, onChange: velocityLimitChanged });
 		// Energy, then Quality LAST -- the reading order the markup sets, and the reasoning is in
 		// Looped-Network.php beside the sections themselves. Build order does not decide what a
 		// reader meets first (the hosts are already in the page), but keeping the two in step means
@@ -89573,16 +89577,32 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// counting the other pipes over the limit (Tom: "List only the worst plus the count of others"). Scrubbing the
 	// transport re-asks every frame, so the answer is kept until the run in hand, the unit or the limit changes.
 	var velNoteCache = { token: null, key: '', text: '' };
-	// The limit a blank setting means: 10 ft/sec in US units, 3 m/sec in SI, else 10 ft/sec in the unit showing.
-	function velocityLimitDefault() {
-		var u = unitKey('lpn_u_velocity');
-		return u === 'mps' ? 3 : (u === 'ftps' || !u ? 10 : +toDisplay(10 * 0.3048, 'lpn_u_velocity').toPrecision(3));
+	// The one rule for a typed limit, in the box and in the Settings table: a number, zero or more.
+	function velocityLimitValid(v) { return typeof v === 'number' && isFinite(v) && v >= 0; }
+	// Every object holding a typed `velocityLimit`: the project's settings, and each scenario's, stored alternative's and
+	// calculation set's own block (a scenario's lives at .settings.settings, see setScenarioSetting()).
+	function velocityLimitHolders() {
+		var out = [];
+		if (velocityLimitValid(settings.velocityLimit)) { out.push(settings); }
+		scenarioSettingHolders().forEach(function (o) {
+			var blk = o && !o.isBase && o.settings && o.settings.settings;
+			if (blk && velocityLimitValid(blk.velocityLimit)) { out.push(blk); }
+		});
+		return out;
 	}
+	// The limit a blank setting means, in the unit showing: EngCalcs.LPN_VELOCITY_WARN (10 ft/s), as the fire flow
+	// box's own criterion is shown, so SI reads 3.05 m/s in both places.
+	function velocityLimitDefault() { return +ffNum(toDisplay(EngCalcs.LPN_VELOCITY_WARN, 'lpn_u_velocity')); }
 	function velocityLimitDefaultText() { return ffNum(velocityLimitDefault()) + ' ' + unitSymbol('lpn_u_velocity'); }
-	// The limit in the setting's own unit, in m/s for the comparison; 0 is "no warning".
+	// The limit in the project's velocity unit as displayed (not m/s); 0 is "no warning".
 	function velocityLimitShown() {
 		var v = scnSetting('velocityLimit');
-		return typeof v === 'number' && v >= 0 ? v : velocityLimitDefault();
+		return velocityLimitValid(v) ? v : velocityLimitDefault();
+	}
+	// A typed limit changed: re-read the run in hand and redraw the status line, as a scrub does. No solve, with
+	// Recalculate on or off. The note's cache key holds the limit, so it is read afresh.
+	function velocityLimitChanged() {
+		if (lastSolveResult) { applySolveResult(lastSolveResult); }
 	}
 	function velocityNote(result) {
 		var pc = EngCalcs.pageConfig || {}, token = EngCalcs.lpnTimeRunToken ? EngCalcs.lpnTimeRunToken() : null,
