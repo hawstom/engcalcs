@@ -103,7 +103,9 @@ async function main() {
 		return { n: pts.length, width: Math.round(width), boxes: boxes.length,
 			shortBoxes: boxes.filter((r) => r.rows.length < 2).length,
 			maxRows: boxes.reduce((m, r) => Math.max(m, r.rows.length), 0), pipeRows: boxes.filter((r) => r.rows.some((x) => /^Pipe /.test(x))).length,
-			quietWrong: quiet.filter((r) => r.sel !== 'n' + r.id).length,
+			// A tap that selects a neighbour is wrong only when that neighbour is more than 3 px from the node tapped
+			// (two dots 2 px apart cannot be told apart by a finger's centre pixel).
+			quietWrong: quiet.filter((r) => { if (r.sel === 'n' + r.id) { return false; } const me = pts.find((p) => p.id === r.id), other = pts.find((p) => 'n' + p.id === r.sel); return !(me && other && Math.hypot(me.x - other.x, me.y - other.y) <= 3); }).length,
 			sample: boxes.slice(0, 3).map((r) => r.id + ': ' + r.rows.join(' / ')) };
 	};
 	const zoomOut = async (S, notches) => {
@@ -166,7 +168,7 @@ async function main() {
 			ok(label + ' (network ' + r.width + ' px wide): ' + r.n + ' node-centre clicks open ' + r.boxes + ' boxes, at most ' + r.maxRows + ' rows', r.n >= 90, JSON.stringify(r));
 			ok('...every box lists two to six rows and no pipe', r.shortBoxes === 0 && r.maxRows <= 6 && r.pipeRows === 0, JSON.stringify(r));
 			ok('...and every click without a box selects the node it is on', r.quietWrong === 0, JSON.stringify(r));
-			if (notches === 0) { ok('...at the opening view only the places where two symbols are drawn touching open one (measured 23 of 97; at most 30)', r.boxes <= 30, JSON.stringify(r)); }
+			if (notches === 0) { ok('...at the opening view only the places where two symbols are drawn touching open one (measured 6 of 97; at most 10)', r.boxes <= 10, JSON.stringify(r)); }
 		}
 		await D.page.close();
 

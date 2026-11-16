@@ -35,10 +35,14 @@ same('a pump clear of the reservoir it overlaps: no box',
 	pick([box('node', 'Lake', 0, 0, 30, 20, 0), box('link', 'PU', 25, 5, 60, 15, 1)], 50, 10), []);
 
 console.log('\n--- the box opens where symbols visibly overlap ---');
-same('two dots that touch, pressed on one', pick([dot('A', 0, 0), dot('B', 7, 0)], 0, 0), ['node:A', 'node:B']);
-same('...pressed on the other: that one first', pick([dot('A', 0, 0), dot('B', 7, 0)], 7, 0), ['node:B', 'node:A']);
+same('two dots overlapping by half a width (centres 4 apart, radius 4; depth 4 of 8), pressed on one', pick([dot('A', 0, 0), dot('B', 4, 0)], 0, 0), ['node:A', 'node:B']);
+same('...pressed on the other: that one first', pick([dot('A', 0, 0), dot('B', 4, 0)], 7, 0), ['node:B', 'node:A']);
+same('two dots that only touch (centres 8 apart): no box', pick([dot('A', 0, 0), dot('B', 8, 0)], 0, 0), []);
+same('two dots that graze, overlapping by 2 px of an 8 px width: no box', pick([dot('A', 0, 0), dot('B', 6, 0)], 0, 0), []);
 same('the reservoir and the pump where they overlap',
-	pick([box('node', 'Lake', 0, 0, 30, 20, 0), box('link', 'PU', 25, 5, 60, 15, 1)], 28, 10), ['node:Lake', 'link:PU']);
+	pick([box('node', 'Lake', 0, 0, 30, 20, 0), box('link', 'PU', 10, 5, 45, 15, 1)], 20, 10), ['node:Lake', 'link:PU']);
+same('a pump that only touches the reservoir\'s edge: no box',
+	pick([box('node', 'Lake', 0, 0, 30, 20, 0), box('link', 'PU', 25, 5, 60, 15, 1)], 28, 10), []);
 same('coincident dots in natural id order (J2 before J10)', pick([dot('J10', 0, 0), dot('J2', 0, 0), dot('J1', 0, 0)], 0, 0), ['node:J1', 'node:J2', 'node:J10']);
 same('a Text over coincident dots is one more row, after the dots',
 	pick([box('label', 'X', -10, -5, 20, 5, 2), dot('A', 0, 0), dot('B', 0, 0)], 0, 0), ['node:A', 'node:B', 'label:X']);

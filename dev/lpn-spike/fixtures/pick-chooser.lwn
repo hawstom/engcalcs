@@ -355,13 +355,39 @@
 		{
 			"id": "O2",
 			"type": "junction",
-			"x": 71.4,
+			"x": 71.0,
 			"y": 70,
 			"elev": 710,
 			"_demand": 0,
 			"tok": {
-				"x": "71.40",
+				"x": "71.00",
 				"y": "70.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "G1",
+			"type": "junction",
+			"x": 60,
+			"y": 52,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "60.00",
+				"y": "52.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "G2",
+			"type": "junction",
+			"x": 63.5,
+			"y": 52,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "63.50",
+				"y": "52.00"
 			},
 			"_initQuality": 0.5
 		}

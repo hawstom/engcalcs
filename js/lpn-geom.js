@@ -926,13 +926,14 @@ EngCalcs.lpnGeom = (function () {
 	//      None: ordinary. Two separate dots that both fall within a finger's reach but do not
 	//      overlap each other are therefore ordinary: the nearer one is the primary and has no
 	//      overlapping neighbour.
+	//      "Overlap" is deep: the depth of one into the other is at least 0.4 of the smaller symbol's width.
 	//   2. The OTHERS are the items under the pickbox too (within `reach` of the press) whose drawn
 	//      extent overlaps the primary's. None: ordinary. So a click on a pump clear of the reservoir
 	//      it overlaps, or on the far end of a long Text, is ordinary; the box is for the overlap.
 	//   3. ORDER: items whose anchor (a circle's or rect's centre) is within `coincident` px of the
 	//      primary's first, then the rest; each by distance from the press, then rank, then id in
 	//      natural order. At most `cap` (6) rows; the primary is always the first.
-	// opts: reach (6), cap (6), coincident (1).
+	// opts: reach (6), cap (6), coincident (1), deep (0.4).
 	function pickSymbols(items, x, y, opts) {
 		var o = opts || {}, reach = o.reach === undefined ? 6 : o.reach, cap = o.cap === undefined ? 6 : o.cap,
 			coin = o.coincident === undefined ? 1 : o.coincident, primary = null, list = [], i, it, d;
@@ -972,21 +973,35 @@ EngCalcs.lpnGeom = (function () {
 			}
 			return true;
 		}
+		// Overlap DEEP enough to see: the depth of one into the other is at least DEEP (0.4) of the
+		// smaller symbol's width, so two dots merely touching (or grazing) are not an overlap. 0.4 and
+		// not 0.5 because Net3's Lake and pump 10, which Tom named as overlapping, share 0.43 of the
+		// reservoir's drawn height and no more. Exactly
+		// coincident symbols always are. A line (a Shape's outline) has no width: it overlaps a dot it
+		// passes within half a radius of the centre, or a box it crosses once the box is shrunk by a
+		// quarter of its smaller side.
+		var DEEP = o.deep === undefined ? 0.4 : o.deep;
+		function shrink(r, k) { return { l: r.l + k, t: r.t + k, r: r.r - k, b: r.b - k }; }
 		function overlaps(a, b) {
-			var s, o2, c, j, pts, n;
+			var s, o2, c, j, pts, n, rc, k;
 			if (a.outline && b.outline) { return false; }   // two Shapes are not a symbol under the click
 			if (a.outline) { s = a; o2 = b; } else if (b.outline) { s = b; o2 = a; } else { s = null; }
 			if (!s) {
-				if (a.circle && b.circle) { return Math.hypot(a.circle.x - b.circle.x, a.circle.y - b.circle.y) <= a.circle.r + b.circle.r; }
-				if (a.rect && b.rect) { return a.rect.l <= b.rect.r && b.rect.l <= a.rect.r && a.rect.t <= b.rect.b && b.rect.t <= a.rect.b; }
-				c = a.circle ? a : b;
-				return rectDist((a.circle ? b : a).rect, c.circle.x, c.circle.y) <= c.circle.r;
+				if (a.circle && b.circle) { return Math.hypot(a.circle.x - b.circle.x, a.circle.y - b.circle.y) <= a.circle.r + b.circle.r - 2 * DEEP * Math.min(a.circle.r, b.circle.r); }
+				if (a.rect && b.rect) {
+					return Math.min(a.rect.r, b.rect.r) - Math.max(a.rect.l, b.rect.l) >= DEEP * Math.min(a.rect.r - a.rect.l, b.rect.r - b.rect.l) &&
+						Math.min(a.rect.b, b.rect.b) - Math.max(a.rect.t, b.rect.t) >= DEEP * Math.min(a.rect.b - a.rect.t, b.rect.b - b.rect.t);
+				}
+				c = a.circle ? a : b; rc = (a.circle ? b : a).rect;
+				return rectDist(rc, c.circle.x, c.circle.y) <= c.circle.r - DEEP * Math.min(2 * c.circle.r, rc.r - rc.l, rc.b - rc.t);
 			}
-			if (o2.circle) { return outlineDist(s.outline, o2.circle.x, o2.circle.y) <= o2.circle.r; }
+			if (o2.circle) { return outlineDist(s.outline, o2.circle.x, o2.circle.y) <= o2.circle.r / 2; }
+			k = Math.min(o2.rect.r - o2.rect.l, o2.rect.b - o2.rect.t) / 4;
+			rc = shrink(o2.rect, k);
 			pts = s.outline.pts; n = pts.length;
-			if (n === 1) { return pts[0].x >= o2.rect.l && pts[0].x <= o2.rect.r && pts[0].y >= o2.rect.t && pts[0].y <= o2.rect.b; }
-			for (j = 0; j + 1 < n; j++) { if (segInRect(pts[j], pts[j + 1], o2.rect)) { return true; } }
-			return !!(s.outline.closed && n > 2 && segInRect(pts[n - 1], pts[0], o2.rect));
+			if (n === 1) { return pts[0].x >= rc.l && pts[0].x <= rc.r && pts[0].y >= rc.t && pts[0].y <= rc.b; }
+			for (j = 0; j + 1 < n; j++) { if (segInRect(pts[j], pts[j + 1], rc)) { return true; } }
+			return !!(s.outline.closed && n > 2 && segInRect(pts[n - 1], pts[0], rc));
 		}
 		function order(a, b) {
 			return (b.coin - a.coin) || (a.d - b.d) || ((a.m.rank || 0) - (b.m.rank || 0)) || natural(a.m.id, b.m.id);

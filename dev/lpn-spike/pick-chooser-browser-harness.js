@@ -321,8 +321,14 @@ async function main() {
 		await click({ x: 700, y: 820 });
 		const o1 = await centre('#lpn_canvas [data-node="O1"]');
 		await click(o1);
-		ok('two junctions that touch as drawn, centres apart, open a box', J(await rows()) === J(['Junction O1', 'Junction O2']), J(await rows()));
+		ok('two junctions overlapping by half a width or more open a box', J(await rows()) === J(['Junction O1', 'Junction O2']), J(await rows()));
 		await page.keyboard.press('Escape'); await S.settle(200);
+		await click({ x: 700, y: 820 });
+		const g1 = await centre('#lpn_canvas [data-node="G1"]'), g2 = await centre('#lpn_canvas [data-node="G2"]');
+		ok('(the dots G1 and G2 are drawn touching but not overlapping deeply: centres one dot width apart)', Math.abs(Math.hypot(g1.x - g2.x, g1.y - g2.y) - 12) < 2, J([g1, g2]));
+		await click(g1);
+		ok('a click on a dot that only touches its neighbour opens no box', !(await chooserOpen()) && J(await selected()) === J(['node:G1']), J([await rows(), await selected()]));
+		await closeProps();
 		await click({ x: 700, y: 820 });
 		const n1 = await centre('#lpn_canvas [data-node="N1"]'), n2 = await centre('#lpn_canvas [data-node="N2"]');
 		ok('(the separate dots N1 and N2 are drawn apart, clear of each other)', Math.hypot(n1.x - n2.x, n1.y - n2.y) > 12, J([n1, n2]));
