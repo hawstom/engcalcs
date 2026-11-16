@@ -357,10 +357,9 @@ EngCalcs.lpnSolveSPD = function (A, b) {
 // so nothing below has to know how a tank's head is built from its bottom elevation and level.
 // **THE VELOCITY A RUN WARNS ABOUT** (Task 864; Tom, 2026-11-15: "add a warning like 'Pipe XX velocity is YY at
 // time ZZ:ZZ'"). 10 ft/s, the criterion the fire flow design check already opens on (Tom, 2026-08-30: "I would
-// have used 10 (3 m/s)"). It is a constant: no project setting holds a velocity limit, and the fire flow box's own
-// 'Highest velocity allowed' is a per-analysis question, not a modelling one.
+// have used 10 (3 m/s)"). This is only the fallback for a caller that names no limit: the page's limit is a
+// project setting (`settings.velocityLimit`, Tom 2026-11-16: "Yes"), and 0 there means no warning.
 EngCalcs.LPN_VELOCITY_WARN = 10 * 0.3048;   // m/s
-EngCalcs.LPN_VELOCITY_WARN_LISTED = 10;     // the fastest this many are named; the rest are counted
 // Every pipe whose velocity exceeds `limit` (m/s) in any frame, fastest first, each with the largest velocity it
 // reaches and the first time it reaches it. `frames` are results ({velocities, t}); a single solve is one frame
 // with no `t`. `isPipe(id)` keeps valves and pumps out. Pure.

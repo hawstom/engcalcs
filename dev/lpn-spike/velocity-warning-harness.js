@@ -4,12 +4,16 @@
 //
 // Tom, 2026-11-15, after a pipe carried 15 ft/s into a full tank: "add a warning like 'Pipe XX velocity is YY
 // at time ZZ:ZZ.'" The page says it in the status line it already uses for run notes (applySolveResult()'s
-// 'solve-notes'), one sentence per pipe whose velocity passes 10 ft/s in any reporting step, giving that pipe's
-// LARGEST velocity and when it occurs; the fastest ten, then one line counting the rest.
+// 'solve-notes'): ONE sentence, for the fastest pipe over the limit in any reporting step, giving its LARGEST
+// velocity and when it occurs, then one line counting the other pipes over the limit (Tom, 2026-11-16: "List only
+// the worst plus the count of others"). The limit is a project setting, `settings.velocityLimit`: blank is the
+// default for the unit (10 ft/s, 3 m/s), zero is no warning.
 //
 // 1. EngCalcs.lpnVelocityPeaks, pure: the largest per pipe, its first time, valves and pumps left out, sorted.
-// 2. The page's sentences (velocityNote(), the DOM stub): a steady solve has no "at time"; more than ten
-//    pipes list ten and count the rest; nothing is said when nothing passes the limit.
+// 2. The page's sentences (velocityNote(), the DOM stub): a steady solve has no "at time"; only the worst pipe is
+//    named and the others counted; nothing is said when nothing passes the limit.
+// 2c. The setting: saved and reopened, a changed limit changes the warning, zero is silent, SI units, and a
+//    new project in a different velocity unit does not carry the old number.
 // 3. Extended-period runs, in both engines: a full tank that CAN OVERFLOW keeps taking water through its 8 in.
 //    feed (the 2026-11-15 repro, whose pipe ran at 15.7 ft/s), and both engines name that pipe at the same
 //    velocity and the same time. Net3 over its day (EPANET) says what it says.
@@ -21,7 +25,7 @@ const { EXAMPLE_EXPORTS, openExample } = require(R + 'example-fixture.js');
 const fs = require('fs');
 
 const L = loadLoopedNetwork(EXAMPLE_EXPORTS +
-	"\t\tvelocityNote: velocityNote, assembleModel: assembleModel, getDoc: function () { return doc; },\n" +
+	"\t\tvelocityNote: velocityNote, serialize: serializeProject, getSettings: function () { return settings; },\n\t\tvelocityLimitDefaultText: velocityLimitDefaultText, resetUnitBearingDefaultsFor: resetUnitBearingDefaultsFor,\n\t\tconvertUnitValues: convertUnitValues, assembleModel: assembleModel, getDoc: function () { return doc; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, defaultSettings: defaultSettings,\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
@@ -73,18 +77,69 @@ const FT = 0.3048, H = 3600;
 	const text = L.velocityNote({ velocities: vel });
 	console.log('   ' + text);
 	const first = ids[ids.length - 1];
-	ok('steady: "⚠ Pipe X velocity is N ft/sec." with no time, fastest first',
+	ok('steady: only the fastest pipe is named, "⚠ Pipe X velocity is N ft/sec.", with no time',
 		text.indexOf('⚠ Pipe ' + first + ' velocity is ' + (11 + ids.length - 1) + ' ft/sec.') === 0 && !/ at \d/.test(text), text.slice(0, 80));
-	ok('...every pipe over the limit is named when there are not more than ten', (text.match(/⚠ Pipe /g) || []).length === ids.length && text.indexOf('more pipes') < 0);
-	const was = EC.LPN_VELOCITY_WARN_LISTED;
-	EC.LPN_VELOCITY_WARN_LISTED = 3;
-	const flood = L.velocityNote({ velocities: vel });
-	EC.LPN_VELOCITY_WARN_LISTED = was;
-	ok('more pipes than the list holds: the fastest are named and the rest counted',
-		(flood.match(/⚠ Pipe /g) || []).length === 3 && flood.indexOf('⚠ And more pipes (' + (ids.length - 3) + ') above 10 ft/sec.') >= 0, flood);
+	ok('...exactly one pipe sentence, then one count line: "⚠ And more pipes (n) above 10 ft/sec." with n = the others',
+		(text.match(/⚠ Pipe /g) || []).length === 1 && text.endsWith(' ⚠ And more pipes (' + (ids.length - 1) + ') above 10 ft/sec.'), text);
+	const one = L.velocityNote({ velocities: { [ids[0]]: 12 * FT } });
+	ok('a single pipe over the limit: its sentence and no count line', one === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec.', one);
 	ok('nothing passes 10 ft/s: nothing is said', L.velocityNote({ velocities: { [ids[0]]: 9.9 * FT } }) === '');
 	const valve = L.velocityNote({ velocities: { NOPE: 50 * FT } });
 	ok('an id that is not a pipe is not named', valve === '');
+}
+
+// ---- 2c. the project setting -------------------------------------------------------------------------
+{
+	setUnitSet('us'); L.reset(); openExample(L);
+	const ids = L.getDoc().links.filter((l) => l.type === 'pipe').map((l) => l.id);
+	const v = { [ids[0]]: 12 * FT, [ids[1]]: 9 * FT, [ids[2]]: 11 * FT };
+	const S = L.getSettings();
+	ok('blank is the default for the unit: 10 ft/sec in US units', S.velocityLimit === undefined && L.velocityLimitDefaultText() === '10 ft/sec', L.velocityLimitDefaultText());
+	ok('default limit: the 12 and 11 ft/s pipes are over, the worst named, one other counted',
+		L.velocityNote({ velocities: v }) === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec. ⚠ And more pipes (1) above 10 ft/sec.', L.velocityNote({ velocities: v }));
+	S.velocityLimit = 11.5;
+	ok('a changed limit changes the warning: at 11.5 only the 12 ft/s pipe, and no count line',
+		L.velocityNote({ velocities: v }) === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec.', L.velocityNote({ velocities: v }));
+	S.velocityLimit = 8;
+	ok('...and at 8 the 9 ft/s pipe joins the count, which names the limit as set',
+		L.velocityNote({ velocities: v }) === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec. ⚠ And more pipes (2) above 8 ft/sec.', L.velocityNote({ velocities: v }));
+	S.velocityLimit = 0;
+	ok('zero means no warning', L.velocityNote({ velocities: { [ids[0]]: 99 * FT } }) === '');
+
+	// saved and reopened
+	S.velocityLimit = 11.5;
+	const saved = JSON.parse(JSON.stringify(L.serialize()));
+	ok('the setting rides in the saved project, as typed', saved.settings.velocityLimit === 11.5);
+	L.reset(); openExample(L);
+	ok('a project without it opens on the default', L.getSettings().velocityLimit === undefined);
+	const back = L.acceptImportedText(JSON.stringify(saved));
+	L.applySaved(back); L.buildDom();
+	ok('reopened, the limit is still 11.5', L.getSettings().velocityLimit === 11.5);
+	ok('...and the warning uses it', L.velocityNote({ velocities: v }) === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec.', L.velocityNote({ velocities: v }));
+
+	// SI: default 3 m/s, the number typed is read in m/s
+	setUnitSet('si'); L.reset(); openExample(L, 'si');
+	const sids = L.getDoc().links.filter((l) => l.type === 'pipe').map((l) => l.id);
+	ok('SI default is 3 m/s', L.velocityLimitDefaultText() === '3 m/s', L.velocityLimitDefaultText());
+	const sv = { [sids[0]]: 3.5, [sids[1]]: 2.9, [sids[2]]: 3.2 };
+	const st = L.velocityNote({ velocities: sv });
+	console.log('   ' + st);
+	ok('SI: 3.5 m/s named, the 3.2 counted, the 2.9 not; the limit is stated in m/s',
+		/^⚠ Pipe .* velocity is 3\.5 m\/s\. ⚠ And more pipes \(1\) above 3 m\/s\.$/.test(st), st);
+	L.getSettings().velocityLimit = 3.3;
+	ok('SI: a typed 3.3 means 3.3 m/s', /^⚠ Pipe \S+ velocity is 3\.5 m\/s\.$/.test(L.velocityNote({ velocities: sv })), L.velocityNote({ velocities: sv }));
+	// a unit change reinterprets, never converts; the Destructive path rewrites it
+	L.getSettings().velocityLimit = 3.3;
+	L.convertUnitValues('lpn_u_velocity', 1 / 0.3048);
+	ok('converting the unit (the Destructive choice) rewrites the typed limit: 3.3 m/s is 10.8268 ft/s', Math.abs(L.getSettings().velocityLimit - 3.3 / 0.3048) < 1e-4, L.getSettings().velocityLimit);
+	// a new project in another velocity unit does not carry the old number
+	L.getSettings().velocityLimit = 12;
+	L.resetUnitBearingDefaultsFor(['lpn_u_velocity']);
+	ok('a new project whose velocity unit differs falls back to the default', L.getSettings().velocityLimit === undefined);
+	L.getSettings().velocityLimit = 12;
+	L.resetUnitBearingDefaultsFor(['lpn_u_flow']);
+	ok('...and one whose velocity unit is the same keeps the limit', L.getSettings().velocityLimit === 12);
+	setUnitSet('us');
 }
 
 // ---- 2b. an id that looks like a replacement pattern, and the per-run cache ---------------------------------

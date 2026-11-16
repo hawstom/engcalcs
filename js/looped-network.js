@@ -8127,7 +8127,7 @@ var EngCalcs = EngCalcs || {};
 	// friction method."*). A pipe still holds one roughness number; a scenario's method
 	// REINTERPRETS it and never converts it, the rule a unit change already follows.
 	['calculation', ['engine', 'autoRun', 'hydraulics', 'emitterExponent', 'tolerance', 'quality',
-		'qualityOptions', 'method']],
+		'qualityOptions', 'method', 'velocityLimit']],
 	// Document-wide values that belong with element properties already in a category.
 	['constituent', ['reactions']], ['energy', ['energy']],
 	// **NEW-ASSET SETTINGS** (Tom, 2026-10-06: *"Leave the creativity to the users. Give them
@@ -9418,6 +9418,8 @@ var EngCalcs = EngCalcs || {};
 		// units are already the new ones here, so the seed reads the built-in value for them.
 		seedDefaultInputs();
 		if (set.lpn_u_length) { labelSettings.customerMaxWidth = defaultLabelSettings().customerMaxWidth; }
+		// A velocity limit typed in the old unit would read as another number in the new one: blank is the default for the unit.
+		if (set.lpn_u_velocity) { delete settings.velocityLimit; }
 		for (group in LPN_LABEL_FIELD_UNIT) {
 			if (!Object.prototype.hasOwnProperty.call(LPN_LABEL_FIELD_UNIT, group)) { continue; }
 			for (field in LPN_LABEL_FIELD_UNIT[group]) {
@@ -32052,7 +32054,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}({
 		idPrefixes: 'lpn_settings_id_prefixes', textSize: 'lpn_settings_text_size', symbolSize: 'lpn_settings_symbol_size',
 		linkWidth: 'lpn_settings_link_width', symbolOpacity: 'lpn_settings_symbol_opacity',
-		labelMaxWidth: 'lpn_settings_label_max_width', alignPipeLabels: 'lpn_settings_align_labels',
+		velocityLimit: 'lpn_settings_velocity_limit', labelMaxWidth: 'lpn_settings_label_max_width', alignPipeLabels: 'lpn_settings_align_labels',
 		labelFlipLeftOfVertical: 'lpn_settings_readability_bias', maskLabels: 'lpn_settings_mask_labels', textHalo: 'lpn_settings_text_halo',
 		showArrows: 'lpn_settings_show_arrows', leaderSnapDeg: 'lpn_settings_leader_snap',
 		legendPosition: 'lpn_settings_legend_position', basemapStyle: 'lpn_settings_basemap_style',
@@ -32309,6 +32311,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		[['settings', 'energy', 'globalEfficiency'], 75], [['settings', 'energy', 'globalPrice'], 0],
 		[['settings', 'energy', 'globalPattern'], undefined], [['settings', 'energy', 'demandCharge'], 0],
 		[['settings', 'energy', 'currency'], undefined],
+		[['settings', 'velocityLimit'], undefined],
 		[['defaultPattern'], undefined], [['view'], undefined], [['bubbles'], undefined],
 		[['project', 'basemap'], 'osm']
 	];
@@ -32386,6 +32389,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (/^settings\.defaults\.(nodeElev|tankLevel|tankMinLevel|tankMaxLevel)$/.test(s) || s === 'settings.hydraulics.headError') { return 'lpn_u_elevhead'; }
 		if (s === 'settings.defaults.tankDiameter') { return 'lpn_u_length'; }
 		if (s === 'settings.defaults.demand' || s === 'settings.hydraulics.flowChange') { return 'lpn_u_flow'; }
+		if (s === 'settings.velocityLimit') { return 'lpn_u_velocity'; }
 		if (s === 'settings.hydraulics.minPressure' || s === 'settings.hydraulics.reqPressure') { return 'lpn_u_pressure'; }
 		return null;
 	}
@@ -32579,6 +32583,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (row.path.join('.') === 'settings.labelMaxWidth' || row.path.join('.') === 'labelSettings.customerMaxWidth') {
 				return pc.lpn_settings_label_always || 'Always show';
 			}
+			if (row.path.join('.') === 'settings.velocityLimit') { return settingTableDefaultText(velocityLimitDefaultText()); }
 			if (row.dflt === undefined) { return pc.lpn_settings_option_unset || 'Not stated'; }
 			s = typeof row.dflt === 'number' ? settingTableNum(row.dflt) : String(row.dflt);
 			return settingTableDefaultText(u ? s + ' ' + u : s);
@@ -61714,6 +61719,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pc.lpn_settings_min_pressure || 'Minimum pressure',
 				pc.lpn_settings_req_pressure || 'Required pressure'];
 		}
+		if (name === 'lpn_u_velocity') { return [pc.lpn_settings_velocity_limit || 'Velocity warning limit']; }
 		if (name === 'lpn_u_flow') {
 			return [pc.lpn_field_base_demand || 'Base demand', pc.lpn_field_valve_setting_flow || 'Flow setting',
 				(pc.lpn_result_flow || 'Flow') + ' (pump curve)',
@@ -61843,6 +61849,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					ov = map[ovKey(l)];
 					conv(ov, 'setting');
 				});
+			});
+		} else if (name === 'lpn_u_velocity') {
+			// The velocity warning limit is typed in this unit; a scenario's own is the same number in the same unit.
+			[settings].concat((scenarios || []).map(function (sc) { return sc && sc.settings; })).forEach(function (h) {
+				if (h && typeof h.velocityLimit === 'number') { h.velocityLimit = +(h.velocityLimit * k).toPrecision(6); n++; }
 			});
 		} else if (name === 'lpn_u_flow') {
 			convSetting('flowChange');   // a flow typed in this unit
@@ -66033,6 +66044,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'lpn_settings_flow_change_tip', 0, { allowZero: true, unitOf: 'lpn_u_flow' });
 		hydNumberRow('dampLimit', 'lpn_settings_damp_limit', 'Damping starts at',
 			'lpn_settings_damp_limit_tip', 0, { allowZero: true });
+		// **THE VELOCITY WARNING LIMIT** (Task 864; Tom: "Yes", a project setting). Not an EPANET option, so it
+		// lives at `settings.velocityLimit`, never in `hydraulics` (which the .inp exporter writes out). A number
+		// typed in the project's velocity unit; BLANK is the default for that unit, ZERO is no warning.
+		var velLimitInput = document.createElement('input');
+		velLimitInput.type = 'number'; velLimitInput.step = 'any';
+		velLimitInput.value = typeof settings.velocityLimit === 'number' ? String(settings.velocityLimit) : '';
+		velLimitInput.addEventListener('change', function () {
+			var t = velLimitInput.value.trim();
+			if (t === '') { delete settings.velocityLimit; }
+			else if (isFinite(+t) && +t >= 0) { settings.velocityLimit = +t; }
+			else { velLimitInput.value = typeof settings.velocityLimit === 'number' ? String(settings.velocityLimit) : ''; return; }
+			saveToStorage();
+			scheduleSolve();
+		});
+		setboxTag(row(compBody, (pc.lpn_settings_velocity_limit || 'Velocity warning limit') + ' (' + unitSymbol('lpn_u_velocity') + ')',
+			velLimitInput, (pc.lpn_settings_velocity_limit_tip || 'The velocity above which a run names the fastest pipe and counts the other pipes also over the limit. Blank uses the default. Zero means no velocity warning.')
+				+ ' ' + (pc.lpn_settings_default_is || 'The default is {n}.').replace('{n}', velocityLimitDefaultText())), [['settings', 'velocityLimit']]);
 		// Energy, then Quality LAST -- the reading order the markup sets, and the reasoning is in
 		// Looped-Network.php beside the sections themselves. Build order does not decide what a
 		// reader meets first (the hosts are already in the page), but keeping the two in step means
@@ -89540,33 +89568,46 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return out;
 	}
 
-	// **FAST PIPES, NAMED** (Task 864). One sentence per pipe whose velocity passes EngCalcs.LPN_VELOCITY_WARN in any
-	// reporting step of the run (or in the one solve), each giving that pipe's largest velocity and when it occurs; the
-	// fastest ten, and a count of the rest. Scrubbing the transport re-asks every frame, so the answer is kept
-	// until the run in hand is replaced.
+	// **THE FASTEST PIPE, NAMED** (Task 864). One sentence for the pipe with the highest velocity above the project's
+	// limit in any reporting step of the run (or in the one solve), giving its largest velocity and when, then one line
+	// counting the other pipes over the limit (Tom: "List only the worst plus the count of others"). Scrubbing the
+	// transport re-asks every frame, so the answer is kept until the run in hand, the unit or the limit changes.
 	var velNoteCache = { token: null, key: '', text: '' };
+	// The limit a blank setting means: 10 ft/sec in US units, 3 m/sec in SI, else 10 ft/sec in the unit showing.
+	function velocityLimitDefault() {
+		var u = unitKey('lpn_u_velocity');
+		return u === 'mps' ? 3 : (u === 'ftps' || !u ? 10 : +toDisplay(10 * 0.3048, 'lpn_u_velocity').toPrecision(3));
+	}
+	function velocityLimitDefaultText() { return ffNum(velocityLimitDefault()) + ' ' + unitSymbol('lpn_u_velocity'); }
+	// The limit in the setting's own unit, in m/s for the comparison; 0 is "no warning".
+	function velocityLimitShown() {
+		var v = scnSetting('velocityLimit');
+		return typeof v === 'number' && v >= 0 ? v : velocityLimitDefault();
+	}
 	function velocityNote(result) {
 		var pc = EngCalcs.pageConfig || {}, token = EngCalcs.lpnTimeRunToken ? EngCalcs.lpnTimeRunToken() : null,
-			frames, peaks, shown, key, extended, parts, more;
-		key = unitLabel('lpn_u_velocity');
+			frames, peaks, p, key, extended, parts = [], more, shown = velocityLimitShown(), limit;
+		if (shown === 0) { return ''; }
+		limit = toSI(shown, 'lpn_u_velocity');
+		key = unitLabel('lpn_u_velocity') + '|' + shown;
 		if (token && velNoteCache.token === token && velNoteCache.key === key) { return velNoteCache.text; }
 		frames = token && EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
 		extended = frames.length > 1;
 		if (!frames.length) { frames = [result]; }
-		peaks = EngCalcs.lpnVelocityPeaks(frames, function (id) { var l = linkById(id); return !!l && l.type === 'pipe'; });
-		shown = peaks.slice(0, EngCalcs.LPN_VELOCITY_WARN_LISTED);
-		// split/join, not .replace(): a pipe id may hold `$&`, which .replace() takes for a pattern of its own, and
-		// the id goes in LAST so that an id holding the text `{velocity}` is not filled a second time.
-		parts = shown.map(function (p) {
-			return (extended && typeof p.t === 'number'
+		peaks = EngCalcs.lpnVelocityPeaks(frames, function (id) { var l = linkById(id); return !!l && l.type === 'pipe'; }, limit);
+		if (peaks.length) {
+			p = peaks[0];
+			// split/join, not .replace(): a pipe id may hold `$&`, which .replace() takes for a pattern of its own, and
+			// the id goes in LAST so that an id holding the text `{velocity}` is not filled a second time.
+			parts.push((extended && typeof p.t === 'number'
 				? (pc.lpn_velocity_warn || '⚠ Pipe {id} velocity is {velocity} at {time}.').split('{time}').join(dsTimeText(p.t))
 				: (pc.lpn_velocity_warn_steady || '⚠ Pipe {id} velocity is {velocity}.'))
-				.split('{velocity}').join(ffQty(p.v, 'lpn_u_velocity')).split('{id}').join(p.id);
-		});
-		more = peaks.length - shown.length;
-		if (more > 0) {
-			parts.push((pc.lpn_velocity_warn_more || '⚠ And more pipes ({n}) above {limit}.')
-				.split('{n}').join(String(more)).split('{limit}').join(ffQty(EngCalcs.LPN_VELOCITY_WARN, 'lpn_u_velocity')));
+				.split('{velocity}').join(ffQty(p.v, 'lpn_u_velocity')).split('{id}').join(p.id));
+			more = peaks.length - 1;
+			if (more > 0) {
+				parts.push((pc.lpn_velocity_warn_more || '⚠ And more pipes ({n}) above {limit}.')
+					.split('{n}').join(String(more)).split('{limit}').join(ffQty(limit, 'lpn_u_velocity')));
+			}
 		}
 		ffLastNum = null;   // ffQty() leaves its last number for a table cell to pick up; none here is one
 		parts = parts.join(' ');
