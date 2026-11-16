@@ -53,14 +53,14 @@ define('EC_WELL_UPPER_HALF', 3.2);
 // The deep cylinder's half width, and the depth where the upper cylinder ends (A4: a short upper hole over a long casing).
 define('EC_WELL_DEEP_HALF', 2);
 define('EC_WELL_STEP', 8);
-// The water level, the y where the drawdown curves meet the casing, and how far the level line runs beyond the casing on each side.
+// The water level: the y where the drawdown curves meet the casing walls, and where the level line crosses the casing (A4 of the proofs).
 define('EC_WELL_LEVEL', 17);
-define('EC_WELL_LEVEL_EXT', 2);
 
 // **THE WELL'S DRAWING** (Tom's sketch of 2026-10-25, WELL, and his verdict on round 9: "We were very close to what we needed already. And I suggested A4 and B7."):
 // a ground line across the top that runs past the pit on both sides; a short, narrow upper cylinder; below it a long, narrow casing with a closed bottom;
-// the drawdown curves, which fall from the ground line's ends and meet the water level, a horizontal line at full stroke weight that crosses the casing and
-// runs a little beyond it (a hairline inside the casing vanished at 17 px, and a solid water body was refused). The FIRST path is the outline of the two
+// the drawdown curves, which fall from the ground line's ends to meet the casing walls at the water level, and the water level itself, a horizontal line at full
+// stroke weight inside the casing (a hairline vanished at 17 px, a solid water body was refused, and one running beyond the casing read as a flange). The
+// curves and the level line carry class ec-water: the map draws them in a lighter tint of its ink, as the proof draws them blue. The FIRST path is the outline of the two
 // cylinders: JS closes it for the symbol's backdrop and grab shape; the LAST is the level line. The curves start below the step, or they run into the upper
 // hole's walls. At the defaults ($cx 12, $gy 4, $k 1) it fills the 24-unit frame; the Well with tank icon draws the same thing smaller, so one set of numbers moves both.
 function ecWellDrawing($cx = 12, $gy = 4, $k = 1) {
@@ -68,12 +68,12 @@ function ecWellDrawing($cx = 12, $gy = 4, $k = 1) {
 	$Y = function ($y) use ($gy, $k) { return round($gy + $k * ($y - 4), 3); };
 	$l = 12 - EC_WELL_UPPER_HALF; $r = 12 + EC_WELL_UPPER_HALF;
 	$a = 12 - EC_WELL_DEEP_HALF; $b = 12 + EC_WELL_DEEP_HALF;
-	$s = EC_WELL_STEP; $ly = EC_WELL_LEVEL; $lx = $a - EC_WELL_LEVEL_EXT; $rx = $b + EC_WELL_LEVEL_EXT; $c0 = 12;
+	$s = EC_WELL_STEP; $ly = EC_WELL_LEVEL; $c0 = 12;
 	return '<path d="M' . $X($l) . ' ' . $Y(4) . 'V' . $Y($s) . 'H' . $X($a) . 'V' . $Y(21.5) . 'H' . $X($b) . 'V' . $Y($s) . 'H' . $X($r) . 'V' . $Y(4) . '"/>'
 		. '<path d="M' . $X(2) . ' ' . $Y(4) . 'H' . $X(22) . '"/>'
-		. '<path d="M' . $X(2) . ' ' . $Y($c0) . 'C' . $X(7) . ' ' . $Y($c0) . ' ' . $X($lx - .5) . ' ' . $Y($c0 + .5) . ' ' . $X($lx) . ' ' . $Y($ly)
-		. 'M' . $X(22) . ' ' . $Y($c0) . 'C' . $X(17) . ' ' . $Y($c0) . ' ' . $X($rx + .5) . ' ' . $Y($c0 + .5) . ' ' . $X($rx) . ' ' . $Y($ly) . '"/>'
-		. '<path stroke-linecap="butt" d="M' . $X($lx) . ' ' . $Y($ly) . 'H' . $X($rx) . '"/>';
+		. '<path class="ec-water" d="M' . $X(2) . ' ' . $Y($c0) . 'C' . $X(7) . ' ' . $Y($c0) . ' ' . $X($a - .5) . ' ' . $Y($c0 + .5) . ' ' . $X($a) . ' ' . $Y($ly)
+		. 'M' . $X(22) . ' ' . $Y($c0) . 'C' . $X(17) . ' ' . $Y($c0) . ' ' . $X($b + .5) . ' ' . $Y($c0 + .5) . ' ' . $X($b) . ' ' . $Y($ly) . '"/>'
+		. '<path class="ec-water" stroke-linecap="butt" d="M' . $X($a) . ' ' . $Y($ly) . 'H' . $X($b) . '"/>';
 }
 // **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (B7 of the 2026-11-14 proofs): the Well's own drawing at 0.55 on the left,
 // its ground line running on as the floor of a tank standing on the ground at the right, and a pipe from the well's head to the tank's bottom corner. A ground

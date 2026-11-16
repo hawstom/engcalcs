@@ -90,7 +90,10 @@ async function main() {
 		ok('the Well, the Tank and the Reservoir are all drawn as symbols', !!symbols.well && !!symbols.tank && !!symbols.reservoir);
 		ok('the tint in the Well\'s holes is the Tank\'s and the Reservoir\'s: the same class, the same fill, the same strength', symbols.well && symbols.well.cls === symbols.tank.cls && symbols.well.cls === symbols.reservoir.cls && symbols.well.fill === symbols.tank.fill && symbols.well.fill === symbols.reservoir.fill && symbols.well.op === symbols.tank.op && symbols.well.op === symbols.reservoir.op, JSON.stringify([symbols.well, symbols.tank, symbols.reservoir]));
 		const lines = (symbols.paths || []).filter((p) => !/backdrop/.test(p.cls));
-		ok('the symbol has a full-weight water-level line across the casing, and its linework is the casing, the ground, the curves and that line, with no box and no solid water', lines.length === 4 && lines.some((p) => /^M8 17H16$/.test(p.d)) && !lines.some((p) => /Z/i.test(p.d)), lines.map((p) => p.d).join(' | '));
+		ok('the symbol has a full-weight water-level line inside the casing, curves ending on the casing walls, and its linework is the casing, the ground, the curves and that line, with no box and no solid water', lines.length === 4 && lines.some((p) => /^M10 17H14$/.test(p.d)) && !lines.some((p) => /Z/i.test(p.d)), lines.map((p) => p.d).join(' | '));
+		// **THE CURVES AND THE LEVEL ARE WATER, NOT CASING** (A4 of the proofs draws them blue against the well's ink): on the map their stroke is a lighter tint of the ink, not the ink.
+		const strokes = await P.evaluate(() => { const w = document.querySelector('#lpn_canvas .lpn-node-symbol-well'), st = (e) => getComputedStyle(e).stroke; const ps = Array.from(w.querySelectorAll('path')).filter((p) => !/backdrop/.test(p.getAttribute('class') || '')); return { casing: st(ps[0]), ground: st(ps[1]), curves: st(ps[2]), level: st(ps[3]) }; });
+		ok('the curves and the level line are drawn in one water tint, apart from the casing and the ground, which are the ink', strokes.curves === strokes.level && strokes.curves !== strokes.casing && strokes.casing === strokes.ground, JSON.stringify(strokes));
 		// **THE LEVEL LINE MUST SHOW AT TOOLBAR SIZE** (round 9 pass: a hairline inside the casing vanished at 17 px). Rasterize the toolbar icon at 17, 21 and 24 px and
 		// read the casing's centre column: the row of the level line is dark, and clearly darker than the air column above it.
 		const px = await P.evaluate(async () => {
@@ -113,6 +116,7 @@ async function main() {
 		for (const name of ['well', 'welltank']) { for (const size of [17, 21, 24]) { const r = px[name + size]; ok('at ' + size + ' px the ' + name + ' icon\'s level line shows in the casing, clearly darker than the air above it', r.level > 0.5 && r.level - r.air > 0.3, JSON.stringify(r)); } }
 		if (process.env.EC_WELL_SHOT) {   // a picture of the Well's symbol, for a review: EC_WELL_SHOT=/path/to.png
 			const c = await wc();
+			if (process.env.EC_WELL_THEME) { await P.evaluate((t) => { document.documentElement.setAttribute('data-theme', t); }, process.env.EC_WELL_THEME); await a.settle(500); }   // EC_WELL_THEME=dark for the picture in a dark theme
 			await P.evaluate(() => { document.querySelectorAll('#lpn_canvas .lpn-label, #lpn_canvas text').forEach((t) => { t.style.visibility = 'hidden'; }); });
 			await P.screenshot({ path: process.env.EC_WELL_SHOT, clip: { x: Math.max(0, c.x - 60), y: Math.max(0, c.y - 60), width: 120, height: 120 } });
 		}

@@ -12023,7 +12023,7 @@ var EngCalcs = EngCalcs || {};
 			// M l 4 V s H a V bottom H b V s H r V 4 ; M lx ly H rx
 			return { x0: Math.min(o[3], lv[0]), x1: Math.max(o[5], lv[2]), y0: o[2], y1: o[4] };
 		}
-		return { x0: 8, x1: 16, y0: 8, y1: 21.5 };
+		return { x0: 10, x1: 14, y0: 8, y1: 21.5 };
 	}
 	var RESERVOIR_HALF_W = 1.9878;
 	var RESERVOIR_HALF_H = 1.9878;
