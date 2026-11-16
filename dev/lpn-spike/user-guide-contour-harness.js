@@ -67,8 +67,8 @@ async function main() {
 		await contour();
 		const st = await U.storedProject(ctx);
 		const alt = JSON.stringify(st.alternatives || []);
-		ok('Graphs, Contour in a scenario turns the plot on there: the fill is drawn, and the scenario stores the settings', (await fills()) > 0 && alt.indexOf('contourFill') >= 0 && alt.indexOf('colorNodeField') >= 0, alt.slice(0, 220));
-		ok('...and the project\'s own settings still have no contour', !st.settings.contourFill && !st.settings.colorNodeField, JSON.stringify([st.settings.contourFill, st.settings.colorNodeField]));
+		ok('Graphs, Contour in a scenario turns the plot on there: the fill is drawn, and the scenario stores the settings', (await fills()) > 0 && alt.indexOf('contourShow') >= 0 && alt.indexOf('colorNodeField') >= 0, alt.slice(0, 220));
+		ok('...and the project\'s own settings still have no contour', !st.settings.contourShow && !st.settings.colorNodeField, JSON.stringify([st.settings.contourShow, st.settings.colorNodeField]));
 		await closeBox();
 		await P.click('#lpn_scenario_btn');
 		await P.waitForSelector('#lpn_menu_popup', { state: 'visible' });

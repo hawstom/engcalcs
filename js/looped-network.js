@@ -8120,7 +8120,7 @@ var EngCalcs = EngCalcs || {};
 		'maskLabels', 'textHalo', 'showArrows', 'leaderSnapDeg', 'legendPosition', 'basemapStyle', 'backdropOpacity',
 		'colorNodeField', 'colorLinkField', 'colorRampNode', 'colorRampLink', 'colorClassesNode',
 		'colorClassesLink', 'colorReverseNode', 'colorReverseLink', 'colorBreaks', 'colorModes',
-		'colorLegendPosition', 'contourFill', 'contourLines', 'contourLabels', 'contourOpacity',
+		'colorLegendPosition', 'contourShow', 'contourFill', 'contourLines', 'contourLabels', 'contourOpacity',
 		'contourInterval', 'contourBuffer', 'contourTerrain']],
 	// Calculation: Bentley's Calculation Options. **FRICTION METHOD INCLUDED** (Tom, 2026-10-06:
 	// *"I see it indefensible to require somebody to have to save a project for something like
@@ -9840,13 +9840,16 @@ var EngCalcs = EngCalcs || {};
 			colorReverseLink: false,
 			// THE CONTOUR PLOT (Task 600). It spreads the NODE colouring over the plane, so it has
 			// no field, breaks or ramp of its own; see refreshContour(). The fill is '' (none),
-			// 'smooth' or 'bands'; the plot is on while the fill or the lines are. The interval is
+			// 'smooth' or 'bands'; the plot is drawn while `contourShow` is on. The interval is
 			// stored per field AND unit ('pressure|psi'), so a unit change falls back to the default
 			// for the new unit rather than reading 5 psi as 5 kPa. `contourBuffer` is the corridor's
 			// reach as a multiple of the median pipe length. `contourTerrain` asks for the ground
 			// between nodes from Mapbox DEM, used only for pressure and only once the gate says yes.
-			contourFill: '',
-			contourLines: false,
+			// `contourShow` alone says whether the plot is drawn; the fill and the lines wait at their own
+			// values for it (Tom, 2026-11-16), so they open ready to show.
+			contourShow: false,
+			contourFill: 'smooth',
+			contourLines: true,
 			contourLabels: true,
 			contourOpacity: 0.6,
 			contourInterval: {},
@@ -13621,7 +13624,7 @@ var EngCalcs = EngCalcs || {};
 		var f = scnSetting('contourFill');
 		return (f === 'smooth' || f === 'bands') ? f : '';
 	}
-	function contourIsOn() { return !!(contourFillMode() || scnSetting('contourLines')); }
+	function contourIsOn() { return !!scnSetting('contourShow'); }
 	function contourBufferOf() {
 		var b = Number(scnSetting('contourBuffer'));
 		return (isFinite(b) && b > 0) ? Math.min(20, b) : CONTOUR_BUFFER_DEFAULT;
@@ -14063,7 +14066,11 @@ var EngCalcs = EngCalcs || {};
 	// Graphs > Contour turns the contour on in the open scenario: through the Settings box's seam.
 	function showContour() {
 		throughSettingSeam(function () {
-			if (!contourIsOn()) { settings.contourFill = 'smooth'; settings.contourLines = true; }
+			if (!contourIsOn()) {
+				settings.contourShow = true;
+				// Nothing to draw with both off: the menu row's promise is a plot, so it brings the default one back.
+				if (!contourFillMode() && !settings.contourLines) { settings.contourFill = 'smooth'; settings.contourLines = true; }
+			}
 			refreshValueColors(); saveToStorage(); syncColorControls();
 		});
 		openContourBox();
@@ -14120,7 +14127,6 @@ var EngCalcs = EngCalcs || {};
 		contourBoxFollow();
 		setTimeout(contourBoxFollow, 0);
 	}
-	var contourShownBefore = null;   // fill and lines as they were when Show contours was last cleared
 	// refreshValueColors() looks at the box now and again after the event (contourBoxFollowSoon), which is how a
 	// child scenario's write-back, landing after this handler, is seen (Perry, 2026-11-11).
 	function contourChanged() { refreshValueColors(); saveToStorage(); syncColorControls(); }
@@ -14160,27 +14166,28 @@ var EngCalcs = EngCalcs || {};
 			});
 			return n;
 		}
-		// **ONE CHECK BOX SHOWS OR HIDES THE PLOT** (Tom, 2026-10-04: "How do we turn off contour plot
-		// view?" ... "Maybe instead we have a toggle for [ ] Show contours"). Hiding had taken two
-		// controls, Fill None AND Contour lines cleared, and the box's x, which looks like the off
-		// switch, only closes the box. Clearing it remembers fill and lines for this visit, so a tick
-		// brings back the plot as it was; the node colouring is the dots' and is left alone.
-		// With No color there is no property to plot. Say so, once, and change nothing: the controls stay as they are and
-		// nothing turns colors on (Tom, 2026-10-29).
+		// **ONE CHECK BOX SHOWS OR HIDES THE PLOT** (Tom, 2026-10-04: "Maybe instead we have a toggle for [ ] Show
+		// contours"), and **IT TOUCHES NOTHING ELSE** (Tom, 2026-11-16: "I would expect them to stand ready to act in the
+		// event that 'Show plot' is on, and to be ineffective when 'Show plot' is off ... Leave all alone ready to do
+		// their job."). Fill, lines, labels and Ground keep their values and stay editable; off, nothing is drawn.
+		// **THE STANDING LINE** names what the plot follows, always, with Node colors a way into Settings there. With No
+		// color there is no property to plot: a second line says so, and nothing turns colors on (Tom, 2026-10-29).
+		var stand = document.createElement('div'), link = document.createElement('a'), tpl = pc.lpn_contour_follows || 'Follows project "{link}" settings.', at = tpl.indexOf('{link}');
+		stand.className = 'lpn-contour-box-note'; stand.id = 'lpn_contour_follows';
+		link.href = '#'; link.id = 'lpn_contour_follows_link';
+		link.textContent = pc.lpn_settings_sym_node_colors || 'Node colors';
+		link.addEventListener('click', function (e) { e.preventDefault(); openSettingsBox('nodeColors'); });
+		stand.appendChild(document.createTextNode(at < 0 ? tpl : tpl.slice(0, at)));
+		if (at >= 0) { stand.appendChild(link); stand.appendChild(document.createTextNode(tpl.slice(at + 6))); }
+		body.appendChild(stand);
 		if (!contourFieldOf()) {
 			var none = document.createElement('div');
 			none.className = 'lpn-contour-box-note'; none.id = 'lpn_contour_none_note';
-			none.textContent = pc.lpn_contour_none_note || 'Nothing to plot: choose a property under Color nodes by in Settings, Symbology, Node colors.';
+			none.textContent = pc.lpn_contour_none_note || 'Nothing to plot: Color nodes by is No color.';
 			body.appendChild(none);
 		}
 		row(pc.lpn_contour_show || 'Show plot', check('lpn_contour_show', contourIsOn(), function (on) {
-			if (on) {
-				var was = contourShownBefore || { fill: 'smooth', lines: true };
-				settings.contourFill = was.fill; settings.contourLines = was.lines;
-			} else {
-				contourShownBefore = { fill: contourFillMode(), lines: !!settings.contourLines };
-				settings.contourFill = ''; settings.contourLines = false;
-			}
+			settings.contourShow = on;
 			contourChanged();
 		}), pc.lpn_contour_show_tip);
 		// **NO PROPERTY, SCHEME OR NODE-COLOR SWITCH HERE** (Tom, 2026-11-14, Task 858): the plot follows Color nodes by and
@@ -32100,7 +32107,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		colorClassesLink: 'lpn_settings_color_classes', colorReverseNode: 'lpn_settings_color_reverse',
 		colorReverseLink: 'lpn_settings_color_reverse', colorBreaks: 'lpn_settings_color_breaks',
 		colorModes: 'lpn_color_mode', colorLegendPosition: 'lpn_settings_color_key_position',
-		contourFill: 'lpn_contour_fill', contourLines: 'lpn_contour_lines', contourOpacity: 'lpn_contour_opacity',
+		contourShow: 'lpn_contour_show', contourFill: 'lpn_contour_fill', contourLines: 'lpn_contour_lines', contourOpacity: 'lpn_contour_opacity',
 		contourInterval: 'lpn_contour_interval', contourBuffer: 'lpn_contour_buffer',
 		contourTerrain: 'lpn_contour_dem', method: 'bpn_method', engine: 'lpn_settings_engine_native',
 		autoRun: 'lpn_settings_auto_run', 'hydraulics.accuracy': 'lpn_settings_accuracy',
@@ -32137,7 +32144,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'settings.symbolCapPercentile': 'lpn_settings_row_symbol_cap_percentile',
 		'settings.contourLabels': 'lpn_settings_row_contour_labels',
 		// Contour rows say so: in the Settings box they sit under a Contour heading the table lacks.
-		'settings.contourFill': 'lpn_settings_row_contour_fill', 'settings.contourOpacity': 'lpn_settings_row_contour_opacity',
+		'settings.contourShow': 'lpn_settings_row_contour_show', 'settings.contourFill': 'lpn_settings_row_contour_fill', 'settings.contourOpacity': 'lpn_settings_row_contour_opacity',
 		'settings.contourInterval': 'lpn_settings_row_contour_interval', 'settings.contourBuffer': 'lpn_settings_row_contour_buffer',
 		'settings.contourTerrain': 'lpn_settings_row_contour_terrain',
 		'settings.hydraulics.checkFreq': 'lpn_settings_row_check_freq',
@@ -44645,6 +44652,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// labels at all, not labels past some particular width, so the state that reproduces the
 		// screen they left is the one this keeps. The old flag is then DELETED so nothing can later
 		// read a stale one and disagree with the map.
+		// **A PROJECT SAVED BEFORE "Show plot" HAD ITS OWN SETTING** drew the plot while its fill or its lines were on.
+		if (savedSettings.contourShow === undefined) { settings.contourShow = !!(savedSettings.contourFill || savedSettings.contourLines); }
 		if (savedSettings.colorThematic) { settings.labelMaxWidth = 0; }
 		delete settings.colorThematic;
 		// **NOTHING CHANGES COLOUR WHEN AN OLD PROJECT IS OPENED.** The colour scheme, the class
@@ -66178,7 +66187,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The Page sub-heading inside the Map section -- what the Hide these titles link opens at,
 		// so the switch it just threw is the first thing on screen.
 		page: 'lpn_set_sec_page',
-		gis: 'lpn_set_sub_gis'
+		gis: 'lpn_set_sub_gis',
+		// The Contour box's link: Symbology, Node colors.
+		nodeColors: 'lpn_set_sub_nodeColors'
 	};
 	// ---- WHERE THE BOX IS AND HOW BIG IT IS, REMEMBERED (Tom, 2026-08-19) -------------------
 	//

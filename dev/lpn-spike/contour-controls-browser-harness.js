@@ -10,6 +10,10 @@
 //   5. in a child scenario time steps leave an open pull-down alone (no rebuild); a re-solve that changes the
 //      default interval shows in the box.
 //   6. a 390-wide phone: the box fits.
+//   7. round 5: the Show plot tip is the language file's; a standing line "Follows project "Node colors" settings." heads the
+//      box with Node colors a link into Settings at Symbology, Node colors; Show plot changes no other control (Fill,
+//      Opacity, Buffer, Lines, Interval, Labels), off draws nothing, on draws them as set; undo, save and reopen, and a
+//      child scenario agree.
 // CONTOUR_SHOT=<dir> also writes a picture of each view there.
 
 'use strict';
@@ -144,18 +148,18 @@ async function main0(Session, browser) {
 			const row = document.getElementById('lpn_contour_show').closest('.lpn-grow'), l = row.querySelector('.ec-help');
 			return { want: EngCalcs.pageConfig.lpn_contour_show_tip, title: l ? (l.title || l.getAttribute('data-bs-original-title') || '') : null, tips: row.querySelectorAll('.ec-tip').length };
 		});
-		ok('the Show plot tip is exactly: Follows project Node colors settings.', tip.want === 'Follows project Node colors settings.' && tip.title === tip.want && tip.tips === 1, JSON.stringify(tip));
+		ok('the Show plot tip is the language file\'s sentence, which quotes Node colors, and is on the label once', !!tip.want && tip.want.indexOf('"Node colors"') > 0 && tip.title === tip.want && tip.tips === 1, JSON.stringify(tip));
 		// A picture of the tip, opened the way a visitor opens it: a click on the ?.
 		const bb = await (await a.page.$('.lpn-grow:has(#lpn_contour_show) .ec-tip')).boundingBox();
 		await a.page.mouse.move(bb.x - 20, bb.y + bb.height / 2);
 		await a.page.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2, { steps: 4 });
 		await a.page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2);
 		await a.settle(800);
-		ok('clicking the ? opens that sentence', await a.page.evaluate(() => Array.from(document.querySelectorAll('.tooltip-inner, .tooltip')).some((e) => e.offsetParent !== null && e.textContent.indexOf('Follows project Node colors settings.') >= 0)));
-		await shot(a.page, 'show-plot-tip-r4');
+		ok('clicking the ? opens that sentence', await a.page.evaluate(() => Array.from(document.querySelectorAll('.tooltip-inner, .tooltip')).some((e) => e.offsetParent !== null && e.textContent.indexOf(EngCalcs.pageConfig.lpn_contour_show_tip) >= 0)));
+		await shot(a.page, 'show-plot-tip-r5');
 		await a.page.keyboard.press('Escape');
 		await a.settle(300);
-		await shot(a.page, 'contour-box-r4');
+		await shot(a.page, 'contour-box-r5');
 		noErrors(a);
 	} finally { await a.close(); }
 }
@@ -181,7 +185,7 @@ async function main1(Session, browser) {
 		await a.settle(500);
 		f = await facts(a.page);
 		ok('Color scheme = Viridis: the plot changes again', f.fill && f.href !== gray && f.href !== before);
-		await shot(a.page, 'contour-follows-settings-r4');
+		await shot(a.page, 'contour-follows-settings-r5');
 		noErrors(a);
 	} finally { await a.close(); }
 }
@@ -198,12 +202,12 @@ async function main2(Session, browser) {
 		ok('...and Show plot keeps its tick', f.show === true);
 		const note = () => a.page.evaluate(() => {
 			const body = document.getElementById('lpn_contour_body'), n = document.getElementById('lpn_contour_none_note'), iv = document.getElementById('lpn_contour_interval');
-			return { text: n ? n.textContent : null, first: !!n && body.firstChild === n, want: EngCalcs.pageConfig.lpn_contour_none_note, iv: iv.value, ivOff: iv.disabled, ctrls: body.querySelectorAll('input, select').length };
+			return { text: n ? n.textContent : null, second: !!n && body.children[0].id === 'lpn_contour_follows' && body.children[1] === n, want: EngCalcs.pageConfig.lpn_contour_none_note, iv: iv.value, ivOff: iv.disabled, ctrls: body.querySelectorAll('input, select').length };
 		});
 		let nt = await note();
-		ok('No color: the box shows one plain line at the top, in the sentence the language file gives', nt.first && nt.text === nt.want && nt.want === 'Nothing to plot: choose a property under Color nodes by in Settings, Symbology, Node colors.', JSON.stringify(nt));
+		ok('No color: a line under the standing one says so, in the sentence the language file gives', nt.second && nt.text === nt.want && !!nt.want, JSON.stringify(nt));
 		ok('...the controls stay as they are, and the Interval box is empty and disabled', nt.ctrls === f.ctrls.length && nt.iv === '' && nt.ivOff === true, JSON.stringify(nt));
-		await shot(a.page, 'contour-no-color-r4');
+		await shot(a.page, 'contour-no-color-r5');
 		await setNode(a, 'head'); await a.settle(700);
 		f = await facts(a.page);
 		ok('choosing Head again brings the plot back, the box unchanged', f.fill && f.lines > 0 && f.show === true && /Head/.test(f.legend), JSON.stringify({ fill: f.fill, lines: f.lines, show: f.show }));
@@ -221,7 +225,7 @@ async function main2(Session, browser) {
 		// A picture of the box with the note, Settings put away.
 		await setNode(a, ''); await a.settle(500);
 		await a.page.evaluate(() => { const x = document.querySelector('#lpn_settings_box .lpn-popover-x'); if (x) { x.click(); } }); await a.settle(500);
-		await shot(a.page, 'contour-box-no-color-note-r4');
+		await shot(a.page, 'contour-box-no-color-note-r5');
 		noErrors(a);
 	} finally { await a.close(); }
 }
@@ -348,8 +352,123 @@ async function sectionPhone(Session, browser) {
 		await contourFromMenu(a);
 		const m = await a.page.evaluate(() => { const b = document.getElementById('lpn_contour_box'), r = b.getBoundingClientRect(); return { w: r.width, l: r.left, rt: r.right, over: b.scrollWidth > b.clientWidth + 1 }; });
 		ok('the box fits the phone with nothing wider than it', m.l >= -1 && m.rt <= 391 && !m.over, JSON.stringify(m));
-		await shot(a.page, 'contour-controls-phone-r4');
+		await shot(a.page, 'contour-controls-phone-r5');
+		const w = await a.page.evaluate(() => { const f = document.getElementById('lpn_contour_follows'), r = f.getBoundingClientRect(), b = document.getElementById('lpn_contour_box').getBoundingClientRect(); return { l: r.left, r: r.right, bl: b.left, br: b.right, h: r.height }; });
+		ok('the standing line fits inside the box on a phone', w.l >= w.bl - 1 && w.r <= w.br + 1, JSON.stringify(w));
 	} finally { await a.close(); }
+}
+
+const controlValues = (a) => a.page.evaluate(() => {
+	const o = {};
+	['lpn_contour_fill', 'lpn_contour_opacity', 'lpn_contour_buffer', 'lpn_contour_lines', 'lpn_contour_interval', 'lpn_contour_labels', 'lpn_contour_dem'].forEach((id) => {
+		const e = document.getElementById(id);
+		if (e) { o[id] = e.type === 'checkbox' ? e.checked : e.value; o[id + ':off'] = e.disabled; }
+	});
+	return JSON.stringify(o);
+});
+const stored = (a) => a.page.evaluate(() => {
+	const i = JSON.parse(localStorage.getItem('lpn_index') || '{}').openId, d = JSON.parse(localStorage.getItem('lpn_project_' + i) || 'null');
+	return d && d.settings ? { show: d.settings.contourShow, fill: d.settings.contourFill, lines: d.settings.contourLines } : null;
+});
+
+async function section7(Session, browser) {
+	console.log('\n--- 7. the standing line and its link; Show plot touches nothing else ---');
+	const a = await openNet3(Session, browser, { width: 1440, height: 900 });
+	try {
+		await contourFromMenu(a);
+		const st = await a.page.evaluate(() => {
+			const body = document.getElementById('lpn_contour_body'), f = document.getElementById('lpn_contour_follows'), l = document.getElementById('lpn_contour_follows_link');
+			const pc = EngCalcs.pageConfig;
+			return { first: body.firstElementChild === f, text: f && f.textContent, want: pc.lpn_contour_follows.replace('{link}', pc.lpn_settings_sym_node_colors), link: l && l.textContent, node: pc.lpn_settings_sym_node_colors, none: !!document.getElementById('lpn_contour_none_note') };
+		});
+		ok('the box opens with the standing line first, in the language file\'s words, with Node colors as its link', st.first && st.text === st.want && st.link === st.node && !st.none, JSON.stringify(st));
+		await shot(a.page, 'contour-box-r5');
+		const before = await a.page.evaluate(() => { const b = document.getElementById('lpn_settings_box'); return !!b && getComputedStyle(b).display !== 'none'; });
+		ok('Settings is not open yet', before === false);
+		await a.page.click('#lpn_contour_follows_link');
+		await a.settle(900);
+		const at = await a.page.evaluate(() => {
+			const b = document.getElementById('lpn_settings_box'), t = document.getElementById('lpn_set_sub_nodeColors');
+			if (!b || !t || getComputedStyle(b).display === 'none') { return null; }
+			const rb = b.getBoundingClientRect(), rt = t.getBoundingClientRect();
+			const cur = document.querySelector('#lpn_setbox_index .lpn-setbox-current, #lpn_setbox_index [aria-current], #lpn_setbox_index .active');
+			return { visible: rt.bottom > rb.top && rt.top < rb.bottom, top: Math.round(rt.top - rb.top), cur: cur ? cur.textContent.trim() : null, nodeColors: EngCalcs.pageConfig.lpn_settings_sym_node_colors };
+		});
+		ok('the link opens Settings with the Node colors heading in view', !!at && at.visible, JSON.stringify(at));
+		ok('...and the index says Node colors', !!at && at.cur === at.nodeColors, JSON.stringify(at));
+		await shot(a.page, 'contour-link-settings-r5');
+		await a.page.evaluate(() => { const x = document.querySelector('#lpn_settings_box .lpn-popover-x'); if (x) { x.click(); } });
+		await a.settle(400);
+		// Set every control to something unlike its default, then clear and check Show plot.
+		await setBox(a, 'lpn_contour_fill', 'bands');
+		await setBox(a, 'lpn_contour_opacity', 35);
+		await setBox(a, 'lpn_contour_buffer', 3);
+		await setBox(a, 'lpn_contour_interval', 20);
+		await setBox(a, 'lpn_contour_labels', false);
+		const set = await controlValues(a);
+		let f = await facts(a.page);
+		ok('with Show plot on, the plot is drawn as set: bands fill and lines', f.show === true && f.fill && f.lines > 0, JSON.stringify({ show: f.show, fill: f.fill, lines: f.lines }));
+		await setBox(a, 'lpn_contour_show', false);
+		f = await facts(a.page);
+		ok('Show plot cleared: nothing is drawn, the node colors stay', !f.fill && f.lines === 0 && f.coloured > 0, JSON.stringify({ fill: f.fill, lines: f.lines, c: f.coloured }));
+		ok('...and every other control keeps its value, none greyed or reset', (await controlValues(a)) === set, await controlValues(a));
+		ok('...the project keeps the fill and the lines, and says the plot is off', JSON.stringify(await stored(a)) === JSON.stringify({ show: false, fill: 'bands', lines: true }) || (await a.settle(2800), JSON.stringify(await stored(a))) === JSON.stringify({ show: false, fill: 'bands', lines: true }), JSON.stringify(await stored(a)));
+		await shot(a.page, 'contour-box-show-off-r5');
+		// A control changed while Show plot is off waits for it.
+		await setBox(a, 'lpn_contour_buffer', 4);
+		f = await facts(a.page);
+		ok('a control changed while Show plot is off draws nothing', !f.fill && f.lines === 0);
+		await setBox(a, 'lpn_contour_show', true);
+		f = await facts(a.page);
+		const back = JSON.parse(await controlValues(a));
+		ok('Show plot checked: the plot returns as set (bands, buffer 4, labels off)', f.fill && f.lines > 0 && back.lpn_contour_fill === 'bands' && back.lpn_contour_buffer === '4' && back.lpn_contour_labels === false && back.lpn_contour_opacity === '35' && back.lpn_contour_interval === '20', JSON.stringify(back));
+		// Undo takes the plot away and brings it back.
+		await setBox(a, 'lpn_contour_show', false);
+		await a.page.mouse.click(5, 5);
+		await a.page.keyboard.press('Control+z');
+		await a.settle(1000);
+		f = await facts(a.page);
+		ok('Undo of Show plot cleared brings the plot back, the other controls as set', f.show === true && f.fill && JSON.parse(await controlValues(a)).lpn_contour_fill === 'bands', JSON.stringify({ show: f.show, fill: f.fill }));
+		// Save and reopen with the plot off.
+		await setBox(a, 'lpn_contour_show', false);
+		await a.settle(2800);
+		await a.reload();
+		await a.answerTrainingPanel().catch(() => {});
+		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await a.settle(2500);
+		const sv = await stored(a);
+		f = await facts(a.page);
+		ok('reopened: the plot is not drawn, and the project holds Show plot clear with Fill Bands', !f.fill && f.lines === 0 && sv && sv.show === false && sv.fill === 'bands', JSON.stringify({ sv, fill: f.fill, lines: f.lines }));
+		// Water, Graphs, Contour is the door that turns the plot on; it keeps the other settings.
+		await contourFromMenu(a);
+		f = await facts(a.page);
+		const re = JSON.parse(await controlValues(a));
+		ok('Graphs, Contour then turns it on with Fill still Bands and opacity 35', f.show === true && f.fill && re.lpn_contour_fill === 'bands' && re.lpn_contour_opacity === '35', JSON.stringify({ show: f.show, fill: f.fill, re }));
+		noErrors(a);
+	} finally { await a.close(); }
+
+	console.log('\n--- 7b. a child scenario: Show plot is the scenario\'s own, the others untouched ---');
+	const b = await openNet3(Session, browser, { width: 1440, height: 900 });
+	try {
+		await contourFromMenu(b);
+		await setBox(b, 'lpn_contour_fill', 'bands');
+		await newScenario(b);
+		await contourFromMenu(b);
+		let f = await facts(b.page);
+		ok('the child opens with the plot showing, as set in Base', f.show === true && f.fill);
+		const set = await controlValues(b);
+		await setBox(b, 'lpn_contour_show', false);
+		f = await facts(b.page);
+		ok('child: Show plot cleared draws nothing and changes no other control', !f.fill && (await controlValues(b)) === set);
+		await b.page.click('#lpn_scenario_btn');
+		await b.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+		const base = await b.lang('lpn_scenario_base');
+		for (const r of await b.page.$$('#lpn_menu_list button.lpn-menu-row')) { if ((await r.textContent()).trim().replace(/^\u2713\s*/, '').replace(/\s*\(\d+\)$/, '') === base) { await r.click(); break; } }
+		await b.settle(1500);
+		f = await facts(b.page);
+		ok('back in Base the plot is still showing, Bands', f.show === true && f.fill && JSON.parse(await controlValues(b)).lpn_contour_fill === 'bands', JSON.stringify({ show: f.show, fill: f.fill }));
+		noErrors(b);
+	} finally { await b.close(); }
 }
 
 async function main() {
@@ -373,6 +492,7 @@ async function main() {
 		await run('4', main4);
 		await run('5', main5);
 		await run('6', sectionPhone);
+		await run('7', section7);
 	} finally {
 		await browser.close();
 		env.stopServer();

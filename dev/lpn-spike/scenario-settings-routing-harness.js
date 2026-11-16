@@ -149,7 +149,7 @@ function addPlainScenarios() {
 function dressProject() {
 	const S = L.getSettings(), LS = L.getLabelSettings();
 	S.colorNodeField = 'pressure'; S.colorLinkField = 'velocity';
-	S.contourFill = 'smooth'; S.contourLines = true;
+	S.contourShow = true; S.contourFill = 'smooth'; S.contourLines = true;
 	LS.node.pressure = true; LS.link.flow = true;
 }
 
