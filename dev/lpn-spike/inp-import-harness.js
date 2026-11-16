@@ -770,15 +770,18 @@ console.log('\n--- the wizard always opens at step 1, and georefArmAsDegrees() m
 	const dp = d.dropped.filter((x) => x.code === 'duplicate-pattern-id')[0];
 	const dc = d.dropped.filter((x) => x.code === 'duplicate-curve-id')[0];
 	ok('a pattern ID defined in two places is reported once, with the first line of each run',
-		!!dp && dp.ids.length === 1 && dp.ids[0] === 'PA (' + lineOf(' PA  1 2 3') + ', ' + lineOf(' PA  4 5 6') + ')',
+		!!dp && dp.ids.length === 1 && dp.ids[0] === 'Pattern PA (lines ' + lineOf(' PA  1 2 3') + ' and ' + lineOf(' PA  4 5 6') + ')',
 		JSON.stringify(dp));
 	ok('...and it is still ONE pattern, the later multipliers after the first (EPANET\'s rule)',
 		d.patterns.filter((x) => x.id === 'PA').length === 1 &&
 		JSON.stringify(d.patterns.filter((x) => x.id === 'PA')[0].multipliers) === '[1,2,3,4,5,6,7]',
 		JSON.stringify(d.patterns));
 	ok('a curve ID defined in two places is reported once, with the first line of each run',
-		!!dc && dc.ids.length === 1 && dc.ids[0] === 'C1 (' + lineOf(' C1  1 10') + ', ' + lineOf(' C1  2 8') + ')',
+		!!dc && dc.ids.length === 1 && dc.ids[0] === 'Curve C1 (lines ' + lineOf(' C1  1 10') + ' and ' + lineOf(' C1  2 8') + ')',
 		JSON.stringify(dc));
+	const three = EngCalcs.lpnInpParse(probeInp(['[PATTERNS]', ' PA  1', ' PB  1', ' PA  2', ' PB  2', ' PA  3', '']));
+	const t3 = three.dropped.filter((x) => x.code === 'duplicate-pattern-id')[0];
+	ok('three runs read "lines a, b and c"', !!t3 && /^Pattern PA \(lines \d+, \d+ and \d+\)$/.test(t3.ids[0]), JSON.stringify(t3));
 	const clean = EngCalcs.lpnInpParse(probeInp(['[PATTERNS]', ' PA  1 2', ' PA  3', ' PB  1', '', '[CURVES]', ' C1  1 10', ' C1  2 8', '']));
 	ok('rows of one ID kept together, as Net3 writes them, are NOT reported',
 		!clean.dropped.some((x) => /^duplicate-/.test(x.code)), JSON.stringify(clean.dropped.map((x) => x.code)));

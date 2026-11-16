@@ -849,8 +849,13 @@
 		// does it. EPANET finds the pattern or curve by ID (input3.c patterndata(), curvedata():
 		// `findpattern()`, `findcurve()`) and appends the later rows to the first object, so the two
 		// runs are ONE pattern or curve; this reader does the same (patternIndex, curveRecord), and
-		// the report says so. Ids are the id and the first line of each run: "PAT1 (12, 40)".
-		function duplicateRuns(sectionRows) {
+		// the report says so. Each entry reads "Pattern PAT1 (lines 12 and 40)": the id and the first line of each run.
+		function duplicateRuns(sectionRows, entryKey, entryFallback) {
+			var pcf = EngCalcs.pageConfig || {};
+			function say(lines) {
+				var n = lines.length, and = pcf.lpn_inp_dup_and || ' and ';
+				return n < 2 ? lines.join('') : lines.slice(0, n - 1).join(', ') + and + lines[n - 1];
+			}
 			var runs = {}, order = [], prev = null, k, row;
 			for (k = 0; k < sectionRows.length; k++) {
 				row = sectionRows[k];
@@ -862,10 +867,10 @@
 				prev = row[0];
 			}
 			return order.filter(function (id) { return runs[id].length > 1; })
-				.map(function (id) { return id + ' (' + runs[id].join(', ') + ')'; });
+				.map(function (id) { return (pcf[entryKey] || entryFallback).replace('{id}', id).replace('{lines}', say(runs[id])); });
 		}
-		var dupPatterns = duplicateRuns(rawSections.PATTERNS || []),
-			dupCurves = duplicateRuns(rawSections.CURVES || []);
+		var dupPatterns = duplicateRuns(rawSections.PATTERNS || [], 'lpn_inp_dup_pattern_entry', 'Pattern {id} (lines {lines})'),
+			dupCurves = duplicateRuns(rawSections.CURVES || [], 'lpn_inp_dup_curve_entry', 'Curve {id} (lines {lines})');
 		if (dupPatterns.length) { drop('duplicate-pattern-id', dupPatterns); }
 		if (dupCurves.length) { drop('duplicate-curve-id', dupCurves); }
 
