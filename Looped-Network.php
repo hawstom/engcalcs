@@ -3009,7 +3009,6 @@ EngCalcs.pageConfig = {
             if (strpos($k, 'lpn_ex_') !== 0) { continue; }
             echo "\t" . $k . ': ' . json_encode($v) . ",\n";
         } ?>
-	lpn_new_text: <?=json_encode($ec_lang['lpn_new_text'])?>,
 	lpn_field_text_bold: <?=json_encode($ec_lang['lpn_field_text_bold'])?>,
 	lpn_field_text_rotation: <?=json_encode($ec_lang['lpn_field_text_rotation'])?>,
 	lpn_field_text_match_pipe: <?=json_encode($ec_lang['lpn_field_text_match_pipe'])?>,

@@ -40716,7 +40716,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// 407): a call site that reads lb.text without going through effective() gets undefined
 		// immediately rather than reading Base while a scenario says something else.
 		lb = {
-			id: id, _text: EngCalcs.pageConfig.lpn_new_text || 'Text',
+			id: id, _text: '',
 			x: an ? x - an.x : x, y: an ? y - an.y : y,
 			anchorNode: (an && anchorNode) ? anchorNode : null, sizeMult: 1
 		};
@@ -60526,9 +60526,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				logLpnFirstAction('element');
 				var placed = addText(w.x, w.y, nearNode ? nearNode.id : null,
 					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
-				// **AND ITS WORDS ARE TYPED WHERE IT STANDS**: the placeholder opens selected in the
-				// in-place editor, so typing replaces it. Its commit adds no undo step of its own, so
-				// one Undo takes the whole new Text away.
+				// **AND ITS WORDS ARE TYPED WHERE IT STANDS**: it is born with no words and opens in the
+				// in-place editor with the caret ready. Finishing with nothing typed takes it back
+				// (Task 854). Its commit adds no undo step of its own, so one Undo takes the whole
+				// new Text away.
 				if (placed) { openTextEditor(placed.id, true); }
 				// **THE TOOL STAYS ARMED, LIKE EVERY OTHER INSERTER** (Tom, 2026-10-07: *"All
 				// inserters should be in repeater mode. Text is not."*). A tap on a Text already there
@@ -77799,7 +77800,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// **A NEW TEXT THAT WAS NEVER WRITTEN IS NEVER LEFT BEHIND** (Perry, 2026-10-14). Esc on a Text
 	// the tool has just placed takes the placement back, and so does leaving the tool (a toolbar
-	// press, anything off the map, another tool) while its placeholder is still untouched. Its
+	// press, anything off the map, another tool) or a press on the map while nothing has been typed
+	// (a new Text is born empty, Task 854; Base and every scenario alike). A Text that had words
+	// and is later emptied is deleted the same way (writeTextWords()). Its
 	// placement's own undo step goes with it, so nothing is left on the map or on the Undo stack.
 	//
 	// **A ZOOM OR A PAN COMMITS.** Any press outside the editor commits before the map sees it, and

@@ -1,8 +1,9 @@
 // **A TEXT IS EDITED IN PLACE** (Tom, 2026-10-14: *"It would be really nice for Text to be editable
 // in place instead of only in the properties box."*). In real Chromium, with real presses and keys:
-//   1. the Text tool places a Text and opens the in-place editor on it, placeholder selected, at
-//      the map words' own font size; a press on the map keeps the placeholder and places the next;
-//      Esc on a new Text takes it away, and so does leaving the tool with its placeholder untouched;
+//   1. the Text tool places a Text born EMPTY (Task 854) and opens the in-place editor on it, caret
+//      ready, at the map words' own font size; Esc, a press on the map, a blank Enter or leaving the
+//      tool with nothing typed takes it away, leaving no Undo step, nothing saved and (in a scenario)
+//      nothing born inactive in Base; typed words stay;
 //   2. a double-click on the Text in Select opens the editor, not Properties; Enter is a new line,
 //      Ctrl+Enter commits, and the map and the saved project hold both lines; a digit and Delete
 //      typed into it are words, not shortcuts;
@@ -119,7 +120,7 @@ async function main() {
 		console.log('\n1. The Text tool places a Text and opens the editor on it');
 		const a = await open(Session, browser, 'Looped-Network.php', NAME);
 		const h = helpers(a), P = h.P;
-		const placeholder = await a.lang('lpn_new_text');
+		const placeholder = 'Tank 1';   // the words the first Text is given below
 		await a.toolbarClick(await a.lang('lpn_tool_add_text'));
 		await h.settle(200);
 		const spot = await h.canvasPoint(0.4, 0.4);
@@ -127,8 +128,7 @@ async function main() {
 		await h.settle(300);
 		let ed = await h.editor();
 		ok('the editor opens on the new Text', !!ed, JSON.stringify(ed));
-		ok('...pre-filled with the placeholder, focused and fully selected',
-			!!ed && ed.value === placeholder && ed.focused && ed.allSelected, JSON.stringify(ed));
+		ok('...empty, with the caret ready (focused)', !!ed && ed.value === '' && ed.focused, JSON.stringify(ed));
 		let texts = await h.mapTexts();
 		ok('...and the map words are hidden under it', texts.length === 1 && texts[0].vis === 'hidden', JSON.stringify(texts));
 		const mapPx = await P.evaluate(() => {
@@ -141,21 +141,41 @@ async function main() {
 		await P.mouse.click(spotB.x, spotB.y);
 		await h.settle(400);
 		ed = await h.editor();
-		ok('a press on the map keeps the placeholder and places the next Text', !!ed && (await h.mapTexts()).length === 2, JSON.stringify(await h.mapTexts()));
+		texts = await h.mapTexts();
+		ok('a press on the map with nothing typed takes that Text away and places the next',
+			!!ed && ed.value === '' && texts.length === 1 && (await h.storedTexts()).length === 1, JSON.stringify(texts));
 		await P.keyboard.press('Escape');
 		await h.settle(300);
-		texts = await h.mapTexts();
-		ok('Esc on that new Text takes it away', !(await h.editor()) && texts.length === 1 && texts[0].rows.join('|') === placeholder,
-			JSON.stringify(texts));
-		ok('...and the saved project holds just the first', (await h.storedTexts()).length === 1);
+		ok('Esc on that empty Text takes it away: nothing on the map, nothing saved',
+			!(await h.editor()) && (await h.mapTexts()).length === 0 && (await h.storedTexts()).length === 0);
 		const spotC = await h.canvasPoint(0.3, 0.6);
 		await P.mouse.click(spotC.x, spotC.y);
+		await h.settle(300);
+		await P.keyboard.press('Enter');
+		await P.keyboard.press('Control+Enter');
+		await h.settle(300);
+		ok('a blank line only (Enter, then commit) takes it away too',
+			!(await h.editor()) && (await h.mapTexts()).length === 0 && (await h.storedTexts()).length === 0, JSON.stringify(await h.mapTexts()));
+		await P.mouse.click(spotC.x, spotC.y);
+		await h.settle(300);
+		await P.keyboard.type(placeholder);
+		await P.keyboard.press('Control+Enter');
+		await h.settle(300);
+		ok('typed words stay', (await h.mapTexts()).length === 1 && (await h.storedTexts())[0]._text === placeholder);
+		await P.mouse.click(spotB.x, spotB.y);
 		await h.settle(300);
 		ok('the tool is still armed and places another', (await h.mapTexts()).length === 2 && !!(await h.editor()));
 		await a.toolbarClick(await a.lang('lpn_tool_select'));
 		await h.settle(400);
-		ok('leaving by the toolbar with the placeholder untouched takes that Text away',
+		ok('leaving by the toolbar with nothing typed takes that Text away',
 			!(await h.editor()) && (await h.mapTexts()).length === 1 && (await h.storedTexts()).length === 1, JSON.stringify(await h.mapTexts()));
+		await P.keyboard.press('Control+z');
+		await h.settle(500);
+		ok('the taken-back Texts left no Undo step: one Undo removes the first Text, whose own step it was',
+			(await h.storedTexts()).length === 0, JSON.stringify(await h.storedTexts()));
+		await P.keyboard.press('Control+y');
+		await h.settle(500);
+		ok('...and Redo puts it back with its words', (await h.storedTexts()).length === 1 && (await h.storedTexts())[0]._text === placeholder);
 		const id = (await h.mapTexts())[0].id;
 
 		console.log('\n2. A double-click in Select edits it; Enter is a new line; Ctrl+Enter commits');
@@ -263,7 +283,7 @@ async function main() {
 		await h.settle(400);
 		ed = await h.editor();
 		ok('the press that finishes it places the next Text, with the editor open on that one',
-			!!ed && ed.value === placeholder, JSON.stringify(ed));
+			!!ed && ed.value === '', JSON.stringify(ed));
 		await P.keyboard.press('Escape');
 		await h.settle(300);
 		st = await h.storedTexts();
@@ -425,7 +445,8 @@ async function main() {
 		await g.P.mouse.click(s3.x, s3.y);
 		await g.settle(300);
 		ed = await g.editor();
-		ok('es: the editor opens with the Spanish placeholder', !!ed && ed.value === await b.lang('lpn_new_text'), JSON.stringify(ed));
+		ok('es: the editor opens empty', !!ed && ed.value === '', JSON.stringify(ed));
+		await g.P.keyboard.type('x');
 		await g.P.keyboard.press('Control+Enter');
 		await g.settle(300);
 		await g.select();
@@ -442,6 +463,42 @@ async function main() {
 			(await g.mapTexts())[0].rows.join('|') === 'Válvula|cerrada' && (await g.storedTexts())[0]._text === 'Válvula\ncerrada',
 			JSON.stringify(await g.mapTexts()));
 		await b.close();
+
+		console.log('\n11. Drawn in a scenario, left empty: no trace in Base or in the scenario');
+		const c2 = await open(Session, browser, 'Looped-Network.php', NAME + '-scn');
+		const k = helpers(c2);
+		// The real dialog box, not the browser-pass answerer, so OK is a pressed button.
+		await k.P.evaluate(() => { delete window.lpnDialogAnswerer; });
+		await c2.menuClickSub(await c2.lang('lpn_scenario_menu'), await c2.lang('lpn_scenario_new'), 'project');
+		await c2.waitDialog(3000);
+		await k.P.evaluate((label) => {
+			const bt = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === label);
+			bt.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+		}, await c2.lang('lpn_dialog_ok'));
+		await k.settle(600);
+		const scn0 = await k.stored();
+		ok('a scenario is current', (scn0.scenarios || []).length >= 2, JSON.stringify((scn0.scenarios || []).length));
+		await c2.toolbarClick(await c2.lang('lpn_tool_add_text'));
+		await k.settle(200);
+		const sp = await k.canvasPoint(0.4, 0.4);
+		await k.P.mouse.click(sp.x, sp.y);
+		await k.settle(300);
+		ok('the editor opens empty in the scenario', ((await k.editor()) || {}).value === '');
+		await k.P.keyboard.press('Escape');
+		await k.settle(400);
+		let sd = await k.stored();
+		ok('Esc leaves no Text in the file: not in Base (born inactive) and not in the scenario',
+			(sd.labels || []).length === 0 && !JSON.stringify(sd.scenarios).includes('"active"'), JSON.stringify(sd.labels));
+		await k.P.mouse.click(sp.x, sp.y);
+		await k.settle(300);
+		await k.P.keyboard.type('Booster');
+		await k.P.keyboard.press('Control+Enter');
+		await k.settle(400);
+		sd = await k.stored();
+		ok('a Text given words in the scenario keeps them there: Base holds it inactive and empty',
+			sd.labels.length === 1 && sd.labels[0]._text === '' && sd.labels[0]._active === false &&
+			JSON.stringify(sd).includes('Booster'), JSON.stringify(sd.labels));
+		await c2.close();
 	} catch (e) {
 		ok('harness ran to the end', false, e && e.stack);
 	} finally {

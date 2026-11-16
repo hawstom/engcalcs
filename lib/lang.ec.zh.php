@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='缩放至所选';
 $ec_lang['lpn_tool_zoom_window']='窗口缩放';
 $ec_lang['lpn_zoom_in']='放大';
 $ec_lang['lpn_zoom_out']='缩小';
-$ec_lang['lpn_new_text']='文字';
 $ec_lang['lpn_field_text_bold']='粗体文字';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical

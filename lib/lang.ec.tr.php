@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Seçime yakınlaştır';
 $ec_lang['lpn_tool_zoom_window']='Pencere Yakınlaştır';
 $ec_lang['lpn_zoom_in']='Yakınlaştır';
 $ec_lang['lpn_zoom_out']='Uzaklaştır';
-$ec_lang['lpn_new_text']='Metin';
 $ec_lang['lpn_field_text_bold']='Kalın metin';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical

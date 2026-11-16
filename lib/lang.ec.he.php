@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='תקריב לבחירה';
 $ec_lang['lpn_tool_zoom_window']='תקריב לחלון';
 $ec_lang['lpn_zoom_in']='הגדלה';
 $ec_lang['lpn_zoom_out']='הקטנה';
-$ec_lang['lpn_new_text']='טקסט';
 $ec_lang['lpn_field_text_bold']='טקסט מודגש';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical

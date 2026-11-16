@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Zumiraj na odabir';
 $ec_lang['lpn_tool_zoom_window']='Zumiraj prozor';
 $ec_lang['lpn_zoom_in']='Uvećaj';
 $ec_lang['lpn_zoom_out']='Umanji';
-$ec_lang['lpn_new_text']='Tekst';
 $ec_lang['lpn_field_text_bold']='Podebljani tekst';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical

@@ -270,7 +270,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   ok('reservoir and lowest-pressure callouts use real strings',
     texts.includes(PC.lpn_tool_add_reservoir) && texts.includes(PC.bpn_p_min));
   ok('no annotation was left on the placeholder "Text"',
-    !texts.some(t => t === PC.lpn_new_text || t === 'Text'), JSON.stringify(texts));
+    !texts.some(t => t === 'Text'), JSON.stringify(texts));
   ok('the two callouts are anchored to nodes, the title block is not',
     doc.labels.filter(t => t.anchorNode).length === 2);
   ok('size multipliers are set (a 2 and two 1.5s), not left at 1',

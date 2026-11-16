@@ -29,7 +29,7 @@ canvas.getBoundingClientRect = function () { return { left: 0, top: 0, right: 12
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getState: function () { return state; },\n" +
-	"\t\taddText: addText, setProp: setProp, applySaved: applySaved,\n" +
+	"\t\taddText: function (x, y, n, a, id) { var lb = addText(x, y, n, a, id); lb._text = 'Text'; buildDom(); return lb; }, setProp: setProp, applySaved: applySaved,\n" +
 	"\t\tapplyLabelVisibility: applyLabelVisibility,\n" +
 	"\t\tlabelEls: function () { return labelEls; }, crowdedTexts: crowdedTexts,\n" +
 	"\t\tbuildDom: buildDom, updateLabelGeometry: updateLabelGeometry,\n" +

@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Kuza hadi Uteuzi';
 $ec_lang['lpn_tool_zoom_window']='Kuza Eneo';
 $ec_lang['lpn_zoom_in']='Kuza';
 $ec_lang['lpn_zoom_out']='Punguza';
-$ec_lang['lpn_new_text']='Maandishi';
 $ec_lang['lpn_field_text_bold']='Maandishi mazito';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
