@@ -1,12 +1,17 @@
-// **THE PICK CHOOSER NEVER OPENS ON AN ORDINARY CLICK, AT ANY ZOOM** (Perry's pre-review of
-// feat/pick-chooser: zoomed out on Net3, a screen-pixel rule opened a box on one click in four, 39 of
-// 97 at 12 notches out, where master gives none). Ambiguity is judged in the model, so the view's
-// scale cannot matter. Real Chromium, the Net3 example, a click on EVERY node's centre:
-//   A. desktop, a mouse: at the opening view and 4, 8, 12 and 20 notches out (the network drawn 120 px wide), no click opens a box, and
-//      every click selects exactly what the same click selects with the chooser rule switched off
-//      (the rule's function is stubbed to answer "ordinary" in the same page, which is the path master has);
+// **THE PICK CHOOSER ON NET3, WHERE THE SCREEN DECIDES** (Tom, 2026-11-15: "Any symbol that is
+// under/at the click (pickbox) should be eligible", and "At Lake, the reservoir overlaps the pump.
+// Clicking on the overlap should give the box."). Two or more symbols under the pickbox open the box,
+// so zoomed far out, where junction dots truly overlap on the screen, boxes open; a junction alone on
+// a pipe never does. Real Chromium, the Net3 example:
+//   L. the Lake: a click where the reservoir's symbol overlaps the pump's glyph opens a box listing
+//      the reservoir, the pump and the pipe that ends there; a click on the reservoir clear of the
+//      pump, and on the pump clear of the reservoir, selects that one with no box;
+//   A. desktop, a mouse, a click on EVERY node's centre at the opening view and 4, 8, 12 and 20 notches
+//      out (the network drawn 120 px wide): the numbers of boxes are PRINTED, and the checks are that
+//      every click without a box selects the node it is on, that every box lists at least two symbols,
+//      and that the opening view opens only the few where a tank or pump glyph lies over a junction;
 //   B. phone, 390 x 844 touch, 8 notches out: the same with a finger.
-// The cases where a box DOES open are in pick-chooser-browser-harness.js.
+// The cases built by hand are in pick-chooser-browser-harness.js.
 //
 //   node dev/lpn-spike/pick-chooser-zoom-browser-harness.js   (takes the browser lock itself)
 //
@@ -75,10 +80,10 @@ async function main() {
 	});
 	const readAndReset = (S) => S.page.evaluate(() => {
 		const sel = Array.from(document.querySelectorAll('#lpn_canvas .lpn-selected')).map((e) => e.dataset.node ? 'n' + e.dataset.node : (e.dataset.link ? 'l' + e.dataset.link : 'x')).sort().join(',');
-		const box = !!document.querySelector('.lpn-pick-chooser');
+		const rows = Array.from(document.querySelectorAll('.lpn-pick-chooser button')).map((b) => b.textContent.trim());
 		document.querySelectorAll('.lpn-pane-ctxmenu').forEach((m) => m.remove());
 		const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); }
-		return { sel, box };
+		return { sel, box: rows.length > 0, rows };
 	});
 	const sweep = async (S, touch) => {
 		const { pts, width } = await centres(S);
@@ -88,17 +93,17 @@ async function main() {
 				await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: p.x, y: p.y, id: 1 }] });
 				await sleep(35);
 				await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-				await sleep(touch ? 60 : 0);
+				await sleep(60);
 			} else { await S.page.mouse.move(p.x, p.y); await S.page.mouse.click(p.x, p.y); await sleep(40); }
 		};
-		const run = async () => { const res = []; for (const p of pts) { await press(p); res.push(await readAndReset(S)); } return res; };
-		const withRule = await run();
-		await S.page.evaluate(() => { window.__pickRule = EngCalcs.lpnGeom.pickCandidates; EngCalcs.lpnGeom.pickCandidates = () => []; });
-		const ruleOff = await run();
-		await S.page.evaluate(() => { EngCalcs.lpnGeom.pickCandidates = window.__pickRule; });
-		const boxes = withRule.filter((r) => r.box).length;
-		const differ = withRule.filter((r, i) => r.sel !== ruleOff[i].sel).length;
-		return { n: pts.length, width: Math.round(width), boxes, differ, ruleOffBoxes: ruleOff.filter((r) => r.box).length };
+		const res = [];
+		for (const p of pts) { await press(p); res.push(Object.assign({ id: p.id }, await readAndReset(S))); }
+		const boxes = res.filter((r) => r.box);
+		const quiet = res.filter((r) => !r.box);
+		return { n: pts.length, width: Math.round(width), boxes: boxes.length,
+			shortBoxes: boxes.filter((r) => r.rows.length < 2).length,
+			quietWrong: quiet.filter((r) => r.sel !== 'n' + r.id).length,
+			sample: boxes.slice(0, 3).map((r) => r.id + ': ' + r.rows.join(' / ')) };
 	};
 	const zoomOut = async (S, notches) => {
 		const c = await S.page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
@@ -107,16 +112,49 @@ async function main() {
 		await S.settle(900);
 	};
 	try {
-		console.log('\nA. Desktop, a mouse, Net3');
+		console.log('\nL. The Lake: the reservoir overlaps the pump');
 		const D = await Session.open(browser, NAME + '-d', { viewport: { width: 1400, height: 900 } });
 		await open(D);
-		let done = 0;
+		const rowsNow = () => D.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => b.textContent.trim()));
+		// A link wears its mark on its halo, which sits just before its grab band (the one with data-link).
+		const selNow = () => D.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas .lpn-selected')).map((e) => { if (e.dataset.node) { return 'n' + e.dataset.node; } const h = e.dataset.link !== undefined ? e : e.nextElementSibling; return h && h.dataset.link !== undefined ? 'l' + h.dataset.link : 'x'; }).sort().join(','));
+		const lake = await D.page.evaluate(() => {
+			const r = (s) => { const e = Array.from(document.querySelectorAll(s)).find((x) => x.getBoundingClientRect().width > 0); return e && e.getBoundingClientRect(); };
+			const a = r('#lpn_canvas circle.lpn-node[data-node="Lake"]'), g = r('#lpn_canvas path.lpn-link-symbol-hit[data-link="10"]');
+			return { a: a && [a.left, a.top, a.right, a.bottom], g: g && [g.left, g.top, g.right, g.bottom] };
+		});
+		ok('the Lake reservoir and the pump glyph are drawn', !!lake.a && !!lake.g, JSON.stringify(lake));
+		const overlap = { x: (Math.max(lake.a[0], lake.g[0]) + Math.min(lake.a[2], lake.g[2])) / 2, y: (Math.max(lake.a[1], lake.g[1]) + Math.min(lake.a[3], lake.g[3])) / 2 };
+		await D.page.mouse.move(overlap.x, overlap.y); await D.page.mouse.click(overlap.x, overlap.y); await D.settle(450);
+		const lakeRows = await rowsNow();
+		ok('a click where the reservoir overlaps the pump opens the box', lakeRows.length >= 2, JSON.stringify(lakeRows));
+		ok('...listing the reservoir and the pump', lakeRows.some((r) => /Lake/.test(r)) && lakeRows.some((r) => /Pump 10/.test(r)), JSON.stringify(lakeRows));
+		ok('...selecting nothing until a row is chosen', (await selNow()) === '', await selNow());
+		const pumpRow = (await D.page.$$('.lpn-pick-chooser button'))[lakeRows.findIndex((r) => /Pump 10/.test(r))];
+		await pumpRow.click(); await D.settle(450);
+		ok('...and choosing Pump 10 selects the pump, which that click could not reach before', (await selNow()) === 'l10', await selNow());
+		await D.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
+		// Clear of the other: left of the glyph on the reservoir, right of the reservoir on the glyph.
+		const onlyLake = { x: (lake.a[0] + Math.min(lake.g[0], lake.a[2])) / 2 + 1, y: overlap.y };
+		const onlyPump = { x: (Math.max(lake.a[2], lake.g[0]) + lake.g[2]) / 2 + 1, y: overlap.y };
+		await D.page.mouse.click(700, 120); await D.settle(300);
+		await D.page.mouse.move(onlyLake.x, onlyLake.y); await D.page.mouse.click(onlyLake.x, onlyLake.y); await D.settle(450);
+		ok('a click on the reservoir clear of the pump selects the reservoir with no box', (await rowsNow()).length === 0 && (await selNow()) === 'nLake', JSON.stringify([await rowsNow(), await selNow(), onlyLake]));
+		await D.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
+		await D.page.mouse.move(onlyPump.x, onlyPump.y); await D.page.mouse.click(onlyPump.x, onlyPump.y); await D.settle(450);
+		ok('a click on the pump clear of the reservoir selects the pump with no box', (await rowsNow()).length === 0 && (await selNow()) === 'l10', JSON.stringify([await rowsNow(), await selNow(), onlyPump]));
+
+		console.log('\nA. Desktop, a mouse, Net3, a click on every node centre');
+		await D.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
+		await D.page.mouse.click(700, 120); await D.settle(300);
 		for (const [label, notches] of [['the opening view', 0], ['4 notches out', 4], ['8 notches out', 4], ['12 notches out', 4], ['20 notches out', 8]]) {
 			await zoomOut(D, notches);
 			const r = await sweep(D, false);
-			done += notches;
-			ok(label + ' (network ' + r.width + ' px wide): ' + r.n + ' node-centre clicks open ' + r.boxes + ' boxes', r.n >= 90 && r.boxes === 0, JSON.stringify(r));
-			ok('...and each selects what the same click selects with the rule off', r.differ === 0, JSON.stringify(r));
+			console.log('  NUMBERS ' + label + ': ' + JSON.stringify(r));
+			ok(label + ' (network ' + r.width + ' px wide): ' + r.n + ' node-centre clicks open ' + r.boxes + ' boxes', r.n >= 90, JSON.stringify(r));
+			ok('...every box lists at least two elements', r.shortBoxes === 0, JSON.stringify(r));
+			ok('...and every click without a box selects the node it is on', r.quietWrong === 0, JSON.stringify(r));
+			if (notches === 0) { ok('...at the opening view only the few places where a tank, reservoir or pump glyph is drawn over a junction open one (at most 10 of 97)', r.boxes <= 10, JSON.stringify(r)); }
 		}
 		await D.page.close();
 
@@ -125,8 +163,10 @@ async function main() {
 		await open(T);
 		await zoomOut(T, 8);
 		const r = await sweep(T, true);
-		ok('8 notches out (network ' + r.width + ' px wide): ' + r.n + ' node-centre taps open ' + r.boxes + ' boxes', r.n >= 50 && r.boxes === 0, JSON.stringify(r));
-		ok('...and each selects what the same tap selects with the rule off', r.differ === 0, JSON.stringify(r));
+		console.log('  NUMBERS phone 8 notches out: ' + JSON.stringify(r));
+		ok('8 notches out (network ' + r.width + ' px wide): ' + r.n + ' node-centre taps open ' + r.boxes + ' boxes', r.n >= 50, JSON.stringify(r));
+		ok('...every box lists at least two elements', r.shortBoxes === 0, JSON.stringify(r));
+		ok('...and every tap without a box selects the node it is on', r.quietWrong === 0, JSON.stringify(r));
 		await T.page.close();
 		ok('no page error', errors.length === 0, errors.join(' | '));
 	} finally {

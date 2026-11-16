@@ -195,6 +195,19 @@
 				"y": "-75.00"
 			},
 			"_initQuality": 0.5
+		},
+		{
+			"id": "W1",
+			"type": "junction",
+			"x": 40,
+			"y": 15,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "40.00",
+				"y": "15.00"
+			},
+			"_initQuality": 0.5
 		}
 	],
 	"links": [
@@ -539,5 +552,17 @@
 	},
 	"controls": [],
 	"rules": [],
-	"inpSections": {}
+	"inpSections": {},
+	"shapes": [
+		{
+			"id": "S1",
+			"pts": [
+				{
+					"x": 40,
+					"y": 15
+				}
+			],
+			"closed": false
+		}
+	]
 }
