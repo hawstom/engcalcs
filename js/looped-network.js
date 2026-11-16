@@ -48158,7 +48158,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
-			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
+			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
 			case 'pressure-unit': return pc.lpn_inp_drop_pressure_unit || 'This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
 			case 'other-options': return pc.lpn_inp_drop_other_options || 'This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
 			// **THE ONE LOSS ON THE `.net` PATH THAT CANNOT BE CARRIED**, so it is told instead. A
@@ -70904,7 +70904,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_quality_chemical_name_tip), [['settings', 'quality']]);
 		setboxTag(rowFn(host, pc.lpn_quality_mass_units || 'Mass units', massSel,
 			pc.lpn_quality_mass_units_tip), [['settings', 'quality']]);
-		// **QUALITY TOLERANCE AND RELATIVE DIFFUSIVITY, EPANET'S OWN NAMES** (R-322, Tom: "I don't
+		// **QUALITY TOLERANCE AND DIFFUSIVITY, EPANET'S OWN NAMES** (R-322, Tom: "I don't
 		// see this in our interface. Is it missing?" -- twice). They were carried in the file and
 		// handed to the engine all along (`qualitySetting()`, js/lpn-epanet.js) with no box to read
 		// or change them from; this is that box, for the two EPANET applies only to a chemical.
@@ -70936,7 +70936,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		qualityOptionRow('tolerance', pc.lpn_quality_tolerance || 'Quality tolerance',
 			pc.lpn_quality_tolerance_tip, '0.01');
-		qualityOptionRow('diffusivity', pc.lpn_quality_diffusivity || 'Relative diffusivity',
+		qualityOptionRow('diffusivity', pc.lpn_quality_diffusivity || 'Diffusivity',
 			pc.lpn_quality_diffusivity_tip, '1.0');
 		// **A COEFFICIENT ROW: BLANK IS A STATE, NOT A ZERO WE TYPED.** Clearing the box removes the
 		// key, so the exporter writes no line and EPANET's own default stands -- the same sparse
