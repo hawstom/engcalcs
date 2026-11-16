@@ -334,6 +334,13 @@ exports.run = async function ({ browser, report }) {
 						fromTop: Math.round(r.top - mr.top)
 					};
 				});
+				// A phone shows no legend at open (Tom, 2026-11-14, Task 851; fresh-open-harness.js holds the
+				// rest of that rule), so the phone's corner is the SETTING's, which small-screen-harness.js
+				// asserts; the ink is measured here on the desktop only.
+				if (name === 'phone') {
+					report.ok(!!g && !g.shown, 'the labels legend is held back on a fresh phone profile');
+					continue;
+				}
 				report.ok(!!(g && g.shown), 'the labels legend is drawn on a fresh ' + name + ' profile');
 				if (g && g.shown) {
 					// Top-left on EVERY screen since 2026-09-28 (Tom); it sits below the zoom chip, 24-29px down.

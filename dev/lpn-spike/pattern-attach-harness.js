@@ -322,7 +322,7 @@ console.log('\n5. the round trip: every value the user did not edit comes back b
 	const wasSpeed = PU1.speed;
 	PU1.speed = 1;
 	const plain = EngCalcs.lpnExportInp(L.serialize(), { effective: (el, p) => el['_' + p] });
-	ok('a pump at speed 1 writes no SPEED column', plain.ok && plain.inp.indexOf('SPEED') < 0);
+	ok('a pump at speed 1 writes no SPEED column', plain.ok && plain.inp.replace(/^\[TITLE\][\s\S]*?\n\n/, '').indexOf('SPEED') < 0);   // the title is the file's own prose, now written back whole
 	PU1.speed = wasSpeed;
 }
 

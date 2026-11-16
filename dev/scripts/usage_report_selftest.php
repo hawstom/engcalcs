@@ -333,8 +333,8 @@ ec_ur_expect('calculators used: Manning-Pipe-Flow is 2 browsers and 4 uses, 0 pa
 ec_ur_expect('calculators used: Looped-Network is 1 browser, 2 uses and 1 page load',
     ec_ur_row_in($xp, 'Calculating, by page', 'Looped-Network') === array('Looped-Network', '1', '2', '1'),
     json_encode(ec_ur_row_in($xp, 'Calculating, by page', 'Looped-Network')));
-ec_ur_expect('the calculation chart says 6 uses from 2 browsers plus 2 uses with no code',
-    strpos($html, 'SAID YES: 6 use(s), from 2 browser(s) plus 2 use(s) with no code') !== false);
+ec_ur_expect('the calculation chart says 6 calculations from 2 browsers plus 2 calculations with no code',
+    strpos($html, 'SAID YES: 6 calculation(s), from 2 browser(s) plus 2 calculation(s) with no code') !== false);
 ec_ur_expect('the contact funnel: viewed 0 browsers 1 use; sent 1 browser 2 uses; no page loads',
     ec_ur_row($xp, 'contact page viewed') === array('contact page viewed', '0', '1', '0')
     && ec_ur_row($xp, 'message sent') === array('message sent', '1', '2', '0'),
@@ -355,9 +355,19 @@ foreach ($xp->query('//tbody/tr') as $tr) {
     if ($cells > 4) { $wide++; }
 }
 ec_ur_expect('no table row carries more than four cells', $wide === 0, "$wide row(s) do");
-ec_ur_expect('the bucket columns are named Browsers (said yes), Uses (said yes), Uses (others)',
+ec_ur_expect('the bucket columns are named Browsers (said yes), Visits/Calculations/Uses (said yes) and (others)',
     isset($heads['browsers (said yes)']) && isset($heads['uses (said yes)'])
-    && isset($heads['uses (others)']), implode(' | ', array_keys($heads)));
+    && isset($heads['uses (others)']) && isset($heads['visits (said yes)'])
+    && isset($heads['visits (others)']) && isset($heads['calculations (said yes)'])
+    && isset($heads['calculations (others)']), implode(' | ', array_keys($heads)));
+// The Looking tables count visits and the Calculating table counts calculations, so neither says Uses.
+$lookHeads = array(); $calcHeads = array();
+foreach ($xp->query('//h3[normalize-space(text())="Looking, by page"]/following-sibling::table[1]//th') as $th) { $lookHeads[] = trim($th->textContent); }
+foreach ($xp->query('//h3[normalize-space(text())="Calculating, by page"]/following-sibling::table[1]//th') as $th) { $calcHeads[] = trim($th->textContent); }
+ec_ur_expect('Looking, by page reads Browsers (said yes), Visits (said yes), Visits (others)',
+    $lookHeads === array('page', 'Browsers (said yes)', 'Visits (said yes)', 'Visits (others)'), json_encode($lookHeads));
+ec_ur_expect('Calculating, by page reads Browsers (said yes), Calculations (said yes), Calculations (others)',
+    $calcHeads === array('page', 'Browsers (said yes)', 'Calculations (said yes)', 'Calculations (others)'), json_encode($calcHeads));
 ec_ur_expect('the page states in words when the two Uses columns are and are not addable',
     preg_match('/are\s+not\s+addable/', $html) === 1 && preg_match('/are\s+addable/', $html) === 1);
 ec_ur_expect('the page names its own source files, so every number is re-derivable',
@@ -480,6 +490,87 @@ ec_ur_expect('an unused command is listed under "Not used in this window" with i
 ec_ur_expect('an unused command has no row in a used table', $cell('map/clean_map') === null);
 foreach (glob("$dir2/{,.}*", GLOB_BRACE) ?: array() as $f) { if (is_file($f)) { @unlink($f); } }
 @rmdir($dir2);
+
+// ---- 9. Using: browser-days, because no log row says which visit it belongs to -----------------
+// Browser A calculates on Manning-Pipe-Flow twice on 09-09 and once on 09-10, and on Looped-Network
+// on 09-10; browser B calculates on both pages on 09-09. One said-yes row has no code and two
+// others rows carry none. By hand: Manning-Pipe-Flow is 2 browsers and 3 browser-days (A-09-09,
+// A-09-10, B-09-09); Looped-Network is 2 browsers and 2 browser-days (B-09-09, A-09-10); in total
+// 2 browsers and 3 browser-days, because A's two pages on 09-10 are one browser-day. A's three
+// calculations on one page in one day are one browser-day, never three visits.
+$dir3 = sys_get_temp_dir() . '/ec-usage-using-' . getmypid();
+@mkdir($dir3, 0777, true);
+$useRows = array(
+    "2026-09-09T00:00:01Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}every{$T}{$A}{$T}visitor",
+    "2026-09-09T00:00:02Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}every{$T}{$A}{$T}visitor",
+    "2026-09-10T00:00:03Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}every{$T}{$A}{$T}visitor",
+    "2026-09-10T00:00:04Z{$T}Looped-Network{$T}en{$T}en-us{$T}fine{$T}every{$T}{$A}{$T}visitor",
+    "2026-09-09T00:00:05Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}coarse{$T}every{$T}{$B}{$T}visitor",
+    "2026-09-09T00:00:06Z{$T}Looped-Network{$T}en{$T}en-us{$T}coarse{$T}every{$T}{$B}{$T}visitor",
+    "2026-09-09T00:00:07Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}every{$T}visitor",
+    "2026-09-09T00:00:08Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}visit",
+    "2026-09-09T00:00:09Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}fine{$T}visit",
+);
+file_put_contents("$dir3/engcalcs-calc-usage.log", implode("\n", $useRows) . "\n");
+$rep3 = ecUsageReportBuild(array($dir3), '', '');
+$c3 = $rep3['series']['calc'];
+ec_ur_expect('using: 2 browsers and 3 browser-days in total (A on two pages the same day is one)',
+    ecUsageSeriesBrowsers($c3) === 2 && ecUsageSeriesBrowserDays($c3) === 3,
+    ecUsageSeriesBrowsers($c3) . ' / ' . ecUsageSeriesBrowserDays($c3));
+ec_ur_expect('using: Manning-Pipe-Flow 2 browsers, 3 browser-days; Looped-Network 2 browsers, 2 browser-days',
+    ecUsageSeriesBrowserDays($c3, 'page', 'Manning-Pipe-Flow') === 3
+    && ecUsageSeriesBrowserDays($c3, 'page', 'Looped-Network') === 2
+    && ecUsageSeriesBrowsers($c3, 'page', 'Manning-Pipe-Flow') === 2
+    && ecUsageSeriesBrowsers($c3, 'page', 'Looped-Network') === 2);
+ec_ur_expect('using: a page nobody calculated on has no browser-days',
+    ecUsageSeriesBrowserDays($c3, 'page', 'Orifice-Flow') === 0);
+ec_ur_expect('using: the said-yes row with no code is not placed (uncoded 1), and the others rows add nothing',
+    $c3['uncoded'] === 1 && $c3['bucketTotals'] === array('visitor' => 7, 'visit' => 2),
+    json_encode(array($c3['uncoded'], $c3['bucketTotals'])));
+ec_ur_expect('only the Calculating series keeps browser-days; the Looking series keeps none',
+    ecUsageSeriesBrowserDays($rep3['series']['view']) === 0 && $rep3['series']['view']['trackDays'] === false);
+$bootU = "$dir3/render.php";
+file_put_contents($bootU,
+    "<?php\n\$_GET['days'] = 0;\n"
+  . "define('EC_USAGE_REPORT_DIRS', " . var_export(serialize(array($dir3)), true) . ");\n"
+  . "require " . var_export($root . '/spock.php', true) . ";\n");
+$html3 = (string) shell_exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($bootU) . ' 2>&1');
+ec_ur_expect('the page renders the Using section with no PHP warning, after Looking and before Calculating',
+    stripos($html3, 'Warning:') === false && stripos($html3, 'Notice:') === false
+    && stripos($html3, 'Fatal error') === false
+    && ($pl = strpos($html3, '<h2>Looking</h2>')) !== false && ($pu = strpos($html3, '<h2>Using</h2>')) !== false
+    && ($pc = strpos($html3, '<h2>Calculating</h2>')) !== false && $pl < $pu && $pu < $pc);
+$d3 = new DOMDocument();
+@$d3->loadHTML($html3);
+$x3 = new DOMXPath($d3);
+$useHeads = array();
+foreach ($x3->query('//h3[normalize-space(text())="Using, by page"]/following-sibling::table[1]//th') as $th) { $useHeads[] = trim($th->textContent); }
+ec_ur_expect('the Using table has Browsers (said yes) and Browser-days (said yes) and no others column',
+    $useHeads === array('page', 'Browsers (said yes)', 'Browser-days (said yes)'), json_encode($useHeads));
+$useRow = function ($label) use ($x3) {
+    $tds = $x3->query('//h3[normalize-space(text())="Using, by page"]/following-sibling::table[1]//td[normalize-space(text())=\'' . $label . '\']');
+    if (!$tds->length) { return null; }
+    $o = array();
+    foreach ($tds->item(0)->parentNode->childNodes as $c) { if ($c->nodeName === 'td') { $o[] = trim($c->textContent); } }
+    return $o;
+};
+ec_ur_expect('the Using table prints Manning-Pipe-Flow 2 / 3 and Looped-Network 2 / 2',
+    $useRow('Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '2', '3')
+    && $useRow('Looped-Network') === array('Looped-Network', '2', '2'),
+    json_encode(array($useRow('Manning-Pipe-Flow'), $useRow('Looped-Network'))));
+ec_ur_expect('the Using summary line says 3 browser-days from 2 browsers plus 1 calculation with no code',
+    strpos($html3, 'SAID YES: 3 browser-day(s), from 2 browser(s), plus 1 calculation(s) with no code') !== false);
+ec_ur_expect('the page says a visit cannot be counted, and says what a browser-day is',
+    strpos($html3, 'cannot be counted') !== false && strpos($html3, 'A browser-day is one browser') !== false);
+$calcRow = null;
+foreach ($x3->query('//h3[normalize-space(text())="Calculating, by page"]/following-sibling::table[1]//td[normalize-space(text())="Manning-Pipe-Flow"]') as $td) {
+    $calcRow = array();
+    foreach ($td->parentNode->childNodes as $c) { if ($c->nodeName === 'td') { $calcRow[] = trim($c->textContent); } }
+}
+ec_ur_expect('Calculating still counts rows: Manning-Pipe-Flow 2 browsers, 5 calculations, 2 others',
+    $calcRow === array('Manning-Pipe-Flow', '2', '5', '2'), json_encode($calcRow));
+foreach (glob("$dir3/{,.}*", GLOB_BRACE) ?: array() as $f) { if (is_file($f)) { @unlink($f); } }
+@rmdir($dir3);
 
 // ---- cleanup -----------------------------------------------------------------------------------
 foreach (glob("$dir/{,.}*", GLOB_BRACE) ?: array() as $f) { if (is_file($f)) { @unlink($f); } }

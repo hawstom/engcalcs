@@ -489,8 +489,11 @@ async function main() {
 		ok('Net3 lat/lon: the coordinate frame and units are not rows', gkeys.length > 50 &&
 			!gkeys.some((k) => /^(units|origin|project\.(coords|crs|georef))/.test(k)), gkeys.length);
 		ok('...and the view is a Presentation row', grows.some((r) => r.key === '["view"]' && r.cells.st_category === PRES));
-		ok('Net3 lat/lon, which states no friction method, still has the row, reading Hazen-Williams (default)',
-			grows.some((r) => r.cells.st_setting === FM && r.cells.st_value === (await0.dflt).replace('{value}', await0.hw)), JSON.stringify(grows.filter((r) => r.cells.st_setting === FM).map((r) => r.cells.st_value)));
+		// EPA's Net3.inp states `Headloss H-W`, and the example carries that statement (as every example carries
+		// what its file states), so the row reads the formula plainly. A project whose file states none reads
+		// "(default)": inp-fidelity-harness.js holds that on the import path.
+		ok('Net3 lat/lon, whose file states Headloss H-W, has the row reading Hazen-Williams',
+			grows.some((r) => r.cells.st_setting === FM && r.cells.st_value === await0.hw), JSON.stringify(grows.filter((r) => r.cells.st_setting === FM).map((r) => r.cells.st_value)));
 		ok('Net3 lat/lon: every Setting cell is words, none a stored name',
 			grows.every((r) => !/[a-z][A-Z]|\w\.\w|\u203a|_|\w:\w|\w\|\w/.test(r.cells.st_setting)),
 			JSON.stringify(grows.filter((r) => /[a-z][A-Z]|\w\.\w|\u203a|_|\w:\w|\w\|\w/.test(r.cells.st_setting)).map((r) => r.cells.st_setting).slice(0, 10)));

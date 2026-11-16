@@ -3758,13 +3758,12 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    deliberately absent here, exactly as they are for #lpn_labels_legend. Two legends need two
    corners; defaulting this one to the opposite corner from the labels legend is why.
 
-   z-index:3, the SAME NUMBER #lpn_labels_legend carries inline in Looped-Network.php and for the
-   same reason: this legend can land in the top-left corner too (a user's own choice of
-   colorLegendPosition), and it must lose to the message-log column there exactly as the labels
-   legend does -- see that div's own comment for the full stacking order. */
+   z-index:7, the SAME NUMBER #lpn_labels_legend carries inline in Looped-Network.php: a legend is
+   above everything else on the map (Tom, 2026-11-14), the message-log column included; only the
+   tile credit and the georeferencing tools, at 8, stay over it. See that div's own comment. */
 .lpn-color-legend {
 	position: absolute;
-	z-index: 3;
+	z-index: 7;
 	font-size: 0.9em;
 	line-height: 1.4;
 	/* A themed panel of chrome over the map; its swatches below are data colours and never change. */
