@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='এই ফাইল কিছু সংযোগ�
 $ec_lang['lpn_inp_drop_report']='এই ফাইলে EPANET রিপোর্ট-ফরম্যাট সেটিং আছে। রান প্রতিবেদন প্রতিবেদন, রান-এর অধীনে পাওয়া যায়, কিন্তু এটি এই সেটিংসের নির্দিষ্ট করা ফরম্যাটের বদলে প্রমিত EPANET ফরম্যাট ব্যবহার করে। লাইনগুলো রাখা হয় এবং EPANET ফাইল সংরক্ষণ করলে আবার লেখা হয়।';
 $ec_lang['lpn_inp_drop_sections']='এই ফাইলে একটি অংশ আছে যা এই পৃষ্ঠা মোটেও পড়ে না। এখানে এটি ব্যবহার করা হয় না। এটি অক্ষত রাখা হয়, এবং আপনি একটি EPANET ফাইল সংরক্ষণ করলে এটি আবার লেখা হয়।';
 $ec_lang['lpn_inp_drop_comments']='এই ফাইলের প্যাটার্ন বা সরল কন্ট্রোলের এই মন্তব্যের লাইনগুলো আমদানি করা হয়নি, কারণ এই পেজে সেগুলো রাখার জায়গা নেই (যেমন, একটি প্যাটার্নের সারিগুলোর মাঝখানে)। প্রতিটি প্যাটার্ন ও কন্ট্রোল পুরোপুরি আমদানি করা হয়েছে।';
-$ec_lang['lpn_inp_drop_quality_options']='এই ফাইল EPANET পানির গুণমানের অপশন উল্লেখ করে: Quality অপশন, যা পানির গুণমান বিশ্লেষণের ধরন নির্দেশ করে, এবং একটি রাসায়নিকের সাথে যুক্ত দুটি সেটিং, Relative diffusivity ও Quality tolerance। তিনটিই রাখা ও ব্যবহার করা হয়। পানির বয়স, উৎস ট্রেস ও একটি রাসায়নিক প্রতিটি এখানে হিসাব করা হয়, এবং রাসায়নিক রান করলে দুটি রাসায়নিক সেটিং ব্যবহৃত হয়। EPANET ফাইল সংরক্ষণ করলে সবগুলো আবার লেখা হয়।';
 $ec_lang['lpn_inp_drop_file_options']='এই ফাইল একটি সহায়ক ফাইলের উল্লেখ করে: স্থানাঙ্ক ধারণকারী Map, অথবা আগে হিসাব করা হাইড্রোলিক্স ধারণকারী Hydraulics। এই পেজ কোনোটিই খুলতে পারে না, তাই লাইনগুলো যেমন আছে তেমন রাখা হয় এবং EPANET ফাইল সংরক্ষণ করলে আবার লেখা হয়।';
 $ec_lang['lpn_inp_drop_other_options']='এই ফাইলে এমন বিকল্প বলা আছে যা এই পৃষ্ঠা পড়ে না। এখানে সেগুলো ব্যবহার করা হয় না। সেগুলো রাখা হয় এবং আপনি একটি EPANET ফাইল সংরক্ষণ করলে আবার লেখা হয়।';
 $ec_lang['lpn_inp_drop_net_options']='এই EPANET .net ফাইলে এমন সেটিংস বলা আছে যার জন্য এই পৃষ্ঠায় কোনো নিয়ন্ত্রণ নেই, তাই সেগুলোর মান বহন করার বদলে এখানে তালিকাভুক্ত করা হয়েছে। বাকি সবকিছু চলে এসেছে। এগুলো দরকার হলে, EPANET-এ ফাইলটি খুলুন এবং ফাইল, রপ্তানি, নেটওয়ার্ক ব্যবহার করে এটি একটি .inp ফাইল হিসেবে সংরক্ষণ করুন, তারপর সেটি আমদানি করুন।';
@@ -3483,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='ডিফল্ট হলো {n}।';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='থামার আগে সমাধানকারীকে যে কনভার্জেন্স সীমায় পৌঁছাতে হবে, যা এক ট্রায়াল থেকে পরের ট্রায়ালে প্রবাহের মোট পরিবর্তনকে লিংকগুলোর মোট প্রবাহ দিয়ে ভাগ করে মাপা হয়। ছোট সংখ্যা বেশি নির্ভুল এবং বেশি সময় নেয়।';
 $ec_lang['lpn_settings_specific_gravity']='আপেক্ষিক ঘনত্ব';
-$ec_lang['lpn_settings_viscosity']='আপেক্ষিক সান্দ্রতা';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3492,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='আপেক্ষিক সান্দ্�
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='২০ ডিগ্রি সেলসিয়াসে পানির তুলনায় তরলের সান্দ্রতা। এটি শুধুমাত্র Darcy-Weisbach পদ্ধতিতে উত্তর পরিবর্তন করে।';
 $ec_lang['lpn_settings_trials']='সর্বোচ্চ ট্রায়াল';
 $ec_lang['lpn_settings_trials_tip']='কনভার্জ করে না এমন নেটওয়ার্কে সমাধানকারী থামার আগে ট্রায়ালের সর্বোচ্চ সংখ্যা।';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -3858,8 +3855,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='গুণমান সহনশীলতা';
 $ec_lang['lpn_quality_tolerance_tip']='যে ঘনমাত্রা পার্থক্যের নিচে EPANET পানির দুটি সংলগ্ন অংশকে একটি হিসেবে গণ্য করে। ফাঁকা রাখলে EPANET-এর ডিফল্ট 0.01 ব্যবহৃত হয়।';
-$ec_lang['lpn_quality_diffusivity']='আপেক্ষিক ব্যাপনশীলতা';
-$ec_lang['lpn_quality_diffusivity_tip']='ক্লোরিনের সাপেক্ষে পানিতে রাসায়নিকের ব্যাপ্তি। ফাঁকা রাখলে EPANET-এর ডিফল্ট 1.0 ব্যবহৃত হয়।';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='{chemical} ঘনমাত্রা';

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**61 still to read on master**, of 70 untranslated keys, of 3353 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**66 still to read on master**, of 75 untranslated keys, of 3353 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -45,7 +45,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   *Current plain sentence:* Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else.
   @@ NEEDS RULING
 
-## lpn_  (69, 60 to read @@ NEEDS RULING)
+## lpn_  (74, 65 to read @@ NEEDS RULING)
 
 - **`lpn_diag_builtin_error`**
   > An error occurred in the built-in solver: {message}
@@ -107,6 +107,9 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 - **`lpn_file_export_wtg_tip`**
   > Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.
   @@ NEEDS RULING
+- **`lpn_inp_drop_quality_options`**
+  > This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.
+  @@ NEEDS RULING
 - **`lpn_inp_export_flat_label_semicolon`**
   > Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.
   @@ NEEDS RULING
@@ -158,8 +161,20 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 - **`lpn_popup_boxtitle_of`**
   > Properties: {asset}
   @@ NEEDS RULING
+- **`lpn_quality_diffusivity`**
+  > Diffusivity
+  @@ NEEDS RULING
+- **`lpn_quality_diffusivity_tip`**
+  > EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²/s for US flow units and m²/s for SI flow units. Blank uses the EPANET default of 1.0.
+  @@ NEEDS RULING
 - **`lpn_settings_solver`**
   > Solver
+  @@ NEEDS RULING
+- **`lpn_settings_viscosity`**
+  > Viscosity
+  @@ NEEDS RULING
+- **`lpn_settings_viscosity_tip`**
+  > EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²/s for US flow units and m²/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.
   @@ NEEDS RULING
 - **`lpn_time_epanet_fallback`**
   > The EPANET solver could not be loaded, so the built-in solver ran this network.
@@ -265,7 +280,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 
 # Strings waiting on a branch
 
-**60 still to read**, of 60 new keys across 6 unmerged branch(es).
+**72 still to read**, of 72 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -276,7 +291,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/assembly (`f8612ee89`) — 49 new, 49 to read @@ NEEDS RULING
+### feat/assembly (`342c3a0fc`) — 51 new, 51 to read @@ NEEDS RULING
 
 - **`lpn_assembly_down_head`**
   > Downstream head
@@ -341,6 +356,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inp_drop_assembly`**
   > The file groups these pumps with nodes it does not contain, so the group was not restored. The nodes and pumps that are there came in as plain elements.
   @@ NEEDS RULING
+- **`lpn_inp_drop_assembly_id`**
+  > These groups share an ID with another group, so they were not restored. Their nodes and links came in as plain elements.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_well_tank`**
   > These are one-point wells with a tank, a form this page no longer draws. Their reservoir, drawdown valve, pump, tee, virtual pipe, and tank are kept as ordinary elements, and their pump controls as ordinary controls.
   @@ NEEDS RULING
@@ -390,13 +408,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Well
   @@ NEEDS RULING
 - **`lpn_tool_add_well_tip`**
-  > Add a well: its groundwater reservoir, drawdown valve, pump node, pump, and discharge node at one point. Specify a point on the map, or specify a pipe to split it and put the well in it.
+  > Add a well: its groundwater reservoir, drawdown valve, pump node, pump, and discharge node at one point. Specify a point on the map, or specify a pipe to split it and put the well in it. A Well's Description and Tag are those of its discharge node, the junction that shares the Well's ID.
   @@ NEEDS RULING
 - **`lpn_tool_add_welltank`**
   > Well with tank
   @@ NEEDS RULING
 - **`lpn_tool_add_welltank_tip`**
-  > Add a well with a tank: a well, a tee, and a tank, each at a point you specify, joined by pipes. The well's pump can be controlled by the tank level. Specify the well first, on the map or on a pipe to split it, then the tee, then the tank.
+  > Add a well with a tank: a well, a tee, and a tank, each at a point you specify, joined by pipes. The well's pump can be controlled by the tank level. Specify the well first, on the map or on a pipe to split it, then the tee, then the tank. A Well's Description and Tag are those of its discharge node, the junction that shares the Well's ID.
   @@ NEEDS RULING
 - **`lpn_tool_plus_next`**
   > Press it again for the next one: {next}.
@@ -409,6 +427,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_well_drawdown_valve`**
   > Drawdown valve
+  @@ NEEDS RULING
+- **`lpn_well_identity_tip`**
+  > A Well's Description and Tag are those of its discharge node, the junction that shares the Well's ID.
   @@ NEEDS RULING
 - **`lpn_well_pump_curve_tip`**
   > The curve in the Libraries box that gives the head the pump adds at each flow, lifted from the pumping level (the static water level elevation less the drawdown). Several pumps can use the same curve, and editing it there changes all of them.
@@ -426,8 +447,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > The tee must be a junction that is not part of another assembly. Specify the tee again.
   @@ NEEDS RULING
 
-### feat/contour-controls (`594da4f12`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/contour-controls (`d67b75482`) — 3 new, 3 to read @@ NEEDS RULING
 
+- **`lpn_contour_none_note`**
+  > Nothing to plot: choose a property under Color nodes by in Settings, Symbology, Node colors.
+  @@ NEEDS RULING
 - **`lpn_settings_color_node_field_tip`**
   > Colors the nodes by this property. The contour plot follows it.
   @@ NEEDS RULING
@@ -435,12 +459,25 @@ build for that would be a gate nobody keeps. Refresh it with
   > Colors the nodes, the contour plot and its key.
   @@ NEEDS RULING
 
-### feat/label-leader-draw (`ef210af6a`) — adds no English strings
-
-### feat/library-order (`0c1d78a35`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/library-order (`d90c3ffde`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_guide_lib_order_none`**
   > The order of patterns, curves, pipe types, and fittings lists never changes a run.
+  @@ NEEDS RULING
+- **`lpn_inp_drop_dup_curve`**
+  > These curve IDs are defined in more than one place in this file. EPANET adds the later points after the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start.
+  @@ NEEDS RULING
+- **`lpn_inp_drop_dup_pattern`**
+  > These pattern IDs are defined in more than one place in this file. EPANET adds the later multipliers after the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start.
+  @@ NEEDS RULING
+- **`lpn_inp_dup_and`**
+  >  and 
+  @@ NEEDS RULING
+- **`lpn_inp_dup_curve_entry`**
+  > Curve {id} (lines {lines})
+  @@ NEEDS RULING
+- **`lpn_inp_dup_pattern_entry`**
+  > Pattern {id} (lines {lines})
   @@ NEEDS RULING
 - **`lpn_library_move_bottom`**
   > Move to bottom
@@ -464,10 +501,28 @@ build for that would be a gate nobody keeps. Refresh it with
   > Move to top
   @@ NEEDS RULING
 
-### feat/pick-chooser (`bdfdf1dd1`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/pick-chooser (`8c2130c6d`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pick_chooser_label`**
   > Select one of the elements here
   @@ NEEDS RULING
 
-### feat/wtg-scenario (`8c9752a5f`) — adds no English strings
+### feat/transport-slim (`2f7678858`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_time_more`**
+  > More time controls
+  @@ NEEDS RULING
+
+### feat/velocity-warning (`2ad68c694`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_velocity_warn`**
+  > ⚠ Pipe {id} velocity is {velocity} at {time}.
+  @@ NEEDS RULING
+- **`lpn_velocity_warn_more`**
+  > ⚠ And more pipes ({n}) above {limit}.
+  @@ NEEDS RULING
+- **`lpn_velocity_warn_steady`**
+  > ⚠ Pipe {id} velocity is {velocity}.
+  @@ NEEDS RULING
+
+### fix/diffusivity (`5d0b057c4`) — adds no English strings

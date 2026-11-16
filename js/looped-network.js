@@ -358,7 +358,19 @@ var EngCalcs = EngCalcs || {};
 		// move when the box's pixel width did, and the angle with it (Task 328).
 		holder.leader.style.display = '';
 		holder.leader.setAttribute('x1', anchor.x); holder.leader.setAttribute('y1', anchor.y);
-		holder.leader.setAttribute('x2', end.x); holder.leader.setAttribute('y2', end.y);
+		// A stack's leader meets the row nearest its node (dropStruckLeaders()): the row's index, turned into a distance at THIS scale,
+		// by the label's own font size. It holds while the label still has the rows it was worked out for (rewriting the rows, or moving
+		// the label, clears it) and never while the label is in the hand; a zoom frame moves it with the font (syncAttachedLeaderEnd()).
+		var at = holder.leaderAttach, ey = at && at.n === holder.lineCount && !labelInHand(holder) ? end.y + at.row * (parseFloat(holder.text.style.fontSize) * 1.2 || effectiveLineHeight()) : end.y;
+		holder.leader.setAttribute('x2', end.x); holder.leader.setAttribute('y2', ey);
+	}
+	// A zoom frame rewrites the font size and lays nothing out until its pass: the rows move to the new size about their first
+	// baseline, and a leader set to meet one of them follows (its end is at the baseline's y, the text element's own).
+	function syncAttachedLeaderEnd(ne) {
+		var at = ne.leaderAttach, y;
+		if (!at || !ne.leader || ne.leader.style.display === 'none' || at.n !== ne.lineCount) { return; }
+		y = parseFloat(ne.text.getAttribute('y'));
+		if (y === y) { ne.leader.setAttribute('y2', y + at.row * (parseFloat(ne.text.style.fontSize) * 1.2)); }
 	}
 	// WHERE THE TEXT GOES, given the endpoint the user placed. The box hangs off B on whichever
 	// side keeps it from lying across its own leader -- a fact about legibility, and therefore
@@ -472,6 +484,7 @@ var EngCalcs = EngCalcs || {};
 		// fit and releases the ground, `hiddenCrossed` says this label lost a crossing nothing could
 		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
 		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
+		if (n.lx !== undefined) { ne.leaderAttach = null; }   // a label the user placed keeps the end they gave its leader
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
 		repositionMultilineText(ne.text, justifyDataLabel(ne.text, ne.side, end, org), org.y);
@@ -994,7 +1007,10 @@ var EngCalcs = EngCalcs || {};
 	// nothing and makes no pipe label yield. Measured over 64 views (Net3, Novato, the 600-junction
 	// network): +41 labels and +287 values for about +3% pass time. In Chromium on Novato N164, N166 and
 	// N265 go to lines at 12 to 16 notches; N163 cannot (the short pipe L181's label stands east of it).
-	// A tie that finds no place is not tried a second time: the same counts, a quarter of the time.
+	// A tie that finds no place is not tried a second time: the same counts, a quarter of the time. (Tried again after its
+	// neighbours have taken their lines, 2026-11-14, a real wheel over N163 on Novato: N163 is a line where master has a stack at
+	// 12-15 and 17-18 notches in a 1920 x 1000 window and at 17-18 in 1366 x 768, but pipe labels master shows lose fields at
+	// 4 of 19 notches (L251 3 to 1 at 1 and 2, L180 3 to 1 at 13, L233 and L317 hidden at 5). Not kept.)
 	var LPN_YIELD = true;
 	var LPN_TIE_LINE = true;
 	// **A LABEL THAT LOST SOMETHING MAY TAKE GROUND HELD ONLY BY A PIPE LABEL THAT YIELDS** (`takeYield`;
@@ -1392,6 +1408,9 @@ var EngCalcs = EngCalcs || {};
 		if (!ne.inline) { ne.inlineFrom = null; }
 		var rows = composeRows(lines, !ne.inline);
 		setMultilineText(ne.text, nodeLabelBase(n).x, rows);
+		// A leader set to meet the label's near edge (dropStruckLeaders()) keeps its place while the rows are the same number: an edit
+		// of a value rewrites them, and the leader does not jump back to the first row until the next pass. Other rows, other edge.
+		if (ne.leaderAttach && ne.leaderAttach.n !== rows.length) { ne.leaderAttach = null; }
 		ne.lineCount = rows.length;
 		ne.lines = lines;   // the FIELD lines, one per value, whatever shape they were drawn in
 		ne.text.style.fontSize = fsNow;
@@ -3414,9 +3433,9 @@ var EngCalcs = EngCalcs || {};
 	// keeps its place and loses only the leader; no label is hidden for it. It cannot make a new
 	// crossing, so it runs once, last. dev/lpn-spike/label-crossing-final-browser-harness.js.
 	var LPN_DROP_STRUCK = true;
-	function dropStruckLeaders(nodeLabels, nodePlaced, labels, placed, obs, holders) {
+	function dropStruckLeaders(nodeLabels, nodePlaced, labels, placed, obs, holders, nodeObs) {
 		var min = leaderThreshold(), lmin = levelLeaderMin(), specs = {}, leaders = [], rows = [], struck = 0, air = effectiveFontSize() * LPN_LEVEL_PAD_FRAC;
-		doc.nodes.forEach(function (n) { var ne = nodeEls[n.id]; if (ne) { ne.leaderStruck = false; } });
+		doc.nodes.forEach(function (n) { var ne = nodeEls[n.id]; if (ne) { ne.leaderStruck = false; ne.leaderAttach = null; } });
 		doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le) { le.leaderStruck = false; } });
 		if (!LPN_DROP_STRUCK) { return 0; }
 		nodeLabels.concat(labels).forEach(function (sp) { specs[sp.id] = sp; });
@@ -3431,7 +3450,7 @@ var EngCalcs = EngCalcs || {};
 			if (r.dropped || !sp || !h || !shown(r.id)) { return; }
 			bs.forEach(function (b) { rows.push({ id: r.id, b: b }); });
 			if (!sp.dragged && (Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y) > min || h.leaderDue)) {
-				leaders.push({ id: r.id, h: h, g: Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id) });
+				leaders.push({ id: r.id, h: h, g: Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id), r: r });
 			}
 		});
 		placed.forEach(function (r) {
@@ -3454,7 +3473,86 @@ var EngCalcs = EngCalcs || {};
 				if (rows[i].id !== ld.id && rows[i].b.w > 0 && Collide.segmentInBoxFraction(ld.g, rows[i].b) > 0) { ld.h.leaderStruck = true; struck++; return; }
 			}
 		});
+		if (LPN_LEADER_NEAREST_ROW) {
+			leaders.forEach(function (ld) { if (ld.r && !ld.h.leaderStruck) { attachToNearestRow(ld, specs[ld.id], leaders, rows, obs, nodeObs); } });
+		}
 		return struck;
+	}
+	// **A STACK'S LEADER MEETS THE ROW NEAREST ITS NODE** (Task 812, Tom's lesson "leaders a person would draw"). The leader runs to the
+	// stack's first row, wherever the node stands: a stack set above and beside its node was reached across its whole height (a
+	// 72 px leader to a stack whose lowest row stood 19 px from the node; a median of 6 px and a top tenth of 30 px more than the shortest
+	// way in over Novato). The leader's end slides down the label's near edge to the row whose line is nearest the node, and stays where it
+	// was if the shorter one would cross a label, a leader, another node's symbol, or more pipes than the leader it replaces. Only the
+	// leader's end moves: no label does, so none is hidden or shown by it. Angles are no longer on the 15-degree grid (Tom, 2026-08-16:
+	// *"constrain leader angles to be at multiples of 15 degrees and not orthogonal"*), which is why this is a flag.
+	var LPN_LEADER_NEAREST_ROW = true;
+	// How many pipes (not the node's own) each of two leaders crosses, in one walk of the segments: [of g, of g2].
+	function pipesCrossed(g, g2, segs) {
+		var a = 0, b = 0, j, o, e = 1e-6 * (1 + Math.abs(g.ax) + Math.abs(g.ay));
+		for (j = 0; j < segs.length; j++) {
+			o = segs[j];
+			if (o.kind !== 'link') { continue; }
+			if ((Math.abs(o.ax - g.ax) < e && Math.abs(o.ay - g.ay) < e) || (Math.abs(o.bx - g.ax) < e && Math.abs(o.by - g.ay) < e)) { continue; }
+			if (Collide.segmentsCross(g, o)) { a++; }
+			if (Collide.segmentsCross(g2, o)) { b++; }
+		}
+		return [a, b];
+	}
+	// **THE LEADER STAYS ON THE 15-DEGREE GRID** (Tom, 2026-08-16: *"constrain leader angles to be at multiples of 15 degrees and not
+	// orthogonal"*, label-placement-goals.md goal 7; Perry's pre-review of the first build, which ended leaders at a row's baseline and
+	// took 42 of 790 Novato node leaders off the grid to 243). The leader still ends on the label's near edge (x of its end), but at the
+	// point where a ray from the node at one of Collide.RING_ANGLES (multiples of 15, never level or plumb) meets that edge inside a
+	// drawn row; the shortest such leader that crosses nothing new is taken, and the old leader (to the first row, on the grid by how
+	// its side was chosen) stays when there is none. The end is kept as a distance down the edge in row pitches, `row` (a fraction),
+	// with the label's row count `n`: the pitch is the label's own font size, so a zoom frame keeps it on the same ray.
+	function attachToNearestRow(ld, sp, leaders, rows, obs, nodeObs) {
+		var r = ld.r, g = ld.g, widths = sp && sp.lines, bx = r.boxes, lh = effectiveLineHeight(), dx = g.bx - g.ax, old = Math.hypot(dx, g.by - g.ay),
+			cands = [], i, m, c, g2, ys, hit, mm, d;
+		if (!widths || widths.length < 2 || widths.length !== ld.h.lineCount || !bx || !(Math.abs(dx) > 1e-9)) { return; }
+		for (m = 0; m < Collide.RING_ANGLES.length; m++) {
+			c = Collide.RING_ANGLES[m] * Math.PI / 180;
+			if (Math.cos(c) * dx <= 0) { continue; }
+			ys = g.ay + dx * Math.tan(c);
+			d = Math.abs(dx / Math.cos(c));
+			if (d >= old - 1e-9) { continue; }
+			// inside the extent of a drawn row (a blank row has no box)
+			hit = false;
+			for (mm = 0; mm < bx.length; mm++) { if (Math.abs(ys - bx[mm].cy) <= bx[mm].h / 2) { hit = true; break; } }
+			if (hit) { cands.push({ y: ys, len: d, deg: Collide.RING_ANGLES[m] }); }
+		}
+		cands.sort(function (a, b) { return a.len - b.len; });
+		for (i = 0; i < cands.length; i++) {
+			g2 = Collide.segment(g.ax, g.ay, g.bx, cands[i].y, 'leader', ld.id);
+			if (!attachClear(ld, g2, bx, leaders, rows, obs, nodeObs)) { continue; }
+			ld.h.leaderAttach = { row: (cands[i].y - r.y) / lh, n: widths.length };
+			ld.g = g2;
+			return;
+		}
+	}
+	function attachClear(ld, g2, bx, leaders, rows, obs, nodeObs) {
+		var g = ld.g, i, c, o, list, m;
+		for (i = 0; i < rows.length; i++) {
+			if (rows[i].id !== ld.id && rows[i].b.w > 0 && Collide.segmentInBoxFraction(g2, rows[i].b) > 0) { return false; }
+		}
+		// its own rows: the end stands on the edge of the one it meets, which the shrunk box leaves alone
+		for (m = 0; m < bx.length; m++) {
+			if (Collide.segmentInBoxFraction(g2, Collide.box(bx[m].cx, bx[m].cy, bx[m].w - 1e-6, bx[m].h, bx[m].a)) > 0 && !(Math.abs(g2.by - bx[m].cy) <= bx[m].h / 2)) { return false; }
+		}
+		// a leader marked struck is not drawn, so it cannot be crossed
+		for (i = 0; i < leaders.length; i++) { if (leaders[i] !== ld && !leaders[i].h.leaderStruck && Collide.segmentsCross(g2, leaders[i].g)) { return false; } }
+		// everything the first fit kept clear of: the symbols (the one the leader starts in is its own), and every other box on the
+		// drawing, Text objects, pipe labels along their pipes, level labels, dragged and foreign labels, customer boxes included
+		for (c = 0; c < 2; c++) {
+			list = c ? (nodeObs && nodeObs !== obs ? nodeObs.boxes : []) : obs.boxes;
+			for (i = 0; i < list.length; i++) {
+				o = list[i];
+				if (!(o.w > 0)) { continue; }
+				if (o.kind === 'symbol' && Math.hypot(o.cx - g.ax, o.cy - g.ay) <= o.w / 2) { continue; }
+				if (Collide.segmentInBoxFraction(g2, o) > 0) { return false; }
+			}
+		}
+		m = pipesCrossed(g, g2, obs.segments);
+		return m[1] <= m[0];
 	}
 	// **EVERYTHING THE LEVEL PASS READS IS TAKEN TO A MILLIONTH OF A DRAWING UNIT**: boxes and segments are measured in
 	// pixels over a scale, and one scale reached by two wheel histories differs in its last bit; a spot that grazes a box then flips
@@ -3964,7 +4062,7 @@ var EngCalcs = EngCalcs || {};
 		perfDebugAccum('  cl:level', function () {
 			placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, labels, placed, holders, fs);
 		});
-		perfDebugAccum('  cl:struck', function () { dropStruckLeaders(nodeLabels, nodePlaced, labels, placed, obs, holders); });
+		perfDebugAccum('  cl:struck', function () { dropStruckLeaders(nodeLabels, nodePlaced, labels, placed, obs, holders, nodeObs); });
 		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
 		// **THE METERS GO LAST, ON THE GROUND EVERYTHING ELSE HAS LEFT** (Task 247). They are the
 		// only labels on this page with two fixed positions and no relaxation, so they can only be
@@ -48124,7 +48222,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
-			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
+			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
 			case 'pressure-unit': return pc.lpn_inp_drop_pressure_unit || 'This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
 			case 'other-options': return pc.lpn_inp_drop_other_options || 'This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
 			// **THE ONE LOSS ON THE `.net` PATH THAT CANNOT BE CARRIED**, so it is told instead. A
@@ -63689,7 +63787,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// drawing buys nothing, and the revival re-applies every one of them
 			// (refreshLabelSuppression), so nothing comes back at the wrong size.
 			if (!dataLabelsHidden) {
-				Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
+				Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; syncAttachedLeaderEnd(nodeEls[id]); });
 				Object.keys(linkEls).forEach(function (id) {
 					linkEls[id].text.style.fontSize = fs;
 					(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
@@ -64147,7 +64245,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			placedSide: h.placedSide, side: h.side, lines: h.lines ? h.lines.slice() : null,
 			lineCount: h.lineCount, shedCount: h.shedCount || 0,
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
-			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, leaderDue: !!h.leaderDue, leaderStruck: !!h.leaderStruck, hiddenDropped: !!h.hiddenDropped,
+			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, leaderDue: !!h.leaderDue, leaderStruck: !!h.leaderStruck, leaderAttach: h.leaderAttach ? { row: h.leaderAttach.row, n: h.leaderAttach.n } : null, hiddenDropped: !!h.hiddenDropped,
 			crowdHidden: !!h.crowdHidden,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
 			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
@@ -64202,7 +64300,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.shedCount = c.shedCount;
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
 		h.hiddenBlocked = c.hiddenBlocked;
-		h.hiddenCrossed = c.hiddenCrossed; h.leaderDue = !!c.leaderDue; h.leaderStruck = !!c.leaderStruck; h.hiddenDropped = c.hiddenDropped;
+		h.hiddenCrossed = c.hiddenCrossed; h.leaderDue = !!c.leaderDue; h.leaderStruck = !!c.leaderStruck; h.leaderAttach = c.leaderAttach ? { row: c.leaderAttach.row, n: c.leaderAttach.n } : null; h.hiddenDropped = c.hiddenDropped;
 		h.crowdHidden = c.crowdHidden;
 		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
@@ -70870,7 +70968,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_quality_chemical_name_tip), [['settings', 'quality']]);
 		setboxTag(rowFn(host, pc.lpn_quality_mass_units || 'Mass units', massSel,
 			pc.lpn_quality_mass_units_tip), [['settings', 'quality']]);
-		// **QUALITY TOLERANCE AND RELATIVE DIFFUSIVITY, EPANET'S OWN NAMES** (R-322, Tom: "I don't
+		// **QUALITY TOLERANCE AND DIFFUSIVITY, EPANET'S OWN NAMES** (R-322, Tom: "I don't
 		// see this in our interface. Is it missing?" -- twice). They were carried in the file and
 		// handed to the engine all along (`qualitySetting()`, js/lpn-epanet.js) with no box to read
 		// or change them from; this is that box, for the two EPANET applies only to a chemical.
@@ -70902,7 +71000,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		qualityOptionRow('tolerance', pc.lpn_quality_tolerance || 'Quality tolerance',
 			pc.lpn_quality_tolerance_tip, '0.01');
-		qualityOptionRow('diffusivity', pc.lpn_quality_diffusivity || 'Relative diffusivity',
+		qualityOptionRow('diffusivity', pc.lpn_quality_diffusivity || 'Diffusivity',
 			pc.lpn_quality_diffusivity_tip, '1.0');
 		// **A COEFFICIENT ROW: BLANK IS A STATE, NOT A ZERO WE TYPED.** Clearing the box removes the
 		// key, so the exporter writes no line and EPANET's own default stands -- the same sparse

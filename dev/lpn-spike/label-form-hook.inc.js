@@ -102,6 +102,38 @@
 			L.forEach(function (g) { var seen = {}; R.forEach(function (r) { if (r.k !== g.k && !seen[r.k] && hit(g, r)) { seen[r.k] = true; out.push(g.k + ' through ' + r.k); } }); });
 			return out;
 		},
+		// Every drawn leader as a drafter would judge it (Task 812, leaders a person would draw), in screen pixels: its
+		// two ends, the rows of its own label, every pipe segment with the pipe's ends, and every node's centre. A
+		// label set along a pipe (rotated) is left out. The faults are counted by label-leader-shapes-browser-harness.js.
+		leaderShapes: function () {
+			var c = svg.getBoundingClientRect(), out = { leaders: [], pipes: [], nodes: [], nodesShown: 0, pipesShown: 0 };
+			function vis(t) { return !!t && !!t.textContent && t.checkVisibility({ visibilityProperty: true, opacityProperty: true }); }
+			function rows(t) {
+				var res = [], cur = null, ts = t.querySelectorAll('tspan'), i, r;
+				for (i = 0; i < ts.length; i++) {
+					r = ts[i].getBoundingClientRect();
+					if (!(r.width > 0)) { continue; }
+					if (ts[i].hasAttribute('x') || !cur) { cur = { l: r.left - c.left, t: r.top - c.top, r: r.right - c.left, b: r.bottom - c.top }; res.push(cur); }
+					else { cur.l = Math.min(cur.l, r.left - c.left); cur.t = Math.min(cur.t, r.top - c.top); cur.r = Math.max(cur.r, r.right - c.left); cur.b = Math.max(cur.b, r.bottom - c.top); }
+				}
+				return res;
+			}
+			function px(p) { return { x: p.x * state.s + state.tx, y: p.y * state.s + state.ty }; }
+			function add(k, h, own) {
+				var e = h && h.leader;
+				if (h && !h.empty && vis(h.text)) { if (k.charAt(0) === 'N') { out.nodesShown++; } else { out.pipesShown++; } }
+				if (e && e.style.display !== 'none' && e.style.visibility !== 'hidden' && e.getAttribute('x1') != null && h.text && vis(h.text) && !/rotate/.test(h.text.getAttribute('transform') || '')) {
+					out.leaders.push({ k: k, own: own, a: px({ x: +e.getAttribute('x1'), y: +e.getAttribute('y1') }), b: px({ x: +e.getAttribute('x2'), y: +e.getAttribute('y2') }), rows: rows(h.text) });
+				}
+			}
+			doc.nodes.forEach(function (n) { var p = nodeAt(n); out.nodes.push({ id: n.id, x: p.x * state.s + state.tx, y: p.y * state.s + state.ty }); add('N' + n.id, nodeEls[n.id], { node: n.id }); });
+			doc.links.forEach(function (l) {
+				var pts = linkPointList(l), i;
+				for (i = 1; i < pts.length; i++) { out.pipes.push({ id: l.id, from: l.from, to: l.to, a: px(pts[i - 1]), b: px(pts[i]) }); }
+				add('L' + l.id, linkEls[l.id], { link: l.id });
+			});
+			return out;
+		},
 		// Every label the last crossing hide hid, and which of them cross nothing in the entries it measured.
 		hiddenCrossedAudit: function () {
 			var g = lastFinalGround, E = g ? crossingEntries(g.nodeLabels, g.nodePlaced, g.labels, g.placed, g.obs) : [], pairs = EngCalcs.lpnCollide.labelCrossings(E).pairs, inPair = {}, out = { hidden: [], unjustified: [], forms: window.__lpnForm.nodeForms(['161']) };
@@ -111,6 +143,44 @@
 				if (h && h.hiddenCrossed) { out.hidden.push(e.id); if (!inPair[e.id]) { out.unjustified.push(e.id); } }
 			});
 			return out;
+		},
+		// Leaders set to meet the row nearest their node (dropStruckLeaders()): for one node, where its leader's end stands against the
+		// rows as drawn, in screen pixels; and the ids that hold one. label-leader-shapes-browser-harness.js.
+		attachedIds: function () { return doc.nodes.filter(function (n) { var ne = nodeEls[n.id]; return ne && ne.leaderAttach && ne.leader && ne.leader.style.display !== 'none'; }).map(function (n) { return n.id; }); },
+		attachState: function (id) {
+			var ne = nodeEls[id], c = svg.getBoundingClientRect(), ts = ne.text.querySelectorAll('tspan'), rows = [], i, r, cur, e = ne.leader, y2;
+			for (i = 0; i < ts.length; i++) {
+				r = ts[i].getBoundingClientRect();
+				if (!(r.width > 0)) { continue; }
+				if (ts[i].hasAttribute('x') || !cur) { cur = { t: r.top - c.top, b: r.bottom - c.top }; rows.push(cur); } else { cur.t = Math.min(cur.t, r.top - c.top); cur.b = Math.max(cur.b, r.bottom - c.top); }
+			}
+			y2 = +e.getAttribute('y2') * state.s + state.ty;
+			return { row: ne.leaderAttach ? ne.leaderAttach.row : null, lineCount: ne.lineCount, rows: rows, y2: y2, shown: e.style.display !== 'none' };
+		},
+		// Where a node stands in the window, for a real wheel to be turned over it.
+		nodeScreen: function (id) { var r = svg.getBoundingClientRect(), p = nodeAt(nodeById(id)); return { x: r.left + p.x * state.s + state.tx, y: r.top + p.y * state.s + state.ty }; },
+		// A node's elevation edited with Recalculate off: its label rewritten in place, no pass.
+		editElev: function (id, v) { var n = nodeById(id); setProp(n, 'elev', v); refreshOneLabelInPlace(n); },
+		// A zoom frame: the font sizes rewritten at a new scale and nothing laid out (what a wheel notch does before its pass).
+		zoomFrame: function (f) { state.s *= f; setTransform(); refreshFontSizes(true); },
+		// An edit with Recalculate off: this node's label cut to its first `keep` fields and rewritten in place, no pass.
+		editInPlace: function (id, keep) {
+			var ls = scnLabels(), on = Object.keys(ls.node).filter(function (k) { return ls.node[k]; }), was = on.slice();
+			on.slice(keep).forEach(function (k) { ls.node[k] = false; });
+			refreshOneLabelInPlace(nodeById(id));
+			was.forEach(function (k) { ls.node[k] = true; });
+		},
+		// attachToNearestRow() on a made-up label: `widths` the row widths (0 for a blank row), the label's near edge at x = 0 with its first
+		// baseline at y = 0, the node `ax` row pitches left of the edge and `ay` below the first baseline. Returns where its leader ends,
+		// in row pitches below the first baseline, and the leader's angle in degrees (y down); null when the old leader stays.
+		attachProbe: function (widths, ax, ay) {
+			var lh = effectiveLineHeight(), boxes = [], h = { lineCount: widths.length, leaderStruck: false }, ld, A = { x: -ax * lh, y: ay * lh }, t;
+			widths.forEach(function (w, i2) { if (w > 0) { boxes.push(Collide.box(w / 2, i2 * lh, w, lh * 0.9, 0)); } });
+			ld = { id: 'probe', h: h, r: { x: 0, y: 0, boxes: boxes }, g: Collide.segment(A.x, A.y, 0, 0, 'leader', 'probe') };
+			attachToNearestRow(ld, { lines: widths }, [ld], [], { boxes: [], segments: [] }, null);
+			if (!h.leaderAttach) { return null; }
+			t = h.leaderAttach.row;
+			return { t: t, deg: Math.atan2(t * lh - A.y, -A.x) * 180 / Math.PI };
 		},
 		fit: function () { zoomExtent(); },
 		// Pipe labels in the view, counted as drawn: shown, fields shown of fields asked, shed (shown with

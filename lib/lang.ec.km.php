@@ -2342,7 +2342,6 @@ $ec_lang['lpn_inp_drop_tags']='ឯកសារនេះកំណត់ស្ល�
 $ec_lang['lpn_inp_drop_report']='ឯកសារនេះមានការកំណត់ទ្រង់ទ្រាយរបាយការណ៍របស់ EPANET។ របាយការណ៍ការដំណើរការមាននៅក្រោម របាយការណ៍, ការដំណើរការ ប៉ុន្តែវាប្រើទ្រង់ទ្រាយស្ដង់ដារ EPANET ជាជាងទ្រង់ទ្រាយដែលការកំណត់ទាំងនេះបញ្ជាក់។ បន្ទាត់ទាំងនោះត្រូវបានរក្សាទុក ហើយសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
 $ec_lang['lpn_inp_drop_sections']='ឯកសារនេះផ្ទុកផ្នែកមួយដែលទំព័រនេះមិនអានទាល់តែសោះ។ គ្មានអ្វីនៅទីនេះប្រើវាទេ។ វាត្រូវបានរក្សាទុកទាំងស្រុង ហើយត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
 $ec_lang['lpn_inp_drop_comments']='បន្ទាត់មតិយោបល់ទាំងនេះក្នុងលំនាំ ឬការគ្រប់គ្រងសាមញ្ញនៃឯកសារនេះមិនត្រូវបាននាំចូលទេ ព្រោះទំព័រនេះគ្មានកន្លែងរក្សាទុកពួកវា (ឧទាហរណ៍ រវាងជួរដេកនៃលំនាំមួយ)។ លំនាំ និងការគ្រប់គ្រងទាំងអស់ត្រូវបាននាំចូលពេញលេញ។';
-$ec_lang['lpn_inp_drop_quality_options']='ឯកសារនេះចែងជម្រើសគុណភាពទឹករបស់ EPANET៖ ជម្រើស Quality ដែលដាក់ឈ្មោះប្រភេទនៃការវិភាគគុណភាពទឹក និងការកំណត់ពីរដែលទៅជាមួយសារធាតុគីមី គឺ Relative diffusivity និង Quality tolerance។ ទាំងបីត្រូវបានរក្សាទុក និងប្រើ។ អាយុទឹក ការតាមដានប្រភព និងសារធាតុគីមីមួយ ត្រូវបានគណនានៅទីនេះរៀងៗខ្លួន ហើយការកំណត់សារធាតុគីមីទាំងពីរត្រូវបានប្រើនៅពេលដំណើរការសារធាតុគីមី។ ទាំងអស់ត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
 $ec_lang['lpn_inp_drop_file_options']='ឯកសារនេះយោងទៅឯកសារជំនួយមួយ៖ Map ដែលផ្ទុកកូអរដោនេ ឬ Hydraulics ដែលផ្ទុកលទ្ធផលធារាសាស្ត្រដែលបានគណនារួច។ ទំព័រនេះមិនអាចបើកឯកសារទាំងពីរប្រភេទនេះទេ ដូច្នេះបន្ទាត់ទាំងនោះត្រូវបានរក្សាទុកដដែល ហើយត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
 $ec_lang['lpn_inp_drop_other_options']='ឯកសារនេះចែងជម្រើសដែលទំព័រនេះមិនអានទេ។ គ្មានអ្វីនៅទីនេះប្រើវាទេ។ ពួកវាត្រូវបានរក្សាទុក ហើយត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
 $ec_lang['lpn_inp_drop_net_options']='ឯកសារ .net EPANET នេះចែងការកំណត់ដែលទំព័រនេះគ្មានប្រដាប់ត្រួតត្រា ដូច្នេះតម្លៃរបស់ពួកវាត្រូវបានរាយនៅទីនេះជាជាងត្រូវបានយកមកប្រើ។ អ្វីៗផ្សេងទៀតបានចូលមកទាំងអស់។ ប្រសិនបើអ្នកត្រូវការពួកវា សូមបើកឯកសារនោះនៅក្នុង EPANET ហើយប្រើ File, Export, Network ដើម្បីរក្សាទុកជាឯកសារ .inp រួចនាំចូលឯកសារនោះវិញ។';
@@ -3483,7 +3482,6 @@ $ec_lang['lpn_settings_default_is']='តម្លៃលំនាំដើមគ�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='ដែនកំណត់ប្រសព្វដែលឧបករណ៍ដោះស្រាយត្រូវឈានដល់មុនពេលឈប់ វាស់ជាការផ្លាស់ប្ដូរសរុបនៃលំហូរពីជុំមួយទៅជុំបន្ទាប់ ចែកនឹងលំហូរសរុបក្នុងតំណ។ លេខតូចជាងត្រឹមត្រូវជាង ប៉ុន្តែចំណាយពេលយូរជាង។';
 $ec_lang['lpn_settings_specific_gravity']='ទម្ងន់ជាក់លាក់';
-$ec_lang['lpn_settings_viscosity']='ភាពខាប់ទាក់ទង';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
 // collided with the word the same sprint used for lpn_result_concentration, on the same screen.
@@ -3492,7 +3490,6 @@ $ec_lang['lpn_settings_viscosity']='ភាពខាប់ទាក់ទង';
 // entry that quoted a translator's mistaken description of the key without anyone checking it
 // against this file -- so the note below says what the number IS and what it is NOT, because two
 // separate readers have now reached for a transport coefficient on a fluid property.
-$ec_lang['lpn_settings_viscosity_tip']='ភាពខាប់នៃវត្ថុរាវធៀបនឹងទឹកនៅ 20 អង្សាសេ។ វាផ្លាស់ប្ដូរចម្លើយតែក្រោមវិធីសាស្ត្រ Darcy-Weisbach ប៉ុណ្ណោះ។';
 $ec_lang['lpn_settings_trials']='ជុំអតិបរមា';
 $ec_lang['lpn_settings_trials_tip']='ចំនួនជុំអតិបរមាមុនពេលឧបករណ៍ដោះស្រាយឈប់លើបណ្ដាញដែលមិនប្រសព្វ។';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
@@ -3858,8 +3855,6 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='ភាពអត់ធ្មត់គុណភាព';
 $ec_lang['lpn_quality_tolerance_tip']='ភាពខុសគ្នានៃកំហាប់ក្រោមតម្លៃដែល EPANET ចាត់ទុកទឹកពីរដុំជាប់គ្នាជាមួយ។ ទទេប្រើលំនាំដើមរបស់ EPANET គឺ 0.01។';
-$ec_lang['lpn_quality_diffusivity']='ភាពសាយភាយទាក់ទង';
-$ec_lang['lpn_quality_diffusivity_tip']='ភាពសាយភាយនៃសារធាតុគីមីក្នុងទឹក ធៀបនឹងក្លរីន។ ទទេប្រើលំនាំដើមរបស់ EPANET គឺ 1.0។';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that
 // would be very cool." One template, read by qualityLabel() everywhere a concentration is named.
 $ec_lang['lpn_quality_named_concentration']='កំហាប់ {chemical}';
