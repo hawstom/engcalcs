@@ -37169,17 +37169,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				heads: [idH, descH, pc.lpn_fitting_name || 'Fitting', pc.lpn_fitting_qty || 'Quantity', pc.lpn_fitting_k || 'Coefficient'] });
 		}
 		var ctls = libControlsRead();
-		if (ctls.some(function (c) { return !c.comment; })) {
+		if (ctls.length) {
 			out.push({ name: pc.lpn_library_controls || 'Controls', heads: [descH, pc.lpn_library_controls || 'Controls'], numeric: [false, false],
-				rows: ctls.filter(function (c) { return !c.comment; }).map(function (c) { return [txt(c.note), libControlText(c)]; }) });
+				rows: ctls.map(function (c) { return c.comment ? [txt(libCommentText(c.lines)), ''] : [txt(c.note), libControlText(c)]; }) });
 		}
 		var ruleLines = libRulesRead(), rrows = [];
 		libRuleItems(ruleLines).forEach(function (e) {
-			if (e.kind === 'comment') { return; }
-			e.lines.forEach(function (line) { rrows.push([txt(e.name), txt(line)]); });
+			if (e.kind === 'comment') { rrows.push(['', txt(libCommentText(e.lines)), '']); return; }
+			e.lines.forEach(function (line) { rrows.push([txt(e.name), '', txt(line)]); });
 		});
 		if (rrows.length) {
-			out.push({ name: pc.lpn_library_rules || 'Rules', heads: [idH, pc.lpn_library_rules || 'Rules'], numeric: [false, false], rows: rrows });
+			out.push({ name: pc.lpn_library_rules || 'Rules', heads: [idH, descH, pc.lpn_library_rules || 'Rules'], numeric: [false, false, false], rows: rrows });
 		}
 		return out;
 	}
