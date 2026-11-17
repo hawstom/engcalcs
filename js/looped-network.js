@@ -41174,7 +41174,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pts = [[0, 0]], hs = [], i;
 		if (!s || !(s.vol > 0) || !(s.pre >= 0) || !(s.on > 0) || !(s.off > s.on) || !(s.pre < s.off)) { return null; }
 		if (s.pre > 0) { pts.push([s.pre, 0]); }
-		for (i = 1; i <= PT_STEPS; i++) { hs.push(s.pre + (s.off - s.pre) * i / PT_STEPS); }
+		for (i = 1; i <= PT_STEPS; i++) { hs.push(i === PT_STEPS ? s.off : s.pre + (s.off - s.pre) * i / PT_STEPS); }   // the last level IS the pump-off head, not a computed neighbour of it
 		if (s.on > s.pre && s.on < s.off) { hs.push(s.on); }
 		hs.sort(function (x, y) { return x - y; });
 		hs.forEach(function (x) {
@@ -41219,18 +41219,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE ONE WRITER OF EVERYTHING DERIVED FROM `pt`**: the VOLUME curve, the tank's limits and the two pump controls. Called after any edit of `pt`, a unit change and
 	// the wizard's last press. With inputs that are not a tank (a blank, a pump on above pump off) it leaves the curve and writes no control.
 	function syncPressureTank(a) {
-		var tank = wellHasTank(a) && a.pt ? nodeById(a.tank) : null, s, fh, pts, c;
+		var tank = wellHasTank(a) && a.pt ? nodeById(a.tank) : null, s, fh, pts, c, lv;
 		if (!tank) { return; }
 		s = pressureTankSI(a);
 		if (!s) { delete a.pumpOn; delete a.pumpOff; syncWellControls(a); return; }
 		fh = unitFactor('lpn_u_elevhead');
-		pts = pressureTankPoints(s).map(function (q) { return [+(q[0] * fh).toPrecision(8), +(q[1] * fh * fh * fh).toPrecision(8)]; });
+		// **EVERY LEVEL IS WRITTEN ONCE, THROUGH ONE ROUNDING**, so the pump-off control, the tank's maximum level and the curve's last level are the same number by construction
+		// (Perry, round 11: 138.4722 against 138.47219 made 50, 60, 70... psi refuse to solve), and so are the pump-on control and the curve's point at that level.
+		lv = function (m) { return +(m * fh).toFixed(4); };
+		pts = [];
+		pressureTankPoints(s).forEach(function (q) {
+			var x = lv(q[0]);
+			if (pts.length && x <= pts[pts.length - 1][0]) { pts.pop(); }
+			pts.push([x, +(q[1] * fh * fh * fh).toPrecision(8)]);
+		});
 		c = a.pt.curve ? curveById(a.pt.curve) : null;
 		if (c) { c.points = pts; delete c.src; delete c.tok; }
 		else { a.pt.curve = ptCurveId(a); docCurves().push({ id: a.pt.curve, kind: 'volume', points: pts }); }
-		tank.minLevel = 0; tank.maxLevel = +(s.off * fh).toPrecision(8); tank.volCurve = a.pt.curve;   // base-write: the group's own tank, written by the group in Base
-		tank._level = +((s.on + s.off) / 2 * fh).toPrecision(8);   // base-write: it opens between the two switch points
-		a.pumpOn = +(s.on * fh).toFixed(4); a.pumpOff = +(s.off * fh).toFixed(4);
+		tank.minLevel = 0; tank.maxLevel = lv(s.off); tank.volCurve = a.pt.curve;   // base-write: the group's own tank, written by the group in Base
+		tank._level = lv((s.on + s.off) / 2);   // base-write: it opens between the two switch points
+		a.pumpOn = lv(s.on); a.pumpOff = lv(s.off);
 		syncWellControls(a);
 		updateNode(tank.id, true);
 	}

@@ -244,6 +244,60 @@ console.log('\n--- the Well with pressure tank, in both engines (round 11) ---')
 	}
 }
 
+console.log('\n--- the Well with pressure tank, every switch pair 20 to 100 psi, in US and SI (round 11, Perry) ---');
+{
+	// Perry: in US units 50, 60, 70 ... psi refused to solve because the pump-off control (4 decimals) and the tank's maximum level (8 significant digits) were not the same number.
+	function sweepNet(on, off, us) {
+		const d = fresh();
+		L.setMode('add-welltankp');
+		press(200, 150); press(200, 150, hitNode('W1')); press(400, 150);
+		L.linkById(d.assemblies[0].branch[1]).virtual = true;
+		const a = d.assemblies[0], j = L.addNode('junction', 600, 150);
+		j._demand = us ? 3 : 0.2;
+		L.addLink('pipe', 'W1', j.id, []);
+		// a pump strong enough to reach 100 psi: shutoff head above 230 ft or 70 m
+		const hd = us ? [[0, 420], [300, 380], [600, 300]] : [[0, 150], [30, 140], [60, 110]];
+		d.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) }, { id: 'PC1', kind: 'head', points: hd });
+		L.setProp(L.linkById('W1DV'), 'curveId', 'DD1'); L.setProp(L.linkById('W1P'), 'curveId', 'PC1');
+		[['W1', 150], ['J1', 150], ['W1R', 120]].forEach(([id, e]) => L.setProp(L.nodeById(id), 'elev', e));
+		L.setProp(L.nodeById(a.tank), 'elev', 150);
+		a.pt.on = us ? on : on * 0.70307; a.pt.off = us ? off : off * 0.70307;
+		L.syncPressureTank(a);
+		return { d, a };
+	}
+	for (const us of [true, false]) {
+		setUnitSet(us ? 'us' : 'si');
+		let bad = [], levelsBad = [], n = 0;
+		for (let on = 20; on <= 95; on += 5) {
+			for (let off = on + 5; off <= 100; off += 5) {
+				const { d, a } = sweepNet(on, off, us), m = L.currentModel(), t = L.nodeById(a.tank), c = d.curves.find((x) => x.id === a.pt.curve);
+				const issues = EC.lpnDiagnose(m, {}).issues || EC.lpnDiagnose(m, {});
+				n++;
+				if (issues.length) { bad.push(on + '/' + off + ': ' + issues.map((i) => i.code).join()); }
+				// one number: the control level, the tank's maximum and the curve's last level; and the pump-on level is a point of the curve
+				if (!(a.pumpOff === t.maxLevel && c.points[c.points.length - 1][0] === a.pumpOff && c.points.some((q) => q[0] === a.pumpOn) && a.pumpOn >= t.minLevel)) { levelsBad.push(on + '/' + off); }
+			}
+		}
+		ok((us ? 'US (ft, psi)' : 'SI') + ': all ' + n + ' pairs insert and pass the diagnosis with no refusal', bad.length === 0, bad.slice(0, 5).join(' | '));
+		ok((us ? 'US' : 'SI') + ': pump-off, the tank\'s maximum level and the curve\'s last level are one number, and the pump-on level is a point of the curve', levelsBad.length === 0, levelsBad.slice(0, 5).join(' '));
+		// An extended-period run that cycles the pump, for pairs including the ones that failed (50, 60, 70, 80, 90, 100)
+		for (const [on, off] of [[30, 50], [40, 60], [50, 70], [60, 80], [80, 100]]) {
+			const { a } = sweepNet(on, off, us);
+			const model = L.currentModel();
+			model.time = Object.assign({}, model.time || {}, { times: Object.assign(EC.lpnTimesDefaults(), { duration: 600, hydraulicStep: 2, reportStep: 2 }) });
+			model.hydraulics = Object.assign({}, model.hydraulics, { accuracy: 1e-5 });
+			const nat = EC.lpnNativeRun(JSON.parse(JSON.stringify(model))), epa = await EC.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
+			// The pump refills the 20-gallon tank within one report step, so a cycle shows as the level jumping up between frames (the flow frames sample the pump off).
+			const refills = (r) => r.frames.reduce((k, f, i) => k + (i && f.levels[a.tank] > r.frames[i - 1].levels[a.tank] + 1 ? 1 : 0), 0);
+			let worstLv = 0; if (nat.ok && epa.ok) { nat.frames.forEach((f, i) => { worstLv = Math.max(worstLv, Math.abs(f.levels[a.tank] - epa.frames[i].levels[a.tank])); }); }
+			// SI: the engines agree level for level. US: they cycle the same way but a pump-on crossing that falls inside a 2 s step is taken one step apart, a timing difference of the engines on a 20-gallon tank, so US asserts the cycling and the limits, not the phase.
+			const lvs = (r) => r.frames.map((f) => f.levels[a.tank]), lo = Math.min.apply(null, lvs(epa)), hi = Math.max.apply(null, lvs(epa)), offM = L.nodeById(a.tank).maxLevel / (us ? 3.280839895 : 1);
+			ok((us ? 'US' : 'SI') + ' ' + on + '/' + off + ' psi: an EPS run cycles the tank between the switch points in both engines' + (us ? '' : ', which agree'), nat.ok && epa.ok && refills(nat) >= 2 && refills(epa) >= 2 && Math.abs(refills(nat) - refills(epa)) <= 1 && hi < offM + 1.5 && lo > 0 && (us || worstLv < 0.1), JSON.stringify([nat.ok, epa.ok, refills(nat), refills(epa), +worstLv.toFixed(3), +lo.toFixed(1), +hi.toFixed(1)]).slice(0, 160));
+		}
+	}
+	setUnitSet('si');
+}
+
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));
 process.exit(fails ? 1 : 0);
 })();

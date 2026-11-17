@@ -92,11 +92,11 @@ function ecWellTankIcon() {
 }
 // **WELL WITH PRESSURE TANK**: the same well and run, ending in an upright vessel on the ground line, a capsule with the diaphragm drawn across it.
 function ecWellPressureTankIcon() {
-	$k = .55; $cx = 6.4; $gy = 13.5; $run = 10.6; $tx = 13.2; $tw = 6.4; $th = 10.5;
+	$k = .55; $cx = 6; $gy = 14; $run = 11.4; $tx = 13; $tw = 9.4; $th = 12.5;
 	return ecWellTankHead($cx, $gy, $k)
-		. '<g stroke-width="1.6"><path d="M' . $cx . ' ' . $gy . 'V' . $run . 'H' . $tx . '"/>'
-		. '<rect x="' . $tx . '" y="' . ($gy - $th) . '" width="' . $tw . '" height="' . $th . '" rx="2.6"/>'
-		. '<path d="M' . $tx . ' ' . ($gy - $th * .55) . 'H' . ($tx + $tw) . '" stroke-width="1.2"/></g>';
+		. '<g stroke-width="1.8"><path d="M' . $cx . ' ' . $gy . 'V' . $run . 'H' . $tx . '"/>'
+		. '<rect x="' . $tx . '" y="' . ($gy - $th) . '" width="' . $tw . '" height="' . $th . '" rx="4.4"/>'
+		. '<path d="M' . $tx . ' ' . ($gy - $th * .55) . 'H' . ($tx + $tw) . '" stroke-width="1.5"/></g>';
 }
 
 $ec_icons = array(
