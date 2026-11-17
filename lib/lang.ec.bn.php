@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='নির্বাচিতে জুম �
 $ec_lang['lpn_tool_zoom_window']='জুম উইন্ডো';
 $ec_lang['lpn_zoom_in']='জুম ইন';
 $ec_lang['lpn_zoom_out']='জুম আউট';
-$ec_lang['lpn_new_text']='টেক্সট';
 $ec_lang['lpn_field_text_bold']='বোল্ড টেক্সট';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='কনটুর';
 $ec_lang['lpn_contour_tip']='মানচিত্রে একটি কনটুর প্লট দেখান: নোডের রংগুলো পাইপ বরাবর ও তার পাশে ছড়িয়ে পড়ে, সাথে লেবেলযুক্ত কনটুর রেখা। এটি ঠিক করতে বা বন্ধ করতে একটি বাক্স খোলে।';
 $ec_lang['lpn_contour_plot']='কনটুর প্লট';
 $ec_lang['lpn_contour_show']='প্লট দেখান';
-$ec_lang['lpn_contour_show_tip']='ভরাট ও কনটুর রেখা লুকাতে টিক তুলে দিন; আগের মতো ফিরিয়ে আনতে টিক দিন। নোডের রং থেকে যায়।';
 $ec_lang['lpn_contour_fill']='ভরাট';
 $ec_lang['lpn_contour_fill_tip']='মসৃণ এক শ্রেণি থেকে পরের শ্রেণিতে রংগুলো মিশিয়ে দেয়। ব্যান্ড রঙের কী-এর প্রতিটি শ্রেণিকে সমতলভাবে রাঙায়।';
 $ec_lang['lpn_contour_fill_smooth']='মসৃণ';

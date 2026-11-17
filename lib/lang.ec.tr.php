@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Seçime yakınlaştır';
 $ec_lang['lpn_tool_zoom_window']='Pencere Yakınlaştır';
 $ec_lang['lpn_zoom_in']='Yakınlaştır';
 $ec_lang['lpn_zoom_out']='Uzaklaştır';
-$ec_lang['lpn_new_text']='Metin';
 $ec_lang['lpn_field_text_bold']='Kalın metin';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Eş eğri';
 $ec_lang['lpn_contour_tip']='Haritada bir eş eğri grafiği gösterin: düğüm renkleri boruların boyunca ve yanlarında yayılır, etiketli eş eğri çizgileriyle birlikte. Ayarlamak veya kapatmak için bir kutu açar.';
 $ec_lang['lpn_contour_plot']='Eş eğri grafiği';
 $ec_lang['lpn_contour_show']='Grafiği göster';
-$ec_lang['lpn_contour_show_tip']='Dolguyu ve eş eğri çizgilerini gizlemek için işareti kaldırın; olduğu gibi geri getirmek için işaretleyin. Düğüm renkleri kalır.';
 $ec_lang['lpn_contour_fill']='Dolgu';
 $ec_lang['lpn_contour_fill_tip']='Yumuşak, renkleri bir sınıftan ötekine harmanlar. Bantlar, renk anahtarının her sınıfını düz boyar.';
 $ec_lang['lpn_contour_fill_smooth']='Yumuşak';

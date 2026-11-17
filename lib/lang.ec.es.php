@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Zoom a la selección';
 $ec_lang['lpn_tool_zoom_window']='Ventana de zoom';
 $ec_lang['lpn_zoom_in']='Acercar';
 $ec_lang['lpn_zoom_out']='Alejar';
-$ec_lang['lpn_new_text']='Texto';
 $ec_lang['lpn_field_text_bold']='Texto en negrita';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Isolíneas';
 $ec_lang['lpn_contour_tip']='Muestra un mapa de isolíneas: los colores de los nodos se extienden a lo largo y a los lados de las tuberías, con isolíneas rotuladas. Abre un cuadro para ajustarlo o desactivarlo.';
 $ec_lang['lpn_contour_plot']='Isolíneas: mapa';
 $ec_lang['lpn_contour_show']='Mostrar gráfico';
-$ec_lang['lpn_contour_show_tip']='Desmarque para ocultar el relleno y las isolíneas; marque para recuperarlos como estaban. Los colores de los nodos se mantienen.';
 $ec_lang['lpn_contour_fill']='Relleno';
 $ec_lang['lpn_contour_fill_tip']='Suave mezcla los colores de una clase a la siguiente. Bandas pinta cada clase de la clave de colores de forma uniforme.';
 $ec_lang['lpn_contour_fill_smooth']='Suave';

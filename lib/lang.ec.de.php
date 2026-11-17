@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Auf Auswahl zoomen';
 $ec_lang['lpn_tool_zoom_window']='Fenster zoomen';
 $ec_lang['lpn_zoom_in']='Vergrößern';
 $ec_lang['lpn_zoom_out']='Verkleinern';
-$ec_lang['lpn_new_text']='Text';
 $ec_lang['lpn_field_text_bold']='Fetter Text';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Konturen';
 $ec_lang['lpn_contour_tip']='Zeigt auf der Karte eine Konturdarstellung: Die Farben der Knoten breiten sich entlang und neben den Rohren aus, mit beschrifteten Konturlinien. Öffnet ein Feld zum Einstellen oder zum Ausschalten.';
 $ec_lang['lpn_contour_plot']='Konturdarstellung';
 $ec_lang['lpn_contour_show']='Darstellung anzeigen';
-$ec_lang['lpn_contour_show_tip']='Abwählen, um die Füllung und die Konturlinien auszublenden; auswählen, um sie wie zuvor wieder einzublenden. Die Knotenfarben bleiben.';
 $ec_lang['lpn_contour_fill']='Füllung';
 $ec_lang['lpn_contour_fill_tip']='Weich blendet die Farben von einer Klasse in die nächste über. Stufen malt jede Klasse der Farbskala einfarbig.';
 $ec_lang['lpn_contour_fill_smooth']='Weich';

@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Увећај на избор';
 $ec_lang['lpn_tool_zoom_window']='Увећај подручје';
 $ec_lang['lpn_zoom_in']='Увећај';
 $ec_lang['lpn_zoom_out']='Умањи';
-$ec_lang['lpn_new_text']='Текст';
 $ec_lang['lpn_field_text_bold']='Подебљан текст';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Изолиније';
 $ec_lang['lpn_contour_tip']='Приказује контурни приказ на мапи: боје чворова се шире дуж цеви и поред њих, са означеним изолинијама. Отвара оквир за подешавање или искључивање.';
 $ec_lang['lpn_contour_plot']='Контурни приказ';
 $ec_lang['lpn_contour_show']='Прикажи графикон';
-$ec_lang['lpn_contour_show_tip']='Уклоните ознаку да сакријете попуну и изолиније; означите је да их вратите какве су биле. Боје чворова остају.';
 $ec_lang['lpn_contour_fill']='Попуна';
 $ec_lang['lpn_contour_fill_tip']='Глатко стапа боје из једног разреда у следећи. Појасеви боје сваки разред из кључа боја равномерно.';
 $ec_lang['lpn_contour_fill_smooth']='Глатко';

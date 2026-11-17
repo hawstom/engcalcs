@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='ពង្រីកទៅធាតុដែ�
 $ec_lang['lpn_tool_zoom_window']='បង្អួចពង្រីក';
 $ec_lang['lpn_zoom_in']='ពង្រីក';
 $ec_lang['lpn_zoom_out']='បង្រួម';
-$ec_lang['lpn_new_text']='អត្ថបទ';
 $ec_lang['lpn_field_text_bold']='អក្សរដិត';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='បន្ទាត់ស្មើតម្លៃ';
 $ec_lang['lpn_contour_tip']='បង្ហាញផែនទីបន្ទាត់ស្មើតម្លៃលើផែនទី៖ ពណ៌របស់ថ្នាំងលាតសន្ធឹងតាមបណ្ដោយ និងនៅជាប់នឹងបំពង់ ជាមួយបន្ទាត់ស្មើតម្លៃដែលមានស្លាក។ បើកប្រអប់មួយដើម្បីកែតម្រូវ ឬបិទវា។';
 $ec_lang['lpn_contour_plot']='បន្ទាត់ស្មើតម្លៃ៖ ផ្ទាំងគ្រោង';
 $ec_lang['lpn_contour_show']='បង្ហាញផ្ទាំងគ្រោង';
-$ec_lang['lpn_contour_show_tip']='ដោះធីកដើម្បីលាក់ការបំពេញពណ៌ និងបន្ទាត់ស្មើតម្លៃ ធីកវិញដើម្បីយកវាត្រឡប់មកដូចដើម។ ពណ៌ថ្នាំងនៅដដែល។';
 $ec_lang['lpn_contour_fill']='ការបំពេញពណ៌';
 $ec_lang['lpn_contour_fill_tip']='រលូន លាយពណ៌ពីថ្នាក់មួយទៅថ្នាក់មួយទៀត។ ជាក្រុម បំពេញពណ៌ថ្នាក់នីមួយៗនៃកូនសោពណ៌ឲ្យស្មើគ្នា។';
 $ec_lang['lpn_contour_fill_smooth']='រលូន';

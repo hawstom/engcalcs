@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='चयन पर ज़ूम करें'
 $ec_lang['lpn_tool_zoom_window']='ज़ूम विंडो';
 $ec_lang['lpn_zoom_in']='ज़ूम इन';
 $ec_lang['lpn_zoom_out']='ज़ूम आउट';
-$ec_lang['lpn_new_text']='टेक्स्ट';
 $ec_lang['lpn_field_text_bold']='मोटा (बोल्ड) टेक्स्ट';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='कंटूर';
 $ec_lang['lpn_contour_tip']='मानचित्र पर कंटूर प्लॉट दिखाएँ: नोड के रंग पाइपों के साथ और उनके दोनों ओर फैलते हैं, और कंटूर रेखाओं पर लेबल होते हैं। इसे समायोजित करने या बंद करने के लिए एक बॉक्स खुलता है।';
 $ec_lang['lpn_contour_plot']='कंटूर प्लॉट';
 $ec_lang['lpn_contour_show']='प्लॉट दिखाएँ';
-$ec_lang['lpn_contour_show_tip']='भराव और कंटूर रेखाएँ छिपाने के लिए अचयनित करें; उन्हें पहले जैसा वापस लाने के लिए चुनें। नोड के रंग बने रहते हैं।';
 $ec_lang['lpn_contour_fill']='भराव';
 $ec_lang['lpn_contour_fill_tip']='चिकना एक श्रेणी से अगली श्रेणी तक रंगों को घुलाता है। पट्टियाँ रंग कुंजी की हर श्रेणी को एक समान रंग से भरती हैं।';
 $ec_lang['lpn_contour_fill_smooth']='चिकना';

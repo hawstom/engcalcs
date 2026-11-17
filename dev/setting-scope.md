@@ -96,10 +96,10 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_solver` | 3 | 2 | 1 | 0 |
 | `lpn_set_sub_units` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_time` | 8 | 8 | 0 | 0 |
-| `lpn_set_sub_hydraulics` | 14 | 14 | 0 | 0 |
+| `lpn_set_sub_hydraulics` | 15 | 15 | 0 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
-| **Total** | 133 | 126 | 4 | 3 |
+| **Total** | 134 | 127 | 4 | 3 |
 
 Controls whose home is not their heading's default, as observed:
 

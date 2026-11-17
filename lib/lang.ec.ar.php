@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='تكبير التحديد';
 $ec_lang['lpn_tool_zoom_window']='تكبير منطقة';
 $ec_lang['lpn_zoom_in']='تكبير';
 $ec_lang['lpn_zoom_out']='تصغير';
-$ec_lang['lpn_new_text']='نص';
 $ec_lang['lpn_field_text_bold']='نص عريض';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='الكنتور';
 $ec_lang['lpn_contour_tip']='عرض مخطط كنتور على الخريطة: تمتد ألوان العُقَد على طول الأنابيب وإلى جانبها، مع خطوط كنتور مُعنوَنة. يفتح مربعاً لضبطه أو إيقافه.';
 $ec_lang['lpn_contour_plot']='مخطط الكنتور';
 $ec_lang['lpn_contour_show']='إظهار المخطط';
-$ec_lang['lpn_contour_show_tip']='ألغِ التحديد لإخفاء التعبئة وخطوط الكنتور؛ وحدّد لإعادتها كما كانت. تبقى ألوان العقد.';
 $ec_lang['lpn_contour_fill']='التعبئة';
 $ec_lang['lpn_contour_fill_tip']='«متدرج» يمزج الألوان من فئة إلى التي تليها. «نطاقات» يلوّن كل فئة من مفتاح الألوان بلون موحّد.';
 $ec_lang['lpn_contour_fill_smooth']='متدرج';

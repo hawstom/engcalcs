@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='انتخاب پر زوم کریں';
 $ec_lang['lpn_tool_zoom_window']='زوم ونڈو';
 $ec_lang['lpn_zoom_in']='زوم ان کریں';
 $ec_lang['lpn_zoom_out']='زوم آؤٹ کریں';
-$ec_lang['lpn_new_text']='متن';
 $ec_lang['lpn_field_text_bold']='موٹا متن';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='کنٹور';
 $ec_lang['lpn_contour_tip']='نقشے پر کنٹور پلاٹ دکھائیں: نوڈ کے رنگ پائپوں کے ساتھ اور ان کے اطراف میں پھیلتے ہیں، اور کنٹور لائنوں پر لیبل ہوتے ہیں۔ اسے ٹھیک کرنے یا بند کرنے کے لیے ایک باکس کھلتا ہے۔';
 $ec_lang['lpn_contour_plot']='کنٹور پلاٹ';
 $ec_lang['lpn_contour_show']='پلاٹ دکھائیں';
-$ec_lang['lpn_contour_show_tip']='بھرائی اور کنٹور لائنیں چھپانے کے لیے نشان ہٹائیں؛ انہیں پہلے جیسا واپس لانے کے لیے نشان لگائیں۔ نوڈ کے رنگ برقرار رہتے ہیں۔';
 $ec_lang['lpn_contour_fill']='بھراؤ';
 $ec_lang['lpn_contour_fill_tip']='ہموار ایک درجے کے رنگ کو اگلے درجے میں گھلا دیتا ہے۔ پٹیاں رنگ کی کلید کے ہر درجے کو سپاٹ رنگ دیتی ہیں۔';
 $ec_lang['lpn_contour_fill_smooth']='ہموار';

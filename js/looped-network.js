@@ -8120,14 +8120,14 @@ var EngCalcs = EngCalcs || {};
 		'maskLabels', 'textHalo', 'showArrows', 'leaderSnapDeg', 'legendPosition', 'basemapStyle', 'backdropOpacity',
 		'colorNodeField', 'colorLinkField', 'colorRampNode', 'colorRampLink', 'colorClassesNode',
 		'colorClassesLink', 'colorReverseNode', 'colorReverseLink', 'colorBreaks', 'colorModes',
-		'colorLegendPosition', 'contourFill', 'contourLines', 'contourLabels', 'contourOpacity',
+		'colorLegendPosition', 'contourShow', 'contourFill', 'contourLines', 'contourLabels', 'contourOpacity',
 		'contourInterval', 'contourBuffer', 'contourTerrain']],
 	// Calculation: Bentley's Calculation Options. **FRICTION METHOD INCLUDED** (Tom, 2026-10-06:
 	// *"I see it indefensible to require somebody to have to save a project for something like
 	// friction method."*). A pipe still holds one roughness number; a scenario's method
 	// REINTERPRETS it and never converts it, the rule a unit change already follows.
 	['calculation', ['engine', 'autoRun', 'hydraulics', 'emitterExponent', 'tolerance', 'quality',
-		'qualityOptions', 'method']],
+		'qualityOptions', 'method', 'velocityLimit']],
 	// Document-wide values that belong with element properties already in a category.
 	['constituent', ['reactions']], ['energy', ['energy']],
 	// **NEW-ASSET SETTINGS** (Tom, 2026-10-06: *"Leave the creativity to the users. Give them
@@ -8360,9 +8360,11 @@ var EngCalcs = EngCalcs || {};
 	// scenario's own block, a stored alternative, a calculation set -- at once. Only a stated value
 	// moves; an inherited one follows its parent. `to` null (a delete) CLEARS the holder's own value,
 	// so the scenario inherits again, rather than holding "none" over its parent.
+	// Every holder of a scenario's settings block: each scenario, stored alternative and calculation set.
+	function scenarioSettingHolders() { return scenarios.concat(doc.alternatives || [], doc.calcSets || []); }
 	function repointScenarioSetting(path, was, to) {
 		var p = settingPath(path);
-		scenarios.concat(doc.alternatives || [], doc.calcSets || []).forEach(function (o) {
+		scenarioSettingHolders().forEach(function (o) {
 			var node = o && !o.isBase ? o.settings : null, i;
 			if (settingGet(node, p) !== was) { return; }
 			touchTree('repointScenarioSetting');
@@ -9418,6 +9420,14 @@ var EngCalcs = EngCalcs || {};
 		// units are already the new ones here, so the seed reads the built-in value for them.
 		seedDefaultInputs();
 		if (set.lpn_u_length) { labelSettings.customerMaxWidth = defaultLabelSettings().customerMaxWidth; }
+		// A velocity limit typed in the old unit would read as another number in the new one: blank is the default for the unit.
+		if (set.lpn_u_velocity) {
+			delete settings.velocityLimit;
+			scenarioSettingHolders().forEach(function (o) {
+				if (o && !o.isBase && settingGet(o.settings, ['settings', 'velocityLimit']) !== undefined) { settingDelete(o, ['settings', 'velocityLimit']); }
+			});
+			touchTree('resetUnitBearingDefaultsFor');
+		}
 		for (group in LPN_LABEL_FIELD_UNIT) {
 			if (!Object.prototype.hasOwnProperty.call(LPN_LABEL_FIELD_UNIT, group)) { continue; }
 			for (field in LPN_LABEL_FIELD_UNIT[group]) {
@@ -9430,6 +9440,8 @@ var EngCalcs = EngCalcs || {};
 				}
 			}
 		}
+		// The Settings rows were built before the reset: show what it left (a limit's unit and default, the new-asset values).
+		rebuildSettingsBox();
 	}
 	// The unit selects the wizard actually left DIFFERENT from the project it was opened on --
 	// only those it can answer for (both sides must have a value) count as "changed".
@@ -9840,13 +9852,16 @@ var EngCalcs = EngCalcs || {};
 			colorReverseLink: false,
 			// THE CONTOUR PLOT (Task 600). It spreads the NODE colouring over the plane, so it has
 			// no field, breaks or ramp of its own; see refreshContour(). The fill is '' (none),
-			// 'smooth' or 'bands'; the plot is on while the fill or the lines are. The interval is
+			// 'smooth' or 'bands'; the plot is drawn while `contourShow` is on. The interval is
 			// stored per field AND unit ('pressure|psi'), so a unit change falls back to the default
 			// for the new unit rather than reading 5 psi as 5 kPa. `contourBuffer` is the corridor's
 			// reach as a multiple of the median pipe length. `contourTerrain` asks for the ground
 			// between nodes from Mapbox DEM, used only for pressure and only once the gate says yes.
-			contourFill: '',
-			contourLines: false,
+			// `contourShow` alone says whether the plot is drawn; the fill and the lines wait at their own
+			// values for it (Tom, 2026-11-16), so they open ready to show.
+			contourShow: false,
+			contourFill: 'smooth',
+			contourLines: true,
 			contourLabels: true,
 			contourOpacity: 0.6,
 			contourInterval: {},
@@ -12981,11 +12996,11 @@ var EngCalcs = EngCalcs || {};
 		return undefined;
 	}
 	function colorFieldOf(group) { return scnSetting(group === 'node' ? 'colorNodeField' : 'colorLinkField'); }
-	// THE FIELD A CONTOUR PLOT SPREADS: the node colouring's own field when the user has set one, else pressure. Showing
-	// contours never writes the node colouring (Tom, 2026-10-29: opening the box turned on Settings Colors); the nodes
-	// stay as the user left them, and the colour key shows the plot's field.
-	function contourFieldOf() { return colorFieldOf('node') || 'pressure'; }
-	function contourOrNodeField() { return colorFieldOf('node') || (contourIsOn() ? 'pressure' : ''); }
+	// **THE FIELD A CONTOUR PLOT SPREADS IS COLOR NODES BY** (Tom, 2026-11-14, Task 858: "remove everything that's
+	// redundant with the project settings"). The plot has no property, scheme or node-color switch of its own; it follows
+	// Settings, Symbology, Node colors. With No color there is no property to plot, so '' and the plot draws nothing;
+	// Show plot is untouched, and the plot returns when a property is chosen again.
+	function contourFieldOf() { return colorFieldOf('node'); }
 	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, read by every control that offers a
 	// colour field, so the same question is never asked two different ways in two places.
 	//
@@ -13020,8 +13035,13 @@ var EngCalcs = EngCalcs || {};
 	function syncColorControls() {
 		// Through the keeper: the select that changed is one of the controls this rebuilds (Task 653).
 		keepSetboxControl(buildColoringSection);
-		// ...and the contour box, the second view of the node colouring (Task 600).
-		refreshContourBoxIfOpen();
+		// ...and the Settings table, whose rows hold the same values; no other table is redrawn for a color change.
+		refreshSettingsTableIfShown();
+	}
+	function refreshSettingsTableIfShown() {
+		var t = paneTabById('settings');
+		if (paneRenderHeld || !t || !t.refresh || !paneTabOnShow('settings')) { return; }
+		t.refresh();
 	}
 	function colorValueOf(group, elem, field) {
 		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
@@ -13406,6 +13426,7 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) { paintLinkColor(l.id, lb); paintLinkStatus(l); });
 		refreshContour();
 		renderColorLegend();
+		contourBoxFollowSoon();
 	}
 	// **THE DASH FOLLOWS THE STATUS AT THE TIME STEP ON SCREEN**, not only the status the file
 	// starts with. buildLinkEls() draws it once; this keeps it true on every solve and every step
@@ -13488,7 +13509,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, any = false;
 		box.innerHTML = '';
 		['node', 'link'].forEach(function (group) {
-			var field = group === 'node' ? contourOrNodeField() : colorFieldOf(group); if (!field) { return; }
+			var field = colorFieldOf(group); if (!field) { return; }
 			var breaks = effectiveBreaks(group, field);
 			if (!breaks.length && colorValues(group, field).length === 0) { return; }
 			any = true;
@@ -13615,7 +13636,7 @@ var EngCalcs = EngCalcs || {};
 		var f = scnSetting('contourFill');
 		return (f === 'smooth' || f === 'bands') ? f : '';
 	}
-	function contourIsOn() { return !!(contourFillMode() || scnSetting('contourLines')); }
+	function contourIsOn() { return !!scnSetting('contourShow'); }
 	function contourBufferOf() {
 		var b = Number(scnSetting('contourBuffer'));
 		return (isFinite(b) && b > 0) ? Math.min(20, b) : CONTOUR_BUFFER_DEFAULT;
@@ -13790,7 +13811,8 @@ var EngCalcs = EngCalcs || {};
 	function refreshContour() {
 		var C = EngCalcs.lpnContour, field = contourFieldOf();
 		contourStats = null;
-		if (!C || !contourIsOn() || !field || !svg) { clearContour(); contourField = null; return; }
+		// Show plot on with Fill None and lines off draws nothing, so nothing is computed either.
+		if (!C || !contourIsOn() || !field || !svg || !(contourFillMode() || scnSetting('contourLines'))) { clearContour(); contourField = null; return; }
 		var layer = contourLayerEl();
 		if (!layer) { return; }
 		var t0 = contourNow(), dem = contourTerrainWanted();
@@ -14044,19 +14066,20 @@ var EngCalcs = EngCalcs || {};
 	// and contour controls."* A small non-modal box on the standing-box shell (drag band, resize
 	// grip, remembered corner), labels only. Everything it sets is the PROJECT's (it rides in
 	// serializeProject()); only where the box sits and whether it is open is the browser's, as
-	// `lpn_contourbox`. The value and the colour scheme are the node colouring's own two settings,
-	// so the Settings box and this one can never disagree with each other or with the dots.
+	// `lpn_contourbox`. The box holds neither the value nor the colour scheme: the plot follows the node colouring's own
+	// two settings, so the Settings box and the plot can never disagree with each other or with the dots.
 	function contourBoxEl() { return document.getElementById('lpn_contour_box'); }
 	function contourBoxIsOpen() {
 		var box = contourBoxEl();
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
-	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines; of pressure
-	// if the nodes are not coloured, and the node colouring is never touched), then opens the box where it is tuned or turned off.
+	// THE MENU ROW: checks Show plot (it changes no other setting: the plot is drawn as the box has Fill and the lines set),
+	// then opens the box where it is tuned or turned off. The plot spreads Color nodes by, which this never writes (Tom, 2026-10-29); with No color the box says
+	// there is nothing to plot.
 	// Graphs > Contour turns the contour on in the open scenario: through the Settings box's seam.
 	function showContour() {
 		throughSettingSeam(function () {
-			if (!contourIsOn()) { settings.contourFill = 'smooth'; settings.contourLines = true; }
+			settings.contourShow = true;
 			refreshValueColors(); saveToStorage(); syncColorControls();
 		});
 		openContourBox();
@@ -14091,7 +14114,30 @@ var EngCalcs = EngCalcs || {};
 		wireBoxMemory(box, LPN_CONTOURBOX_KEY, contourboxLayout, saveContourboxLayout, contourBoxIsOpen);
 	}
 	function refreshContourBoxIfOpen() { if (contourBoxIsOpen()) { buildContourBox(); } }
-	var contourShownBefore = null;   // fill and lines as they were when Show contours was last cleared
+	// **THE BOX FOLLOWS EVERY DOOR** (Task 858, Perry 2026-11-13): Settings, the Tables row, Undo and a scenario switch all
+	// end in refreshValueColors(), which calls this. The box is rebuilt only when what it shows has changed, so a field
+	// being typed in is never rebuilt under the cursor; it is looked at again after the event, because a child scenario's
+	// write-back lands after the handler that started it.
+	var contourBoxSig = '';
+	// What the box shows, read the way the box reads it: through the scenario's view, so the signature stored at a build
+	// and the one compared on a step are the same question (a child scenario's `settings` is not the view's).
+	function contourBoxSigNow() {
+		var field = contourFieldOf(), cf = contourField;
+		return JSON.stringify([contourIsOn(), field, colorRampKey('node'), colorClassCount('node'),
+			contourFillMode(), contourOpacityOf(), contourBufferOf(), !!scnSetting('contourLines'), scnSetting('contourLabels') !== false,
+			field ? contourIntervalOf(field, cf ? cf.lo : 0, cf ? cf.hi : 1) : null, !!scnSetting('contourTerrain')]);
+	}
+	function contourBoxFollow() {
+		if (!contourBoxIsOpen()) { return; }
+		if (contourBoxSig !== withSetboxView(contourBoxSigNow)) { buildContourBox(); }
+	}
+	function contourBoxFollowSoon() {
+		if (!contourBoxIsOpen()) { return; }
+		contourBoxFollow();
+		setTimeout(contourBoxFollow, 0);
+	}
+	// refreshValueColors() looks at the box now and again after the event (contourBoxFollowSoon), which is how a
+	// child scenario's write-back, landing after this handler, is seen (Perry, 2026-11-11).
 	function contourChanged() { refreshValueColors(); saveToStorage(); syncColorControls(); }
 	function buildContourBox() { return withSetboxView(buildContourBoxNow); }
 	function buildContourBoxNow() {
@@ -14129,27 +14175,36 @@ var EngCalcs = EngCalcs || {};
 			});
 			return n;
 		}
-		// **ONE CHECK BOX SHOWS OR HIDES THE PLOT** (Tom, 2026-10-04: "How do we turn off contour plot
-		// view?" ... "Maybe instead we have a toggle for [ ] Show contours"). Hiding had taken two
-		// controls, Fill None AND Contour lines cleared, and the box's x, which looks like the off
-		// switch, only closes the box. Clearing it remembers fill and lines for this visit, so a tick
-		// brings back the plot as it was; the node colouring is the dots' and is left alone.
+		// **ONE CHECK BOX SHOWS OR HIDES THE PLOT** (Tom, 2026-10-04: "Maybe instead we have a toggle for [ ] Show
+		// contours"), and **IT TOUCHES NOTHING ELSE** (Tom, 2026-11-16: "I would expect them to stand ready to act in the
+		// event that 'Show plot' is on, and to be ineffective when 'Show plot' is off ... Leave all alone ready to do
+		// their job."). Fill, lines, labels and Ground keep their values and stay editable; off, nothing is drawn.
+		// **THE STANDING LINE** names what the plot follows, always, with Node colors a way into Settings there. With No
+		// color there is no property to plot: a second line says so, and nothing turns colors on (Tom, 2026-10-29).
+		var stand = document.createElement('div'), link = document.createElement('a'), tpl = pc.lpn_contour_follows || 'Follows project "{link}" settings.', at = tpl.indexOf('{link}');
+		// A translation that lost the placeholder falls back to the English sentence, so the link is always there.
+		if (at < 0) { tpl = 'Follows project "{link}" settings.'; at = tpl.indexOf('{link}'); }
+		stand.className = 'lpn-contour-box-note'; stand.id = 'lpn_contour_follows';
+		link.href = '#'; link.id = 'lpn_contour_follows_link';
+		link.textContent = pc.lpn_settings_sym_node_colors || 'Node colors';
+		link.addEventListener('click', function (e) { e.preventDefault(); openSettingsBox('nodeColors'); });
+		stand.appendChild(document.createTextNode(tpl.slice(0, at)));
+		stand.appendChild(link);
+		stand.appendChild(document.createTextNode(tpl.slice(at + 6)));
+		body.appendChild(stand);
+		if (!contourFieldOf()) {
+			var none = document.createElement('div');
+			none.className = 'lpn-contour-box-note'; none.id = 'lpn_contour_none_note';
+			none.textContent = pc.lpn_contour_none_note || 'Nothing to plot: "Color nodes by" is set to "No color".';
+			body.appendChild(none);
+		}
 		row(pc.lpn_contour_show || 'Show plot', check('lpn_contour_show', contourIsOn(), function (on) {
-			if (on) {
-				var was = contourShownBefore || { fill: 'smooth', lines: true };
-				settings.contourFill = was.fill; settings.contourLines = was.lines;
-			} else {
-				contourShownBefore = { fill: contourFillMode(), lines: !!settings.contourLines };
-				settings.contourFill = ''; settings.contourLines = false;
-			}
+			settings.contourShow = on;
 			contourChanged();
-		}), pc.lpn_contour_show_tip);
-		var field = contourFieldOf();
-		row(pc.lpn_color_node_field || 'Color nodes by',
-			select('lpn_contour_field', [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions('node')), colorFieldOf('node') || '', function (v) {
-				settings.colorNodeField = v; contourChanged();
-			}));
-		row(pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, 'node', '_contour'));
+		}));
+		// **NO PROPERTY, SCHEME OR NODE-COLOR SWITCH HERE** (Tom, 2026-11-14, Task 858): the plot follows Color nodes by and
+		// Color scheme in Settings, Symbology, Node colors. Tom's order: Show plot, Fill, opacity, buffer, Show contour
+		// lines, interval, labels, Ground.
 		row(pc.lpn_contour_fill || 'Fill', select('lpn_contour_fill', [
 			['', pc.lpn_settings_legend_off || 'None'],
 			['smooth', pc.lpn_contour_fill_smooth || 'Smooth'],
@@ -14159,21 +14214,23 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_contour_opacity || 'Fill opacity', number('lpn_contour_opacity', Math.round(100 * contourOpacityOf()), 1, 5, function (v) {
 			settings.contourOpacity = Math.max(0.01, Math.min(1, v / 100)); contourChanged();
 		}), null, '%', 3);
-		row(pc.lpn_contour_lines || 'Contour lines', check('lpn_contour_lines', settings.contourLines, function (on) {
-			settings.contourLines = on; contourChanged();
-		}));
-		var cf = contourField, lo = cf ? cf.lo : 0, hi = cf ? cf.hi : 1;
-		row(pc.lpn_contour_interval || 'Interval', number('lpn_contour_interval', field ? contourIntervalOf(field, lo, hi) : 5, 0, 'any', function (v) {
-			if (!field) { return; }
-			settings.contourInterval = settings.contourInterval || {};
-			settings.contourInterval[contourIntervalKey(field)] = v; contourChanged();
-		}), null, field ? colorFieldUnitText('node', field) : '', 6);
-		row(pc.lpn_tool_labels || 'Labels', check('lpn_contour_labels', settings.contourLabels !== false, function (on) {
-			settings.contourLabels = on; contourChanged();
-		}));
 		row(pc.lpn_contour_buffer || 'Buffer (× median pipe length)', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
 			settings.contourBuffer = Math.min(20, v); contourChanged();
 		}), pc.lpn_contour_buffer_tip, '', 4);
+		row(pc.lpn_contour_lines || 'Show contour lines', check('lpn_contour_lines', settings.contourLines, function (on) {
+			settings.contourLines = on; contourChanged();
+		}));
+		var field = contourFieldOf(), cf = contourField, lo = cf ? cf.lo : 0, hi = cf ? cf.hi : 1;
+		// The interval is kept per property, so with No color there is none to show: the box is empty and disabled.
+		var intervalBox = number('lpn_contour_interval', field ? contourIntervalOf(field, lo, hi) : '', 0, 'any', function (v) {
+			settings.contourInterval = settings.contourInterval || {};
+			settings.contourInterval[contourIntervalKey(field)] = v; contourChanged();
+		});
+		if (!field) { intervalBox.disabled = true; }
+		row(pc.lpn_contour_interval || 'Interval', intervalBox, null, field ? colorFieldUnitText('node', field) : '', 6);
+		row(pc.lpn_tool_labels || 'Labels', check('lpn_contour_labels', settings.contourLabels !== false, function (on) {
+			settings.contourLabels = on; contourChanged();
+		}));
 		if (contourTerrainOffered()) {
 			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
 			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
@@ -14196,6 +14253,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (focusedId) { var f = document.getElementById(focusedId); if (f && f.focus) { f.focus(); } }
 		initTipsIn(body);
+		contourBoxSig = contourBoxSigNow();
 	}
 	// **A WHOLE-DRAWING BUILD MEASURES EVERY NODE LABEL IN ONE READ, AFTER THE LAST ONE IS APPENDED.**
 	// A getBBox() between two appends forces a layout of the half-built drawing, once per node; on a
@@ -28756,22 +28814,21 @@ var EngCalcs = EngCalcs || {};
 	 * Keyboard: the button opens on Enter, Space or Down; inside the list Up/Down/Home/End move,
 	 * Enter or Space chooses, Escape closes and gives the button back the focus.
 	 */
-	// `idSuffix` lets a second view of the same picker (the contour box, Task 600) carry ids of its own.
-	function buildRampPicker(pc, group, idSuffix) {
+	function buildRampPicker(pc, group) {
 		var R = ramps(), wrap = document.createElement('div'), btn = document.createElement('button'),
 			pop = document.createElement('div'), opts = [], open = false, active = 0, name,
 			cur = colorRampKey(group), n = colorClassCount(group);
 		wrap.className = 'lpn-ramp-picker';
 		name = ((R && R.RAMPS[cur]) || { name: cur }).name;
 		btn.type = 'button';
-		btn.id = 'lpn_set_ramp_' + group + (idSuffix || '');
+		btn.id = 'lpn_set_ramp_' + group;
 		btn.className = 'lpn-ramp-btn';
 		btn.setAttribute('aria-haspopup', 'listbox');
 		btn.setAttribute('aria-expanded', 'false');
 		btn.setAttribute('aria-label', (pc.lpn_settings_color_ramp || 'Color scheme') + ': ' + name);
 		btn.title = name;
 		btn.appendChild(swatchBarEl(group, cur, n));
-		pop.id = 'lpn_set_ramp_list_' + group + (idSuffix || '');
+		pop.id = 'lpn_set_ramp_list_' + group;
 		pop.className = 'lpn-ramp-pop';
 		pop.setAttribute('role', 'listbox');
 		pop.setAttribute('aria-label', pc.lpn_settings_color_ramp || 'Color scheme');
@@ -28955,10 +29012,10 @@ var EngCalcs = EngCalcs || {};
 				R2 = ramps(), i;
 			setboxTag(rowIn(target, (group === 'node'
 				? (pc.lpn_color_node_field || 'Color nodes by')
-				: (pc.lpn_color_link_field || 'Color links by')), fieldSelect(group)), [['settings', 'color' + (group === 'node' ? 'Node' : 'Link') + 'Field']]);
+				: (pc.lpn_color_link_field || 'Color links by')), fieldSelect(group), group === 'node' ? pc.lpn_settings_color_node_field_tip : null), [['settings', 'color' + (group === 'node' ? 'Node' : 'Link') + 'Field']]);
 
 			// THE SCHEME. A button showing a bar of this group's own colours -- see buildRampPicker.
-			setboxTag(rowIn(target, pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, group)), [['settings', 'colorRamp' + (group === 'node' ? 'Node' : 'Link')]]);
+			setboxTag(rowIn(target, pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, group), group === 'node' ? pc.lpn_settings_color_ramp_node_tip : null), [['settings', 'colorRamp' + (group === 'node' ? 'Node' : 'Link')]]);
 			// **AND A POINTER TO THE ACKNOWLEDGEMENT, UNDER THE PICKER IT IS ABOUT** (Tom,
 			// 2026-08-20: "Were we going to put a Credits link near the color pickers? Maybe under
 			// the Color scheme label?"). It SCROLLS to the footer copy and marks it for a moment; it
@@ -30290,7 +30347,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Every column here writes through setProp() (Task 407; all overridable since 2026-10-12).
 			{ key: 'text', label: 'lpn_tool_add_text', str: true, em: 9, prop: 'text',
 				get: function (lb) { return effective(lb, 'text'); },
-				set: function (lb, v) { setProp(lb, 'text', v); refreshLabelContent(lb.id); } },
+				// **WORDS CLEARED IN THE TABLE DELETE THE TEXT, as in Properties and on the map**
+				// (paneCommitCell() hands them to writeTextWords()); a paste never writes a wordless
+				// Text, so a blank here is refused and counted.
+				deletesOnBlank: true,
+				set: function (lb, v) {
+					if (!String(v).trim()) { return false; }
+					setProp(lb, 'text', v); refreshLabelContent(lb.id);
+				} },
 			// Not overridable, like every other element's Description (see descField()).
 			paneColDesc(),
 			{ key: 'sizeMult', label: 'lpn_field_text_size', em: 2.5, prop: 'sizeMult',
@@ -32052,7 +32116,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}({
 		idPrefixes: 'lpn_settings_id_prefixes', textSize: 'lpn_settings_text_size', symbolSize: 'lpn_settings_symbol_size',
 		linkWidth: 'lpn_settings_link_width', symbolOpacity: 'lpn_settings_symbol_opacity',
-		labelMaxWidth: 'lpn_settings_label_max_width', alignPipeLabels: 'lpn_settings_align_labels',
+		velocityLimit: 'lpn_settings_velocity_limit', labelMaxWidth: 'lpn_settings_label_max_width', alignPipeLabels: 'lpn_settings_align_labels',
 		labelFlipLeftOfVertical: 'lpn_settings_readability_bias', maskLabels: 'lpn_settings_mask_labels', textHalo: 'lpn_settings_text_halo',
 		showArrows: 'lpn_settings_show_arrows', leaderSnapDeg: 'lpn_settings_leader_snap',
 		legendPosition: 'lpn_settings_legend_position', basemapStyle: 'lpn_settings_basemap_style',
@@ -32062,7 +32126,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		colorClassesLink: 'lpn_settings_color_classes', colorReverseNode: 'lpn_settings_color_reverse',
 		colorReverseLink: 'lpn_settings_color_reverse', colorBreaks: 'lpn_settings_color_breaks',
 		colorModes: 'lpn_color_mode', colorLegendPosition: 'lpn_settings_color_key_position',
-		contourFill: 'lpn_contour_fill', contourLines: 'lpn_contour_lines', contourOpacity: 'lpn_contour_opacity',
+		contourShow: 'lpn_contour_show', contourFill: 'lpn_contour_fill', contourLines: 'lpn_contour_lines', contourOpacity: 'lpn_contour_opacity',
 		contourInterval: 'lpn_contour_interval', contourBuffer: 'lpn_contour_buffer',
 		contourTerrain: 'lpn_contour_dem', method: 'bpn_method', engine: 'lpn_settings_engine_native',
 		autoRun: 'lpn_settings_auto_run', 'hydraulics.accuracy': 'lpn_settings_accuracy',
@@ -32099,7 +32163,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'settings.symbolCapPercentile': 'lpn_settings_row_symbol_cap_percentile',
 		'settings.contourLabels': 'lpn_settings_row_contour_labels',
 		// Contour rows say so: in the Settings box they sit under a Contour heading the table lacks.
-		'settings.contourFill': 'lpn_settings_row_contour_fill', 'settings.contourOpacity': 'lpn_settings_row_contour_opacity',
+		'settings.contourShow': 'lpn_settings_row_contour_show', 'settings.contourFill': 'lpn_settings_row_contour_fill', 'settings.contourOpacity': 'lpn_settings_row_contour_opacity',
 		'settings.contourInterval': 'lpn_settings_row_contour_interval', 'settings.contourBuffer': 'lpn_settings_row_contour_buffer',
 		'settings.contourTerrain': 'lpn_settings_row_contour_terrain',
 		'settings.hydraulics.checkFreq': 'lpn_settings_row_check_freq',
@@ -32309,6 +32373,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		[['settings', 'energy', 'globalEfficiency'], 75], [['settings', 'energy', 'globalPrice'], 0],
 		[['settings', 'energy', 'globalPattern'], undefined], [['settings', 'energy', 'demandCharge'], 0],
 		[['settings', 'energy', 'currency'], undefined],
+		[['settings', 'velocityLimit'], undefined],
 		[['defaultPattern'], undefined], [['view'], undefined], [['bubbles'], undefined],
 		[['project', 'basemap'], 'osm']
 	];
@@ -32386,6 +32451,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (/^settings\.defaults\.(nodeElev|tankLevel|tankMinLevel|tankMaxLevel)$/.test(s) || s === 'settings.hydraulics.headError') { return 'lpn_u_elevhead'; }
 		if (s === 'settings.defaults.tankDiameter') { return 'lpn_u_length'; }
 		if (s === 'settings.defaults.demand' || s === 'settings.hydraulics.flowChange') { return 'lpn_u_flow'; }
+		if (s === 'settings.velocityLimit') { return 'lpn_u_velocity'; }
 		if (s === 'settings.hydraulics.minPressure' || s === 'settings.hydraulics.reqPressure') { return 'lpn_u_pressure'; }
 		return null;
 	}
@@ -32519,6 +32585,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return v === null ? undefined : v;
 	}
 	// A select row (a choice, or a yes/no) shows the Settings box's own options.
+	// A blank option that is a real value (No color) is written; only the "Not stated" blank means no write.
+	function settingRowBlankIsChoice(row) {
+		return row.home !== 'cp' && (settingTableChoices(row.path) || []).some(function (o) { return o[0] === ''; });
+	}
 	function settingRowIsSelect(row) { return row.kind === 'choice' || row.kind === 'bool'; }
 	function settingRowOptions(row, scn) {
 		var ch = row.kind === 'bool' ? [['true', settingTableYes()], ['false', settingTableNo()]] : (row.home === 'cp' ? customPropRowChoices(row) : settingTableChoices(row.path)) || [],
@@ -32579,6 +32649,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (row.path.join('.') === 'settings.labelMaxWidth' || row.path.join('.') === 'labelSettings.customerMaxWidth') {
 				return pc.lpn_settings_label_always || 'Always show';
 			}
+			if (row.path.join('.') === 'settings.velocityLimit') { return settingTableDefaultText(velocityLimitDefaultText()); }
 			if (row.dflt === undefined) { return pc.lpn_settings_option_unset || 'Not stated'; }
 			s = typeof row.dflt === 'number' ? settingTableNum(row.dflt) : String(row.dflt);
 			return settingTableDefaultText(u ? s + ' ' + u : s);
@@ -32621,6 +32692,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return { ok: false };
 		}
 		if (u && t.length > u.length && t.slice(-u.length) === u) { t = t.slice(0, -u.length).trim(); }
+		// The same rule the Settings box holds this limit to: blank inherits, otherwise zero or more.
+		if (row.path.join('.') === 'settings.velocityLimit') {
+			if (t === '') { return { ok: true, v: null }; }
+			return velocityLimitValid(+t) ? { ok: true, v: +t } : { ok: false };
+		}
 		switch (row.kind) {
 			case 'time':
 				if (!EngCalcs.lpnParseTime || t === '') { return { ok: false }; }
@@ -32815,12 +32891,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// blank option of an unstated select is "leave it unstated": no write.
 				parse: function (t, r) {
 					if (!row(r)) { return { ok: false }; }
-					if (settingRowIsSelect(r) && t === '') { return { ok: true, v: '' }; }
+					if (settingRowIsSelect(r) && t === '' && !settingRowBlankIsChoice(r)) { return { ok: true, v: '' }; }
 					return settingRowParse(r, t).ok ? { ok: true, v: t } : { ok: false };
 				},
 				set: function (r, v) {
 					var p;
-					if (!row(r) || (settingRowIsSelect(r) && v === '')) { return; }
+					if (!row(r) || (settingRowIsSelect(r) && v === '' && !settingRowBlankIsChoice(r))) { return; }
 					p = settingRowParse(r, v);
 					if (!p.ok || !settingRowWrite(r, activeScenario(), p)) { return; }
 					settingTableAfterEdit();
@@ -34610,6 +34686,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// needs exactly one undo step for the whole thing, anchor included -- so `opts.noSnapshot`
 		// lets the caller take that single snapshot itself, before this write, rather than getting
 		// a second one here that would split Ctrl+Z into two presses.
+		// A Text emptied here is deleted by the one rule every route to a Text's words shares
+		// (writeTextWords(), which takes its own undo step), not written empty.
+		if (c.deletesOnBlank && !String(p.v).trim() && !(was.ok && was.v === p.v)) {
+			writeTextWords(el, p.v);
+			completeEdit(null);
+			refreshPopupIfOpen();
+			paneLeaveEdit(input);
+			return true;
+		}
 		if (!(opts && opts.noSnapshot) && !(was.ok && was.v === p.v)) { saveUndoSnapshot(); }
 		c.set(el, p.v);
 		// **A SETTER THAT MAY REFUSE OR NORMALISE WHAT WAS TYPED SAYS SO, AND THE CELL IS RE-READ**
@@ -34770,6 +34855,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// offset is not stated anywhere a copy can read (the position cells go plain there), so it
 			// is born at zero offset -- attached, at the anchor's own point, same as spec §2 leaves a
 			// blank cell at the default a drawn element is born with.
+			// **A TEXT ALWAYS HAS WORDS** (Task 854): a row stating none is refused, by row, like every
+			// other row that cannot be made, rather than born as a blank, unclickable Text.
+			if (!err && spec.group === 'label' && !String(txt('text')).trim()) {
+				err = panePasteSay('lpn_pane_paste_text_no_words', 'Row {row}: a new Text needs its words.', row);
+			}
 			if (!err && spec.group === 'label') {
 				var anchorTxt = txt('anchor'), anchorNodeEl, anchorLinkEl;
 				if (anchorTxt) {
@@ -34906,6 +34996,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				plan.anchorNode || plan.anchorLink ? 0 : inwardY(plan.yv),
 				plan.anchorNode || null, plan.anchorLink ? { link: plan.anchorLink, t: 0.5 } : null, plan.id);
 			if (el.anchorNode || el.anchorLink) { el.x = 0; el.y = 0; updateLabelGeometry(el.id); }
+			// The words go to Base itself (as a drawn Text's first words do, writeTextWords()), so a Text
+			// pasted in a scenario is never wordless in the Base record it is born inactive in.
+			plan.writes = plan.writes.filter(function (w) {
+				if (w.c.key !== 'text') { return true; }
+				el._text = w.v;   // base-write: a new Text's first words
+				return false;
+			});
+			textLabelRelayout(el.id);
 		} else if (spec.group === 'shape') {
 			el = { id: plan.id, pts: plan.pts, closed: false };
 			addShapeToDoc(el);
@@ -40716,7 +40814,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// 407): a call site that reads lb.text without going through effective() gets undefined
 		// immediately rather than reading Base while a scenario says something else.
 		lb = {
-			id: id, _text: EngCalcs.pageConfig.lpn_new_text || 'Text',
+			id: id, _text: '',
 			x: an ? x - an.x : x, y: an ? y - an.y : y,
 			anchorNode: (an && anchorNode) ? anchorNode : null, sizeMult: 1
 		};
@@ -40733,7 +40831,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A newly-added Text was never actually persisted (Task 146 Phase 1 gap, found while
 		// wiring the text-edit popup, 2026-07-30) -- addNode()/addLink() reach saveToStorage()
 		// via scheduleSolve(); a Text never triggers a solve, so nothing else was saving it.
-		saveToStorage();
+		// A Text born with no words is not saved: it is either about to be typed (the editor holds it
+		// out of the project until it has words) or about to be given words by its caller.
+		if (lb._text) { saveToStorage(); }
 		// **AND IT WAS NOT IN THE TABLE EITHER, FOR THE SAME REASON AND THE SAME ONE LINE SHORT**
 		// (Tom, 2026-09-08: *"Adding a text doesn't immediately add to the Text table. I have to
 		// change tabs and back to see the new text."*). Every other add reaches the open pane
@@ -43157,7 +43257,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var out = {
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
 			v: openDocVersion, project: project, scenarios: scenarios,
-			nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
+			nodes: doc.nodes, links: doc.links, labels: savedLabels(), nextId: nextId,
 			// **THE CUSTOMERS** (Task 247). Modelling data, and therefore the project's, on exactly
 			// the argument the curve and pipe-type libraries below are: a junction's demand means
 			// nothing without the meters lumped into it. A document that has none writes an empty
@@ -44535,6 +44635,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (savedSettings.symbolCapMultiple === undefined) { savedSettings.symbolCapMultiple = 0.5; }
 		if (savedSettings.symbolCapPercentile === undefined) { savedSettings.symbolCapPercentile = 20; }
 		settings = Object.assign(defaultSettings(), savedSettings);
+		migrateContourShow(savedSettings);
 		// **A PROJECT SAVED BEFORE `Quality` WAS INTERPRETED STILL CARRIES ONLY THE TOKEN**, and it
 		// must not come back as "no analysis": it would then export a file missing a line its source
 		// stated, which is the one thing the carry existed to prevent. So the token is interpreted
@@ -44664,6 +44765,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A project's name is real, stored data from the moment it is created -- assigned by
 	// newProject(), never substituted at display time. The fallback below is a can't-happen path kept
 	// so a hand-edited index cannot render a nameless tab; initLibrary() names every blank on sight.
+	// **A PROJECT SAVED BEFORE "Show plot" HAD ITS OWN SETTING** drew the plot while its fill or its lines were on (a fill of
+	// None with lines off meant "plot off"), and its defaults were fill None, lines off. This reads what the file STATES,
+	// with those old defaults for what it omits, and writes the new design's equivalent: contourShow says on or off; a plot
+	// that was off gets the default fill and lines back, so that checking Show plot later draws something; a plot that was
+	// on keeps the fill and lines the file had. The project's own block, then every scenario's, alternative's and
+	// calculation set's block (the walk repointScenarioSetting() makes) that states a fill or lines.
+	function migrateContourShow(savedSettings) {
+		var oldFill = savedSettings.contourFill === undefined ? '' : savedSettings.contourFill,
+			oldLines = savedSettings.contourLines === undefined ? false : savedSettings.contourLines;
+		function convert(block, fill, lines, show, inherits) {
+			// A block that was off states only that; its fill and lines are removed so it inherits its parent's, which the project's
+			// own block restores to the defaults.
+			if (!show && inherits) { block.contourShow = false; delete block.contourFill; delete block.contourLines; }
+			else if (!show) { block.contourShow = false; block.contourFill = 'smooth'; block.contourLines = true; }
+			else { block.contourShow = true; block.contourFill = fill; block.contourLines = lines; }
+		}
+		if (savedSettings.contourShow === undefined) { convert(settings, oldFill, oldLines, !!(oldFill || oldLines), false); }
+		scenarios.concat(doc.alternatives || [], doc.calcSets || []).forEach(function (o) {
+			var b = o && !o.isBase && plainObject(o.settings) ? o.settings : null, f, l;
+			if (!b || b.contourShow !== undefined || (b.contourFill === undefined && b.contourLines === undefined)) { return; }
+			f = b.contourFill === undefined ? oldFill : b.contourFill;
+			l = b.contourLines === undefined ? oldLines : b.contourLines;
+			convert(b, f, l, !!(f || l), true);
+		});
+	}
 	function projectDisplayName(p) {
 		return (p && p.name) ? p.name : nextProjectName();
 	}
@@ -58017,8 +58143,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 							fn: function () { closeMenu(); openPane('profile'); }
 						},
 						// THE CONTOUR PLOT IS A MAP LAYER, so this row SHOWS it rather than opening a
-						// tab: a smooth fill of the node colouring with labelled lines (pressure, if
-						// nodes are not coloured yet), then its own box, where it is tuned and turned
+						// tab: a smooth fill of the node colouring with labelled lines (nothing, with
+						// No color), then its own box, where it is tuned and turned
 						// off. See refreshContour() and showContour().
 						{
 							label: pc.lpn_contour_menu || 'Contour', tip: pc.lpn_contour_tip,
@@ -60529,9 +60655,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				logLpnFirstAction('element');
 				var placed = addText(w.x, w.y, nearNode ? nearNode.id : null,
 					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
-				// **AND ITS WORDS ARE TYPED WHERE IT STANDS**: the placeholder opens selected in the
-				// in-place editor, so typing replaces it. Its commit adds no undo step of its own, so
-				// one Undo takes the whole new Text away.
+				// **AND ITS WORDS ARE TYPED WHERE IT STANDS**: it is born with no words and opens in the
+				// in-place editor with the caret ready. Finishing with nothing typed takes it back
+				// (Task 854). Its commit adds no undo step of its own, so one Undo takes the whole
+				// new Text away.
 				if (placed) { openTextEditor(placed.id, true); }
 				// **THE TOOL STAYS ARMED, LIKE EVERY OTHER INSERTER** (Tom, 2026-10-07: *"All
 				// inserters should be in repeater mode. Text is not."*). A tap on a Text already there
@@ -61717,6 +61844,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pc.lpn_settings_min_pressure || 'Minimum pressure',
 				pc.lpn_settings_req_pressure || 'Required pressure'];
 		}
+		if (name === 'lpn_u_velocity') { return [pc.lpn_settings_velocity_limit || 'Velocity warning limit']; }
 		if (name === 'lpn_u_flow') {
 			return [pc.lpn_field_base_demand || 'Base demand', pc.lpn_field_valve_setting_flow || 'Flow setting',
 				(pc.lpn_result_flow || 'Flow') + ' (pump curve)',
@@ -61847,6 +61975,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					conv(ov, 'setting');
 				});
 			});
+		} else if (name === 'lpn_u_velocity') {
+			// The velocity warning limit is typed in this unit; a scenario's own is the same number in the same unit.
+			velocityLimitHolders().forEach(function (h) { h.velocityLimit = +(h.velocityLimit * k).toPrecision(6); n++; });
+			// A scenario's settings are read through a resolved-tree cache: the written numbers must be re-read.
+			if (n) { touchTree('convertUnitValues'); }
 		} else if (name === 'lpn_u_flow') {
 			convSetting('flowChange');   // a flow typed in this unit
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
@@ -62035,6 +62168,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// decimals count that just followed the unit shows its new number in an open panel.
 		refreshUseUnitsBoxes();
 		refreshLabelNumberBoxes();
+		// The velocity warning row names its unit and its default in the label and tip, both fixed when the box was built.
+		rebuildSettingsBox();
 		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
 		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
 		// costs nothing and a future input to the cap might not be so lucky.
@@ -65759,7 +65894,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// max-day into the document.
 			// ONE HOME NOW: the box's seam (withSetboxView(), setboxEditEnd()) sends a scenario's edit to
 			// the scenario, the demand multiplier included, and shows the value the scenario uses.
-			var home = function () { return settings.hydraulics || (settings.hydraulics = {}); };
+			// `o.top` is a setting that lives on `settings` itself, not among the [OPTIONS] in `settings.hydraulics`.
+			var home = function () { return o.top ? settings : (settings.hydraulics || (settings.hydraulics = {})); };
 			input.value = home()[key] === undefined ? '' : String(home()[key]);
 			input.addEventListener('change', function () {
 				var t = input.value.trim(), h = home();
@@ -65773,6 +65909,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				else { input.value = h[key] === undefined ? '' : String(h[key]); return; }
 				if (o.perScenario) { touchTree('demandMultiplier'); }
 				if (key === 'emitterExponent') { settings.emitterExponent = settings.hydraulics[key] === undefined ? 0.5 : settings.hydraulics[key]; }
+				if (o.onChange) { saveToStorage(); o.onChange(); return; }
 				// The scenario menu shows an override COUNT beside every name, and this row can now
 				// change it. Refreshed here rather than left to the next scenario switch, so the
 				// badge is never one edit behind what the box says.
@@ -65804,7 +65941,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tipText = (tipText ? tipText + ' ' : '')
 					+ (pc.lpn_settings_default_is || 'The default is {n}.').replace('{n}', String(dflt));
 			}
-			setboxTag(row(compBody, labelText, input, tipText), [['settings', 'hydraulics', key]].concat(key === 'emitterExponent' ? [['settings', 'emitterExponent']] : []));
+			setboxTag(row(compBody, labelText, input, tipText), [o.top ? ['settings', key] : ['settings', 'hydraulics', key]].concat(key === 'emitterExponent' ? [['settings', 'emitterExponent']] : []));
 		}
 		if (!settings.hydraulics) { settings.hydraulics = {}; }
 		// **THE TWO SWITCHES COME FIRST UNDER Hydraulics, and Tom put them there** (2026-09-05:
@@ -66036,6 +66173,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'lpn_settings_flow_change_tip', 0, { allowZero: true, unitOf: 'lpn_u_flow' });
 		hydNumberRow('dampLimit', 'lpn_settings_damp_limit', 'Damping starts at',
 			'lpn_settings_damp_limit_tip', 0, { allowZero: true });
+		// **THE VELOCITY WARNING LIMIT** (Task 864; Tom: "Yes", a project setting). Not an EPANET option, so it
+		// lives at `settings.velocityLimit` (`top`), never in `hydraulics` (which the .inp exporter writes out). A number
+		// typed in the project's velocity unit; BLANK is the default for that unit, ZERO is no warning. A change
+		// re-reads the run in hand and starts no solve (velocityLimitChanged()).
+		hydNumberRow('velocityLimit', 'lpn_settings_velocity_limit', 'Velocity warning limit',
+			'lpn_settings_velocity_limit_tip', velocityLimitDefaultText(),
+			{ allowZero: true, unitOf: 'lpn_u_velocity', top: true, onChange: velocityLimitChanged });
 		// Energy, then Quality LAST -- the reading order the markup sets, and the reasoning is in
 		// Looped-Network.php beside the sections themselves. Build order does not decide what a
 		// reader meets first (the hosts are already in the page), but keeping the two in step means
@@ -66139,7 +66283,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The Page sub-heading inside the Map section -- what the Hide these titles link opens at,
 		// so the switch it just threw is the first thing on screen.
 		page: 'lpn_set_sec_page',
-		gis: 'lpn_set_sub_gis'
+		gis: 'lpn_set_sub_gis',
+		// The Contour box's link: Symbology, Node colors.
+		nodeColors: 'lpn_set_sub_nodeColors'
 	};
 	// ---- WHERE THE BOX IS AND HOW BIG IT IS, REMEMBERED (Tom, 2026-08-19) -------------------
 	//
@@ -78023,11 +78169,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// nothing left to click, so it could never be reached again. Blank (or only spaces and new lines)
 	// is a delete, through deleteElement(), the Delete key's own door: one undo step, and inside a
 	// scenario it excludes the Text from that scenario exactly as Delete does. Returns 'deleted'.
-	function writeTextWords(lb, value, noSnapshot) {
+	// The Text the in-place editor is holding while its first words are being typed: it is on the map
+	// and in the document, but not yet part of the project (Task 854), so no save, reload or tab
+	// close can store a Text with no words. Words typed and not yet committed are lost with it,
+	// as an uncommitted edit of any Text is.
+	function savedLabels() {
+		var ed = textEditor;
+		if (!ed || !ed.fresh) { return doc.labels; }
+		return doc.labels.filter(function (lb) { return lb.id !== ed.id; });
+	}
+	// `fresh`: the first words of a Text just placed. They are written to Base itself, whichever
+	// scenario is showing: a Text drawn in a scenario is born inactive in Base, and that record has
+	// to carry the words too, or switching it on there (or a parent listing it) shows a Text with
+	// none. The scenario then inherits them, so no override is made for what was only ever typed once.
+	function writeTextWords(lb, value, fresh) {
 		if (!lb || value === effective(lb, 'text')) { return false; }
 		if (!String(value).trim()) { deleteElement('label', lb.id); return 'deleted'; }
-		if (!noSnapshot) { saveUndoSnapshot(); }
-		setProp(lb, 'text', value);
+		if (!fresh) { saveUndoSnapshot(); }
+		if (fresh) { lb._text = value; }   // base-write: a new Text's first words, so its Base record is never wordless
+		else { setProp(lb, 'text', value); }
 		afterPropertyEdit(lb);
 		return true;
 	}
@@ -78047,7 +78207,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// **A NEW TEXT THAT WAS NEVER WRITTEN IS NEVER LEFT BEHIND** (Perry, 2026-10-14). Esc on a Text
 	// the tool has just placed takes the placement back, and so does leaving the tool (a toolbar
-	// press, anything off the map, another tool) while its placeholder is still untouched. Its
+	// press, anything off the map, another tool) or a press on the map while nothing has been typed
+	// (a new Text is born empty, Task 854; Base and every scenario alike). A Text that had words
+	// and is later emptied is deleted the same way (writeTextWords()). Its
 	// placement's own undo step goes with it, so nothing is left on the map or on the Undo stack.
 	//
 	// **A ZOOM OR A PAN COMMITS.** Any press outside the editor commits before the map sees it, and
@@ -78087,7 +78249,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ta.style.fontWeight = textLabelWeight(lb);
 		ta.style.textAlign = fx === 0 ? 'left' : fx === 1 ? 'right' : 'center';
 		document.body.appendChild(ta);
-		ed = textEditor = { id: labelId, ta: ta, fresh: !!fresh, opened: Date.now(), orig: ta.value,
+		ed = textEditor = { id: labelId, ta: ta, fresh: !!fresh, opened: Date.now(),
 			// The step the placement took, so a placement taken back takes its step back too.
 			placeSnap: fresh ? undoStack[undoStack.length - 1] : null, winW: layoutWidth(),
 			ax: s.x, ay: s.y, fx: fx, fy: fy, ang: ang, done: false };
@@ -78157,8 +78319,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ta.select();
 		return true;
 	}
-	// `commit`: true writes the words, false cancels, 'leave' writes them unless this is a new Text
-	// still holding its untouched placeholder, which is then taken back.
+	// `commit`: true writes the words, false cancels. A new Text with no words is taken back either way.
+
 	function closeTextEditor(commit) {
 		var ed = textEditor, lb, le, done;
 		if (!ed || ed.done) { return; }
@@ -78173,7 +78335,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (le && le.text) { le.text.style.visibility = ''; }
 		if (ed.ta.parentNode) { ed.ta.parentNode.removeChild(ed.ta); }
 		if (!lb) { return; }
-		if (ed.fresh && (!commit || (commit === 'leave' && ed.ta.value === ed.orig) || !ed.ta.value.trim())) {
+		if (ed.fresh && (!commit || !ed.ta.value.trim())) {
 			takeBackNewText(ed);
 			return;
 		}
@@ -82563,7 +82725,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		if (n === 0) { return ''; }
 		return ((EngCalcs.pageConfig || {}).lpn_roughness_method_note ||
-			'\u26a0 Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.')
+			'⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.')
 			.replace('{method}', frictionMethodLabel()).replace('{n}', String(n));
 	}
 	// A status line with the standing notes beneath it, unless already there.
@@ -89789,6 +89951,68 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return out;
 	}
 
+	// **THE FASTEST PIPE, NAMED** (Task 864). One sentence for the pipe with the highest velocity above the project's
+	// limit in any reporting step of the run (or in the one solve), giving its largest velocity and when, then one line
+	// counting the other pipes over the limit (Tom: "List only the worst plus the count of others"). Scrubbing the
+	// transport re-asks every frame, so the answer is kept until the run in hand, the unit or the limit changes.
+	var velNoteCache = { token: null, key: '', text: '' };
+	// The one rule for a typed limit, in the box and in the Settings table: a number, zero or more.
+	function velocityLimitValid(v) { return typeof v === 'number' && isFinite(v) && v >= 0; }
+	// Every object holding a typed `velocityLimit`: the project's settings, and each scenario's, stored alternative's and
+	// calculation set's own block (a scenario's lives at .settings.settings, see setScenarioSetting()).
+	function velocityLimitHolders() {
+		var out = [];
+		if (velocityLimitValid(settings.velocityLimit)) { out.push(settings); }
+		scenarioSettingHolders().forEach(function (o) {
+			var blk = o && !o.isBase && o.settings && o.settings.settings;
+			if (blk && velocityLimitValid(blk.velocityLimit)) { out.push(blk); }
+		});
+		return out;
+	}
+	// The limit a blank setting means, in the unit showing: EngCalcs.LPN_VELOCITY_WARN (10 ft/s), as the fire flow
+	// box's own criterion is shown, so SI reads 3.05 m/s in both places.
+	function velocityLimitDefault() { return +ffNum(toDisplay(EngCalcs.LPN_VELOCITY_WARN, 'lpn_u_velocity')); }
+	function velocityLimitDefaultText() { return ffNum(velocityLimitDefault()) + ' ' + unitSymbol('lpn_u_velocity'); }
+	// The limit in the project's velocity unit as displayed (not m/s); 0 is "no warning".
+	function velocityLimitShown() {
+		var v = scnSetting('velocityLimit');
+		return velocityLimitValid(v) ? v : velocityLimitDefault();
+	}
+	// A typed limit changed: re-read the run in hand and redraw the status line, as a scrub does. No solve, with
+	// Recalculate on or off. The note's cache key holds the limit, so it is read afresh.
+	function velocityLimitChanged() {
+		if (lastSolveResult) { applySolveResult(lastSolveResult); }
+	}
+	function velocityNote(result) {
+		var pc = EngCalcs.pageConfig || {}, token = EngCalcs.lpnTimeRunToken ? EngCalcs.lpnTimeRunToken() : null,
+			frames, peaks, p, key, extended, parts = [], more, shown = velocityLimitShown(), limit;
+		if (shown === 0) { return ''; }
+		limit = toSI(shown, 'lpn_u_velocity');
+		key = unitLabel('lpn_u_velocity') + '|' + shown;
+		if (token && velNoteCache.token === token && velNoteCache.key === key) { return velNoteCache.text; }
+		frames = token && EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		extended = frames.length > 1;
+		if (!frames.length) { frames = [result]; }
+		peaks = EngCalcs.lpnVelocityPeaks(frames, function (id) { var l = linkById(id); return !!l && l.type === 'pipe'; }, limit);
+		if (peaks.length) {
+			p = peaks[0];
+			// split/join, not .replace(): a pipe id may hold `$&`, which .replace() takes for a pattern of its own, and
+			// the id goes in LAST so that an id holding the text `{velocity}` is not filled a second time.
+			parts.push((extended && typeof p.t === 'number'
+				? (pc.lpn_velocity_warn || '⚠ Pipe {id} velocity is {velocity} at {time}.').split('{time}').join(dsTimeText(p.t))
+				: (pc.lpn_velocity_warn_steady || '⚠ Pipe {id} velocity is {velocity}.'))
+				.split('{velocity}').join(ffQty(p.v, 'lpn_u_velocity')).split('{id}').join(p.id));
+			more = peaks.length - 1;
+			if (more > 0) {
+				parts.push((pc.lpn_velocity_warn_more || '⚠ And more pipes ({n}) above {limit}.')
+					.split('{n}').join(String(more)).split('{limit}').join(ffQty(limit, 'lpn_u_velocity')));
+			}
+		}
+		ffLastNum = null;   // ffQty() leaves its last number for a table cell to pick up; none here is one
+		parts = parts.join(' ');
+		if (token) { velNoteCache = { token: token, key: key, text: parts }; }
+		return parts;
+	}
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
 		tsbRefresh();
@@ -89938,7 +90162,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([result.stoppedNote || '', notConvergedNote, engineRouteNote, pdaNote, omittedNote, roughnessNote,
+		setStatus([result.stoppedNote || '', notConvergedNote, engineRouteNote, pdaNote, omittedNote, roughnessNote, velocityNote(result),
 			// A one-point GPV curve, read as a line through the origin (EngCalcs.lpnGpvCurveProblem),
 			// said whichever engine answered: both give it the code.
 			droppedNote('gpv-one-point', 'lpn_gpv_one_point_note',

@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Zoom sur la sélection';
 $ec_lang['lpn_tool_zoom_window']='Fenêtre de zoom';
 $ec_lang['lpn_zoom_in']='Zoom avant';
 $ec_lang['lpn_zoom_out']='Zoom arrière';
-$ec_lang['lpn_new_text']='Texte';
 $ec_lang['lpn_field_text_bold']='Texte en gras';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Courbes de niveau';
 $ec_lang['lpn_contour_tip']='Affiche un tracé de courbes de niveau sur la carte : les couleurs des nœuds se diffusent le long des conduites et de part et d\'autre, avec des courbes de niveau étiquetées. Ouvre une boîte pour le régler ou le désactiver.';
 $ec_lang['lpn_contour_plot']='Courbes de niveau : tracé';
 $ec_lang['lpn_contour_show']='Afficher le tracé';
-$ec_lang['lpn_contour_show_tip']='Décochez pour masquer le remplissage et les isolignes ; cochez pour les rétablir tels qu\'ils étaient. Les couleurs des nœuds restent.';
 $ec_lang['lpn_contour_fill']='Remplissage';
 $ec_lang['lpn_contour_fill_tip']='Dégradé fond les couleurs d\'une classe à la suivante. Bandes peint chaque classe de la légende des couleurs d\'un aplat.';
 $ec_lang['lpn_contour_fill_smooth']='Dégradé';

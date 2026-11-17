@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Покажи избраните';
 $ec_lang['lpn_tool_zoom_window']='Мащаб в прозорец';
 $ec_lang['lpn_zoom_in']='Увеличи';
 $ec_lang['lpn_zoom_out']='Намали';
-$ec_lang['lpn_new_text']='Текст';
 $ec_lang['lpn_field_text_bold']='Получер текст';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Изолинии';
 $ec_lang['lpn_contour_tip']='Показва на картата карта с изолинии: цветовете на възлите се разпростират по тръбите и встрани от тях, с надписани изолинии. Отваря кутия за настройването й или за изключването й.';
 $ec_lang['lpn_contour_plot']='Изолинии: карта';
 $ec_lang['lpn_contour_show']='Показване на графиката';
-$ec_lang['lpn_contour_show_tip']='Изчистете, за да скриете запълването и изолиниите; отметнете, за да се върнат както са били. Цветовете на възлите остават.';
 $ec_lang['lpn_contour_fill']='Запълване';
 $ec_lang['lpn_contour_fill_tip']='При Плавно цветовете преливат от един клас към следващия. При Ивици всеки клас от цветовата скала се оцветява равномерно.';
 $ec_lang['lpn_contour_fill_smooth']='Плавно';

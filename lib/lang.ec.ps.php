@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='ټاکل شویو ته زوم';
 $ec_lang['lpn_tool_zoom_window']='د زوم کړکۍ';
 $ec_lang['lpn_zoom_in']='زیات زوم';
 $ec_lang['lpn_zoom_out']='کم زوم';
-$ec_lang['lpn_new_text']='متن';
 $ec_lang['lpn_field_text_bold']='ډب متن';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='کانتور';
 $ec_lang['lpn_contour_tip']='پر نقشه د کانتور انځور ښودل: د نقطو رنګونه د پایپونو په اوږدو او څنګ کې خپریږي، او د نومونو لرونکې کانتور کرښې ښکاري. یو بکس پرانیزي چې تاسو یې تنظیم یا بند کړئ.';
 $ec_lang['lpn_contour_plot']='کانتور انځور';
 $ec_lang['lpn_contour_show']='پلات ښودل';
-$ec_lang['lpn_contour_show_tip']='د ډکولو او د کانتور کرښو پټولو لپاره یې پاک کړئ؛ د هغوی بېرته راوستلو لپاره یې وټاکئ لکه څنګه چې وو. د نقطو رنګونه پاتې کیږي.';
 $ec_lang['lpn_contour_fill']='ډکول';
 $ec_lang['lpn_contour_fill_tip']='نرم رنګونه له یوې طبقې نه بلې ته په ورو ورو سره ګډوي. بندونه د رنګ کیلي هره طبقه په یو ډول (ساده) رنګوي.';
 $ec_lang['lpn_contour_fill_smooth']='نرم';

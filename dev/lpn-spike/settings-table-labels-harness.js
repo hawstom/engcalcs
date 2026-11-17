@@ -48,7 +48,7 @@ const L = loadLoopedNetwork(EXAMPLE_EXPORTS +
 	"\t\t\t\t\tif (g[0] === 'node') { settings.contourInterval = settings.contourInterval || {}; settings.contourInterval[contourIntervalKey(d[0])] = 5; }\n" +
 	"\t\t\t\t});\n" +
 	"\t\t\t});\n" +
-	"\t\t\tsettings.colorNodeField = 'pressure'; settings.colorLinkField = 'velocity'; settings.contourFill = 'smooth';\n" +
+	"\t\t\tsettings.colorNodeField = 'pressure'; settings.colorLinkField = 'velocity'; settings.contourShow = true; settings.contourFill = 'smooth';\n" +
 	"\t\t\tsettings.contourLines = true; settings.contourLabels = true; settings.contourTerrain = true;\n" +
 	"\t\t\tsettings.quality = { mode: 'trace', traceNode: '' }; settings.qualityOptions = { quality: 'Trace 1', diffusivity: '1', tolerance: '0.01' };\n" +
 	"\t\t\tsettings.tolerance = 0.001; settings.emitterExponent = 0.5; settings.nodeElevSource = 'value';\n" +

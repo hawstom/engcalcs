@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Perbesar ke Pilihan';
 $ec_lang['lpn_tool_zoom_window']='Perbesar Jendela';
 $ec_lang['lpn_zoom_in']='Perbesar';
 $ec_lang['lpn_zoom_out']='Perkecil';
-$ec_lang['lpn_new_text']='Teks';
 $ec_lang['lpn_field_text_bold']='Teks tebal';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Kontur';
 $ec_lang['lpn_contour_tip']='Tampilkan plot kontur pada peta: warna simpul menyebar di sepanjang dan di samping pipa, dengan garis kontur berlabel. Membuka kotak untuk menyetelnya atau mematikannya.';
 $ec_lang['lpn_contour_plot']='Plot kontur';
 $ec_lang['lpn_contour_show']='Tampilkan plot';
-$ec_lang['lpn_contour_show_tip']='Hapus centang untuk menyembunyikan isian dan garis kontur; centang untuk menampilkannya kembali seperti semula. Warna simpul tetap.';
 $ec_lang['lpn_contour_fill']='Isian';
 $ec_lang['lpn_contour_fill_tip']='Halus memadukan warna dari satu kelas ke kelas berikutnya. Pita mewarnai setiap kelas pada kunci warna secara rata.';
 $ec_lang['lpn_contour_fill_smooth']='Halus';
