@@ -47,7 +47,7 @@ exports.run = async function ({ browser, report }) {
 			report.ok(strip.selects.indexOf(n) >= 0, n + ' is on the strip');
 		});
 		// `lpn_u_age` joined them 2026-09-09 with water age, and is results-only for the same reason.
-		['lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_age'].forEach((n) => {
+		['lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_age', 'lpn_u_volume'].forEach((n) => {
 			report.ok(strip.selects.indexOf(n) >= 0,
 				n + ' is on it too — results-only, and it never had an input twin');
 		});

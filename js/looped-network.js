@@ -9286,7 +9286,10 @@ var EngCalcs = EngCalcs || {};
 		lpn_u_elevhead: { fth2o: 2, mh2o: 3 },
 		lpn_u_pressure: { psi: 2, mh2o: 3, fth2o: 2 },
 		lpn_u_velocity: { ftps: 1, mps: 2 },
-		lpn_u_gradient: { gradePercent: 2, grade: 4 }
+		lpn_u_gradient: { gradePercent: 2, grade: 4 },
+		// A tank's Available volume (a results column; it has no label row). Whole gallons and litres,
+		// the unit's own size for the rest, so a million-gallon figure is not printed to the cent.
+		lpn_u_volume: { gal: 0, mgal: 3, ft3: 0, acft: 2, m3: 1, l: 0, ml: 3 }
 	};
 	// **THE GUESS FROM THE FACTOR, for a unit the table above does not list** (Tom's first half of
 	// R-328). A typical magnitude of each quantity in SI, times the unit's own factor, is what the
@@ -9294,12 +9297,13 @@ var EngCalcs = EngCalcs || {};
 	// 0.01 m3/s flow reads 0.19 in imperial MGD (3 places) and 36 in m3/h (1 place).
 	var LPN_LABEL_TYPICAL_SI = {
 		lpn_u_flow: 0.01, lpn_u_length: 100, lpn_u_diameter: 0.2, lpn_u_elevhead: 30,
-		lpn_u_pressure: 40, lpn_u_velocity: 1, lpn_u_gradient: 0.005
+		lpn_u_pressure: 40, lpn_u_velocity: 1, lpn_u_gradient: 0.005, lpn_u_volume: 500
 	};
 	// **WHEN NO UNIT IS SHOWING YET** -- the selects are not on the page, which happens only outside a
 	// browser -- a count is the US preset's, the same US a page with no Accept-Language opens on.
 	var LPN_LABEL_UNIT_US = { lpn_u_flow: 'gpm', lpn_u_length: 'ft', lpn_u_diameter: 'in',
-		lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_velocity: 'ftps', lpn_u_gradient: 'gradePercent' };
+		lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_velocity: 'ftps', lpn_u_gradient: 'gradePercent',
+		lpn_u_volume: 'gal' };
 	function labelDecimalsForUnit(sel, key) {
 		var row = LPN_UNIT_DECIMALS[sel] || {}, f, typ = LPN_LABEL_TYPICAL_SI[sel], d;
 		if (!key) { key = LPN_LABEL_UNIT_US[sel]; }
@@ -12857,7 +12861,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (field === 'volume') {
 			var volSI = tankUsableVolumeSI(n);
-			return volSI === undefined ? undefined : volSI * tankVolumeFactor();
+			return volSI === undefined ? undefined : toDisplay(volSI, resultUnit('volume'));
 		}
 		if (field === 'pressure') {
 			if (isFixedHeadNode(n)) { return fixedHeadPressure(n); }
@@ -12934,9 +12938,6 @@ var EngCalcs = EngCalcs || {};
 		}
 		return pts[pts.length - 1][1];
 	}
-	// A volume is shown in the LENGTH unit cubed (cubic feet or cubic metres, which is what EPANET
-	// pairs with its length): the factor and the mark come from the one LENGTH selector.
-	function tankVolumeFactor() { var f = unitFactor('lpn_u_length'); return f * f * f; }
 	// A tank's Can overflow as EPANET's own word. The file's spelling is kept in storage (`yes`, `NO`),
 	// because it is carried and never computed with; this is how every venue reads it. Absent is NO.
 	function tankOverflowWord(n) { return /^y/i.test(String(effective(n, 'overflow') || '')) ? 'YES' : 'NO'; }
@@ -12946,7 +12947,11 @@ var EngCalcs = EngCalcs || {};
 		if (tankOverflowWord(n) === word && effective(n, 'overflow')) { return; }
 		setProp(n, 'overflow', word);
 	}
-	function tankVolumeUnitText() {
+	// An AVAILABLE volume is a result, read in the Volume selector like any solved number.
+	function tankVolumeUnitText() { return unitLabel(resultUnit('volume')); }
+	// A typed MINIMUM volume is a number in the file's own terms: EPANET states it in the Length
+	// unit cubed, so its heading names that and no selector converts it.
+	function tankMinVolumeUnitText() {
 		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_length');
 		if (k === 'ft') { return pc.u_ft3 || 'ft^3'; }
 		if (k === 'm') { return pc.u_m3 || 'm^3'; }
@@ -13127,7 +13132,7 @@ var EngCalcs = EngCalcs || {};
 		// **A TANK'S TWO RESULTS ARE NOT COLOUR OR LABEL FIELDS** (Task 783; the chemical-symbology
 		// harness holds every colour field to a Labels row, and these have neither), so they sit
 		// outside COLOR_NODE_FIELDS and the unit is answered here. Depth reads in the Elevation/Head
-		// unit like the three typed levels; volume in the LENGTH unit cubed.
+		// unit like the three typed levels; volume in the Volume unit.
 		if (group === 'node' && field === 'volume') { return tankVolumeUnitText(); }
 		if (group === 'node' && field === 'depth') { return unitLabel(resultUnit('elevhead')); }
 		id = colorFieldUnit(group, field);
@@ -30476,7 +30481,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume',
 							get: function (n) { return effective(n, 'minVolume'); },
 							set: function (n, v) { setProp(n, 'minVolume', v); updateNode(n.id, true); } };
-						c.unitText = tankVolumeUnitText;
+						c.unitText = tankMinVolumeUnitText;
 						return c;
 					}()),
 					{ key: 'overflow', label: 'lpn_field_tank_overflow', em: 3.5, prop: 'overflow',
@@ -30503,6 +30508,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					(function () {
 						var c = paneColNodeResult('volume', 'lpn_result_tank_volume', null);
 						c.unitText = tankVolumeUnitText;
+						c.dec = function () { return labelDecimalsForUnit('lpn_u_volume', unitKey('lpn_u_volume')); };
 						return c;
 					}()),
 					paneColNodeInitQuality(),
@@ -40971,7 +40977,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				label: pc.lpn_field_tank_maxlevel_short || 'Maximum depth' },
 			{ types: ['tank'], keys: ['tankDiameter'], props: ['tankDiameter'], unit: 'lpn_u_length',
 				label: pc.lpn_field_tank_diameter || 'Tank diameter' },
-			{ types: ['tank'], keys: ['minVolume'], props: ['minVolume'], unitText: tankVolumeUnitText, label: pc.lpn_field_tank_minvol || 'Minimum volume' },
+			{ types: ['tank'], keys: ['minVolume'], props: ['minVolume'], unitText: tankMinVolumeUnitText, label: pc.lpn_field_tank_minvol || 'Minimum volume' },
 			{ types: ['tank'], keys: ['overflow'], props: ['overflow'], none: ['NO', 'no', 'No'], label: pc.lpn_field_tank_overflow || 'Can overflow' },
 			{ types: ['tank'], keys: ['volCurve'], props: ['volCurve'], label: pc.lpn_curve_kind_volume || 'Tank volume' },
 			{ types: ['tank'], keys: ['mixingModel'], props: ['mixingModel'], none: ['MIXED'], label: pc.lpn_mixing_model || 'Mixing model' },
@@ -47477,7 +47483,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_u_pressure: us ? 'psi' : 'mh2o',
 			lpn_u_diameter: us ? 'in' : 'mm',
 			lpn_u_flow: LPN_INP_FLOW_UNIT[parsed.flowUnits] || (us ? 'gpm' : 'lps'),
-			lpn_u_velocity: us ? 'ftps' : 'mps'
+			lpn_u_velocity: us ? 'ftps' : 'mps',
+			// A tank's volume is a result, so the file states no unit for it; the file's own system picks the preset's.
+			lpn_u_volume: us ? 'gal' : 'm3'
 			// No lpn_u_gradient: head-loss gradient is dimensionless and an .inp does not name one.
 		};
 		// **A D-W FILE'S ROUGHNESS IS IN EPANET'S OWN UNIT** (audit 2026-11, F1): millimetres in an
@@ -61512,7 +61520,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// In strip order, which is Looped-Network.php's order.
 	var LPN_UNIT_SELECTS = ['lpn_u_length', 'lpn_u_diameter', 'lpn_u_elevhead', 'lpn_u_pressure',
-		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_roughness', 'lpn_u_age'];
+		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_roughness', 'lpn_u_age', 'lpn_u_volume'];
 	// **THE OLD RESULT KEYS, KEPT ONLY TO BE READ OUT OF AN OLD FILE.** Written by no code path;
 	// this map exists so reconcileLegacyUnits() below can name them, and for nothing else.
 	var LPN_LEGACY_RESULT_KEYS = {
@@ -61531,7 +61539,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// hours. It reads a WATER AGE and only a water age -- a source share is a percentage and
 		// has no unit at all, which is why qualityUnitId() below answers '' for that mode rather
 		// than naming this one.
-		age: 'lpn_u_age'
+		age: 'lpn_u_age',
+		// A tank's Available volume. Results-only: a typed Minimum volume stays in the Length unit cubed.
+		volume: 'lpn_u_volume'
 	};
 	function resultUnit(q) { return LPN_RESULT_UNIT[q]; }
 	// **AN EMITTER COEFFICIENT IN THE UNITS ON SCREEN, AND BACK** (Task 191; Tom, 2026-09-08).
@@ -76016,7 +76026,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
 			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is in the Length unit cubed, as the
 			// Available volume below it is; blank is EPANET's 0, "use the diameter".
-			numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')',
+			numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankMinVolumeUnitText() + ')',
 				effective(n, 'minVolume'),
 				function (v) { setProp(n, 'minVolume', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_minvol_tip, { el: n, prop: 'minVolume' });

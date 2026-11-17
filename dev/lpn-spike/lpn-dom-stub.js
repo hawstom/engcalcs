@@ -693,6 +693,8 @@ function setUnitSet(which) {
   // two presets agree -- an hour is an hour on both sides of the Atlantic -- so there is no `us ?`
   // here and that is not an omission.
   mkUnitSelect('lpn_u_age', 'elapsed_time', familyUnits('elapsed_time'), 'hr');
+  // A tank's Available volume, results-only; the one family whose US default (gal) is not a length cubed.
+  mkUnitSelect('lpn_u_volume', 'volume_tank', familyUnits('volume_tank'), us ? 'gal' : 'm3');
   // Darcy-Weisbach roughness height e (ROADMAP Task 271) -- family `roughness`, which lib/Units.lib.php
   // lists m/mm/ft/in and millifeet (EPANET's US D-W unit), us => ft, si => mm. Conditional in the PAGE (shown only
   // under Darcy-Weisbach) but unconditional here: applyMethodUI() hides the row, and a stub that

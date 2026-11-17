@@ -139,6 +139,8 @@ echoHeader("EngCalcsApp", $html_title,
 		<?php // RESULTS-ONLY, like Velocity and Head loss gradient beside it: nothing on this page is
 		      // typed in hours. A source share is a percentage and has no selector at all. ?>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_water_age']?></span><?php echoUnitSelect('lpn_u_age', 'elapsed_time', '', $ec_lang['lpn_result_water_age']); ?></span>
+		<?php // RESULTS-ONLY, like Water age: a tank's Available volume. A typed Minimum volume stays in the Length unit cubed. ?>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_curve_volume_col']?></span><?php echoUnitSelect('lpn_u_volume', 'volume_tank', '', $ec_lang['lpn_curve_volume_col']); ?></span>
 		<span class="lpn-units-item" id="lpn_u_roughness_row"><span class="lpn-units-name"><?=$ec_lang['lpn_field_roughness']?></span><?php echoUnitSelect('lpn_u_roughness', 'roughness', '', $ec_lang['lpn_field_roughness']); ?></span>
 		</div>
 	</div><?php // #lpn_units_strip ?>

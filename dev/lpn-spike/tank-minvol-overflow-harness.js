@@ -34,6 +34,7 @@ const L = loadLoopedNetwork(
 	"\t\tassembleModel: assembleModel, convertUnitValues: convertUnitValues,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), { effective: effective }); },\n" +
 	"\t\trenderNodeFields: renderNodeFields,\n" +
+	"\t\tserializeProject: serializeProject, unitKey: unitKey, colorNodeValue: colorNodeValue, tankVolumeUnitText: tankVolumeUnitText, unitServes: unitServes,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\ttableCols: function (id) { return paneCols(paneTableById(id)); },\n" +
 	"\t\tquery: function (scope, prop, op, value) {\n" +
@@ -220,6 +221,49 @@ console.log('\n--- 6. Find reads both ---');
 	open(FILE(' T1 20 10 2 20 30 500 * YES'));
 	ok('a tank is findable on Minimum volume', L.query('tank', 'minVolume', 'equals', '500').length === 1 && L.query('tank', 'minVolume', 'gt', '600').length === 0);
 	ok('a tank is findable on Can overflow', L.query('tank', 'overflow', 'equals', 'YES').length === 1 && L.query('tank', 'overflow', 'equals', 'NO').length === 0);
+}
+
+console.log('\n--- 7. the Volume selector (Task 857): results only, saved with the project, never touches the file ---');
+{
+	const sel = (u) => L.applyUnitSelections({ lpn_u_volume: u });
+	const TXT = FILE(' T1 20 10 2 20 30 500 * NO');
+	const clean = (t) => tankRows(t).join('|');
+	setUnitSet('us');
+	open(TXT);
+	ok('a US file opens on gallons', L.unitKey('lpn_u_volume') === 'gal', L.unitKey('lpn_u_volume'));
+	ok('the Volume selector decides no typed number', L.unitServes('lpn_u_volume').length === 0);
+	const base = L.exportInp().inp;
+	// Available volume by hand: a 30 ft tank, Net-style: 20 ft level, lowest water depth 2... the file
+	// states Init 10, Min 2, Max 20, Diam 30. Usable volume at the initial depth 10 = pi/4 * 30^2 * (10 - 2).
+	const ft3 = Math.PI / 4 * 30 * 30 * (10 - 2);
+	const t = L.nodeById('T1');
+	const perFt3 = { gal: 28.316846592 / 3.785411784, ft3: 1, m3: 0.028316846592, l: 28.316846592 };
+	// Only the stated (not solved) tank state is needed: the usable volume is read off the document.
+	['gal', 'ft3', 'm3', 'l'].forEach((u) => {
+		sel(u);
+		const v = L.colorNodeValue(t, 'volume');
+		ok(u + ': Available volume at the initial depth ' + (ft3 * perFt3[u]).toFixed(2) + ' (shown ' + v + ')',
+			typeof v === 'number' && Math.abs(v - ft3 * perFt3[u]) < 1e-6 * ft3 * perFt3[u], String(v));
+		ok(u + ': the heading unit follows', L.tankVolumeUnitText() === { gal: 'gal', ft3: 'ft^3', m3: 'm^3', l: 'L' }[u], L.tankVolumeUnitText());
+		ok(u + ': the file goes out byte for byte the same', L.exportInp().inp === base);
+		ok(u + ': Minimum volume stays the file\'s 500 ft3 (heading in the Length unit cubed)', clean(L.exportInp().inp) === 'T1 20 10 2 20 30 500 * NO', clean(L.exportInp().inp));
+	});
+	// Saved and reopened.
+	sel('l');
+	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
+	ok('the project saves the Volume unit by name', saved.units && saved.units.lpn_u_volume === 'l', JSON.stringify(saved.units));
+	sel('ft3');
+	L.applyUnitSelections(saved.units);
+	ok('and reopens in it', L.unitKey('lpn_u_volume') === 'l');
+	// An old project that never stored it keeps the page's own selection (the preset's on a fresh page).
+	setUnitSet('us');
+	const old = JSON.parse(JSON.stringify(saved.units)); delete old.lpn_u_volume;
+	L.applyUnitSelections(old);
+	ok('an old project opens on the preset default (US: gallons)', L.unitKey('lpn_u_volume') === 'gal', L.unitKey('lpn_u_volume'));
+	setUnitSet('si');
+	L.applyUnitSelections(old);
+	ok('...and SI: cubic metres', L.unitKey('lpn_u_volume') === 'm3', L.unitKey('lpn_u_volume'));
+	setUnitSet('us');
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');

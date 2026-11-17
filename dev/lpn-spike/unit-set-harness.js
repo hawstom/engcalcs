@@ -68,9 +68,9 @@ setUnitSet('us');
 	console.log('\n--- one set ---');
 	const all = L.ALL;
 	['lpn_u_length', 'lpn_u_diameter', 'lpn_u_roughness', 'lpn_u_elevhead', 'lpn_u_pressure',
-		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_age']
+		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_age', 'lpn_u_volume']
 		.forEach(n => ok('the set holds ' + n, all.indexOf(n) >= 0));
-	ok('and holds nothing else', all.length === 9, JSON.stringify(all));
+	ok('and holds nothing else', all.length === 10, JSON.stringify(all));
 	// **NO `lpn_u_r_*` SURVIVES ANYWHERE IN THE SET.** Named as a pattern rather than as three
 	// strings, so a fourth one invented later is caught too.
 	ok('no result-only twin is left in the set', all.every(n => n.indexOf('lpn_u_r_') !== 0),
