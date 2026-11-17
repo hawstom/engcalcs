@@ -33,7 +33,7 @@ require(ROOT + 'js/lpn-inp.js');
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
-	"\t\taddNode: addNode, addLink: addLink, addText: addText, buildDom: buildDom,\n" +
+	"\t\taddNode: addNode, addLink: addLink, addText: function (x, y, n, a, id) { var lb = addText(x, y, n, a, id); setProp(lb, 'text', 'Text'); refreshLabelContent(lb.id); return lb; }, buildDom: buildDom,\n" +
 	"\t\tlabelById: labelById, linkById: linkById,\n" +
 	"\t\tdeleteLink: deleteLink, deleteNode: deleteNode,\n" +
 	"\t\tserializeProject: serializeProject, applySaved: applySaved,\n" +

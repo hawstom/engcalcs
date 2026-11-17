@@ -149,7 +149,7 @@ function addPlainScenarios() {
 function dressProject() {
 	const S = L.getSettings(), LS = L.getLabelSettings();
 	S.colorNodeField = 'pressure'; S.colorLinkField = 'velocity';
-	S.contourFill = 'smooth'; S.contourLines = true;
+	S.contourShow = true; S.contourFill = 'smooth'; S.contourLines = true;
 	LS.node.pressure = true; LS.link.flow = true;
 }
 
@@ -283,6 +283,32 @@ if (BLIND && process.env.LPN_SEAM_OVERRIDE === '1') {
 		L.applySaved(L.acceptImportedText(text));
 		const back = L.getScenarios().filter((s) => s.name === 'Figure')[0];
 		ok('...and the held view survives a save and reopen unchanged', back && JSON.stringify(L.viewOf(back)) === heldWas, heldWas);
+
+		console.log('\n--- 4. a project saved before Show plot had its own setting ---');
+		// Under the old design the plot was on while the fill or the lines were; a stated fill of None with lines off was "off",
+		// and what a file omits was fill None, lines off. The migration reads what the file states.
+		const old = JSON.parse(text), nonBase = old.scenarios.filter((x) => !x.isBase);
+		const mk = (n, blk) => { const c = JSON.parse(JSON.stringify(nonBase[0])); c.id = 'oldc' + n; c.name = 'Old ' + n; c.settings = blk; delete c.alternatives; old.scenarios.push(c); };
+		delete old.settings.contourShow;
+		old.settings.contourFill = ''; old.settings.contourLines = false;
+		mk(1, { contourFill: 'bands' });
+		mk(2, { contourLines: true });
+		mk(3, { contourFill: '', contourLines: false });
+		const re = L.applySaved(L.acceptImportedText(JSON.stringify(old))) || null;
+		const S0 = L.getSettings(), blk = (n) => L.getScenarios().filter((x) => x.id === 'oldc' + n)[0].settings;
+		ok('an old project that drew no plot opens with Show plot off and the default fill and lines back', S0.contourShow === false && S0.contourFill === 'smooth' && S0.contourLines === true, JSON.stringify([S0.contourShow, S0.contourFill, S0.contourLines]));
+		ok('a scenario that stated a fill turns Show plot on there, keeping its fill and the old default of no lines', blk(1).contourShow === true && blk(1).contourFill === 'bands' && blk(1).contourLines === false, JSON.stringify(blk(1)));
+		ok('a scenario that stated lines alone turns Show plot on, and gains no fill', blk(2).contourShow === true && blk(2).contourFill === '' && blk(2).contourLines === true, JSON.stringify(blk(2)));
+		ok('a scenario that stated no fill and no lines is off and states nothing else, so it inherits', blk(3).contourShow === false && blk(3).contourFill === undefined && blk(3).contourLines === undefined, JSON.stringify(blk(3)));
+		const oldB = JSON.parse(text); delete oldB.settings.contourShow; oldB.settings.contourFill = 'bands'; oldB.settings.contourLines = true;
+		const kid = JSON.parse(JSON.stringify(oldB.scenarios.filter((x) => !x.isBase)[0])); kid.id = 'oldkid'; kid.name = 'Old kid'; kid.settings = { contourFill: '', contourLines: false }; delete kid.alternatives; oldB.scenarios.push(kid);
+		L.applySaved(L.acceptImportedText(JSON.stringify(oldB)));
+		const kb = L.getScenarios().filter((x) => x.id === 'oldkid')[0].settings;
+		ok('a child that was off under a Bands parent is off and inherits Bands', L.getSettings().contourFill === 'bands' && kb.contourShow === false && kb.contourFill === undefined, JSON.stringify([L.getSettings().contourFill, kb]));
+		const old2 = JSON.parse(text); delete old2.settings.contourShow; delete old2.settings.contourFill; old2.settings.contourLines = true;
+		L.applySaved(L.acceptImportedText(JSON.stringify(old2)));
+		const S2 = L.getSettings();
+		ok('a file stating lines on and omitting the fill opens on, with no fill', S2.contourShow === true && S2.contourFill === '' && S2.contourLines === true, JSON.stringify([S2.contourShow, S2.contourFill, S2.contourLines]));
 
 		console.log('\n' + (fails ? fails + ' FAILED' : 'ALL PASS'));
 		process.exit(fails ? 1 : 0);

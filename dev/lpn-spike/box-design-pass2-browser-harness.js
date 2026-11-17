@@ -124,10 +124,8 @@ async function main() {
 		const namesC = await page.evaluate(() => ({ g: EngCalcs.pageConfig.lpn_graphs_menu, c: EngCalcs.pageConfig.lpn_contour_menu }));
 		await a.menuClickSub(namesC.g, namesC.c, 'project');
 		await a.settle(1200);
-		const cSel = await sty('#lpn_contour_field');
-		ok('P7 the Contour plot pull-downs look like the sheet\'s', !!cSel && JSON.stringify(cSel) === JSON.stringify(sheetSel), JSON.stringify({ sheetSel, cSel }));
-		const ramp = await page.evaluate(() => { const b = document.querySelector('#lpn_contour_body .lpn-ramp-btn'); const c = getComputedStyle(b); const s = document.getElementById('lpn_contour_fill'); return { bg: c.backgroundColor, border: c.borderTopWidth, h: Math.round(b.getBoundingClientRect().height), selH: Math.round(s.getBoundingClientRect().height) }; });
-		ok('P7 the Colour scheme bar is a flat cell too (no border, same row height as the pull-down)', ramp.border === '0px' && Math.abs(ramp.h - ramp.selH) <= 2, JSON.stringify(ramp));
+		const cSel = await sty('#lpn_contour_fill');
+		ok('P7 the Contour plot pull-down looks like the sheet\'s', !!cSel && JSON.stringify(cSel) === JSON.stringify(sheetSel), JSON.stringify({ sheetSel, cSel }));
 		await shot('contour');
 		await page.evaluate(() => { const x = document.querySelector('#lpn_contour_box .lpn-popover-x, #lpn_contour_box [aria-label="Close"]'); if (x) { x.click(); } });
 		await a.settle(300);
@@ -140,16 +138,23 @@ async function main() {
 			await page.evaluate((l) => { const b = Array.from(document.querySelectorAll('dialog button, .lpn-dialog button, button')).filter((x) => x.textContent.trim() === l && x.getBoundingClientRect().width > 0)[0]; if (b) { b.click(); } }, await a.lang('lpn_dialog_ok'));
 			await a.settle(1000);
 		}
+		// The plot follows Color nodes by (Tom, 2026-11-14), so Pressure is chosen first, in Settings; the box must then leave it alone.
+		await a.toolbarClick(await a.lang('lpn_tool_settings'));
+		await a.settle(500);
+		await page.evaluate(() => { const n = document.getElementById('lpn_set_color_node'); n.value = 'pressure'; n.dispatchEvent(new Event('change', { bubbles: true })); });
+		await a.settle(500);
+		await page.keyboard.press('Escape');
+		await a.settle(300);
 		const before = await settingsNow();
 		const namesG = await page.evaluate(() => ({ g: EngCalcs.pageConfig.lpn_graphs_menu, c: EngCalcs.pageConfig.lpn_contour_menu }));
 		await a.menuClickSub(namesG.g, namesG.c, 'project');
 		await a.settle(1500);
 		const afterOpen = await settingsNow();
 		const nodeField = (st) => st && st.settings ? (st.settings.colorNodeField || '') : null;
-		ok('P10 before: no node colouring', nodeField(before) === '', JSON.stringify(nodeField(before)));
-		ok('P10 opening the box leaves Settings > Colors off (no node colour field written)', nodeField(afterOpen) === '', JSON.stringify(nodeField(afterOpen)));
-		ok('P10 ...no node is painted', (await nodeColoured()) === 0, String(await nodeColoured()));
-		ok('P10 ...yet the contour plot is drawn', (await plotParts()) > 0, String(await plotParts()));
+		ok('P10 before: the nodes are colored by pressure', nodeField(before) === 'pressure', JSON.stringify(nodeField(before)));
+		ok('P10 opening the box leaves Settings > Colors as chosen (no node colour field written)', nodeField(afterOpen) === 'pressure', JSON.stringify(nodeField(afterOpen)));
+		ok('P10 ...the nodes are still painted', (await nodeColoured()) > 0, String(await nodeColoured()));
+		ok('P10 ...and the contour plot is drawn', (await plotParts()) > 0, String(await plotParts()));
 		ok('P10 ...with a colour key on the map for it', await page.evaluate(() => { const l = document.getElementById('lpn_color_legend'); return !!l && getComputedStyle(l).display !== 'none' && l.textContent.length > 10; }));
 		await shot('contour-open');
 
@@ -169,12 +174,12 @@ async function main() {
 		ok('P9 click 3: unticked and the plot is gone again', seq[2].tick === false && seq[2].plot === false, JSON.stringify(seq[2]));
 		ok('P9 click 4: ticked and the plot is back again', seq[3].tick === true && seq[3].plot === true, JSON.stringify(seq[3]));
 		const afterToggle = await settingsNow();
-		ok('P9/P10 toggling never touched node colouring either', nodeField(afterToggle) === '', JSON.stringify(nodeField(afterToggle)));
+		ok('P9/P10 toggling never touched node colouring either', nodeField(afterToggle) === 'pressure', JSON.stringify(nodeField(afterToggle)));
 
-		console.log('\n--- P9L: clicking the WORDS "Show contours" ticks the box, the plot following ---');
+		console.log('\n--- P9L: clicking the WORDS "Show plot" ticks the box, the plot following ---');
 		const seqL = [];
 		for (let i = 1; i <= 3; i++) {
-			const at = await page.evaluate(() => { const r = document.getElementById('lpn_contour_show').closest('.lpn-grow').querySelector('.lpn-gtext').getBoundingClientRect(); return { x: r.left + Math.min(10, r.width / 2), y: r.top + r.height / 2 }; });
+			const at = await page.evaluate(() => { const g = document.getElementById('lpn_contour_show').closest('.lpn-grow'), r = (g.querySelector('.lpn-gtext') || g.querySelector('.lpn-gname')).getBoundingClientRect(); return { x: r.left + Math.min(10, r.width / 2), y: r.top + r.height / 2 }; });
 			await page.mouse.click(at.x, at.y);
 			await a.settle(900);
 			seqL.push({ click: i, tick: (await state()).tick, plot: (await plotParts()) > 0 });

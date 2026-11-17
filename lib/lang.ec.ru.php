@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Показать выбранное';
 $ec_lang['lpn_tool_zoom_window']='Окно масштабирования';
 $ec_lang['lpn_zoom_in']='Увеличить';
 $ec_lang['lpn_zoom_out']='Уменьшить';
-$ec_lang['lpn_new_text']='Текст';
 $ec_lang['lpn_field_text_bold']='Жирный текст';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Изолинии';
 $ec_lang['lpn_contour_tip']='Показать на карте поле изолиний: цвета узлов растекаются вдоль труб и рядом с ними, с подписанными линиями уровня. Открывает окно для настройки или отключения.';
 $ec_lang['lpn_contour_plot']='Изолинии: карта';
 $ec_lang['lpn_contour_show']='Показать график';
-$ec_lang['lpn_contour_show_tip']='Снимите отметку, чтобы скрыть заливку и изолинии; установите её, чтобы вернуть их в прежнем виде. Цвета узлов сохраняются.';
 $ec_lang['lpn_contour_fill']='Заливка';
 $ec_lang['lpn_contour_fill_tip']='«Плавная» плавно переходит от цвета одного класса к другому. «Полосы» закрашивают каждый класс цветовой шкалы одним цветом.';
 $ec_lang['lpn_contour_fill_smooth']='Плавная';

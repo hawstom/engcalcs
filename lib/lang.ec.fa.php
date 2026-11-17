@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='بزرگ‌نمایی به انتخاب';
 $ec_lang['lpn_tool_zoom_window']='بزرگ‌نمایی پنجره‌ای';
 $ec_lang['lpn_zoom_in']='بزرگ‌نمایی';
 $ec_lang['lpn_zoom_out']='کوچک‌نمایی';
-$ec_lang['lpn_new_text']='متن';
 $ec_lang['lpn_field_text_bold']='متن پررنگ';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2063,7 +2062,6 @@ $ec_lang['lpn_contour_menu']='کانتور';
 $ec_lang['lpn_contour_tip']='نمایش یک نمودار کانتور روی نقشه: رنگ گره‌ها در امتداد و کنار لوله‌ها پخش می‌شود، همراه با خطوط کانتور دارای برچسب. جعبه‌ای باز می‌شود تا آن را تنظیم یا خاموش کنید.';
 $ec_lang['lpn_contour_plot']='نمودار کانتور';
 $ec_lang['lpn_contour_show']='نمایش نمودار';
-$ec_lang['lpn_contour_show_tip']='برای پنهان کردن پرشدگی و خطوط کانتور علامت را بردارید؛ برای بازگرداندن آن‌ها به همان حالت پیشین علامت بزنید. رنگ‌های گره‌ها می‌مانند.';
 $ec_lang['lpn_contour_fill']='پرشدگی';
 $ec_lang['lpn_contour_fill_tip']='هموار رنگ‌ها را از یک رده به رده بعدی درهم می‌آمیزد. نواری هر رده از کلید رنگ را یکدست رنگ می‌کند.';
 $ec_lang['lpn_contour_fill_smooth']='هموار';

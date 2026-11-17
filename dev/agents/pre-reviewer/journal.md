@@ -4965,6 +4965,22 @@ OBSERVED (re-verify; real Chromium, master bff7bd03e vs branch, identical scale 
 - Leaders through a label/node: no net regression; leader starting inside own end symbol (short pipes) 1-7 per view, 0 on master (by design).
 NOT DONE: mutation test of harnesses; builder's own harnesses; Tom's window; light/dark.
 
+
+## 2026-11-11 feat/contour-controls (d563be90d), Task 858
+OBSERVED (re-verify; real Chromium, Net3, master 27710ab0f vs branch; probes in scratchpad q/):
+- Old project, Color nodes by none/head/pressure, box opened: plot image (hash), legend, dots coloured identical to master in all three. Box order and tips as built; phone 390: box 4..386, no overflow.
+- DEFECT: in a child scenario, tick Show node colors, then change Property to plot: map and key follow, the box select snaps back to the old property (stored override says the new one). Not in Base; not without the tick; not on master.
+- DEFECT: choose Property to plot = head in the box, then Settings > Node colors = pressure: dots recolour to pressure, key and plot stay Head. Master had one setting so could not diverge.
+- NOT DONE: mutation test of the builder's harness (worktree has no node_modules, harness not run), light/dark, Tables-row look.
+
+## 2026-11-13 feat/contour-controls round 2 (2cd401111), Task 858
+OBSERVED (re-verify; real Chromium, Net1 Base and a child scenario; probes in scratchpad r2/; pictures perry-*-r2.png):
+- Base: ~20 chained moves across box, Settings box, Tables row (property, No color, ramp; Net1 and an old project with colorNodeField head and none, no contourField): box, Settings, Tables, key and dots agree in every step. Option values are elev / demandActual / demand (= "Base demand"); a probe using 'elevation' is an invalid option.
+- DEFECT: Tables row edit with the Contour box open leaves the box showing the old property and tick (plot and Settings are right; reopening the box fixes it).
+- DEFECT: in a child scenario, Settings Color nodes by changed with the box open: box select and tick lag (plot right); reopening fixes it. Builder's setTimeout rebuild is only in the box's own handler.
+- DEFECT (panel step): Net1 opens with Show node colors cleared; the step "change Property to plot in the box and look at Color nodes by" shows No color unless the tick is set first.
+- In the box a ? opens on click, hover on the ? alone showed nothing in 1.5 s (step says hover).
+NOT DONE: mutation test of builder's harness; touch; phone; other languages.
 ## 2026-11-14 feat/pick-chooser (cfe6dca84), Task 861
 OBSERVED (re-verify before citing; real Chromium, branch on 8101 vs master on 8100, fixture pick-chooser.lwn opened through File > Open, desktop 1400x900 and phone 390x844 touch; scripts in scratchpad pc/):
 - Preview steps 1-7 walk exactly as written on desktop; 2, 3, 5 and the tap-bare-map close walk on a phone. Step 8 is mis-worded: the Q1/Q2 pair is the UPPER pair on screen (y 352, the exploded pile is y 632), not "lower". On a phone step 2's pipe click leaves Properties open over the whole map, so the pile tap does nothing until Properties is closed (not in the steps). First File > Open shows a "first time you save" panel needing Continue.

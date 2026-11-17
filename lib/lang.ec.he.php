@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='תקריב לבחירה';
 $ec_lang['lpn_tool_zoom_window']='תקריב לחלון';
 $ec_lang['lpn_zoom_in']='הגדלה';
 $ec_lang['lpn_zoom_out']='הקטנה';
-$ec_lang['lpn_new_text']='טקסט';
 $ec_lang['lpn_field_text_bold']='טקסט מודגש';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='קווי מתאר';
 $ec_lang['lpn_contour_tip']='מציג על המפה תרשים קווי מתאר: צבעי הצמתים מתפשטים לאורך הצינורות ולצדם, עם קווי מתאר מתויגים. פותח תיבה לכוונון התרשים או לכיבויו.';
 $ec_lang['lpn_contour_plot']='קווי מתאר: תרשים';
 $ec_lang['lpn_contour_show']='הצגת התרשים';
-$ec_lang['lpn_contour_show_tip']='בטלו את הסימון כדי להסתיר את המילוי ואת קווי הגובה; סמנו כדי להחזיר אותם כפי שהיו. צבעי הצמתים נשארים.';
 $ec_lang['lpn_contour_fill']='מילוי';
 $ec_lang['lpn_contour_fill_tip']='חלק מערבב את הצבעים ממחלקה אחת לבאה אחריה. פסים צובע כל מחלקה של מקרא הצבעים בצבע אחיד.';
 $ec_lang['lpn_contour_fill_smooth']='חלק';
