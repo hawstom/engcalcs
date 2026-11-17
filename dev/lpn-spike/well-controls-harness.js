@@ -255,6 +255,9 @@ console.log('\n--- the Well with pressure tank, every switch pair 20 to 100 psi,
 		const a = d.assemblies[0], j = L.addNode('junction', 600, 150);
 		j._demand = us ? 3 : 0.2;
 		L.addLink('pipe', 'W1', j.id, []);
+		// A new pipe opens on the typed default 100, which is 100 mm in SI and 100 INCHES in US: a frictionless 2.5 m pipe that makes the loop stiff, and the two engines then take the
+		// tank's sub-second fill events a step apart (found chasing the "US-only" slip: it is the pipe, not the unit). Pipes are given a real size, 4 in or 100 mm.
+		d.links.forEach((l) => { if (l.type === 'pipe') { L.setProp(l, 'diameter', us ? 4 : 100); } });
 		// a pump strong enough to reach 100 psi: shutoff head above 230 ft or 70 m
 		const hd = us ? [[0, 420], [300, 380], [600, 300]] : [[0, 150], [30, 140], [60, 110]];
 		d.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) }, { id: 'PC1', kind: 'head', points: hd });
@@ -290,9 +293,9 @@ console.log('\n--- the Well with pressure tank, every switch pair 20 to 100 psi,
 			// The pump refills the 20-gallon tank within one report step, so a cycle shows as the level jumping up between frames (the flow frames sample the pump off).
 			const refills = (r) => r.frames.reduce((k, f, i) => k + (i && f.levels[a.tank] > r.frames[i - 1].levels[a.tank] + 1 ? 1 : 0), 0);
 			let worstLv = 0; if (nat.ok && epa.ok) { nat.frames.forEach((f, i) => { worstLv = Math.max(worstLv, Math.abs(f.levels[a.tank] - epa.frames[i].levels[a.tank])); }); }
-			// SI: the engines agree level for level. US: they cycle the same way but a pump-on crossing that falls inside a 2 s step is taken one step apart, a timing difference of the engines on a 20-gallon tank, so US asserts the cycling and the limits, not the phase.
+			// The engines agree level for level in both unit sets, as the pipes are a real size (see sweepNet).
 			const lvs = (r) => r.frames.map((f) => f.levels[a.tank]), lo = Math.min.apply(null, lvs(epa)), hi = Math.max.apply(null, lvs(epa)), offM = L.nodeById(a.tank).maxLevel / (us ? 3.280839895 : 1);
-			ok((us ? 'US' : 'SI') + ' ' + on + '/' + off + ' psi: an EPS run cycles the tank between the switch points in both engines' + (us ? '' : ', which agree'), nat.ok && epa.ok && refills(nat) >= 2 && refills(epa) >= 2 && Math.abs(refills(nat) - refills(epa)) <= 1 && hi < offM + 1.5 && lo > 0 && (us || worstLv < 0.1), JSON.stringify([nat.ok, epa.ok, refills(nat), refills(epa), +worstLv.toFixed(3), +lo.toFixed(1), +hi.toFixed(1)]).slice(0, 160));
+			ok((us ? 'US' : 'SI') + ' ' + on + '/' + off + ' psi: an EPS run cycles the tank between the switch points in both engines, which agree', nat.ok && epa.ok && refills(nat) >= 2 && refills(epa) >= 2 && Math.abs(refills(nat) - refills(epa)) <= 1 && hi < offM + 1.5 && lo > 0 && worstLv < 0.1, JSON.stringify([nat.ok, epa.ok, refills(nat), refills(epa), +worstLv.toFixed(3), +lo.toFixed(1), +hi.toFixed(1)]).slice(0, 160));
 		}
 	}
 	setUnitSet('si');
