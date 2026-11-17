@@ -5011,3 +5011,10 @@ OBSERVED (re-verify; real Chromium via the branch's own env.js server, Net1 well
 - Old fixture (dev/lpn-spike/assembly-before-round8.lwn, not fixtures/) opens with W1R/W1V/W1D/W1/W1P, tank well W2 with L5/J3/L6/T1; Explode+Undo ok. Pump+ and Valve+: headings Junction/Pump|Valve/Junction, Explode and Undo ok. .inp export of a Well and a Well with tank carries ID= TEE= TANK= PIPES=; reimport gives the same IDs, headings, flows, pressures.
 - Symbol tint equals reservoir and tank (same class, one colour). Phone 390x844: box fits, no sideways scroll, Well label hidden at the opening view.
 - NOT DONE: scenario in the browser (my New-scenario click made no scenario), Tables and Find renames, rename refusal wording (the harness answers dialogs, a plain junction shows none either), builder's harness mutation test, light/dark.
+
+## 2026-11-16 feat/graph-scrub (976263e31), Task 863 second half
+OBSERVED (re-verify; real Chromium, Net1 EPS 25 frames to 24 h, desktop 1400x900 mouse, 390x844 touch, ?lang=ar):
+- Drag on the Time series line steps to stops (0 -> 54000 = selector 15:00), clamps both ends, click on or beside the line moves nothing, Play stops on press, a blur ends a drag; touch on the phone the same; no page scroll. Cursor over the line is ew-resize. Transport buttons/selects: markup, rects and styles identical to master (8100) at 1400 and 390. Builder's harness: all ok, including bubble and Properties graph.
+- Floating Properties box covers the bottom-pane chart in the middle (line at 15:00 is under it: elementFromPoint gives the box graph's svg). A toast at the right edge covered the line at 24:00. On the phone the box covers the whole pane, so its own graph is the handle.
+- Stray: lpn-time.js has an orphan doc comment ("A press on the graph's time line takes the clock in hand") above lpnTimeStops.
+- NOT DONE: Net3 (examples list matched but result looked like Net1; not distinguished), system-flow chart alone, mutation test, how the line looks in the pane, dark theme.
