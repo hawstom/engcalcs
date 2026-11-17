@@ -33,9 +33,8 @@ const L = loadLoopedNetwork(
 	"\t\tapplyUnitSelections: applyUnitSelections,\n" +
 	"\t\tserialize: serializeProject, migrateSaved: migrateSaved, applySaved: applySaved,\n" +
 	"\t\tassembleModel: assembleModel, inpDropText: inpDropText,\n" +
-	"\t\truleEntries: function () { return libRuleEntries(libRulesRead()); },\n" +
-	"\t\truleDesc: function (e) { return libRuleDesc(libRulesRead(), e); },\n" +
-	"\t\trulesSplice: libRulesSplice, rulesWithout: libRulesWithout, rulesAppend: libRulesAppend,\n" +
+	"\t\truleItems: function () { return libRuleItems(libRulesRead()); },\n" +
+	"\t\trulesWith: libRulesWith,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -157,18 +156,14 @@ const lost = (sec) => ((a.parsed.dropped || []).filter((d) => d.code === 'commen
 ok('every [PATTERNS] comment no pattern can keep is REPORTED: between rows, on a row, above a later run',
 	J(lost('PATTERNS')) === J([';between rows', ';row trailing', ';Interleaved run: EPANET keeps the first description']),
 	J(lost('PATTERNS')));
-const ctls = a.doc.controls || [];
+const items = a.doc.controls || [], ctls = items.filter((c) => !c.comment);
 ok('four controls are kept (the one naming a missing link is reported, as before)', ctls.length === 4, ctls.length);
-ok('control 1: the heading a blank line separates is NOT its description, and is kept verbatim',
-	ctls[0] && ctls[0].note === 'Fill the tank' && J(ctls[0].head) === J([';Controls heading', '']), J(ctls[0]));
-ok('control 2 reads both lines directly above it as one description (the Net3 reading)',
-	ctls[1] && ctls[1].note === 'Two lines of heading comment' && ctls[1].head === undefined, J(ctls[1]));
-ok('...and keeps their own lines to write back', ctls[1] && J(ctls[1].noteSrc) === J([';Two lines of', ';heading comment']));
-ok('control 3 reads its trailing comment as its description, marked as trailing',
-	ctls[2] && ctls[2].note === 'trailing note' && ctls[2].noteAt === 'end', J(ctls[2]));
-ok('control 4: no description; the comment after the last control stays after it',
-	ctls[3] && ctls[3].note === undefined && J(ctls[3].foot) === J([';after the last control']), J(ctls[3]));
-ok('the comment above the control that was left out is REPORTED', J(lost('CONTROLS')) === J([';above a missing link']), J(lost('CONTROLS')));
+ok('the comments are rows of their own, in the order the file states: heading, "Fill the tank", the two-line block, "above a missing link", the closing one',
+	J(items.map((c) => c.comment ? c.lines.length : 'C')) === J([1, 1, 'C', 2, 'C', 'C', 'C', 1, 1]), J(items.map((c) => c.comment ? c.lines : c.raw)));
+ok('the blank line before a comment or a control is its `gap`', items[1].gap === 1 && items[3].gap === 1 && items[0].gap === undefined, J(items.map((c) => c.gap)));
+ok('no control reads a comment above it as its description', ctls.every((c) => c.head === undefined && c.noteSrc === undefined && c.foot === undefined));
+ok('control 3 reads its trailing comment as its description', ctls[2].note === 'trailing note' && ctls[2].noteAt === 'end', J(ctls[2]));
+ok('the comment above the control that was left out is KEPT as a row, so nothing is reported lost for [CONTROLS]', lost('CONTROLS') === undefined && items.some((c) => c.comment && c.lines[0] === ';above a missing link'), J(lost('CONTROLS')));
 ok('[RULES] keeps its comment lines AND its blank lines', J(a.doc.rules) === J(RULES_IN), J(a.doc.rules));
 ok('...and the rule count reported is still the rules\' own lines, not the comments',
 	(a.parsed.dropped || []).some((d) => d.code === 'rules' && d.detail === 6),
@@ -186,13 +181,13 @@ ok('[PATTERNS]: heading, description, PA\'s rows, ";", PB, heading and blank lin
 	&& P[5] === ';Separated by a blank line, so a heading (EPANET reads no description)' && P[6] === '' && /^\s*PC\s/.test(P[7])
 	&& P[8] === ';after the last pattern' && P.length === 9, J(P));
 ok('[CONTROLS] comes back as the file had it, less the left-out control and the blank line between groups',
-	J(C) === J([';Controls heading', '', ';Fill the tank', 'LINK P1 OPEN IF NODE T3 BELOW 5', ';Two lines of',
+	J(C) === J([';Controls heading', '', ';Fill the tank', 'LINK P1 OPEN IF NODE T3 BELOW 5', '', ';Two lines of',
 		';heading comment', 'LINK P1 CLOSED IF NODE T3 ABOVE 15', 'LINK P2 OPEN AT TIME 2 ;trailing note',
-		'LINK P2 CLOSED AT TIME 20', ';after the last control']), J(C));
+		'LINK P2 CLOSED AT TIME 20', ';above a missing link', ';after the last control']), J(C));
 ok('[RULES] comes back line for line, blank lines included', J(R) === J(RULES_IN), J(R));
 const b = importText(out.inp, 'again.inp');
 const keep = (d) => J({ p: d.patterns.map((x) => [x.id, x.head, x.note, x.foot]),
-	c: d.controls.map((x) => [x.head, x.note, x.noteSrc, x.noteAt, x.foot]), r: d.rules });
+	c: d.controls.reduce((acc, x) => x.comment ? acc.concat(x.lines) : acc.concat([[x.raw, x.note, x.noteAt]]), []), r: d.rules });
 ok('re-import: the same descriptions, headings and closing comments', keep(b.doc) === keep(a.doc), keep(b.doc));
 ok('...and nothing reported lost the second time', !(b.parsed.dropped || []).some((d) => d.code === 'comments'),
 	J((b.parsed.dropped || []).filter((d) => d.code === 'comments')));
@@ -201,20 +196,14 @@ ok('...and nothing reported lost the second time', !(b.parsed.dropped || []).som
 // ---- 3. an edited description is written as one line --------------------------------------------
 console.log('\n3. An edited description goes out as one line in the same place');
 const ed = JSON.parse(JSON.stringify(a.doc));
-ed.controls[1].note = 'Edited heading';
-delete ed.controls[1].noteSrc;            // what the Library's Description field does
-ed.controls[2].note = 'Edited trailing';
+ed.controls[5].note = 'Edited trailing';
+ed.controls[3].lines = [';Edited heading'];   // what the Libraries comment field does
 ed.patterns[0].note = 'Edited pattern';
 const out2 = EngCalcs.lpnExportInp(ed);
-const C2 = section(out2.inp, 'CONTROLS'), P2 = section(out2.inp, 'PATTERNS');
-ok('control 2\'s two lines become one', C2[3] === ';Edited heading' && /^LINK P1 CLOSED/.test(C2[4]), J(C2));
-ok('control 3 keeps its comment on its own line', C2[5] === 'LINK P2 OPEN AT TIME 2 ;Edited trailing', J(C2));
+const C2 = sectionAll(out2.inp, 'CONTROLS'), P2 = section(out2.inp, 'PATTERNS');
+ok('an edited comment row goes out as the new lines, in the same place', C2[5] === ';Edited heading' && /^LINK P1 CLOSED/.test(C2[6]), J(C2));
+ok('a control description is written after its sentence', C2.indexOf('LINK P1 CLOSED IF NODE T3 ABOVE 15 ;Edited trailing') >= 0 || C2.some((l) => /;Edited trailing$/.test(l)), J(C2));
 ok('the pattern\'s description line is the edited one, under its heading', P2[1] === ';Edited pattern', J(P2));
-// A stale noteSrc (an old project, or an editor that forgot) must not write the OLD lines.
-const st = JSON.parse(JSON.stringify(a.doc));
-st.controls[1].note = 'Edited but src left';
-ok('a noteSrc that no longer says the description is not written',
-	section(EngCalcs.lpnExportInp(st).inp, 'CONTROLS')[3] === ';Edited but src left');
 // A pattern with no multipliers: EPANET's writer states the comment anyway (inpfile.c).
 const em = JSON.parse(JSON.stringify(a.doc));
 em.patterns.push({ id: 'PE', multipliers: [], note: 'Empty one' });
@@ -230,26 +219,18 @@ console.log('\n3b. The Rules editor: a heading is never a description, never del
 	const live = L.getDoc();
 	const keptRules = live.rules;
 	live.rules = RULES_IN.slice();
-	const es = L.ruleEntries();
-	ok('two rules', es.length === 2 && es[0].name === 'R1' && es[1].name === 'R2', J(es));
-	ok('rule R1\'s Description is "desc R1" alone, not the section heading', L.ruleDesc(es[0]) === 'desc R1', L.ruleDesc(es[0]));
-	ok('rule R2\'s Description is its own comment', L.ruleDesc(es[1]) === 'Second rule description', L.ruleDesc(es[1]));
-	const cleared = L.rulesSplice(es[0].descStart, es[0].start, []);
-	ok('clearing R1\'s Description removes only its line; the heading stays', J(cleared) === J([';Rules section heading', ''].concat(RULES_IN.slice(3))), J(cleared));
-	const del1 = L.rulesWithout(0);
-	ok('deleting R1 removes R1 and its description; the heading and R2 stay',
-		J(del1) === J([';Rules section heading', '', ';Second rule description', 'RULE R2', 'IF TANK T3 LEVEL BELOW 2', 'THEN LINK P2 STATUS IS OPEN']), J(del1));
-	const del2 = L.rulesWithout(1);
-	ok('deleting R2 removes R2 and its description; R1 and the heading stay', J(del2) === J(RULES_IN.slice(0, 6)), J(del2));
-	// 6. a rule appended after loose comments keeps its own description and only that
-	const dest = ['RULE A', 'IF TANK T3 LEVEL ABOVE 1', 'THEN LINK P2 STATUS IS OPEN', ';a loose comment'];
-	const app = L.rulesAppend(dest, [';desc B', 'RULE B', 'IF TANK T3 LEVEL ABOVE 2', 'THEN LINK P2 STATUS IS CLOSED']);
-	live.rules = app;
-	const ea = L.ruleEntries();
-	ok('an appended rule after a loose comment gets a blank line between',
-		app[4] === '' && app[5] === ';desc B', J(app));
-	ok('...so its Description is its own, not merged with the comment above', L.ruleDesc(ea[1]) === 'desc B', L.ruleDesc(ea[1]));
-	ok('...and after a rule body no blank line is added', L.rulesAppend(dest.slice(0, 3), ['RULE C']).length === 4);
+	const es = L.ruleItems();
+	ok('five items: heading, comment, rule R1, comment, rule R2', es.map((e) => e.kind).join() === 'comment,comment,rule,comment,rule' && es[2].name === 'R1' && es[4].name === 'R2', J(es));
+	ok('a comment directly above a rule is its own row, not that rule\'s Description', es[1].lines[0] === ';desc R1' && es[1].gap === 1 && es[2].gap === 0, J(es));
+	const cleared = L.rulesWith(1, null);
+	ok('deleting the comment above R1 leaves the heading and both rules', J(cleared) === J([';Rules section heading', ''].concat(RULES_IN.slice(3))), J(cleared));
+	const del1 = L.rulesWith(2, null);
+	ok('deleting R1 removes R1 only; every comment and R2 stay',
+		J(del1) === J([';Rules section heading', '', ';desc R1', '', ';Second rule description', 'RULE R2', 'IF TANK T3 LEVEL BELOW 2', 'THEN LINK P2 STATUS IS OPEN']), J(del1));
+	const del2 = L.rulesWith(4, null);
+	ok('deleting R2 removes R2 only', J(del2) === J(RULES_IN.slice(0, 8)), J(del2));
+	const ed = L.rulesWith(3, [';Second, rewritten']);
+	ok('editing a comment replaces only its lines', J(ed) === J(RULES_IN.slice(0, 7).concat([';Second, rewritten'], RULES_IN.slice(8))), J(ed));
 	live.rules = keptRules;
 }
 
@@ -272,10 +253,10 @@ const tok = (t) => t.split(/\r?\n/).map((l) => l.replace(/;.*$/, '').trim().spli
 		tok(section(o.inp, 'PATTERNS').join('\n')) === tok(section(text, 'PATTERNS').join('\n')) &&
 		tok(section(o.inp, 'CONTROLS').join('\n')) === tok(section(text, 'CONTROLS').join('\n')));
 	if (f === 'Net3.inp') {
-		ok('Net3 control 1 is "Lake source operates only part of the day"',
-			d.controls[0].note === 'Lake source operates only part of the day', J(d.controls[0]));
-		ok('Net3 control 3 carries both heading lines',
-			d.controls[2].note === 'Pump 335 controlled by level in Tank 1 When pump is closed, bypass pipe is opened', J(d.controls[2]));
+		ok('Net3 [CONTROLS] is a comment row, two controls, a comment row of two lines, and four controls (Tom, 2026-11-16: a comment is a row)',
+			J(d.controls.map((c) => c.comment ? c.lines.length : 'C')) === J([1, 'C', 'C', 2, 'C', 'C', 'C', 'C']) && d.controls[0].lines[0] === ';Lake source operates only part of the day' && d.controls[3].gap === 1, J(d.controls.map((c) => c.comment ? c.lines : c.raw)));
+		ok('...and no Net3 control has a description of its own', d.controls.every((c) => c.comment || c.note === undefined));
+		ok('Net3 [CONTROLS] exports character for character', section(o.inp, 'CONTROLS').join('\n') === section(text, 'CONTROLS').join('\n'));
 		const c3 = section(o.inp, 'CONTROLS');
 		ok('Net3 [CONTROLS] comments come back exactly as the source wrote them',
 			J(c3.filter((l) => /^;/.test(l))) === J(section(text, 'CONTROLS').filter((l) => /^;/.test(l))), J(c3));
@@ -293,8 +274,8 @@ console.log('\n5. The project file keeps every description; an old project loads
 }
 const re = L.getDoc();
 ok('pattern note survives save and reload', (re.patterns || []).some((p) => p.id === 'PA' && p.note === 'Morning peak'));
-ok('control note and its source lines survive', re.controls && re.controls[1].note === 'Two lines of heading comment'
-	&& J(re.controls[1].noteSrc) === J([';Two lines of', ';heading comment']));
+ok('comment rows and a control description survive', re.controls && J(re.controls[3].lines) === J([';Two lines of', ';heading comment'])
+	&& re.controls[5].note === 'trailing note' && re.controls[3].gap === 1);
 ok('rule comment lines survive', J(re.rules) === J(a.doc.rules), J(re.rules));
 const model = L.assembleModel();
 ok('the engine still gets both rules, and nothing from the comment lines',

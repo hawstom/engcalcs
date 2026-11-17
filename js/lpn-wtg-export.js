@@ -1726,7 +1726,7 @@ async function build(planned, o) {
 	if (!o.epanet) { throw fail('engine', 'The EPANET engine is needed to find when each pump switches.', null, 'offline'); }
 	const SQL = await getEngine();
 	const parsed = planned.parsed;
-	const watch = Array.from(new Set(parsed.links.filter((l) => l.type === 'pump').map((l) => l.id).concat((parsed.controls || []).map((c) => c.link))));
+	const watch = Array.from(new Set(parsed.links.filter((l) => l.type === 'pump').map((l) => l.id).concat((parsed.controls || []).filter((c) => !c.comment).map((c) => c.link))));
 	let sched = { initial: {}, changes: [] };
 	if (watch.length) { sched = await referenceSchedule(o.epanet, planned.inp, watch); }
 	const eff = Number((/Global Efficiency\s+([\d.]+)/i.exec(planned.inp) || [])[1]) || 75;

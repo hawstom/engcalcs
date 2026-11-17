@@ -35,7 +35,7 @@ const L = loadLoopedNetwork(
 	"\t\tserialize: serializeProject, migrateSaved: migrateSaved, applySaved: applySaved,\n" +
 	"\t\tassembleModel: assembleModel,\n" +
 	"\t\tlibOrderSelect: libOrderSelect, libOrderSelIndex: libOrderSelIndex, libOrderMove: libOrderMove,\n" +
-	"\t\tlibSelForgetIndexed: libSelForgetIndexed, libRulesMoved: libRulesMoved, libRuleEntries: libRuleEntries, libReadControl: libReadControl,\n" +
+	"\t\tlibSelForgetIndexed: libSelForgetIndexed, libRulesMoved: libRulesMoved, libRuleItems: libRuleItems, libReadControl: libReadControl,\n" +
 	"\t\tundoDepth: function () { return undoStack.length; }, undo: undo, redo: redo, clearUndo: clearUndo,\n" +
 	"\t\tsetLibSection: function (s) { libSection = s; }, rebuildLibraryBox: rebuildLibraryBox,\n" +
 	"\t\tlibRenamePattern: libRenamePattern, libRenameCurve: libRenameCurve, libRenamePipeType: libRenamePipeType, libRenameFittingSet: libRenameFittingSet,\n" +
@@ -218,14 +218,15 @@ head('4. the .inp export writes the stored order, and an unmoved project exports
 		const ctl = (inp) => inp.split(/\r?\n/).slice(inp.split(/\r?\n/).findIndex((l) => /^\[CONTROLS\]/i.test(l)) + 1)
 			.filter((l) => l.trim() && !/^;/.test(l.trim())).slice(0, 3);
 		const c0 = ctl(after);
-		L.libOrderSelect('controls', 0);
+		// index 0 is Net3's first comment row; the first control is index 1
+		L.libOrderSelect('controls', 1);
 		L.libOrderMove('controls', 'bottom');
 		const c1 = ctl(EngCalcs.lpnExportInp(d).inp);
 		ok('Net3: [CONTROLS] follows the stored order', c1[0] === c0[1] && c1[1] === c0[2], JSON.stringify([c0, c1]));
 	}
 }
 
-head('4b. the comments a file keeps at a position stay at it: a section\'s heading above its first item and what follows its last');
+head('4b. patterns: the comments a file keeps at a position stay at it: a section\'s heading above its first pattern and what follows its last');
 {
 	// Net3 with a heading at the top and two comment lines at the end of both [PATTERNS] and [CONTROLS]
 	let text = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net3.inp'), 'utf8').replace(/\r\n/g, '\n');
@@ -255,7 +256,7 @@ head('4b. the comments a file keeps at a position stay at it: a section\'s headi
 		ok(name + ': ...and the two lines after the last item', same(lastTwo(ls), FOOT[name]));
 	});
 	const sec = { patterns: 'PATTERNS', controls: 'CONTROLS' };
-	['patterns', 'controls'].forEach((key) => {
+	['patterns'].forEach((key) => {
 		const n = SECTIONS[key](d0).length;
 		let bad = 0, moves = 0, badReimport = 0;
 		for (let i = 0; i < n; i++) {
@@ -297,24 +298,78 @@ head('4b2. rules: a heading above the first rule (a blank line between) and what
 	const lines = (inp) => { const o = []; let on = false; inp.replace(/\r\n/g, '\n').split('\n').forEach((l) => { const m = /^\[(\w+)\]/.exec(l.trim()); if (m) { on = m[1] === 'RULES'; return; } if (on && l.trim()) { o.push(l.trim()); } }); return o; };
 	const base = lines(EngCalcs.lpnExportInp(d0).inp);
 	ok('the export of the unmoved rules has the heading first and the foot last', base[0] === ';== RULES HEADING ==' && base[base.length - 1] === ';RULES FOOT', JSON.stringify(base.slice(0, 2)));
-	let bad = 0, moves = 0;
-	for (let i = 0; i < 3; i++) {
+	// Comments are rows of their own (Task 859; Tom, 2026-11-16), so the heading and the foot are items that move like any other. What a
+	// move must never do is add, drop or change a line, or put a blank line anywhere but where one already was.
+	const items = L.libRuleItems(d0.rules);
+	ok('the section reads as heading, A with its comment, B, C with its comment, foot: nine rows', items.map((x) => x.kind).join() === 'comment,comment,rule,rule,comment,rule,comment', items.map((x) => x.kind).join());
+	let bad = 0, moves = 0, badBlank = 0;
+	const sortedBase = base.slice().sort().join('\n'), blanksOf = (inp) => { const o = []; let on = false; inp.replace(/\r\n/g, '\n').split('\n').forEach((l) => { const m = /^\[(\w+)\]/.exec(l.trim()); if (m) { on = m[1] === 'RULES'; return; } if (on) { o.push(l.trim() ? 'x' : ''); } }); return o.join(''); };
+	for (let i = 0; i < items.length; i++) {
 		['top', 'up', 'down', 'bottom'].forEach((how) => {
 			const d = importNet('rules.inp', text);
 			L.libOrderSelect('rules', i);
 			if (!L.libOrderMove('rules', how)) { return; }
 			moves++;
-			const out = lines(EngCalcs.lpnExportInp(d).inp);
-			const cnt = (t) => out.filter((l) => l === t).length;
-			if (out[0] !== ';== RULES HEADING ==' || out[out.length - 1] !== ';RULES FOOT' || cnt(';== RULES HEADING ==') !== 1 || cnt(';RULES FOOT') !== 1 || out.length !== base.length) { bad++; }
+			const inp = EngCalcs.lpnExportInp(d).inp, out = lines(inp);
+			if (out.slice().sort().join('\n') !== sortedBase) { bad++; }
+			void badBlank; void blanksOf;
 		});
 	}
-	ok('after ' + moves + ' moves (every rule, every direction) the heading is first and the foot last', moves > 0 && bad === 0, bad + ' exported wrongly');
-	// a comment DIRECTLY above a RULE line, with no blank line, is that rule's description (for a control the same, and Tom's ruling on a
-	// Description: lines and paragraphs), so it goes with the rule; EPANET 2.2 reads no comment on a rule at all (src/rules.c)
+	ok('after ' + moves + ' moves (every row, every direction) no line is added, dropped or changed', moves > 0 && bad === 0, bad + ' exported wrongly');
+	{
+		const d = importNet('rules.inp', text), before = EngCalcs.lpnExportInp(d).inp;
+		L.libOrderSelect('rules', 2);
+		L.libOrderMove('rules', 'down');
+		L.libOrderMove('rules', 'up');
+		ok('a rule down and back up: the export is byte for byte the one before', EngCalcs.lpnExportInp(d).inp === before);
+	}
+	// A comment directly above a RULE line, with no blank line, is a row of its own and does not travel with the rule.
 	const rules = ['; at the top', 'RULE A', 'IF SYSTEM CLOCKTIME >= 5 AM', 'THEN PUMP 10 STATUS IS OPEN', '', 'RULE B', 'IF SYSTEM CLOCKTIME >= 6 AM', 'THEN PUMP 10 STATUS IS OPEN'];
-	const moved = L.libRulesMoved(rules, 0, 1);
-	ok('a comment directly above a rule with no blank line is its description and moves with it', moved.indexOf('; at the top') > moved.indexOf('RULE B'), JSON.stringify(moved));
+	const moved = L.libRulesMoved(rules, 1, 2);
+	ok('a comment directly above a rule stays put when the rule moves', moved[0] === '; at the top' && moved.indexOf('RULE B') === 1 && moved.indexOf('RULE A') > moved.indexOf('RULE B'), JSON.stringify(moved));
+}
+
+head('4b3. controls: a comment is a row of its own, and Net3 reads, moves and writes it that way');
+{
+	const net3 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net3.inp'), 'utf8').replace(/\r\n/g, '\n');
+	const sec = (inp) => { const o = []; let on = false; inp.replace(/\r\n/g, '\n').split('\n').forEach((l) => { const m = /^\[(\w+)\]/.exec(l.trim()); if (m) { on = m[1] === 'CONTROLS'; return; } if (on) { o.push(l); } }); while (o.length && !o[o.length - 1].trim()) { o.pop(); } return o; };
+	const d = importNet('Net3.inp');
+	const kinds = (dd) => dd.controls.map((c) => c.comment ? 'C' + c.lines.length : 'k').join();
+	ok('Net3: comment of 1 line, two controls, a comment of 2 lines, four controls', kinds(d) === 'C1,k,k,C2,k,k,k,k', kinds(d));
+	ok('...the two-line comment is set off by one blank line, and no control carries a description', d.controls[3].gap === 1 && d.controls.every((c) => c.comment || (!c.note && !c.head && !c.foot)));
+	ok('an unedited Net3 writes its [CONTROLS] character for character', same(sec(EngCalcs.lpnExportInp(d).inp), sec(net3)), JSON.stringify(sec(EngCalcs.lpnExportInp(d).inp)));
+	// the second control up: the first control and the comment above it swap places with nothing else
+	L.libOrderSelect('controls', 2);
+	L.libOrderMove('controls', 'up');
+	ok('moving a control changes only the two controls: both comment rows are still where they were', kinds(d) === 'C1,k,k,C2,k,k,k,k' && d.controls[0].lines[0] === ';Lake source operates only part of the day' && d.controls[3].lines.length === 2);
+	const o1 = sec(EngCalcs.lpnExportInp(d).inp), s1 = sec(net3);
+	ok('...and the file reads Link 10 CLOSED before Link 10 OPEN, under the same comment', o1[0] === s1[0] && o1[1] === s1[2] && o1[2] === s1[1] && same(o1.slice(3), s1.slice(3)), JSON.stringify(o1.slice(0, 4)));
+	// a comment row moves on its own, and what stays at a position is the blank line
+	L.libOrderSelect('controls', 0);
+	L.libOrderMove('controls', 'down');
+	ok('a comment row moves down by itself, past one control', d.controls[0].comment !== true && d.controls[1].comment === true && d.controls[1].lines[0] === ';Lake source operates only part of the day', kinds(d));
+	const o2 = sec(EngCalcs.lpnExportInp(d).inp);
+	ok('...no line is added or lost, and the blank line stays where it was', o2.length === s1.length && o2.slice().sort().join('\n') === s1.slice().sort().join('\n') && o2.indexOf('') === s1.indexOf(''), JSON.stringify(o2));
+	const back = importNet('again.inp', EngCalcs.lpnExportInp(d).inp);
+	ok('...and it reads back as the same rows', same(back.controls.map((c) => c.comment ? c.lines : c.raw), d.controls.map((c) => c.comment ? c.lines : c.raw)));
+	// each of Net1, Net2 and Net3 exports its [CONTROLS] character for character
+	['Net1.inp', 'Net2.inp', 'Net3.inp'].forEach((f) => {
+		const t = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', f), 'utf8').replace(/\r\n/g, '\n'), dd = importNet(f, t);
+		ok(f + ': [CONTROLS] exports character for character', same(sec(EngCalcs.lpnExportInp(dd).inp).map((l) => l.trim()), sec(t).map((l) => l.trim())), JSON.stringify([sec(EngCalcs.lpnExportInp(dd).inp), sec(t)]));
+	});
+	// a project saved by the build before this one (a description above a control, a heading, a foot) opens as comment rows in the same places
+	{
+		const old = [
+			{ link: 'P1', raw: 'LINK P1 OPEN AT TIME 1', action: {}, condition: {}, head: [';Heading', ''], note: 'Fill it', noteSrc: [';Fill it'], foot: [';end'] },
+			{ link: 'P2', raw: 'LINK P2 OPEN AT TIME 2 ;trail', action: {}, condition: {}, note: 'trail', noteAt: 'end' }
+		];
+		const up = EngCalcs.lpnControlsUpgrade(old);
+		ok('an older project: heading, description and foot become comment rows around the control, the trailing one stays its note',
+			up.map((c) => c.comment ? c.lines.join('|') + '/' + (c.gap || 0) : c.raw + '/' + (c.note || '') + '/' + (c.gap || 0)).join(' ; ') ===
+			';Heading/0 ; ;Fill it/1 ; LINK P1 OPEN AT TIME 1//0 ; ;end/0 ; LINK P2 OPEN AT TIME 2 ;trail/trail/0',
+			up.map((c) => c.comment ? c.lines.join('|') + '/' + (c.gap || 0) : c.raw + '/' + (c.note || '') + '/' + (c.gap || 0)).join(' ; '));
+		ok('...and upgrading again changes nothing', same(EngCalcs.lpnControlsUpgrade(up), up));
+	}
 }
 
 head('4c. an item with no ID is selected by position, and a position that has changed is never kept');
@@ -353,7 +408,7 @@ head('4d. no list of IDs holds the same ID twice, so "the order of these lists n
 	});
 }
 
-head('5. rules move as blocks');
+head('5. rules and the comments between them move as rows');
 {
 	const RULES = [
 		'; heading for the whole section', '',
@@ -362,32 +417,38 @@ head('5. rules move as blocks');
 		';Shuts it again.', ';(two lines)', 'RULE C', 'IF TANK 2 LEVEL ABOVE 133', 'THEN PUMP 9 STATUS IS CLOSED', '',
 		'; end of rules'
 	];
-	const names = (lines) => L.libRuleEntries(lines).map((e) => e.name);
-	ok('the fixture reads as three rules, A B C', same(names(RULES), ['A', 'B', 'C']), JSON.stringify(names(RULES)));
+	const items = (lines) => L.libRuleItems(lines);
+	const names = (lines) => items(lines).filter((e) => e.kind === 'rule').map((e) => e.name);
+	const kinds = (lines) => items(lines).map((e) => e.kind === 'rule' ? e.name : 'c').join('');
+	ok('the fixture reads as seven rows: heading, comment, A, B, a two-line comment, C, a closing comment', kinds(RULES) === 'ccABcCc', kinds(RULES));
+	ok('a comment directly above a rule is a row of its own, with no blank line before RULE A', items(RULES)[1].gap === 1 && items(RULES)[2].gap === 0 && items(RULES)[4].lines.length === 2);
 	const sortedLines = (a) => a.slice().sort().join('\n');
-	const moves = [[0, 2], [2, 0], [0, 1], [1, 0], [1, 2], [2, 1], [0, 0]];
+	const gapsOf = (lines) => items(lines).map((e) => e.gap).join();
+	const moves = [[2, 3], [3, 2], [2, 5], [5, 2], [3, 5], [5, 3], [2, 2]];
 	moves.forEach(([from, to]) => {
-		const out = L.libRulesMoved(RULES, from, to), order = ['A', 'B', 'C'];
+		const out = L.libRulesMoved(RULES, from, to), order = items(RULES).map((e) => e.kind === 'rule' ? e.name : 'c');
 		order.splice(to, 0, order.splice(from, 1)[0]);
-		ok('move ' + from + ' to ' + to + ': the rules read in the new order', same(names(out), order), JSON.stringify(names(out)));
+		ok('move row ' + from + ' to ' + to + ': the rows read in the new order', kinds(out) === order.join(''), kinds(out) + ' vs ' + order.join(''));
 		ok('...no line added, dropped or changed', out.length === RULES.length && sortedLines(out) === sortedLines(RULES));
-		// the gaps (blank lines and headings between rules) stay at the same places
-		const gapAt = (lines) => lines.filter((l) => !l.trim() || /^;(?!(Opens|Shuts|\(two))/.test(l));
-		ok('...and the blank lines and headings between the rules are the same, in the same order', same(gapAt(out), gapAt(RULES)));
+		ok('...and the blank lines stay at the same positions in the list', gapsOf(out) === gapsOf(RULES), gapsOf(out) + ' vs ' + gapsOf(RULES));
 	});
 	{
-		const out = L.libRulesMoved(RULES, 2, 0), at = out.indexOf('RULE C');
-		ok('a rule takes its own description with it', out[at - 1] === ';(two lines)' && out[at - 2] === ';Shuts it again.');
-		ok('...and its own lines', out[at + 1] === 'IF TANK 2 LEVEL ABOVE 133' && out[at + 2] === 'THEN PUMP 9 STATUS IS CLOSED');
-		const back = L.libRulesMoved(out, 0, 2);
+		// Consecutive comment lines are one row, so two comment rows moved next to each other read as one; no line is lost.
+		const out = L.libRulesMoved(RULES, 6, 5);
+		ok('a comment moved against another with no blank line between them joins it as one row, and no line is lost', kinds(out) === 'ccABcC' && sortedLines(out) === sortedLines(RULES), kinds(out));
+	}
+	{
+		const out = L.libRulesMoved(RULES, 5, 2), at = out.indexOf('RULE C');
+		ok('a rule takes its own lines with it and no comment', out[at + 1] === 'IF TANK 2 LEVEL ABOVE 133' && out[at + 2] === 'THEN PUMP 9 STATUS IS CLOSED' && out[at - 1] !== ';(two lines)', JSON.stringify(out.slice(0, 6)));
+		const back = L.libRulesMoved(out, 2, 5);
 		ok('moving it back restores the text exactly', same(back, RULES));
 	}
 	// a block of lines that is not a rule, at the head of the text, stays first and cannot move
 	{
 		const odd = ['IF SYSTEM CLOCKTIME >= 1 AM', 'THEN PUMP 9 STATUS IS OPEN', '', 'RULE X', 'IF TANK 2 LEVEL BELOW 1', 'THEN PUMP 9 STATUS IS OPEN', '',
 			'RULE Y', 'IF TANK 2 LEVEL BELOW 2', 'THEN PUMP 9 STATUS IS OPEN'];
-		const e = L.libRuleEntries(odd);
-		ok('a leading block with no RULE line is an entry with no name', e.length === 3 && !e[0].name, JSON.stringify(e.map((x) => x.name)));
+		const e = L.libRuleItems(odd);
+		ok('a leading block with no RULE line is a text item with no name', e.length === 3 && e[0].kind === 'text' && !e[0].name, JSON.stringify(e.map((x) => x.kind)));
 		const d = importNet('Net1.inp');
 		d.rules = odd.slice();
 		L.libOrderSelect('rules', 0);
@@ -402,18 +463,18 @@ head('5. rules move as blocks');
 		d.rules = RULES.slice();
 		L.libOrderSelect('rules', 2);
 		const depth = L.undoDepth();
-		ok('Move to top on a rule moves it', L.libOrderMove('rules', 'top') === true && same(names(d.rules), ['C', 'A', 'B']));
+		ok('Move to bottom on a rule moves it', L.libOrderMove('rules', 'bottom') === true && same(names(d.rules), ['B', 'C', 'A']));
 		ok('...as one undo step', L.undoDepth() === depth + 1);
-		ok('...and the selection follows it', L.libOrderSelIndex('rules') === 0);
+		ok('...and the selection follows it', L.libOrderSelIndex('rules') === 6);
 		ok('...and the project file holds the new order', same(L.serialize(true).rules, d.rules));
 		const inp = EngCalcs.lpnExportInp(d).inp, order = [...inp.matchAll(/^RULE (\w+)/gm)].map((m) => m[1]);
-		ok('...and the .inp writes [RULES] in that order', same(order, ['C', 'A', 'B']), JSON.stringify(order));
+		ok('...and the .inp writes [RULES] in that order', same(order, ['B', 'C', 'A']), JSON.stringify(order));
 		// the flat text is cut into rules once for the action, not once for every question the move asks of it
 		{
 			const split = EngCalcs.lpnRuleSplit;
 			let cuts = 0;
 			EngCalcs.lpnRuleSplit = function () { cuts++; return split.apply(this, arguments); };
-			L.libOrderSelect('rules', 1);
+			L.libOrderSelect('rules', 2);
 			L.libOrderMove('rules', 'down');
 			EngCalcs.lpnRuleSplit = split;
 			ok('one Move on a rule cuts the [RULES] text at most twice (' + cuts + ')', cuts > 0 && cuts <= 2, String(cuts));

@@ -2471,7 +2471,7 @@ $ec_lang['lpn_inp_drop_dup_curve']='These curve IDs are defined in more than one
 $ec_lang['lpn_inp_dup_pattern_entry']='Pattern {id} (lines {lines})';
 $ec_lang['lpn_inp_dup_curve_entry']='Curve {id} (lines {lines})';
 $ec_lang['lpn_inp_dup_and']=' and ';
-$ec_lang['lpn_inp_drop_comments']='These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.';
+$ec_lang['lpn_inp_drop_comments']='These comment lines in the patterns of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern was imported in full.';
 $ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_file_options']='This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_other_options']='This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
@@ -4638,6 +4638,8 @@ $ec_lang['lpn_library_rules']='Rules';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_rules_tip']='A rule opens or closes a link, or changes its setting, when a water level, a pressure, a flow, or the time reaches a set value. A rule can test more than one condition and can specify the action to take when the condition is false.';
 $ec_lang['lpn_library_rule_add']='Add a rule';
+$ec_lang['lpn_library_comment_add']='Add a comment';
+$ec_lang['lpn_library_comment']='Comment';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_rule_tip']='One clause per line. Descriptions with examples in "ALL CAPS" follow. Line 1: Name of rule, "RULE 1". Line 2: A condition, "IF TANK 2 LEVEL BELOW 17.1". Line 3: An action, "THEN PUMP 9 STATUS IS OPEN". Line 4: A priority, "PRIORITY 1". Add "AND" or "OR" lines to test more than one condition, and "ELSE" lines to specify the action when the condition is false. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Use consistent project units. Keywords must be in English.';
 $ec_lang['lpn_library_rule_ok']='✓ This rule was read';
