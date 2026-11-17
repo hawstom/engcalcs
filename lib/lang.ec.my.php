@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='ရွေးထားသည်ကို ပ
 $ec_lang['lpn_tool_zoom_window']='ဇူးမ် ဘောင်';
 $ec_lang['lpn_zoom_in']='ဇူးမ် ချဲ့ရန်';
 $ec_lang['lpn_zoom_out']='ဇူးမ် လျှော့ရန်';
-$ec_lang['lpn_new_text']='စာသား';
 $ec_lang['lpn_field_text_bold']='စာလုံးထူ';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical

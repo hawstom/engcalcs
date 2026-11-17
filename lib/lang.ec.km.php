@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='ពង្រីកទៅធាតុដែ�
 $ec_lang['lpn_tool_zoom_window']='បង្អួចពង្រីក';
 $ec_lang['lpn_zoom_in']='ពង្រីក';
 $ec_lang['lpn_zoom_out']='បង្រួម';
-$ec_lang['lpn_new_text']='អត្ថបទ';
 $ec_lang['lpn_field_text_bold']='អក្សរដិត';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical

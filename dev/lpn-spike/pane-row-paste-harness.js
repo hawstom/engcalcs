@@ -440,7 +440,7 @@ console.log('\n--- 9. Paste as new rows at end of table: the menu arms it, Ctrl+
 	report(nodes().length === 7 && L.nodeById('K7').elev === 70, 'the next plain Ctrl+V is ordinary again');
 	// Text and Customers create rows by paste too (Tom, 2026-09-28: "Nothing about text is harder
 	// to put in a table than a junction is"), so the action is offered there as well.
-	pasteIntoEmpty('text', 'X1\t\t\tK1');
+	pasteIntoEmpty('text', 'X1\t\t\tK1\t\tWords');
 	L.openPane('text'); L.renderTable('text');
 	L.ctxMenu('text', 'X1', 'sizeMult');
 	const itText = item(menuEl());

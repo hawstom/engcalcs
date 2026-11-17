@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='নির্বাচিতে জুম �
 $ec_lang['lpn_tool_zoom_window']='জুম উইন্ডো';
 $ec_lang['lpn_zoom_in']='জুম ইন';
 $ec_lang['lpn_zoom_out']='জুম আউট';
-$ec_lang['lpn_new_text']='টেক্সট';
 $ec_lang['lpn_field_text_bold']='বোল্ড টেক্সট';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
