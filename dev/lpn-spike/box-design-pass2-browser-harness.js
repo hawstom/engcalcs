@@ -176,10 +176,10 @@ async function main() {
 		const afterToggle = await settingsNow();
 		ok('P9/P10 toggling never touched node colouring either', nodeField(afterToggle) === 'pressure', JSON.stringify(nodeField(afterToggle)));
 
-		console.log('\n--- P9L: clicking the WORDS "Show contours" ticks the box, the plot following ---');
+		console.log('\n--- P9L: clicking the WORDS "Show plot" ticks the box, the plot following ---');
 		const seqL = [];
 		for (let i = 1; i <= 3; i++) {
-			const at = await page.evaluate(() => { const r = document.getElementById('lpn_contour_show').closest('.lpn-grow').querySelector('.lpn-gtext').getBoundingClientRect(); return { x: r.left + Math.min(10, r.width / 2), y: r.top + r.height / 2 }; });
+			const at = await page.evaluate(() => { const g = document.getElementById('lpn_contour_show').closest('.lpn-grow'), r = (g.querySelector('.lpn-gtext') || g.querySelector('.lpn-gname')).getBoundingClientRect(); return { x: r.left + Math.min(10, r.width / 2), y: r.top + r.height / 2 }; });
 			await page.mouse.click(at.x, at.y);
 			await a.settle(900);
 			seqL.push({ click: i, tick: (await state()).tick, plot: (await plotParts()) > 0 });
