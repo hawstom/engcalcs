@@ -1241,9 +1241,9 @@
 	 * time step without clicking the toolbar.
 	 */
 	EC.lpnTimeGoTo = function (t) { setTime(t); };
-	/** A press on the graph's time line takes the clock in hand: playback stops, or the next tick moves the line from under the finger. */
 	/** The reporting times the transport may stand on (a stopped run offers only those it solved): what a drag on a graph may seek to. */
 	EC.lpnTimeStops = function () { return stopsOf(); };
+	/** A press on the graph's time line takes the clock in hand: playback stops, or the next tick moves the line from under the finger. */
 	EC.lpnTimePause = function () { if (state.playing) { pause(); } };
 
 	/**
