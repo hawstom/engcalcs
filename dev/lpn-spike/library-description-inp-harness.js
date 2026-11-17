@@ -180,10 +180,10 @@ ok('[PATTERNS]: heading, description, PA\'s rows, ";", PB, heading and blank lin
 	P[0] === ';ID   Multipliers' && P[1] === ';Morning peak' && /^\s*PA\s/.test(P[2]) && P[3] === ';' && /^\s*PB\s/.test(P[4])
 	&& P[5] === ';Separated by a blank line, so a heading (EPANET reads no description)' && P[6] === '' && /^\s*PC\s/.test(P[7])
 	&& P[8] === ';after the last pattern' && P.length === 9, J(P));
-ok('[CONTROLS] comes back as the file had it, less the left-out control and the blank line between groups',
+ok('[CONTROLS] comes back as the file had it, less the left-out control, whose blank line goes to the row after it',
 	J(C) === J([';Controls heading', '', ';Fill the tank', 'LINK P1 OPEN IF NODE T3 BELOW 5', '', ';Two lines of',
 		';heading comment', 'LINK P1 CLOSED IF NODE T3 ABOVE 15', 'LINK P2 OPEN AT TIME 2 ;trailing note',
-		'LINK P2 CLOSED AT TIME 20', ';above a missing link', ';after the last control']), J(C));
+		'LINK P2 CLOSED AT TIME 20', ';above a missing link', '', ';after the last control']), J(C));
 ok('[RULES] comes back line for line, blank lines included', J(R) === J(RULES_IN), J(R));
 const b = importText(out.inp, 'again.inp');
 const keep = (d) => J({ p: d.patterns.map((x) => [x.id, x.head, x.note, x.foot]),

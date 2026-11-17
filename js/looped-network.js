@@ -48154,6 +48154,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Comment lines a pattern or a control cannot keep: between the rows of one pattern, on
 			// the end of a pattern row, or above a control that was itself left out. The ids are the
 			// comment lines themselves, which is the only name they have.
+			case 'control-comments': return pc.lpn_inp_drop_control_comments || 'These comment lines in the controls of this file were not imported, because the control they belong to was not imported. Every control that could be imported was.';
 			case 'comments': return pc.lpn_inp_drop_comments || 'These comment lines in the patterns of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern was imported in full.';
 			case 'duplicate-pattern-id': return pc.lpn_inp_drop_dup_pattern || 'These pattern IDs are defined in more than one place in this file. EPANET adds the later multipliers after the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start.';
 			case 'duplicate-curve-id': return pc.lpn_inp_drop_dup_curve || 'These curve IDs are defined in more than one place in this file. EPANET adds the later points after the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start.';
@@ -69777,15 +69778,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function libImportRuleChunks(lines) {
 		lines = lines || [];
 		return libRuleItems(lines)
-			.filter(function (e) { return e.kind === 'rule'; })
-			.map(function (e) { return { id: e.name, lines: e.lines }; });
+			.filter(function (e) { return e.kind === 'rule' || e.kind === 'comment'; })
+			.map(function (e) { return e.kind === 'comment' ? { comment: true, lines: e.lines, gap: e.gap } : { id: e.name, lines: e.lines }; });
 	}
 	function libImportRulesSource(saved) {
 		return libImportRuleChunks(Array.isArray(saved.rules) ? saved.rules : []);
 	}
 	function libImportRulesExisting() { return libImportRuleChunks(libRulesRead()); }
 	function libImportRulesWrite() {
-		return { push: function (clone) { doc.rules = libRules().concat(clone.lines || []); } };
+		return { push: function (clone) {
+			var items = libRuleItems(libRules());
+			items.push({ kind: clone.comment ? 'comment' : 'rule', name: clone.id || '', lines: clone.lines || [], gap: clone.comment ? (clone.gap | 0) : 0 });
+			doc.rules = libRuleItemsText(items);
+		} };
 	}
 	var LIB_IMPORTABLE = {
 		// Dimensionless, and shared with no other page, so patterns carry no unit of their own
@@ -70056,20 +70061,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var spec = LIB_IMPORTABLE[kind];
 			if (!spec) { return; }
 			var source = libImportSourceOf(spec, saved),
-				taken = {}, clones = [], added = [], clashed = [];
+				taken = {}, clones = [], added = [], clashed = [], pendingComments = [], nComments = 0;
 			spec.read().forEach(function (rec) {
 				if (libImportIsUsable(spec, rec)) { taken[String(libImportKeyOf(spec, rec))] = true; }
 			});
 			source.forEach(function (rec) {
+				// A comment row in Controls or Rules travels with the item below it: the comments above a copied item come with it,
+				// and the ones above an item left out stay behind.
+				if (rec && rec.comment) { pendingComments.push(rec); return; }
+				var held = pendingComments;
+				pendingComments = [];
 				if (!libImportIsUsable(spec, rec)) { return; }
 				var id = String(libImportKeyOf(spec, rec)), clone;
 				if (taken[id]) { clashed.push(id); return; }
 				try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { return; }
 				taken[id] = true;
+				held.forEach(function (c) { try { clones.push(JSON.parse(JSON.stringify(c))); nComments++; } catch (err) { /* skipped */ } });
 				clones.push(clone);
 				added.push(id);
 			});
-			plan.push({ kind: kind, spec: spec, clones: clones, added: added, clashed: clashed });
+			plan.push({ kind: kind, spec: spec, clones: clones, added: added, clashed: clashed, comments: nComments });
 		});
 		if (plan.some(function (p) { return p.clones.length > 0; })) {
 			// ONE snapshot for the whole wizard: the user pressed one button, so one Undo puts the
@@ -70104,6 +70115,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (p.added.length) {
 				lines.push((pc.lpn_library_import_added || 'Copied in: {names}')
 					.replace('{names}', p.added.join(', ')));
+			}
+			if (p.comments) {
+				lines.push((pc.lpn_library_import_comments || 'Comment rows copied in with them: {n}').replace('{n}', String(p.comments)));
 			}
 			if (p.clashed.length) {
 				lines.push((pc.lpn_library_import_conflict || 'Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.')
@@ -70705,7 +70719,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function libOrderWire(secEl, sec) {
 		var pc = EngCalcs.pageConfig || {}, info = libOrderInfo(sec), n = info.n, entries = secEl.querySelectorAll('.lpn-lib-entry'),
-			add = Array.prototype.filter.call(secEl.children, function (c) { return c.tagName === 'BUTTON'; })[0],
+			adds = Array.prototype.filter.call(secEl.children, function (c) { return c.tagName === 'BUTTON'; }),
 			row, group, tip;
 		if (n < 2 || entries.length !== n) { return; }
 		tip = (pc.lpn_library_move_tip || 'Moves the selected item. Click an item to select it. The order is saved with the project.') + ' ' +
@@ -70714,8 +70728,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				: (pc.lpn_library_move_tip_none || 'The order does not change a run.'));
 		// The shared box style's own row for a box's buttons: sticky, so the four stay in reach down a long list.
 		row = libEl('div', 'lpn-box-tools lpn-lib-toolrow');
-		secEl.insertBefore(row, add || entries[0]);
-		if (add) { row.appendChild(add); }
+		secEl.insertBefore(row, adds[0] || entries[0]);
+		adds.forEach(function (b) { row.appendChild(b); });
 		group = libEl('div', 'lpn-lib-order');
 		group.setAttribute('role', 'group');
 		group.setAttribute('aria-label', pc.lpn_library_move_group || 'Move the selected item');
@@ -72879,8 +72893,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function libRuleItemsText(items) {
 		var out = [];
 		items.forEach(function (it, k) {
-			var g;
-			for (g = 0; k && g < (it.gap | 0); g++) { out.push(''); }
+			var g, n = it.gap | 0;
+			// Two comment rows never meet without a blank line: consecutive comment lines read back as one row.
+			if (k && it.kind === 'comment' && items[k - 1].kind === 'comment') { n = Math.max(n, 1); }
+			for (g = 0; k && g < n; g++) { out.push(''); }
 			it.lines.forEach(function (l) { out.push(l); });
 		});
 		return out;

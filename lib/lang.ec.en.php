@@ -2471,6 +2471,8 @@ $ec_lang['lpn_inp_drop_dup_curve']='These curve IDs are defined in more than one
 $ec_lang['lpn_inp_dup_pattern_entry']='Pattern {id} (lines {lines})';
 $ec_lang['lpn_inp_dup_curve_entry']='Curve {id} (lines {lines})';
 $ec_lang['lpn_inp_dup_and']=' and ';
+$ec_lang['lpn_inp_dup_comma']=', ';
+$ec_lang['lpn_inp_drop_control_comments']='These comment lines in the controls of this file were not imported, because the control they belong to was not imported. Every control that could be imported was.';
 $ec_lang['lpn_inp_drop_comments']='These comment lines in the patterns of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern was imported in full.';
 $ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_file_options']='This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
@@ -4538,6 +4540,7 @@ $ec_lang['lpn_library_import_go']='Import';
 $ec_lang['lpn_library_import_no_libraries']='That project file has no libraries to copy.';
 $ec_lang['lpn_library_import_heading']='Imported from {file}';
 $ec_lang['lpn_library_import_added']='Copied in: {names}';
+$ec_lang['lpn_library_import_comments']='Comment rows copied in with them: {n}';
 $ec_lang['lpn_library_import_conflict']='Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.';
 // Said under ONE library's heading in the receipt, where 'these' is that library. The whole-file
 // case is lpn_library_import_no_libraries above, which has no heading over it to lean on.

@@ -751,5 +751,29 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 		shapeRows[2] === String(pc.lpn_file_import_shp), `Shapes holds the GeoJSON, DXF and Shapefile rows: ${JSON.stringify(shapeRows)}`);
 }());
 
+// ---- 13. COMMENT ROWS TRAVEL WITH THE ITEM BELOW THEM (Task 859) ----------------------------------
+head('13. importing Controls and Rules brings the comment rows above the copied items and leaves the ones above skipped items');
+(function () {
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 }, controls: [{ link: '9', raw: 'LINK 9 OPEN AT TIME 1', action: {}, condition: null, text: {} }], rules: ['RULE R1', 'IF SYSTEM CLOCKTIME >= 5 AM', 'THEN LINK 9 STATUS IS OPEN'] });
+	clearReport();
+	L.libImportRun({ v: 6, units: {},
+		controls: [
+			{ comment: true, lines: [';heading'] },
+			{ link: '9', raw: 'LINK 9 OPEN AT TIME 1', action: {}, condition: null, text: {} },
+			{ comment: true, lines: [';above a new one'], gap: 1 },
+			{ link: '9', raw: 'LINK 9 CLOSED AT TIME 2', action: {}, condition: null, text: {} },
+			{ comment: true, lines: [';closing note'], gap: 1 }
+		],
+		rules: [';first', 'RULE R1', 'IF SYSTEM CLOCKTIME >= 6 AM', 'THEN LINK 9 STATUS IS CLOSED', '', ';second', 'RULE R2', 'IF SYSTEM CLOCKTIME >= 7 AM', 'THEN LINK 9 STATUS IS OPEN']
+	}, 'from.lwn', ['controls', 'rules']);
+	const c = L.getDoc().controls;
+	check(JSON.stringify(c.map((x) => x.comment ? x.lines[0] : x.raw)) === JSON.stringify(['LINK 9 OPEN AT TIME 1', ';above a new one', 'LINK 9 CLOSED AT TIME 2']),
+		'Controls: the same control is skipped with the comment above it; the new one comes with its comment; a closing comment stays behind: ' + JSON.stringify(c.map((x) => x.comment ? x.lines[0] : x.raw)));
+	const r = L.getDoc().rules;
+	check(r.indexOf(';second') > 0 && r.indexOf('RULE R2') === r.indexOf(';second') + 1 && r.indexOf(';first') < 0,
+		'Rules: R2 comes with ";second"; R1 clashed, so ";first" is left behind with it: ' + JSON.stringify(r));
+	check(said('lpn_library_import_comments'), 'the receipt says comment rows were copied in: ' + JSON.stringify(reportLines()));
+}());
+
 console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All library-import checks passed.'));
 process.exit(failures ? 1 : 0);

@@ -792,7 +792,7 @@
 		var patterns = [], patternIndex = {}, times = null, controls = [];
 		// Comment lines in [PATTERNS] and [CONTROLS] that no pattern or control can keep, by
 		// section. Reported at the end as one `comments` difference each.
-		var lostComments = { PATTERNS: [], CONTROLS: [] };
+		var lostComments = { PATTERNS: [] };
 		rows = rawSections.PATTERNS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
@@ -851,8 +851,8 @@
 		function duplicateRuns(sectionRows, entryKey, entryFallback) {
 			var pcf = EngCalcs.pageConfig || {};
 			function say(lines) {
-				var n = lines.length, and = pcf.lpn_inp_dup_and || ' and ';
-				return n < 2 ? lines.join('') : lines.slice(0, n - 1).join(', ') + and + lines[n - 1];
+				var n = lines.length, and = pcf.lpn_inp_dup_and || ' and ', comma = pcf.lpn_inp_dup_comma || ', ';
+				return n < 2 ? lines.join('') : lines.slice(0, n - 1).join(comma) + and + lines[n - 1];
 			}
 			var runs = {}, order = [], prev = null, k, row;
 			for (k = 0; k < sectionRows.length; k++) {
@@ -1452,13 +1452,21 @@
 			return keepTrailingGap ? sc.gap : 0;
 		}
 		rows = rawSections.CONTROLS || [];
+		// A control not kept leaves its end-of-line comment reported and its blank lines to the next row, so nothing vanishes silently.
+		var carryGap = 0, lostCtlComments = [];
+		function ctlNotKept(r, gap) {
+			if (EngCalcs.lpnDescText(r.cmt)) { lostCtlComments.push(';' + r.cmt); }
+			carryGap = Math.max(carryGap, gap || 0);
+		}
 		for (i = 0; i < rows.length; i++) {
-			if (!haveClock) { lostComments.CONTROLS = lostComments.CONTROLS.concat(rows[i].preLines || []); continue; }
+			if (!haveClock) { lostCtlComments = lostCtlComments.concat(rows[i].preLines || []); if (EngCalcs.lpnDescText(rows[i].cmt)) { lostCtlComments.push(';' + rows[i].cmt); } continue; }
+			var firstNew = ctlItems.length;
 			var ctlGap = pushCommentRows(rows[i].preLines || [], true);
+			if (carryGap && ctlItems.length > firstNew) { ctlItems[firstNew].gap = Math.max(ctlItems[firstNew].gap || 0, carryGap); carryGap = 0; }
 			var parsedCtl = EngCalcs.lpnParseControl(rows[i]);
-			if (!parsedCtl.ok) { drop('controls', [], parsedCtl.raw + ' (' + parsedCtl.error + ')'); continue; }
+			if (!parsedCtl.ok) { drop('controls', [], parsedCtl.raw + ' (' + parsedCtl.error + ')'); ctlNotKept(rows[i], ctlGap); continue; }
 			var ctl = parsedCtl.control, cLink = linkIndex[ctl.link];
-			if (!cLink) { drop('controls', [ctl.link], ctl.raw + ' (link not in file)', 'link'); continue; }
+			if (!cLink) { drop('controls', [ctl.link], ctl.raw + ' (link not in file)', 'link'); ctlNotKept(rows[i], ctlGap); continue; }
 			if (ctl.action.setting !== undefined) {
 				ctl.action.settingUnit = cLink.type === 'valve'
 					? valveSettingUnit((cLink.valveType || '').toUpperCase())
@@ -1466,19 +1474,20 @@
 			}
 			if (ctl.condition.kind === 'node') {
 				var cNode = nodeIndex[ctl.condition.node];
-				if (!cNode) { drop('controls', [ctl.condition.node], ctl.raw + ' (node not in file)', 'node'); continue; }
+				if (!cNode) { drop('controls', [ctl.condition.node], ctl.raw + ' (node not in file)', 'node'); ctlNotKept(rows[i], ctlGap); continue; }
 				// 'head' and 'press' are keys of `scale` below, so a caller wanting SI
 				// multiplies by scale[unit] and never re-derives which is which.
 				ctl.condition.unit = cNode.type === 'junction' ? 'press' : 'head';
 			}
 			var trail = EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(rows[i].cmt));
 			if (trail) { ctl.note = trail; ctl.noteAt = 'end'; EngCalcs.lpnDescTokSet(ctl, 'note', rows[i].cmt, trail); }
+			ctlGap = Math.max(ctlGap, carryGap); carryGap = 0;
 			if (ctlGap) { ctl.gap = ctlGap; }
 			ctlItems.push(ctl);
 		}
 		if (sectionFoot.CONTROLS) {
 			if (haveClock) { pushCommentRows(sectionFoot.CONTROLS, false); }
-			else { lostComments.CONTROLS = lostComments.CONTROLS.concat(sectionFoot.CONTROLS); }
+			else { lostCtlComments = lostCtlComments.concat(sectionFoot.CONTROLS); }
 		}
 		if (ctlItems.length) { delete ctlItems[0].gap; }
 		controls = ctlItems.filter(function (c) { return !c.comment; });
@@ -1491,10 +1500,14 @@
 			if (last) { last.foot = foot; }
 			else { lostComments.PATTERNS = lostComments.PATTERNS.concat(foot); }
 		})();
-		['PATTERNS', 'CONTROLS'].forEach(function (sec) {
+		['PATTERNS'].forEach(function (sec) {
 			var lost = lostComments[sec].filter(function (l) { return EngCalcs.lpnDescText(String(l).replace(/^\s*;/, '')); });
 			if (lost.length) { drop('comments', lost.map(function (l) { return l.trim(); }), sec); }
 		});
+		(function () {
+			var lost = lostCtlComments.filter(function (l) { return EngCalcs.lpnDescText(String(l).replace(/^\s*;/, '')); });
+			if (lost.length) { drop('control-comments', lost.map(function (l) { return l.trim(); }), 'CONTROLS'); }
+		})();
 
 		// ---- geometry ----
 		rows = rawSections.COORDINATES || [];
@@ -3515,11 +3528,18 @@
 		// **A COMMENT ROW GOES BACK AS ITS OWN LINES, AND A CONTROL'S DESCRIPTION ON ITS OWN LINE**, each
 		// after the blank lines (`gap`) the file had before it.
 		var offControls = [];
+		// A skipped control hands its blank lines to the next row written, and two comment rows never meet without one
+		// (consecutive comment lines read back as ONE row).
+		var prevWasComment = false, carryGapOut = 0;
 		function gapLines(item) {
+			var g = Math.max(item.gap | 0, carryGapOut);
+			carryGapOut = 0;
+			if (item.comment && prevWasComment) { g = Math.max(g, 1); }
+			prevWasComment = !!item.comment;
 			if (!controlRows.length) { return; }
-			for (var g = 0; g < (item.gap | 0); g++) { controlRows.push(''); }
+			for (var k = 0; k < g; k++) { controlRows.push(''); }
 		}
-		EngCalcs.lpnControlsUpgrade(doc.controls || []).forEach(function (ctl) {
+		(doc.controls || []).forEach(function (ctl) {
 			var note, line, cn;
 			if (ctl && ctl.comment && Array.isArray(ctl.lines)) {
 				gapLines(ctl);
@@ -3530,6 +3550,7 @@
 			cn = ctl.condition && ctl.condition.kind === 'node' ? ctl.condition.node : null;
 			if ((ctl.link !== undefined && ctl.link !== null && offLink[ctl.link]) || (cn !== null && omitted[cn])) {
 				offControls.push(String(ctl.raw).trim());
+				carryGapOut = Math.max(carryGapOut, ctl.gap | 0);
 				return;
 			}
 			note = EngCalcs.lpnDescText(ctl.note);
@@ -3544,10 +3565,20 @@
 		// as the text it came in as.
 		var ruleLines = doc.rules || [], offRules = [];
 		if (ruleLines.length && (Object.keys(offLink).length || Object.keys(omitted).length)) {
-			var keptRules = [];
-			EngCalcs.lpnRuleBlocks(ruleLines).forEach(function (b) {
-				var off = b.nodes.some(function (id) { return omitted[id]; }) || b.links.some(function (id) { return offLink[id]; });
-				if (off) { offRules.push(b.name || '?'); } else { keptRules = keptRules.concat(b.lines); }
+			// Only a rule's own lines go; the comments and blank lines around it stay (they are rows of their own), and two comment
+			// rows the removal brings together get a blank line between them, so they read back as two.
+			var keptRules = [], removed = false;
+			function isCom(l) { return /^\s*;/.test(String(l)); }
+			(EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(ruleLines) : []).forEach(function (c) {
+				var body = c.lines.slice(0, c.lines.length - (c.trailing || 0)), tail = c.lines.slice(body.length), blk, off = false;
+				if (c.name) {
+					blk = EngCalcs.lpnRuleBlocks(body)[0];
+					off = !!blk && (blk.nodes.some(function (id) { return omitted[id]; }) || blk.links.some(function (id) { return offLink[id]; }));
+				}
+				if (off) { offRules.push(c.name || '?'); removed = true; } else { keptRules = keptRules.concat(body); removed = removed && !body.length; }
+				if (tail.length && removed && keptRules.length && isCom(keptRules[keptRules.length - 1]) && isCom(tail[0])) { keptRules.push(''); }
+				if (tail.length) { removed = false; }
+				keptRules = keptRules.concat(tail);
 			});
 			if (offRules.length) { diff('inactive-rule', offRules); ruleLines = keptRules; }
 		}

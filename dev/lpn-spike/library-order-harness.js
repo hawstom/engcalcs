@@ -35,7 +35,7 @@ const L = loadLoopedNetwork(
 	"\t\tserialize: serializeProject, migrateSaved: migrateSaved, applySaved: applySaved,\n" +
 	"\t\tassembleModel: assembleModel,\n" +
 	"\t\tlibOrderSelect: libOrderSelect, libOrderSelIndex: libOrderSelIndex, libOrderMove: libOrderMove,\n" +
-	"\t\tlibSelForgetIndexed: libSelForgetIndexed, libRulesMoved: libRulesMoved, libRuleItems: libRuleItems, libReadControl: libReadControl,\n" +
+	"\t\tlibSelForgetIndexed: libSelForgetIndexed, libRulesMoved: libRulesMoved, libRuleItems: libRuleItems, libReadControl: libReadControl, libItemGapPass: libItemGapPass,\n" +
 	"\t\tundoDepth: function () { return undoStack.length; }, undo: undo, redo: redo, clearUndo: clearUndo,\n" +
 	"\t\tsetLibSection: function (s) { libSection = s; }, rebuildLibraryBox: rebuildLibraryBox,\n" +
 	"\t\tlibRenamePattern: libRenamePattern, libRenameCurve: libRenameCurve, libRenamePipeType: libRenamePipeType, libRenameFittingSet: libRenameFittingSet,\n" +
@@ -372,6 +372,52 @@ head('4b3. controls: a comment is a row of its own, and Net3 reads, moves and wr
 	}
 }
 
+head('4b4. comment rows never run together on export: after a delete, a move or a scenario skip, and a dropped control leaves nothing silently');
+{
+	const net1 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net1.inp'), 'utf8').replace(/\r\n/g, '\n');
+	const withControls = (body) => net1.replace(/\[CONTROLS\][^\[]*/i, '[CONTROLS]\n' + body + '\n\n');
+	const rowsOf = (d) => d.controls.map((c) => c.comment ? 'C' : 'k').join('');
+	const secLines = (inp) => { const o = []; let on = false; inp.replace(/\r\n/g, '\n').split('\n').forEach((l) => { const m = /^\[(\w+)\]/.exec(l.trim()); if (m) { on = m[1] === 'CONTROLS'; return; } if (on) { o.push(l); } }); while (o.length && !o[o.length - 1].trim()) { o.pop(); } return o; };
+	const T = ';A\nLINK 9 OPEN AT TIME 1\n;B\nLINK 9 CLOSED AT TIME 2\n;C\nLINK 9 OPEN AT TIME 3';
+	// delete: A, control, B meet when the control goes
+	let d = importNet('c.inp', withControls(T));
+	ok('the fixture reads as six rows with no blank line anywhere', rowsOf(d) === 'CkCkCk' && d.controls.every((c) => !c.gap), rowsOf(d));
+	L.libItemGapPass(d.controls, 1); d.controls.splice(1, 1);
+	let out = EngCalcs.lpnExportInp(d).inp, back = importNet('c2.inp', out);
+	ok('delete: two comment rows that meet are written with a blank line between, and read back as two rows', rowsOf(back) === 'CCkCk' && secLines(out).indexOf('') === 1, rowsOf(back) + ' ' + JSON.stringify(secLines(out)));
+	// move: the first control down past B
+	d = importNet('c.inp', withControls(T));
+	L.libOrderSelect('controls', 1);
+	L.libOrderMove('controls', 'down');
+	out = EngCalcs.lpnExportInp(d).inp; back = importNet('c3.inp', out);
+	ok('move: the same, and the row count survives the round trip', rowsOf(d) === 'CCkkCk' && rowsOf(back) === rowsOf(d), rowsOf(d) + ' vs ' + rowsOf(back));
+	// scenario skip: a control on a link that is off in this scenario is left out; its blank lines pass to the next row
+	d = importNet('c.inp', withControls(';A\nLINK 9 OPEN AT TIME 1\n\n\n;B\nLINK 9 CLOSED AT TIME 2'));
+	d.links.find((l) => l.id === '9')._active = false;
+	out = EngCalcs.lpnExportInp(d).inp;
+	ok('scenario skip: nothing of Link 9 is written, and the two blank lines of the skipped control still stand between A and B',
+		secLines(out).join('|') === ';A|||;B' || /;A\n\n\n;B/.test(out) || secLines(out).join('|') === ';A|||;B', JSON.stringify(secLines(out)));
+	// a control dropped on import: its end-of-line comment is reported and its blank lines go to the next row
+	d = importNet('c.inp', withControls(';A\nLINK 9 OPEN AT TIME 1\n\n\nLINK NOPE OPEN AT TIME 2 ;lost on the end\n\n;B\nLINK 9 CLOSED AT TIME 3'));
+	const parsed = EngCalcs.lpnInpParse(withControls(';A\nLINK 9 OPEN AT TIME 1\n\n\nLINK NOPE OPEN AT TIME 2 ;lost on the end\n\n;B\nLINK 9 CLOSED AT TIME 3'));
+	const rep = (parsed.dropped || []).filter((x) => x.code === 'control-comments')[0];
+	ok('a control left out on import: its end-of-line comment is reported, under the controls wording', !!rep && rep.ids.indexOf(';lost on the end') >= 0 && !(parsed.dropped || []).some((x) => x.code === 'comments'), JSON.stringify(parsed.dropped));
+	ok('...and its blank lines are not lost: the next row keeps the larger gap', d.controls[2].comment && d.controls[2].gap === 2, JSON.stringify(d.controls.map((c) => c.gap)));
+	// a rule left out by the scenario keeps the comments around it, and two comment rows it brings together stay two
+	d = importNet('c.inp', net1);
+	d.rules = [';A', 'RULE X', 'IF SYSTEM CLOCKTIME >= 5 AM', 'THEN LINK 9 STATUS IS OPEN', ';B', 'RULE Y', 'IF SYSTEM CLOCKTIME >= 6 AM', 'THEN LINK 10 STATUS IS OPEN'];
+	d.links.find((l) => l.id === '9')._active = false;
+	out = EngCalcs.lpnExportInp(d).inp;
+	const rl = []; let onR = false;
+	out.split('\n').forEach((l) => { const m = /^\[(\w+)\]/.exec(l.trim()); if (m) { onR = m[1] === 'RULES'; return; } if (onR) { rl.push(l); } });
+	ok('scenario skip, rules: RULE X is gone, comments A and B stay, a blank line keeps them two rows',
+		!rl.some((l) => /RULE X/.test(l)) && rl.indexOf(';A') >= 0 && rl.indexOf(';B') === rl.indexOf(';A') + 2 && rl[rl.indexOf(';A') + 1] === '', JSON.stringify(rl));
+	// the export does not change the document
+	const before = JSON.stringify(d.controls);
+	EngCalcs.lpnExportInp(d);
+	ok('an export never changes the rows', JSON.stringify(d.controls) === before);
+}
+
 head('4c. an item with no ID is selected by position, and a position that has changed is never kept');
 {
 	const d = freshDoc();
@@ -433,9 +479,9 @@ head('5. rules and the comments between them move as rows');
 		ok('...and the blank lines stay at the same positions in the list', gapsOf(out) === gapsOf(RULES), gapsOf(out) + ' vs ' + gapsOf(RULES));
 	});
 	{
-		// Consecutive comment lines are one row, so two comment rows moved next to each other read as one; no line is lost.
+		// Consecutive comment lines are one row, so two comment rows moved against each other are written with a blank line between.
 		const out = L.libRulesMoved(RULES, 6, 5);
-		ok('a comment moved against another with no blank line between them joins it as one row, and no line is lost', kinds(out) === 'ccABcC' && sortedLines(out) === sortedLines(RULES), kinds(out));
+		ok('a comment moved against another stays its own row: a blank line is written between them, no other line is added or lost', kinds(out) === 'ccABccC' && sortedLines(out.filter((l) => l.trim())) === sortedLines(RULES.filter((l) => l.trim())), kinds(out));
 	}
 	{
 		const out = L.libRulesMoved(RULES, 5, 2), at = out.indexOf('RULE C');
