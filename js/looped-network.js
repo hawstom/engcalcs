@@ -39034,50 +39034,79 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// thing about the same moment.
 	function tsHours(t) { return (t || 0) / 3600; }
 	// **THE TIME LINE IS A HANDLE** (Tom, 2026-11-14, Ida's second door to the time: the transport is the
-	// only way to change the instant on a phone, and the chart already says which moment it is). A press on
-	// the dashed line and a drag along the chart steps the run to the reporting step nearest the pointer,
-	// by the transport's own seek, EngCalcs.lpnTimeGoTo(), which is also what Back, Forward and the time
+	// only way to change the instant on a phone, and the chart already says which moment it is). A press
+	// on the dashed line and a drag along the chart steps the run to the transport's own stop nearest the
+	// pointer, by its own seek, EngCalcs.lpnTimeGoTo(), which is also what Back, Forward and the time
 	// selector end in. A wide invisible stroke carries the press (a finger cannot hit a 1 px line) and
 	// `touch-action: none` on it keeps a finger from scrolling the pane instead.
 	//
-	// **THE CHART IS REDRAWN ON EVERY STEP, SO THE DRAG LIVES ON THE DOCUMENT**, not on the line that was
-	// pressed: that line is replaced under the pointer by the redraw this very seek causes. What the move
-	// needs to know (the drawn svg, its axis, its frames) is kept per host and refreshed by every redraw.
-	var tsNowCtx = (typeof WeakMap === 'function') ? new WeakMap() : null, tsNowCtxById = {}, tsNowDrag = null;
-	// **A CHART'S CONTAINER CAN BE REPLACED BY ITS OWN REDRAW** (the Properties box builds a new one every
-	// time), so what the drag holds is the container's id when it has one, and the container itself when
-	// it does not (a map bubble's persists). Each redraw re-registers under the same key.
-	function tsNowKey(host) { return host.id || host; }
-	function tsNowGet(key) { return typeof key === 'string' ? tsNowCtxById[key] : tsNowCtx.get(key); }
+	// **A PRESS THAT DOES NOT TRAVEL MOVES NOTHING**: the run is seeked only once the pointer is
+	// TS_NOW_SLOP px from where it went down, and never to the stop it is already on, so a click beside
+	// the line on a dense chart (1 px a step), or one on the line while a Statistic is showing, leaves
+	// the transport as it was.
+	//
+	// **THE CHART IS REDRAWN ON EVERY STEP, SO THE DRAG LIVES ON THE DOCUMENT**, not on the line that
+	// was pressed: that line is replaced under the pointer by the redraw this very seek causes. The
+	// drawing's numbers ride on the svg (svg._tsNow), and at every move the live svg is found again in
+	// the chart's container (by id when it has one: the Properties box builds a new container each
+	// time). Nothing here outlives the drag.
+	var TS_NOW_SLOP = 3, tsNowDrag = null;
+	function tsNowLiveSvg(d) {
+		var host = typeof d.host === 'string' ? document.getElementById(d.host) : d.host, all, i;
+		if (!host) { return null; }
+		all = host.querySelectorAll('svg');
+		for (i = 0; i < all.length; i++) { if (all[i]._tsNow && all[i].isConnected) { return all[i]; } }
+		return null;
+	}
 	function tsNowSeek(e) {
-		var c = tsNowDrag && tsNowGet(tsNowDrag.key), pt, p, hrs, best = null, i;
-		if (!c || !c.svg.isConnected || !c.svg.getScreenCTM || !EngCalcs.lpnTimeGoTo) { return; }
-		pt = c.svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
-		p = pt.matrixTransform(c.svg.getScreenCTM().inverse());
+		var svg, c, stops, pt, p, hrs, best = null, i;
+		if (!tsNowDrag || !EngCalcs.lpnTimeGoTo || !EngCalcs.lpnTimeStops) { return; }
+		if (!tsNowDrag.moved) {
+			if (Math.abs(e.clientX - tsNowDrag.x0) < TS_NOW_SLOP) { return; }
+			tsNowDrag.moved = true;
+		}
+		svg = tsNowLiveSvg(tsNowDrag);
+		if (!svg || !svg.getScreenCTM) { return; }
+		c = svg._tsNow;
+		stops = EngCalcs.lpnTimeStops();
+		pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+		p = pt.matrixTransform(svg.getScreenCTM().inverse());
 		hrs = c.xB.min + (p.x - c.box.left) / (c.box.width || 1) * (c.xB.max - c.xB.min);
-		for (i = 0; i < c.frames.length; i++) {
-			if (best === null || Math.abs(tsHours(c.frames[i].t) - hrs) < Math.abs(tsHours(best) - hrs)) { best = c.frames[i].t; }
+		for (i = 0; i < stops.length; i++) {
+			if (best === null || Math.abs(tsHours(stops[i]) - hrs) < Math.abs(tsHours(best) - hrs)) { best = stops[i]; }
 		}
 		if (best === null || best === tsNowDrag.last) { return; }
 		tsNowDrag.last = best;
 		EngCalcs.lpnTimeGoTo(best);
 	}
 	function tsNowEnd(e) {
-		if (!tsNowDrag || (e && e.pointerId !== tsNowDrag.id)) { return; }
+		if (!tsNowDrag || (e && e.pointerId !== undefined && e.pointerId !== tsNowDrag.id)) { return; }
 		document.removeEventListener('pointermove', tsNowMove, true);
 		document.removeEventListener('pointerup', tsNowEnd, true);
 		document.removeEventListener('pointercancel', tsNowEnd, true);
+		window.removeEventListener('blur', tsNowEnd);
 		tsNowDrag = null;
 	}
 	function tsNowMove(e) {
 		if (!tsNowDrag || e.pointerId !== tsNowDrag.id) { return; }
+		// A pointerup that never arrived (released outside the window, or over a frame) must not leave the
+		// chart following a pointer with no button down.
+		if (e.pointerType === 'mouse' && e.buttons === 0) { tsNowEnd(null); return; }
 		e.preventDefault();
 		tsNowSeek(e);
 	}
-	function tsNowHandle(host, svg, x, box, xB, frames) {
-		var hit;
-		if (!tsNowCtx) { return; }
-		if (host.id) { tsNowCtxById[host.id] = { svg: svg, box: box, xB: xB, frames: frames }; } else { tsNowCtx.set(host, { svg: svg, box: box, xB: xB, frames: frames }); }
+	// **THE DASHED LINE AND ITS HANDLE, ONE HELPER FOR EVERY CHART THAT CARRIES THE TRANSPORT'S TIME.**
+	// Called twice per chart: 'line' under the series, 'hit' last, so the handle is on top of every line,
+	// dot and ring and a press where a series crosses the line still takes the line.
+	function tsNowMark(host, svg, now, X, box, xB, part) {
+		var x, hit;
+		if (now < xB.min || now > xB.max) { return; }
+		x = X(now);
+		if (part === 'line') {
+			el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-ts-now' }, svg);
+			svg._tsNow = { box: box, xB: xB };
+			return;
+		}
 		hit = el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-ts-now-hit' }, svg);
 		// **`touch-action` IS NOT HONOURED ON AN SVG SHAPE** (measured: a sideways finger drag from the line
 		// took the browser's swipe-back and left the page), so the finger's touchstart is claimed here too.
@@ -39088,11 +39117,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			e.preventDefault();
 			tsNowEnd(null);
 			if (EngCalcs.lpnTimePause) { EngCalcs.lpnTimePause(); }
-			tsNowDrag = { id: e.pointerId, key: tsNowKey(host), last: null };
+			tsNowDrag = { id: e.pointerId, host: host.id || host, x0: e.clientX, moved: false,
+				last: (EngCalcs.lpnTimeStatisticLabel && EngCalcs.lpnTimeStatisticLabel()) ? null : EngCalcs.lpnTimeNow() };
 			document.addEventListener('pointermove', tsNowMove, true);
 			document.addEventListener('pointerup', tsNowEnd, true);
 			document.addEventListener('pointercancel', tsNowEnd, true);
-			tsNowSeek(e);
+			window.addEventListener('blur', tsNowEnd);
 		});
 	}
 	function tsWaitingText(pc) {
@@ -39275,11 +39305,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// beside it is. Inside the frame only -- a run whose report starts late has moments the
 		// chart honestly does not cover.
 		now = tsHours(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0);
-		if (now >= xB.min && now <= xB.max) {
-			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
-				class: 'lpn-ts-now' }, svg);
-			tsNowHandle(host, svg, X(now), box, xB, frames);
-		}
+		tsNowMark(host, svg, now, X, box, xB, 'line');
 
 		dots = frames.length <= LPN_TS_DOT_MAX;
 		series.forEach(function (s) {
@@ -39331,6 +39357,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						.replace('{v}', String(plainRound(m.v, 2)))));
 			});
 		});
+
+		tsNowMark(host, svg, now, X, box, xB, 'hit');
 
 		// Axis titles. The y one is the quantity and its unit, built the way renderColorLegend()
 		// builds its heading -- the same whole label and the same parenthesised unit, so the chart
@@ -40308,11 +40336,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			class: 'lpn-profile-frame' }, svg);
 		// Where the transport is parked, as on Time series.
 		now = tsHours(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0);
-		if (now >= xB.min && now <= xB.max) {
-			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
-				class: 'lpn-ts-now' }, svg);
-			tsNowHandle(host, svg, X(now), box, xB, frames);
-		}
+		tsNowMark(host, svg, now, X, box, xB, 'line');
 		dots = frames.length <= LPN_TS_DOT_MAX;
 		ttlName = { produced: pc.lpn_sysflow_produced || 'Produced', consumed: pc.lpn_sysflow_consumed || 'Consumed' };
 		['produced', 'consumed'].forEach(function (key) {
@@ -40331,6 +40355,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					(EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : p.t) + '   ' + plainRound(p[key], 2)));
 			});
 		});
+		tsNowMark(host, svg, now, X, box, xB, 'hit');
 		// Axis titles: EPANET's "Flow (units)", built from the page's own Flow label and the units
 		// strip, the way the map key and Time series build theirs.
 		unit = unitLabel(resultUnit('flow'));

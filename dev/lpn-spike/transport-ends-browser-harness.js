@@ -184,8 +184,42 @@ async function main() {
 			// A click on the line (no travel) keeps the step it is on.
 			const before2 = after.now;
 			if (!touch) { await s.page.mouse.click(after.x, after.y); }
+			else {
+				const cdpT = await s.context.newCDPSession(s.page);
+				await cdpT.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: after.x, y: after.y }] });
+				await cdpT.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+			}
 			await s.settle(500);
-			ok(tag + ': a click on the line leaves the step as it was', (await geo()).now === before2);
+			ok(tag + ': a ' + (touch ? 'tap' : 'click') + ' on the line leaves the step as it was', (await geo()).now === before2);
+			// (The Properties box floats over the right of the chart, so the next checks stand the line well to the left.)
+			await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, frames[8]);
+			await s.settle(500);
+			// The handle is on top of the series: where a dot sits on the time line, the press lands on the handle.
+			ok(tag + ': at a dot on the time line, the handle is the top element', await s.page.evaluate(() => {
+				const h = document.querySelector('#lpn_ts_chart .lpn-ts-now-hit'), hb = h.getBoundingClientRect(), mid = hb.left + hb.width / 2;
+				const d = Array.from(document.querySelectorAll('#lpn_ts_chart .lpn-ts-dot')).map((c) => c.getBoundingClientRect()).filter((r) => Math.abs(r.left + r.width / 2 - mid) < 1)[0];
+				if (!d) { return false; }
+				const top = document.elementFromPoint(d.left + d.width / 2, d.top + d.height / 2);
+				return !!top && top.classList.contains('lpn-ts-now-hit');
+			}));
+			// Dragging off either end clamps to the first and the last step.
+			for (const [name, xTo, want] of [['left', g.left - 80, frames[0]], ['right', g.right + 80, frames[frames.length - 1]]]) {
+				const gg = await geo();
+				if (!touch) {
+					await s.page.mouse.move(gg.x, gg.y); await s.page.mouse.down();
+					for (let k = 1; k <= 8; k++) { await s.page.mouse.move(gg.x + (xTo - gg.x) * k / 8, gg.y); await s.settle(40); }
+					await s.page.mouse.up();
+				} else {
+					const cdpE = await s.context.newCDPSession(s.page);
+					await cdpE.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: gg.x, y: gg.y }] });
+					for (let k = 1; k <= 8; k++) { await cdpE.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: gg.x + (xTo - gg.x) * k / 8, y: gg.y }] }); await s.settle(40); }
+					await cdpE.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+				}
+				await s.settle(500);
+				ok(tag + ': a drag off the ' + name + ' end clamps to the ' + (name === 'right' ? 'last' : 'first') + ' step', (await geo()).now === want, (await geo()).now + ' vs ' + want);
+			}
+			await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, before2);
+			await s.settle(500);
 			// A press on the line while the run is playing stops the playback, or the next tick moves the line from under the pointer.
 			if (!touch) {
 				await s.page.evaluate(() => { EngCalcs.lpnTimeGoTo(0); });
@@ -246,6 +280,97 @@ async function main() {
 			}
 			// A drag with the line off to the end clamps to the last step.
 			ok(tag + ': no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
+			await s.context.close().catch(() => {});
+		}
+
+		// ---- A PRESS THAT DOES NOT TRAVEL MOVES NOTHING, ON A DENSE CHART (about 1 px a step) AND WITH A STATISTIC SHOWING ----
+		{
+			s = await Session.open(browser, 'A', { viewport: { width: 1400, height: 900 } });
+			await s.goto('Looped-Network.php');
+			await s.settle(1200);
+			await s.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await openNet1(s);
+			await s.toolbarClick(await s.lang('lpn_tool_settings'));
+			await s.settle(600);
+			const setTime = (key, text) => s.page.evaluate(([k, t]) => {
+				const row = Array.from(document.querySelectorAll('#lpn_set_time_fields .lpn-time-row')).filter((r) => JSON.parse(r.getAttribute('data-lpn-setting'))[0][1] === k)[0];
+				const inp = row.querySelector('input'); inp.value = t; inp.dispatchEvent(new Event('change', { bubbles: true }));
+			}, [key, text]);
+			await setTime('duration', '12:00');
+			await setTime('hydraulicStep', '0:01');
+			await setTime('reportStep', '0:01');
+			await s.settle(500);
+			await s.page.evaluate(() => { const sel = document.getElementById('lpn_set_time_statistic'); sel.value = 'MAXIMUM'; sel.dispatchEvent(new Event('change', { bubbles: true })); });
+			await s.settle(300);
+			await s.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+			await s.waitFor(() => s.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 600), 'dense EPS frames', 240000);
+			const bb2 = await (await s.page.$('.lpn-node-hit[data-node="10"]')).boundingBox();
+			await s.page.mouse.click(bb2.x + bb2.width / 2, bb2.y + bb2.height / 2);
+			await s.settle(500);
+			await s.toolbarClick(await s.lang('lpn_pane_toggle'));
+			await s.settle(500);
+			await s.page.evaluate(() => document.getElementById('lpn_pane_tab_timeseries').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(800);
+			await s.page.evaluate(() => document.getElementById('lpn_ts_add').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(600);
+			await s.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c && c.offsetParent) { c.click(); } });
+			await s.settle(300);
+			const stops = await s.page.evaluate(() => EngCalcs.lpnTimeStops());
+			const mid = stops[Math.floor(stops.length / 2)];
+			await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, mid);
+			await s.settle(700);
+			const dg = () => s.page.evaluate(() => {
+				const h = document.querySelector('#lpn_ts_chart .lpn-ts-now-hit'), f = document.querySelector('#lpn_ts_chart .lpn-profile-frame');
+				const a = h.getBoundingClientRect(), b = f.getBoundingClientRect();
+				return { x: a.left + a.width / 2, y: a.top + a.height / 2, w: b.width, now: EngCalcs.lpnTimeNow(), n: EngCalcs.lpnTimeStops().length };
+			});
+			let d = await dg();
+			console.log('   dense chart: ' + (d.w / d.n).toFixed(2) + ' px a step, ' + d.n + ' steps');
+			ok('dense: the chart is about a pixel a step or less', d.w / d.n <= 2, (d.w / d.n).toFixed(2));
+			// A click 8 px off the line (a press on the handle, which is 24 px wide) with no travel.
+			await s.page.mouse.click(d.x + 8, d.y);
+			await s.settle(500);
+			ok('dense: a click 8 px off the line leaves the step unchanged', (await dg()).now === mid, mid + ' -> ' + (await dg()).now);
+			await s.page.mouse.click(d.x - 8, d.y);
+			await s.settle(500);
+			ok('dense: ...and 8 px the other way too', (await dg()).now === mid);
+			// Where a series line crosses the time line, the press lands on the handle.
+			ok('dense: where the series line crosses the time line, the handle is the top element', await s.page.evaluate(() => {
+				const h = document.querySelector('#lpn_ts_chart .lpn-ts-now-hit'), hb = h.getBoundingClientRect(), mx = hb.left + hb.width / 2;
+				const pl = document.querySelector('#lpn_ts_chart polyline.lpn-ts-line'), svg = pl.ownerSVGElement, ctm = pl.getScreenCTM();
+				let best = null;
+				for (let i = 0; i < pl.points.numberOfItems; i++) {
+					const q = pl.points.getItem(i), sx = q.x * ctm.a + q.y * ctm.c + ctm.e, sy = q.x * ctm.b + q.y * ctm.d + ctm.f;
+					if (best === null || Math.abs(sx - mx) < Math.abs(best.sx - mx)) { best = { sx, sy }; }
+				}
+				if (!best || Math.abs(best.sx - mx) > 2) { return false; }
+				const top = document.elementFromPoint(best.sx, best.sy);
+				return !!top && top.classList.contains('lpn-ts-now-hit');
+			}));
+			// A lost button release must not leave the chart following the pointer.
+			await s.page.mouse.move(d.x, d.y);
+			await s.page.mouse.down();
+			await s.page.mouse.move(d.x + 60, d.y);
+			await s.settle(300);
+			const dragged = (await dg()).now;
+			ok('dense: a real drag moves the run (to a stop of the transport)', dragged !== mid && stops.indexOf(dragged) >= 0, mid + ' -> ' + dragged);
+			await s.page.evaluate(() => { window.dispatchEvent(new Event('blur')); });
+			await s.page.mouse.move(d.x + 200, d.y);
+			await s.settle(300);
+			ok('dense: after the window loses focus, moving the pointer does not scrub', (await dg()).now === dragged);
+			await s.page.mouse.up();
+			// A bare click on the line while a Statistic is showing leaves the Statistic.
+			await s.page.evaluate(() => {
+				const sel = document.getElementById('lpn_time_step'); sel.value = 'stat'; sel.dispatchEvent(new Event('change', { bubbles: true }));
+			});
+			await s.settle(600);
+			const statOn = () => s.page.evaluate(() => !!EngCalcs.lpnTimeStatisticLabel());
+			ok('dense: the Statistic is showing', await statOn());
+			d = await dg();
+			await s.page.mouse.click(d.x, d.y);
+			await s.settle(500);
+			ok('dense: a click on the line leaves the Statistic showing', await statOn());
+			ok('dense: no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
 			await s.context.close().catch(() => {});
 		}
 
