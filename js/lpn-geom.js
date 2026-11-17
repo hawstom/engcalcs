@@ -929,21 +929,23 @@ EngCalcs.lpnGeom = (function () {
 	//      None: ordinary. Two separate dots that both fall within a finger's reach but do not
 	//      overlap each other are therefore ordinary: the nearer one is the primary and has no
 	//      overlapping neighbour.
-	//   2. The OTHERS are the items under the pickbox too (within `reach` of the press) whose drawn
+	//   2. The OTHERS are the items under the pickbox too (within `reach` of the press, or any at all when the
+	//      press is ON a junction's disc) whose drawn
 	//      extent overlaps the primary's. None: ordinary. So a click on a pump clear of the reservoir
 	//      it overlaps, or on the far end of a long Text, is ordinary; the box is for the overlap.
 	//   3. ORDER: the primary FIRST AND NEVER CUT; then items whose anchor (a circle's, rect's or
 	//      quad's centre) is within `coincident` px of the primary's, then the rest; each by distance
 	//      from the press, then rank, then id in natural order. At most `cap` (6) rows.
-	// opts: reach (6), cap (6), coincident (1), deep (0.4), deepGlyph (0.1).
+	// opts: reach (6), cap (6), coincident (1), deep (0.4), contact (1 px^2).
 	//
 	// **A PUMP'S OR VALVE'S SYMBOL IS A SYMBOL** (Tom, 2026-11-16, phone test: "a pump or valve is
 	// overlapping a node. I specifically requested all symbol overlaps to be included"). Its item
 	// carries `parts`, the convex pieces of its drawn silhouette (a pump's casing and tail, a valve's two
-	// triangles), and an overlap with a glyph is judged piece by piece against `deepGlyph`, 0.1 of the
-	// narrower piece, not 0.4: a pump's tail ends ON its node, so the node's disc lies over only the
-	// tail's tip (0.12 on Net3's pump 10), and that is the overlap he meant. Where a glyph is not
-	// involved the rule is unchanged. The glyph's LINE is never an item.
+	// triangles). An overlap with a glyph is VISIBLE CONTACT: the two drawn shapes share at least
+	// `contact` px^2 (1, about four pixels of ink), summed over all its pieces. Depth is the wrong
+	// measure there: a disc over a valve's waist meets both triangles lightly and a disc on a pump's
+	// tail tip is shallow, yet both show ink on ink. Touching, or near, is not contact. Where no glyph
+	// is involved the 0.4 depth rule is unchanged. The glyph's LINE is never an item.
 	//
 	// "Overlap" is deep: the depth of one into the other is at least `deep` (0.4, and not 0.5 because
 	// Net3's Lake and pump 10, which Tom named as overlapping, share 0.43 of the reservoir's drawn
@@ -1017,23 +1019,6 @@ EngCalcs.lpnGeom = (function () {
 		if (p.circle) { return Math.max(0, Math.hypot(px - p.circle.x, py - p.circle.y) - p.circle.r); }
 		return pickPolyInside(p.poly, px, py) ? 0 : pickPolyEdgeDist(p.poly, px, py);
 	}
-	// The narrowest the piece is across: a circle's diameter, a polygon's least width over its edge normals.
-	function pickPartWidth(p) {
-		var best = Infinity, i, n, a, b, len, k, lo, hi, v;
-		if (p.circle) { return 2 * p.circle.r; }
-		n = p.poly.length;
-		for (i = 0; i < n; i++) {
-			a = p.poly[i]; b = p.poly[(i + 1) % n];
-			len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
-			lo = Infinity; hi = -Infinity;
-			for (k = 0; k < n; k++) {
-				v = (-(b.y - a.y) * p.poly[k].x + (b.x - a.x) * p.poly[k].y) / len;
-				lo = Math.min(lo, v); hi = Math.max(hi, v);
-			}
-			best = Math.min(best, hi - lo);
-		}
-		return best;
-	}
 	function pickPolyOf(m) {
 		if (m.poly) { return m.poly; }
 		if (m.rect || m.quad) { return pickCorners(m); }
@@ -1067,24 +1052,47 @@ EngCalcs.lpnGeom = (function () {
 		}
 		return depth;
 	}
+	var PICK_STROKE_HALF = 0.6;
 	function pickPartsOf(m) {
 		if (m.parts) { return m.parts; }
-		if (m.circle) { return [{ circle: m.circle }]; }
+		// A node's disc is drawn with a stroke about 1.2 px wide round its radius: that ink is seen too.
+		if (m.circle) { return [{ circle: { x: m.circle.x, y: m.circle.y, r: m.circle.r + PICK_STROKE_HALF } }]; }
 		return [{ poly: pickPolyOf(m) }];
 	}
-	// Two symbols one of which is a glyph: they overlap when ANY piece of one is `deepGlyph` of the
-	// narrower piece deep in any piece of the other.
-	function pickGlyphOverlaps(a, b, deepGlyph) {
-		var pa = pickPartsOf(a), pb = pickPartsOf(b), i, j, d;
-		for (i = 0; i < pa.length; i++) {
-			for (j = 0; j < pb.length; j++) {
-				d = pickPartDepth(pa[i], pb[j]);
-				if (d > 0 && d >= deepGlyph * Math.min(pickPartWidth(pa[i]), pickPartWidth(pb[j]))) { return true; }
-			}
+	// Two symbols one of which is a glyph overlap when their drawn shapes SHARE AT LEAST `contact` px^2
+	// (Tom: "all symbol overlaps", seen by eye; Perry: a disc over the notch between a valve's two
+	// triangles touches both and must count the sum). The area is sampled on a 0.5 px grid over the
+	// boxes' common part, a point counting when it is in any piece of both. Depth rules (0.4) judge
+	// two ordinary symbols; a light touch of a thin glyph piece has little depth and plenty of ink.
+	function pickPartHas(parts, x, y) {
+		var i, p;
+		for (i = 0; i < parts.length; i++) {
+			p = parts[i];
+			if (p.circle ? Math.hypot(x - p.circle.x, y - p.circle.y) <= p.circle.r : pickPolyInside(p.poly, x, y)) { return true; }
 		}
 		return false;
 	}
-	function pickOverlaps(a, b, deep, deepGlyph) {
+	function pickPartsBox(parts) {
+		var b = { l: Infinity, t: Infinity, r: -Infinity, b: -Infinity };
+		parts.forEach(function (p) {
+			var pts = p.circle ? [{ x: p.circle.x - p.circle.r, y: p.circle.y - p.circle.r }, { x: p.circle.x + p.circle.r, y: p.circle.y + p.circle.r }] : p.poly;
+			pts.forEach(function (q) { b.l = Math.min(b.l, q.x); b.r = Math.max(b.r, q.x); b.t = Math.min(b.t, q.y); b.b = Math.max(b.b, q.y); });
+		});
+		return b;
+	}
+	function pickContactArea(a, b, step) {
+		var pa = pickPartsOf(a), pb = pickPartsOf(b), ba = pickPartsBox(pa), bb = pickPartsBox(pb),
+			l = Math.max(ba.l, bb.l), r = Math.min(ba.r, bb.r), t = Math.max(ba.t, bb.t), bt = Math.min(ba.b, bb.b), x, y, n = 0;
+		if (r <= l || bt <= t) { return 0; }
+		for (x = l + step / 2; x < r; x += step) {
+			for (y = t + step / 2; y < bt; y += step) {
+				if (pickPartHas(pa, x, y) && pickPartHas(pb, x, y)) { n++; }
+			}
+		}
+		return n * step * step;
+	}
+	function pickGlyphOverlaps(a, b, contact) { return pickContactArea(a, b, 0.5) >= contact; }
+	function pickOverlaps(a, b, deep, contact) {
 		var s, o2, c, j, pts, rc, loc, shrunk, k, qr;
 		if (a.outline && b.outline) { return false; }   // two Shapes are not a symbol under the click
 		if (a.outline || b.outline) {
@@ -1102,7 +1110,7 @@ EngCalcs.lpnGeom = (function () {
 			for (j = 0; j + 1 < pts.length; j++) { if (pickSegInRect(pts[j], pts[j + 1], shrunk)) { return true; } }
 			return false;
 		}
-		if ((a.parts || b.parts)) { return pickGlyphOverlaps(a, b, deepGlyph); }
+		if ((a.parts || b.parts)) { return pickGlyphOverlaps(a, b, contact); }
 		if (a.circle && b.circle) {
 			return Math.hypot(a.circle.x - b.circle.x, a.circle.y - b.circle.y) <= a.circle.r + b.circle.r - 2 * deep * Math.min(a.circle.r, b.circle.r);
 		}
@@ -1119,7 +1127,7 @@ EngCalcs.lpnGeom = (function () {
 	}
 	function pickSymbols(items, x, y, opts) {
 		var o = opts || {}, reach = o.reach === undefined ? 6 : o.reach, cap = o.cap === undefined ? 6 : o.cap,
-			coin = o.coincident === undefined ? 1 : o.coincident, deep = o.deep === undefined ? 0.4 : o.deep, deepGlyph = o.deepGlyph === undefined ? 0.1 : o.deepGlyph,
+			coin = o.coincident === undefined ? 1 : o.coincident, deep = o.deep === undefined ? 0.4 : o.deep, contact = o.contact === undefined ? 1 : o.contact,
 			primary = null, list = [], i, it, d, pa;
 		function natural(a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); }
 		function order(a, b) {
@@ -1136,9 +1144,12 @@ EngCalcs.lpnGeom = (function () {
 		pa = pickAnchor(primary.m);
 		for (i = 0; i < items.length; i++) {
 			it = items[i];
-			if (it === primary.m || !pickOverlaps(primary.m, it, deep, deepGlyph)) { continue; }
+			if (it === primary.m || !pickOverlaps(primary.m, it, deep, contact)) { continue; }
 			d = pickExtentDistance(it, x, y);
-			if (d <= reach) {
+			// A junction's disc is under the whole finger: whatever overlaps the disc the press is ON counts,
+			// wherever on the disc the press fell. A big symbol (a reservoir, a Text) keeps the reach: a click
+			// on the reservoir clear of the pump that overlaps its corner is an ordinary click.
+			if (d <= reach || (primary.d === 0 && primary.m.circle)) {
 				list.push({ m: it, d: d, coin: (pa && pickAnchor(it) && Math.hypot(pa.x - pickAnchor(it).x, pa.y - pickAnchor(it).y) <= coin) ? 1 : 0 });
 			}
 		}

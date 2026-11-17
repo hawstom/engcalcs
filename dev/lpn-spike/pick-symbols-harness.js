@@ -66,6 +66,11 @@ console.log('\n--- a pump\'s or valve\'s symbol is a symbol: its drawn pieces, n
 	same('a junction only touching the casing: no box', pick([dot('J', 8 + 6 + 4, 10 + 6 + 4), pump('PU', 0, 0)], 18, 20), []);
 	same('a junction over a valve\'s triangle: the box', pick([dot('J', 3, 9), valve('V', 0, 0)], 3, 9), ['node:J', 'link:V']);
 	same('a junction in the valve\'s waist gap, above the apex (empty corner): no box', pick([dot('J', 9, 1), valve('V', 0, 0)], 9, 1), []);
+	// Visible contact (round 5, Perry): shared ink of at least 1 px^2, summed over every piece of the glyph.
+	same('a disc over the notch between a valve\'s triangles meets both: the box', pick([dot('J', 9, 4, 4), valve('V', 0, 0)], 9, 4), ['node:J', 'link:V']);
+	same('a disc grazing the pump\'s tail end by 1.5 px (about 3 px^2 of ink): the box', pick([dot('J', 24, 7), pump('PU', 0, 0)], 24, 7), ['node:J', 'link:PU']);
+	same('a disc a pixel clear of the pump\'s tail end: no box', pick([dot('J', 25.7, 7), pump('PU', 0, 0)], 25.7, 7), []);
+	same('a press on the disc\'s far side still sees the glyph under the same disc', pick([dot('J', 24, 7), pump('PU', 0, 0)], 28, 7), ['node:J', 'link:PU']);
 	same('two glyphs over each other: the box', pick([pump('PA', 0, 0), valve('V', 4, 0)], 8, 9), ['link:PA', 'link:V']);
 	same('a tank under the pump\'s casing: the box', pick([box('node', 'T', 0, 0, 16, 12, 0), pump('PU', 4, 0)], 10, 8), ['node:T', 'link:PU']);
 }

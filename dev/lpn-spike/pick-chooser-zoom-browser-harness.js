@@ -159,6 +159,15 @@ async function main() {
 		const farRows = await rowsNow();
 		ok('a click on the pump more than the pickbox from the reservoir does not offer the reservoir', !farRows.some((r) => /Lake/.test(r)) && (farRows.length ? farRows.some((r) => /Pump 10/.test(r)) : (await selNow()) === 'l10'), JSON.stringify([farRows, await selNow(), onlyPump]));
 
+		// Near, not touching (Perry, 2026-11-16): the pump 335 neighbours Junction 601 and Reservoir River are not under its ink.
+		for (const id of ['601', 'River']) {
+			const c = await D.page.evaluate((id) => { const e = document.querySelector('#lpn_canvas circle.lpn-node[data-node="' + id + '"], #lpn_canvas .lpn-node[data-node="' + id + '"]'); if (!e) { return null; } const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }, id);
+			await D.page.mouse.move(c.x, c.y); await D.page.mouse.click(c.x, c.y); await D.settle(450);
+			const rr = await rowsNow();
+			ok('at the opening view a click on ' + id + ', near pump 335 but clear of its ink, lists no pump', !rr.some((x) => /^Pump /.test(x)), JSON.stringify(rr));
+			await D.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
+			await D.page.keyboard.press('Escape'); await D.settle(200);
+		}
 		console.log('\nA. Desktop, a mouse, Net3, a click on every node centre');
 		await D.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
 		await D.page.mouse.click(700, 120); await D.settle(300);
