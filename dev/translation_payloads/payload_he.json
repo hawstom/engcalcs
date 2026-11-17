@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 3353,
-        "delta_key_count": 101,
-        "english_changed_key_count": 26,
+        "expected_key_count": 3362,
+        "delta_key_count": 117,
+        "english_changed_key_count": 31,
         "exempt_key_count": 40,
         "exempt_keys": [
             "u_imgd",
@@ -72,17 +72,22 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ספיקה\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: עומד\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: אובדן לחץ\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: קטע\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: הפסד מקומי\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: דרישה\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: לחץ\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: קישור\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ברירת מחדל\n- solver or the part that works out the answer\n    English: solver\n    Your language: פותר\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: מכל\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: שסתום\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: ערכים משלו\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: לקוח\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: עומד\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: צורה\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ספיקה\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: מהירות\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: עומד\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: אובדן לחץ\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: קטע\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: הפסד מקומי\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: דרישה\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: לחץ\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: קישור\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ברירת מחדל\n- solver or the part that works out the answer\n    English: solver\n    Your language: פותר\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: מכל\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: שסתום\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: ערכים משלו\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: לקוח\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: עומד\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: צורה\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "u_millifeet": "millifeet",
+        "lpn_pane_paste_text_no_words": "Row {row}: a new Text needs its words.",
         "lpn_field_tank_minvol": "Minimum volume",
         "lpn_field_tank_minvol_tip": "The volume of water in the tank at its minimum depth, in the length unit cubed, for a tank with a sloped or curved bottom; 0 uses the tank diameter, and a volume curve overrides it.",
         "lpn_field_tank_overflow": "Can overflow",
         "lpn_field_tank_overflow_tip": "Yes lets a full tank spill what it cannot hold, so the pipe into it stays open; No closes the pipe into a full tank. Only an extended period simulation uses it.",
         "lpn_popup_boxtitle_of": "Properties: {asset}",
+        "lpn_guide_text_contour_box": "Controls the contour plot drawn on the map from the node property chosen in Color nodes by, in the color scheme chosen in Settings, Symbology, Node colors: the fill and its opacity, how far the color reaches from each pipe, and the contour line interval and labels. With No color chosen there is no property to plot and nothing is drawn. Show plot draws or hides the plot and changes no other setting; it leaves the node colors. It changes only the display, not the network.",
         "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario has the solid dot and the arrow described below at its left, and they work as they do in Properties. Its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. An arrow over the solid dot pushes the override upward: click it, and after a confirmation that names where the value goes, it is cleared here and entered in the parent scenario. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is what Clear restores, as in Clear restores 18 in, the value in Base. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_ct_what_def": "<p>Choose Water, Graphs, Contour. The row checks Show plot in the open scenario and opens the box; the plot is drawn with the Fill and the contour lines as the box has them set, which for a new project is a smooth fill with labeled lines. The plot spreads the node colors along the pipes and up to a set multiple of the median pipe length beside them, fading out over the outer part. Its property is the one chosen in Color nodes by, in Settings, Symbology, Node colors; with No color there is nothing to plot, and the box says so. It does not color across pumps, valves, or closed links. The line under the color key states how many nodes and pipes the plot uses, the reach beside the pipes, and the interval of the lines. With too few nodes, it says so.<\/p>",
+        "lpn_guide_ct_box_def": "<p>The first line of the box states Follows project \"Node colors\" settings, and Node colors is a link that opens Settings at Symbology, Node colors. The plot spreads the node property chosen in Color nodes by, in the Color scheme, both there; the box has no property or scheme of its own, and a change in Settings shows in the plot at once. With No color chosen, a second line says there is nothing to plot, nothing is drawn, and the plot returns when a property is chosen again. Show plot draws or hides the plot and changes nothing else: when it is cleared, the Fill, Show contour lines, Labels, and the other settings keep their values and have no effect, and when it is checked they act as set; the node colors stay either way. The box holds the Fill (None, Smooth, or Bands, which paints each class in one solid color), the Fill opacity, the Buffer (× median pipe length), and Show contour lines, with its Interval and Labels. In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network's area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.<\/p>",
+        "lpn_guide_ct_example_def": "<p>Open the Net1 example, choose Settings, Symbology, Node colors, and under Color nodes by choose Pressure. Then choose Water, Graphs, Contour. The contour plot shows pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. The nodes keep their colors after Show plot is cleared, and the Fill and the contour lines keep their settings for when it is checked again.<\/p>",
         "lpn_guide_rr_what_def": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.<\/p>",
         "lpn_guide_rr_example_def": "<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.<\/p>",
         "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
@@ -93,6 +98,9 @@
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
         "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
+        "lpn_contour_follows": "Follows project \"{link}\" settings.",
+        "lpn_contour_none_note": "Nothing to plot: \"Color nodes by\" is set to \"No color\".",
+        "lpn_contour_lines": "Show contour lines",
         "lpn_file_export_item_wtg": ".wtg file…",
         "lpn_file_export_wtg_tip": "Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.",
         "lpn_wtg_export_lost_lead": "This export does not yet write the following:",
@@ -145,6 +153,7 @@
         "lpn_engine_unavailable_why": "The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.",
         "lpn_engine_needed_failed_why": "The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}",
+        "lpn_settings_row_contour_show": "Show contour plot",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_settings_engine_native": "Use the built-in solver",
@@ -152,6 +161,8 @@
         "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.",
         "lpn_time_run_stopped_kept": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.",
         "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. They show the network at {time} only, with every tank at its initial level.",
+        "lpn_settings_color_node_field_tip": "Colors the nodes by this property. The contour plot follows it.",
+        "lpn_settings_color_ramp_node_tip": "Colors the nodes, the contour plot and its key.",
         "lpn_time_epanet_fallback": "The EPANET solver could not be loaded, so the built-in solver ran this network.",
         "lpn_time_epanet_fallback_why": "The built-in solver ran this network, because the EPANET solver could not be used. {reason}",
         "lpn_time_run_report": "Solver (run) report",
@@ -174,18 +185,28 @@
         "lpn_diag_energy_refused": "EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:",
         "lpn_diag_builtin_stopped": "The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
         "lpn_diag_builtin_stopped_at": "The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
-        "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}"
+        "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}",
+        "lpn_velocity_warn": "⚠ Pipe {id} velocity is {velocity} at {time}.",
+        "lpn_velocity_warn_steady": "⚠ Pipe {id} velocity is {velocity}.",
+        "lpn_velocity_warn_more": "⚠ And more pipes ({n}) above {limit}.",
+        "lpn_settings_velocity_limit": "Velocity warning limit",
+        "lpn_settings_velocity_limit_tip": "The velocity above which a run reports the fastest pipe and how many other pipes also exceed it. Blank uses the default. Zero turns the warning off."
     },
     "keys": {
         "u_millifeet": "millifeet",
+        "lpn_pane_paste_text_no_words": "Row {row}: a new Text needs its words.",
         "lpn_field_tank_minvol": "Minimum volume",
         "lpn_field_tank_minvol_tip": "The volume of water in the tank at its minimum depth, in the length unit cubed, for a tank with a sloped or curved bottom; 0 uses the tank diameter, and a volume curve overrides it.",
         "lpn_field_tank_overflow": "Can overflow",
         "lpn_field_tank_overflow_tip": "Yes lets a full tank spill what it cannot hold, so the pipe into it stays open; No closes the pipe into a full tank. Only an extended period simulation uses it.",
         "lpn_popup_boxtitle_of": "Properties: {asset}",
+        "lpn_guide_text_contour_box": "Controls the contour plot drawn on the map from the node property chosen in Color nodes by, in the color scheme chosen in Settings, Symbology, Node colors: the fill and its opacity, how far the color reaches from each pipe, and the contour line interval and labels. With No color chosen there is no property to plot and nothing is drawn. Show plot draws or hides the plot and changes no other setting; it leaves the node colors. It changes only the display, not the network.",
         "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario has the solid dot and the arrow described below at its left, and they work as they do in Properties. Its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. An arrow over the solid dot pushes the override upward: click it, and after a confirmation that names where the value goes, it is cleared here and entered in the parent scenario. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is what Clear restores, as in Clear restores 18 in, the value in Base. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_ct_what_def": "<p>Choose Water, Graphs, Contour. The row checks Show plot in the open scenario and opens the box; the plot is drawn with the Fill and the contour lines as the box has them set, which for a new project is a smooth fill with labeled lines. The plot spreads the node colors along the pipes and up to a set multiple of the median pipe length beside them, fading out over the outer part. Its property is the one chosen in Color nodes by, in Settings, Symbology, Node colors; with No color there is nothing to plot, and the box says so. It does not color across pumps, valves, or closed links. The line under the color key states how many nodes and pipes the plot uses, the reach beside the pipes, and the interval of the lines. With too few nodes, it says so.<\/p>",
+        "lpn_guide_ct_box_def": "<p>The first line of the box states Follows project \"Node colors\" settings, and Node colors is a link that opens Settings at Symbology, Node colors. The plot spreads the node property chosen in Color nodes by, in the Color scheme, both there; the box has no property or scheme of its own, and a change in Settings shows in the plot at once. With No color chosen, a second line says there is nothing to plot, nothing is drawn, and the plot returns when a property is chosen again. Show plot draws or hides the plot and changes nothing else: when it is cleared, the Fill, Show contour lines, Labels, and the other settings keep their values and have no effect, and when it is checked they act as set; the node colors stay either way. The box holds the Fill (None, Smooth, or Bands, which paints each class in one solid color), the Fill opacity, the Buffer (× median pipe length), and Show contour lines, with its Interval and Labels. In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network's area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.<\/p>",
+        "lpn_guide_ct_example_def": "<p>Open the Net1 example, choose Settings, Symbology, Node colors, and under Color nodes by choose Pressure. Then choose Water, Graphs, Contour. The contour plot shows pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. The nodes keep their colors after Show plot is cleared, and the Fill and the contour lines keep their settings for when it is checked again.<\/p>",
         "lpn_guide_rr_what_def": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.<\/p>",
         "lpn_guide_rr_example_def": "<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.<\/p>",
         "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
@@ -196,6 +217,9 @@
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
         "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
+        "lpn_contour_follows": "Follows project \"{link}\" settings.",
+        "lpn_contour_none_note": "Nothing to plot: \"Color nodes by\" is set to \"No color\".",
+        "lpn_contour_lines": "Show contour lines",
         "lpn_file_export_item_wtg": ".wtg file…",
         "lpn_file_export_wtg_tip": "Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.",
         "lpn_wtg_export_lost_lead": "This export does not yet write the following:",
@@ -248,6 +272,7 @@
         "lpn_engine_unavailable_why": "The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.",
         "lpn_engine_needed_failed_why": "The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}",
+        "lpn_settings_row_contour_show": "Show contour plot",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_settings_engine_native": "Use the built-in solver",
@@ -255,6 +280,8 @@
         "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.",
         "lpn_time_run_stopped_kept": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.",
         "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. They show the network at {time} only, with every tank at its initial level.",
+        "lpn_settings_color_node_field_tip": "Colors the nodes by this property. The contour plot follows it.",
+        "lpn_settings_color_ramp_node_tip": "Colors the nodes, the contour plot and its key.",
         "lpn_time_epanet_fallback": "The EPANET solver could not be loaded, so the built-in solver ran this network.",
         "lpn_time_epanet_fallback_why": "The built-in solver ran this network, because the EPANET solver could not be used. {reason}",
         "lpn_time_run_report": "Solver (run) report",
@@ -277,7 +304,12 @@
         "lpn_diag_energy_refused": "EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:",
         "lpn_diag_builtin_stopped": "The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
         "lpn_diag_builtin_stopped_at": "The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
-        "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}"
+        "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}",
+        "lpn_velocity_warn": "⚠ Pipe {id} velocity is {velocity} at {time}.",
+        "lpn_velocity_warn_steady": "⚠ Pipe {id} velocity is {velocity}.",
+        "lpn_velocity_warn_more": "⚠ And more pipes ({n}) above {limit}.",
+        "lpn_settings_velocity_limit": "Velocity warning limit",
+        "lpn_settings_velocity_limit_tip": "The velocity above which a run reports the fastest pipe and how many other pipes also exceed it. Blank uses the default. Zero turns the warning off."
     },
     "key_context": {
         "u_millifeet": {
@@ -293,6 +325,22 @@
                     "key": "u_bar",
                     "value": "בר",
                     "english": "bar"
+                }
+            }
+        },
+        "lpn_pane_paste_text_no_words": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_paste_text_no_position",
+                    "value": "שורה {row}: טקסט חדש זקוק גם ל-{first} וגם ל-{second}.",
+                    "english": "Row {row}: a new Text needs both {first} and {second}."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_paste_no_anchor",
+                    "value": "שורה {row}: {id} אינו צומת או צינור ברשת זו עדיין. הדביקו אותו קודם, ולאחר מכן את הטקסט הזה.",
+                    "english": "Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text."
                 }
             }
         },
@@ -392,6 +440,22 @@
                 }
             }
         },
+        "lpn_guide_text_contour_box": {
+            "reason": "english_changed",
+            "current_value": "שולטת בתרשים קווי המתאר המצויר על המפה מערך הצומת שנבחר ב-צביעת צמתים לפי: ערכת הצבעים, המילוי והשקיפות שלו, מרווח קווי המתאר והתוויות, והמרחק שאליו הצבע מגיע מכל צינור. כיבויה מסתיר את התרשים ומשאיר את צבעי הצמתים. היא משנה רק את התצוגה, לא את הרשת.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_text_energy_box",
+                    "value": "מדווחת על צריכת האנרגיה, ההספק השיאי והעלות של כל משאבה בהדמיית התקופה המורחבת האחרונה, לפי היעילות של כל משאבה ומחיר האנרגיה שנקבע תחת הגדרות, אנרגיה. היא דורשת משך ריצה כולל בהגדרות ורשת פתורה. היא אינה משנה את הרשת.",
+                    "english": "Reports the energy use, peak power, and cost of each pump over the last extended period simulation, using each pump's efficiency and the energy price set under Settings, Energy. It needs a Total run time in Settings and a solved network. It does not change the network."
+                },
+                "next_translated": {
+                    "key": "lpn_guide_text_scncmp_box",
+                    "value": "פותרת כל תרחיש שסומן במנהל התרחישים, כולם אלא אם הסימונים נוקו, מעותק של השרטוט, ומציגה בטבלה לכל תרחיש את מספר הערכים המותאמים, מכפיל הדרישה, משך הריצה הכולל, צעד הזמן ההידראולי, הלחץ הנמוך ביותר והמהירות הגבוהה ביותר. בחרו מים, דוחות, השוואת תרחישים כדי לפתוח אותה. ההשוואה מתחילה כשהתיבה נפתחת, ומתחילה שוב אחרי כל עריכה כל עוד התיבה פתוחה.\\n\\nהיא אינה משנה את הפרויקט, והתרחיש הפתוח נשאר כפי שהיה.",
+                    "english": "Solves each scenario that is checked in the Scenario manager, all of them unless checks have been cleared, from a copy of the drawing, and tabulates for each the number of overrides, the demand multiplier, the total run time, the hydraulic time step, the lowest pressure, and the highest velocity. Choose Water, Reports, Scenario comparison to open it. The comparison starts when it opens and starts again after each edit while it remains open.\\n\\nIt does not change the project, and the scenario that is open is left as it was."
+                }
+            }
+        },
         "lpn_guide_text_rptbox": {
             "reason": "english_changed",
             "current_value": "מציגה את דוח הטקסט שכתב מנוע EPANET עבור הדמיית התקופה המורחבת האחרונה, כולל האזהרות שלו וסיכום הרשת. כל הדמיית תקופה מורחבת מחליפה אותו; פתרון ברגע בודד אינו מחליף אותו, ועריכה משאירה את הדוח הקודם במקומו.",
@@ -437,6 +501,54 @@
                     "key": "lpn_guide_set_search_term",
                     "value": "חיפוש",
                     "english": "Searching"
+                }
+            }
+        },
+        "lpn_guide_ct_what_def": {
+            "reason": "english_changed",
+            "current_value": "<p>בחרו מים, גרפים, קווי מתאר. השורה מפעילה את התרשים בתרחיש הפתוח, כמילוי חלק עם קווים מתויגים, תוך שימוש בלחץ אם הצמתים עדיין אינם צבועים, ופותחת את התיבה. התרשים פורס את צבעי הצמתים לאורך הצינורות ועד כפולה קבועה של אורך הצינור החציוני לצדם, ומתעמעם בחלק החיצוני. הוא אינו צובע מעבר למשאבות, לשסתומים או לקישורים סגורים. השורה שמתחת למקרא הצבעים מציינת כמה צמתים וצינורות התרשים משתמש בהם, את הטווח לצד הצינורות ואת המרווח בין הקווים. כשיש מעט מדי צמתים, היא אומרת זאת.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ct_what_term",
+                    "value": "מהו התרשים",
+                    "english": "What the plot is"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ct_box_term",
+                    "value": "התיבה",
+                    "english": "The box"
+                }
+            }
+        },
+        "lpn_guide_ct_box_def": {
+            "reason": "english_changed",
+            "current_value": "<p>הצגת התרשים, כשהיא מנוקה, מסתירה את המילוי ואת הקווים ושומרת על צבעי הצמתים. התיבה מחזיקה גם את צביעת צמתים לפי ואת ערכת צבעים, שהן אותן שתי הגדרות כמו בהגדרות, הדמיה, צבעי צמתים, את המילוי (ללא, חלק או פסים, שצובע כל מחלקה בצבע אחיד אחד), את אטימות המילוי, את קווי המתאר עם המרווח והתוויות שלהם, ואת החיץ (× אורך הצינור החציוני). בפרויקט שממוקם על כדור הארץ, התיבה יכולה גם לקחת את הקרקע שבין הצמתים מ-Mapbox DEM, לאחר שהמבקר מסכים לשלוח את מספרי האריחים של אזור הרשת. ההגדרות האלה נשמרות עם הפרויקט וניתנות להתאמה על ידי תרחיש. התרשים משנה את התצוגה בלבד, לא את הרשת.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ct_box_term",
+                    "value": "התיבה",
+                    "english": "The box"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ct_example_def",
+                    "value": "<p>פתחו את הדוגמה Net1 ובחרו מים, גרפים, קווי מתאר. תרשים קווי המתאר מציג לחץ, והשורה שמתחת למקרא הצבעים מציינת 9 צמתים, 11 צינורות, טווח של פי 2.5 מאורך הצינור החציוני לצדם וקווים כל 5 psi. המשאבה, קישור 9, אינה אחד מ-11 הצינורות. הצמתים שומרים על הצבעים שהיו להם, לפני התרשים ואחרי שהצגת התרשים מנוקה.<\/p>",
+                    "english": "<p>Open the Net1 example, choose Settings, Symbology, Node colors, and under Color nodes by choose Pressure. Then choose Water, Graphs, Contour. The contour plot shows pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. The nodes keep their colors after Show plot is cleared, and the Fill and the contour lines keep their settings for when it is checked again.<\/p>"
+                }
+            }
+        },
+        "lpn_guide_ct_example_def": {
+            "reason": "english_changed",
+            "current_value": "<p>פתחו את הדוגמה Net1 ובחרו מים, גרפים, קווי מתאר. תרשים קווי המתאר מציג לחץ, והשורה שמתחת למקרא הצבעים מציינת 9 צמתים, 11 צינורות, טווח של פי 2.5 מאורך הצינור החציוני לצדם וקווים כל 5 psi. המשאבה, קישור 9, אינה אחד מ-11 הצינורות. הצמתים שומרים על הצבעים שהיו להם, לפני התרשים ואחרי שהצגת התרשים מנוקה.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ct_box_def",
+                    "value": "<p>הצגת התרשים, כשהיא מנוקה, מסתירה את המילוי ואת הקווים ושומרת על צבעי הצמתים. התיבה מחזיקה גם את צביעת צמתים לפי ואת ערכת צבעים, שהן אותן שתי הגדרות כמו בהגדרות, הדמיה, צבעי צמתים, את המילוי (ללא, חלק או פסים, שצובע כל מחלקה בצבע אחיד אחד), את אטימות המילוי, את קווי המתאר עם המרווח והתוויות שלהם, ואת החיץ (× אורך הצינור החציוני). בפרויקט שממוקם על כדור הארץ, התיבה יכולה גם לקחת את הקרקע שבין הצמתים מ-Mapbox DEM, לאחר שהמבקר מסכים לשלוח את מספרי האריחים של אזור הרשת. ההגדרות האלה נשמרות עם הפרויקט וניתנות להתאמה על ידי תרחיש. התרשים משנה את התצוגה בלבד, לא את הרשת.<\/p>",
+                    "english": "<p>The first line of the box states Follows project \"Node colors\" settings, and Node colors is a link that opens Settings at Symbology, Node colors. The plot spreads the node property chosen in Color nodes by, in the Color scheme, both there; the box has no property or scheme of its own, and a change in Settings shows in the plot at once. With No color chosen, a second line says there is nothing to plot, nothing is drawn, and the plot returns when a property is chosen again. Show plot draws or hides the plot and changes nothing else: when it is cleared, the Fill, Show contour lines, Labels, and the other settings keep their values and have no effect, and when it is checked they act as set; the node colors stay either way. The box holds the Fill (None, Smooth, or Bands, which paints each class in one solid color), the Fill opacity, the Buffer (× median pipe length), and Show contour lines, with its Interval and Labels. In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network's area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_rr_what_term",
+                    "value": "מה מחזיק הדוח",
+                    "english": "What the report holds"
                 }
             }
         },
@@ -597,6 +709,54 @@
                     "key": "lpn_menu_help",
                     "value": "עזרה",
                     "english": "Help"
+                }
+            }
+        },
+        "lpn_contour_follows": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_contour_plot",
+                    "value": "קווי מתאר: תרשים",
+                    "english": "Contour plot"
+                },
+                "next_translated": {
+                    "key": "lpn_contour_show",
+                    "value": "הצגת התרשים",
+                    "english": "Show plot"
+                }
+            }
+        },
+        "lpn_contour_none_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_contour_plot",
+                    "value": "קווי מתאר: תרשים",
+                    "english": "Contour plot"
+                },
+                "next_translated": {
+                    "key": "lpn_contour_show",
+                    "value": "הצגת התרשים",
+                    "english": "Show plot"
+                }
+            }
+        },
+        "lpn_contour_lines": {
+            "reason": "english_changed",
+            "current_value": "קווי מתאר",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_contour_opacity",
+                    "value": "אטימות המילוי",
+                    "english": "Fill opacity"
+                },
+                "next_translated": {
+                    "key": "lpn_contour_interval",
+                    "value": "מרווח",
+                    "english": "Interval"
                 }
             }
         },
@@ -1437,6 +1597,22 @@
                 }
             }
         },
+        "lpn_settings_row_contour_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_row_bubbles",
+                    "value": "גרפי סדרת זמן במפה",
+                    "english": "Time series graphs on the map"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_row_contour_fill",
+                    "value": "מילוי קווי מתאר",
+                    "english": "Contour fill"
+                }
+            }
+        },
         "lpn_settings_viscosity": {
             "reason": "missing",
             "current_value": null,
@@ -1564,6 +1740,43 @@
                     "key": "lpn_control_dangling_note",
                     "value": "בקרות אלה קוראות בשם אלמנט שאינו עוד בפרויקט זה, ולכן הן הושמטו: {ids}",
                     "english": "These controls refer to an element that is no longer in this project, so they were ignored: {ids}"
+                }
+            }
+        },
+        "lpn_settings_color_node_field_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_color_ramp",
+                    "value": "ערכת צבעים",
+                    "english": "Color scheme"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_color_credits",
+                    "value": "קרדיטים",
+                    "english": "Credits"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_color_node_field",
+                "english": "Node color",
+                "value": "צבע צומת"
+            }
+        },
+        "lpn_settings_color_ramp_node_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_color_ramp",
+                    "value": "ערכת צבעים",
+                    "english": "Color scheme"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_color_credits",
+                    "value": "קרדיטים",
+                    "english": "Credits"
                 }
             }
         },
@@ -1956,6 +2169,94 @@
                     "value": "⚠ לשסתומי המטרה הכללית האלה יש עקומת אובדן עומד עם נקודה אחת בלבד, ולכן אובדן העומד שלהם נלקח כפרופורציוני לספיקה, דרך אותה נקודה: {ids}",
                     "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
                 }
+            }
+        },
+        "lpn_velocity_warn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pda_deficit_note",
+                    "value": "צמתים שמקבלים פחות מהדרישה שלהם: {n}.",
+                    "english": "Junctions receiving less than their demand: {n}."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_pressures",
+                    "value": "הלחץ הנדרש חייב להיות גדול מהלחץ המזערי. שנו אחד מהם בהגדרות.",
+                    "english": "Required pressure must be greater than Minimum pressure. Change one of them in Settings."
+                }
+            }
+        },
+        "lpn_velocity_warn_steady": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pda_deficit_note",
+                    "value": "צמתים שמקבלים פחות מהדרישה שלהם: {n}.",
+                    "english": "Junctions receiving less than their demand: {n}."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_pressures",
+                    "value": "הלחץ הנדרש חייב להיות גדול מהלחץ המזערי. שנו אחד מהם בהגדרות.",
+                    "english": "Required pressure must be greater than Minimum pressure. Change one of them in Settings."
+                }
+            }
+        },
+        "lpn_velocity_warn_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pda_deficit_note",
+                    "value": "צמתים שמקבלים פחות מהדרישה שלהם: {n}.",
+                    "english": "Junctions receiving less than their demand: {n}."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_pressures",
+                    "value": "הלחץ הנדרש חייב להיות גדול מהלחץ המזערי. שנו אחד מהם בהגדרות.",
+                    "english": "Required pressure must be greater than Minimum pressure. Change one of them in Settings."
+                }
+            }
+        },
+        "lpn_settings_velocity_limit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pda_deficit_note",
+                    "value": "צמתים שמקבלים פחות מהדרישה שלהם: {n}.",
+                    "english": "Junctions receiving less than their demand: {n}."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_pressures",
+                    "value": "הלחץ הנדרש חייב להיות גדול מהלחץ המזערי. שנו אחד מהם בהגדרות.",
+                    "english": "Required pressure must be greater than Minimum pressure. Change one of them in Settings."
+                }
+            },
+            "tip": {
+                "key": "lpn_settings_velocity_limit_tip",
+                "english": "The velocity above which a run reports the fastest pipe and how many other pipes also exceed it. Blank uses the default. Zero turns the warning off."
+            }
+        },
+        "lpn_settings_velocity_limit_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pda_deficit_note",
+                    "value": "צמתים שמקבלים פחות מהדרישה שלהם: {n}.",
+                    "english": "Junctions receiving less than their demand: {n}."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_pressures",
+                    "value": "הלחץ הנדרש חייב להיות גדול מהלחץ המזערי. שנו אחד מהם בהגדרות.",
+                    "english": "Required pressure must be greater than Minimum pressure. Change one of them in Settings."
+                }
+            },
+            "label": {
+                "key": "lpn_settings_velocity_limit",
+                "english": "Velocity warning limit"
             }
         }
     },
