@@ -419,6 +419,240 @@
 				"y": "22.00"
 			},
 			"_initQuality": 0.5
+		},
+		{
+			"id": "PAa",
+			"type": "junction",
+			"x": 115,
+			"y": -20,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "115.00",
+				"y": "-20.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "PAb",
+			"type": "junction",
+			"x": 155,
+			"y": -20,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "155.00",
+				"y": "-20.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "PAj",
+			"type": "junction",
+			"x": 135,
+			"y": -20,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "135.00",
+				"y": "-20.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "PBa",
+			"type": "junction",
+			"x": 115,
+			"y": -35,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "115.00",
+				"y": "-35.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "PBb",
+			"type": "junction",
+			"x": 155,
+			"y": -35,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "155.00",
+				"y": "-35.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "PBj",
+			"type": "junction",
+			"x": 139,
+			"y": -35,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "139.00",
+				"y": "-35.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "VAa",
+			"type": "junction",
+			"x": 115,
+			"y": -50,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "115.00",
+				"y": "-50.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "VAb",
+			"type": "junction",
+			"x": 155,
+			"y": -50,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "155.00",
+				"y": "-50.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "VAj",
+			"type": "junction",
+			"x": 135,
+			"y": -50,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "135.00",
+				"y": "-50.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "VBa",
+			"type": "junction",
+			"x": 115,
+			"y": -65,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "115.00",
+				"y": "-65.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "VBb",
+			"type": "junction",
+			"x": 155,
+			"y": -65,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "155.00",
+				"y": "-65.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "VBj",
+			"type": "junction",
+			"x": 138,
+			"y": -65,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "138.00",
+				"y": "-65.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "PNa",
+			"type": "junction",
+			"x": 115,
+			"y": -80,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "115.00",
+				"y": "-80.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "PNb",
+			"type": "junction",
+			"x": 155,
+			"y": -80,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "155.00",
+				"y": "-80.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "PNj",
+			"type": "junction",
+			"x": 143,
+			"y": -80,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "143.00",
+				"y": "-80.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "VNa",
+			"type": "junction",
+			"x": 115,
+			"y": -95,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "115.00",
+				"y": "-95.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "VNb",
+			"type": "junction",
+			"x": 155,
+			"y": -95,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "155.00",
+				"y": "-95.00"
+			},
+			"_initQuality": 0
+		},
+		{
+			"id": "VNj",
+			"type": "junction",
+			"x": 143,
+			"y": -95,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "143.00",
+				"y": "-95.00"
+			},
+			"_initQuality": 0
 		}
 	],
 	"links": [
@@ -559,6 +793,108 @@
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
+		},
+		{
+			"id": "PA",
+			"type": "pump",
+			"from": "PAa",
+			"to": "PAb",
+			"verts": [],
+			"_diameter": 18,
+			"lenAuto": false,
+			"_k": 0,
+			"curvePoints": [
+				[
+					1500,
+					250
+				]
+			],
+			"curveRef": null,
+			"h0": 101.6,
+			"a": 2836.19,
+			"b": 2,
+			"curveId": "1"
+		},
+		{
+			"id": "PB",
+			"type": "pump",
+			"from": "PBa",
+			"to": "PBb",
+			"verts": [],
+			"_diameter": 18,
+			"lenAuto": false,
+			"_k": 0,
+			"curvePoints": [
+				[
+					1500,
+					250
+				]
+			],
+			"curveRef": null,
+			"h0": 101.6,
+			"a": 2836.19,
+			"b": 2,
+			"curveId": "1"
+		},
+		{
+			"id": "VA",
+			"type": "valve",
+			"from": "VAa",
+			"to": "VAb",
+			"verts": [],
+			"_diameter": 18,
+			"lenAuto": false,
+			"_k": 0,
+			"_setting": 0,
+			"_status": "open",
+			"_valveType": "PRV"
+		},
+		{
+			"id": "VB",
+			"type": "valve",
+			"from": "VBa",
+			"to": "VBb",
+			"verts": [],
+			"_diameter": 18,
+			"lenAuto": false,
+			"_k": 0,
+			"_setting": 0,
+			"_status": "open",
+			"_valveType": "PRV"
+		},
+		{
+			"id": "PN",
+			"type": "pump",
+			"from": "PNa",
+			"to": "PNb",
+			"verts": [],
+			"_diameter": 18,
+			"lenAuto": false,
+			"_k": 0,
+			"curvePoints": [
+				[
+					1500,
+					250
+				]
+			],
+			"curveRef": null,
+			"h0": 101.6,
+			"a": 2836.19,
+			"b": 2,
+			"curveId": "1"
+		},
+		{
+			"id": "VN",
+			"type": "valve",
+			"from": "VNa",
+			"to": "VNb",
+			"verts": [],
+			"_diameter": 18,
+			"lenAuto": false,
+			"_k": 0,
+			"_setting": 0,
+			"_status": "open",
+			"_valveType": "PRV"
 		}
 	],
 	"labels": [

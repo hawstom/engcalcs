@@ -61105,13 +61105,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		k = nodeRadius(n) * s;
 		return { kind: 'node', id: n.id, type: n.type, rank: PICK_KIND_RANK.node, circle: { x: px, y: py, r: k } };
 	}
-	// A pump's or valve's glyph: its silhouette's box, turned with the glyph (place, angle and flip as
+	// A pump's or valve's glyph: its silhouette's pieces (casing and tail, or two triangles) and the box round them, turned with the glyph (place, angle and flip as
 	// positionPumpSymbol() writes them), centred where the casing is, not where the pipe's midpoint is.
 	function pickGlyphItem(l, pl, s, px, py) {
 		var k = pumpSymbolSize(l.type) * s / SYMBOL_VIEWBOX, ink = SYMBOL_INK[l.type], a = pl.angle * Math.PI / 180,
 			ux = Math.cos(a), uy = Math.sin(a), ox = ((ink.x0 + ink.x1) / 2 - SYMBOL_VIEWBOX / 2) * k,
 			oy = ((ink.y0 + ink.y1) / 2 - SYMBOL_VIEWBOX / 2) * k * (pl.flip ? -1 : 1);
-		return { kind: 'link', id: l.id, type: l.type, rank: PICK_KIND_RANK.link, quad: {
+		// The silhouette's own pieces (SYMBOL_SILHOUETTE), turned the same way: a pump's casing and tail, a valve's
+		// two triangles. The quad is only the box round them.
+		function at(lx, ly) {
+			var X = (lx - SYMBOL_VIEWBOX / 2) * k, Y = (ly - SYMBOL_VIEWBOX / 2) * k * (pl.flip ? -1 : 1);
+			return { x: px + X * ux - Y * uy, y: py + X * uy + Y * ux };
+		}
+		function tri(a, b, c) { return { poly: [at(a[0], a[1]), at(b[0], b[1]), at(c[0], c[1])] }; }
+		var c9 = at(9, 13), parts = l.type === 'pump'
+			? [{ circle: { x: c9.x, y: c9.y, r: 6 * k } }, { poly: [at(9, 7), at(22.5, 7), at(22.5, 13), at(9, 13)] }]
+			: [tri([3, 3], [3, 21], [12, 12]), tri([21, 3], [21, 21], [12, 12])];
+		return { kind: 'link', id: l.id, type: l.type, rank: PICK_KIND_RANK.link, parts: parts, quad: {
 			cx: px + ox * ux - oy * uy, cy: py + ox * uy + oy * ux, hw: (ink.x1 - ink.x0) * k / 2, hh: (ink.y1 - ink.y0) * k / 2, ux: ux, uy: uy } };
 	}
 	// A node's distance in client px from a press to its drawn extent (0 on the ink).

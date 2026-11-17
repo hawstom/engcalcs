@@ -50,6 +50,26 @@ same('a point Shape on a dot', pick([dot('A', 0, 0), shape('S1', [{ x: 0, y: 0 }
 same('a closed Shape whose outline passes through a dot',
 	pick([dot('A', 0, 0), shape('S3', [{ x: -20, y: 0 }, { x: 20, y: 0 }, { x: 20, y: 30 }], true)], 0, 0), ['node:A', 'shape:S3']);
 
+console.log('\n--- a pump\'s or valve\'s symbol is a symbol: its drawn pieces, not its box (round 4) ---');
+{
+	// A pump 20 px wide: casing (circle r 6 at 8,10) and tail (rect 8..20 x 4..10); a valve: two triangles.
+	const pump = (id, ox, oy) => ({ kind: 'link', id, type: 'pump', rank: 1,
+		quad: { cx: ox + 10, cy: oy + 10, hw: 10, hh: 6, ux: 1, uy: 0 },
+		parts: [{ circle: { x: ox + 8, y: oy + 10, r: 6 } }, { poly: [{ x: ox + 8, y: oy + 4 }, { x: ox + 20, y: oy + 4 }, { x: ox + 20, y: oy + 10 }, { x: ox + 8, y: oy + 10 }] }] });
+	const valve = (id, ox, oy) => ({ kind: 'link', id, type: 'valve', rank: 1,
+		quad: { cx: ox + 9, cy: oy + 9, hw: 9, hh: 9, ux: 1, uy: 0 },
+		parts: [{ poly: [{ x: ox, y: oy }, { x: ox, y: oy + 18 }, { x: ox + 9, y: oy + 9 }] }, { poly: [{ x: ox + 18, y: oy }, { x: ox + 18, y: oy + 18 }, { x: ox + 9, y: oy + 9 }] }] });
+	same('a junction on the pump\'s casing: the box, the junction first', pick([dot('J', 8, 10), pump('PU', 0, 0)], 8, 10), ['node:J', 'link:PU']);
+	same('a junction on the pump\'s tail end, the dot mostly clear of the tail: the box', pick([dot('J', 22, 7), pump('PU', 0, 0)], 22, 7), ['node:J', 'link:PU']);
+	same('a press on the pump\'s tail finds the junction over its end too', pick([dot('J', 22, 7), pump('PU', 0, 0)], 17, 7), ['link:PU', 'node:J']);
+	same('a junction in the empty corner of the pump\'s box (below the tail, clear of the casing): no box', pick([dot('J', 20, 17), pump('PU', 0, 0)], 20, 17), []);
+	same('a junction only touching the casing: no box', pick([dot('J', 8 + 6 + 4, 10 + 6 + 4), pump('PU', 0, 0)], 18, 20), []);
+	same('a junction over a valve\'s triangle: the box', pick([dot('J', 3, 9), valve('V', 0, 0)], 3, 9), ['node:J', 'link:V']);
+	same('a junction in the valve\'s waist gap, above the apex (empty corner): no box', pick([dot('J', 9, 1), valve('V', 0, 0)], 9, 1), []);
+	same('two glyphs over each other: the box', pick([pump('PA', 0, 0), valve('V', 4, 0)], 8, 9), ['link:PA', 'link:V']);
+	same('a tank under the pump\'s casing: the box', pick([box('node', 'T', 0, 0, 16, 12, 0), pump('PU', 4, 0)], 10, 8), ['node:T', 'link:PU']);
+}
+
 console.log('\n--- no line is a row ---');
 same('an open polyline over a dot is not a row: no box', pick([dot('A', 0, 0), shape('S2', [{ x: -20, y: 0 }, { x: 20, y: 0 }], false)], 0, 0), []);
 same('an open polyline over two coincident dots: the dots only',

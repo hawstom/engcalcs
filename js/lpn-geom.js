@@ -935,7 +935,15 @@ EngCalcs.lpnGeom = (function () {
 	//   3. ORDER: the primary FIRST AND NEVER CUT; then items whose anchor (a circle's, rect's or
 	//      quad's centre) is within `coincident` px of the primary's, then the rest; each by distance
 	//      from the press, then rank, then id in natural order. At most `cap` (6) rows.
-	// opts: reach (6), cap (6), coincident (1), deep (0.4).
+	// opts: reach (6), cap (6), coincident (1), deep (0.4), deepGlyph (0.1).
+	//
+	// **A PUMP'S OR VALVE'S SYMBOL IS A SYMBOL** (Tom, 2026-11-16, phone test: "a pump or valve is
+	// overlapping a node. I specifically requested all symbol overlaps to be included"). Its item
+	// carries `parts`, the convex pieces of its drawn silhouette (a pump's casing and tail, a valve's two
+	// triangles), and an overlap with a glyph is judged piece by piece against `deepGlyph`, 0.1 of the
+	// narrower piece, not 0.4: a pump's tail ends ON its node, so the node's disc lies over only the
+	// tail's tip (0.12 on Net3's pump 10), and that is the overlap he meant. Where a glyph is not
+	// involved the rule is unchanged. The glyph's LINE is never an item.
 	//
 	// "Overlap" is deep: the depth of one into the other is at least `deep` (0.4, and not 0.5 because
 	// Net3's Lake and pump 10, which Tom named as overlapping, share 0.43 of the reservoir's drawn
@@ -953,6 +961,7 @@ EngCalcs.lpnGeom = (function () {
 	// Distance in screen px from a point to an item's drawn extent; 0 on or inside it.
 	function pickExtentDistance(m, px, py) {
 		var q;
+		if (m.parts) { return Math.min.apply(null, m.parts.map(function (p) { return pickPartDist(p, px, py); })); }
 		if (m.circle) { return Math.max(0, Math.hypot(px - m.circle.x, py - m.circle.y) - m.circle.r); }
 		if (m.rect) { return pickRectDist(m.rect, px, py); }
 		if (m.quad) { q = pickQuadLocal(m.quad, px, py); return pickRectDist(pickQuadRect(m.quad), q.x, q.y); }
@@ -1007,7 +1016,93 @@ EngCalcs.lpnGeom = (function () {
 		}
 		return true;
 	}
-	function pickOverlaps(a, b, deep) {
+
+	// A GLYPH (a pump's or valve's drawn symbol) carries `parts`: the convex pieces its silhouette is
+	// made of, each {circle: {x, y, r}} or {poly: [{x, y}]} (client px, in order), beside the bounding
+	// `quad` that stands for it wherever a box is enough (its anchor, a Shape's outline). A pump is its
+	// casing (a circle) and its tail (a rectangle), a valve is two triangles, so the empty corners of
+	// the glyph's bounding box are not part of what a press or an overlap sees.
+	function pickPolyInside(poly, px, py) {
+		var i, n = poly.length, sign = 0, c, a, b;
+		for (i = 0; i < n; i++) {
+			a = poly[i]; b = poly[(i + 1) % n];
+			c = (b.x - a.x) * (py - a.y) - (b.y - a.y) * (px - a.x);
+			if (c !== 0) { if (sign && (c > 0) !== (sign > 0)) { return false; } sign = c; }
+		}
+		return true;
+	}
+	function pickPolyEdgeDist(poly, px, py) { return pointToPolylineDistance(poly.concat([poly[0]]), px, py); }
+	function pickPartDist(p, px, py) {
+		if (p.circle) { return Math.max(0, Math.hypot(px - p.circle.x, py - p.circle.y) - p.circle.r); }
+		return pickPolyInside(p.poly, px, py) ? 0 : pickPolyEdgeDist(p.poly, px, py);
+	}
+	// The narrowest the piece is across: a circle's diameter, a polygon's least width over its edge normals.
+	function pickPartWidth(p) {
+		var best = Infinity, i, n, a, b, len, k, lo, hi, v;
+		if (p.circle) { return 2 * p.circle.r; }
+		n = p.poly.length;
+		for (i = 0; i < n; i++) {
+			a = p.poly[i]; b = p.poly[(i + 1) % n];
+			len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+			lo = Infinity; hi = -Infinity;
+			for (k = 0; k < n; k++) {
+				v = (-(b.y - a.y) * p.poly[k].x + (b.x - a.x) * p.poly[k].y) / len;
+				lo = Math.min(lo, v); hi = Math.max(hi, v);
+			}
+			best = Math.min(best, hi - lo);
+		}
+		return best;
+	}
+	function pickPolyOf(m) {
+		if (m.poly) { return m.poly; }
+		if (m.rect || m.quad) { return pickCorners(m); }
+		return null;
+	}
+	// How deep one convex piece sits in another, in px (0 when apart).
+	function pickPartDepth(a, b) {
+		var c, o, d, pts, depth, i, k, axes = [], len, lo, hi, v, ca, cb;
+		if (a.circle && b.circle) { return Math.max(0, a.circle.r + b.circle.r - Math.hypot(a.circle.x - b.circle.x, a.circle.y - b.circle.y)); }
+		if (a.circle || b.circle) {
+			c = a.circle ? a : b; o = a.circle ? b : a;
+			d = pickPartDist(o, c.circle.x, c.circle.y);
+			if (d > 0) { return Math.max(0, c.circle.r - d); }
+			return c.circle.r + pickPolyEdgeDist(o.poly, c.circle.x, c.circle.y);
+		}
+		ca = a.poly; cb = b.poly;
+		[ca, cb].forEach(function (poly) {
+			for (i = 0; i < poly.length; i++) { axes.push({ x: -(poly[(i + 1) % poly.length].y - poly[i].y), y: poly[(i + 1) % poly.length].x - poly[i].x }); }
+		});
+		depth = Infinity;
+		for (k = 0; k < axes.length; k++) {
+			len = Math.hypot(axes[k].x, axes[k].y) || 1; lo = [Infinity, Infinity]; hi = [-Infinity, -Infinity];
+			[ca, cb].forEach(function (poly, j) {
+				poly.forEach(function (p) {
+					v = (p.x * axes[k].x + p.y * axes[k].y) / len;
+					if (v < lo[j]) { lo[j] = v; } if (v > hi[j]) { hi[j] = v; }
+				});
+			});
+			depth = Math.min(depth, Math.min(hi[0], hi[1]) - Math.max(lo[0], lo[1]));
+			if (depth <= 0) { return 0; }
+		}
+		return depth;
+	}
+	function pickPartsOf(m) {
+		if (m.parts) { return m.parts; }
+		if (m.circle) { return [{ circle: m.circle }]; }
+		return [{ poly: pickPolyOf(m) }];
+	}
+	// Two symbols one of which is a glyph: they overlap when ANY piece of one is `deepGlyph` of the
+	// narrower piece deep in any piece of the other.
+	function pickGlyphOverlaps(a, b, deepGlyph) {
+		var pa = pickPartsOf(a), pb = pickPartsOf(b), i, j;
+		for (i = 0; i < pa.length; i++) {
+			for (j = 0; j < pb.length; j++) {
+				if (pickPartDepth(pa[i], pb[j]) >= deepGlyph * Math.min(pickPartWidth(pa[i]), pickPartWidth(pb[j])) && pickPartDepth(pa[i], pb[j]) > 0) { return true; }
+			}
+		}
+		return false;
+	}
+	function pickOverlaps(a, b, deep, deepGlyph) {
 		var s, o2, c, j, pts, rc, loc, shrunk, k, qr;
 		if (a.outline && b.outline) { return false; }   // two Shapes are not a symbol under the click
 		if (a.outline || b.outline) {
@@ -1025,6 +1120,7 @@ EngCalcs.lpnGeom = (function () {
 			for (j = 0; j + 1 < pts.length; j++) { if (pickSegInRect(pts[j], pts[j + 1], shrunk)) { return true; } }
 			return false;
 		}
+		if ((a.parts || b.parts)) { return pickGlyphOverlaps(a, b, deepGlyph); }
 		if (a.circle && b.circle) {
 			return Math.hypot(a.circle.x - b.circle.x, a.circle.y - b.circle.y) <= a.circle.r + b.circle.r - 2 * deep * Math.min(a.circle.r, b.circle.r);
 		}
@@ -1041,7 +1137,7 @@ EngCalcs.lpnGeom = (function () {
 	}
 	function pickSymbols(items, x, y, opts) {
 		var o = opts || {}, reach = o.reach === undefined ? 6 : o.reach, cap = o.cap === undefined ? 6 : o.cap,
-			coin = o.coincident === undefined ? 1 : o.coincident, deep = o.deep === undefined ? 0.4 : o.deep,
+			coin = o.coincident === undefined ? 1 : o.coincident, deep = o.deep === undefined ? 0.4 : o.deep, deepGlyph = o.deepGlyph === undefined ? 0.1 : o.deepGlyph,
 			primary = null, list = [], i, it, d, pa;
 		function natural(a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); }
 		function order(a, b) {
@@ -1058,7 +1154,7 @@ EngCalcs.lpnGeom = (function () {
 		pa = pickAnchor(primary.m);
 		for (i = 0; i < items.length; i++) {
 			it = items[i];
-			if (it === primary.m || !pickOverlaps(primary.m, it, deep)) { continue; }
+			if (it === primary.m || !pickOverlaps(primary.m, it, deep, deepGlyph)) { continue; }
 			d = pickExtentDistance(it, x, y);
 			if (d <= reach) {
 				list.push({ m: it, d: d, coin: (pa && pickAnchor(it) && Math.hypot(pa.x - pickAnchor(it).x, pa.y - pickAnchor(it).y) <= coin) ? 1 : 0 });

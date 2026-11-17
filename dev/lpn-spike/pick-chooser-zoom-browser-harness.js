@@ -9,7 +9,7 @@
 //      out (the network drawn 120 px wide): the number of boxes and the largest row count are PRINTED,
 //      and the checks are that every click without a box selects the node it is on, that every box
 //      lists two to six rows with no pipe, and that the opening view opens only the few where a tank
-//      or pump glyph lies over a junction;
+//      or pump glyph lies over a junction (a pump's or valve's symbol counts like any node's: Net3's pumps 10 and 335 each lie over a junction);
 //   B. phone, 390 x 844 touch, 8 notches out: the same with a finger.
 // The cases built by hand are in pick-chooser-browser-harness.js.
 //
@@ -170,7 +170,7 @@ async function main() {
 			ok('...every box lists two to six rows and no pipe (Net3 has no zero-length pipe)', r.shortBoxes === 0 && r.maxRows <= 6 && r.pipeRows === 0, JSON.stringify(r));
 			if (notches === 0) { ok('Tank 3 over Junction 20 is a box of those two and no pipe', !!r.box20 && r.box20.length === 2 && r.box20.some((x) => /Tank 3/.test(x)) && r.box20.some((x) => /Junction 20/.test(x)), JSON.stringify(r.box20)); }
 			ok('...and every click without a box selects the node it is on', r.quietWrong === 0, JSON.stringify(r));
-			if (notches === 0) { ok('...at the opening view only the places where two symbols are drawn touching open one (measured 4 of 97; at most 6)', r.boxes <= 6, JSON.stringify(r)); }
+			if (notches === 0) { ok('...at the opening view only the places where two symbols are drawn touching open one (measured 7 of 97: three tank or pump over junction; at most 8)', r.boxes <= 8, JSON.stringify(r)); }
 		}
 		await D.page.close();
 

@@ -25,6 +25,9 @@
 //      them give none; an open Shape line crossing a pipe gives none; a junction on a closed Shape's
 //      outline gives the junction and the Shape. A tap on a tank's ink beside a nearer junction centre
 //      selects the tank.
+//   K. Round 4: a pump's or valve's symbol is a symbol. A junction over a pump's middle or tail end, or a
+//      valve's middle or edge, opens a box of the two, with a mouse and a finger; a junction 28 px clear
+//      opens none; the pump's line away from its symbol opens none.
 //   E. Review fixes: a finger's tap near the right and bottom edges opens the box with no row under the
 //      press and no row answering the lift's compatibility click; a pipe a finger taps within reach of
 //      the pile is not a row; a right-click or a long press that dismisses the box opens no
@@ -73,12 +76,12 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	const project = fs.readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'fixtures', 'pick-chooser.lwn'), 'utf8');
 	const errors = [];
-	const open = async (S) => {
+	const open = async (S, text) => {
 		S.page.on('pageerror', (e) => errors.push(String(e && e.message)));
 		await S.page.addInitScript(() => { window.EC_DEFAULT_DOCKS = true; });
 		await S.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (r) => r.abort());
 		await S.goto('Looped-Network.php?ec_nolog=1');
-		await S.page.evaluate((t) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', t); localStorage.setItem('lpn_hovercard', 'off'); }, project);
+		await S.page.evaluate((t) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', t); localStorage.setItem('lpn_hovercard', 'off'); }, text || project);
 		await S.reload();
 		await S.answerTrainingPanel().catch(() => {});
 		await S.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
@@ -501,6 +504,51 @@ async function main() {
 		ok('...after the lift the rows answer touches again', !!geo && geo.firstHit);
 		ok('...and the tap chose nothing', (await t.chooserOpen()) && J(await t.selected()) === J(selBefore), J(await t.selected()));
 		await T.page.close();
+
+
+		// =========================================================== round 4: a pump's or valve's symbol is a symbol
+		console.log('\nK. Round 4 (Tom, 2026-11-16, phone test): a pump or valve SYMBOL over a junction opens the box, a mouse and a finger');
+		const proj4 = JSON.parse(project); proj4.view = { cx: 135, cy: -57, s: 3.5 };
+		const cases4 = [['PA', 'pump', 'Pump PA', 'Junction PAj', 'a junction at the middle of a pump'], ['PB', 'pump', 'Pump PB', 'Junction PBj', 'a junction over the tail end of a pump'],
+			['VA', 'valve', 'Valve VA', 'Junction VAj', 'a junction at the middle of a valve'], ['VB', 'valve', 'Valve VB', 'Junction VBj', 'a junction over the edge of a valve']];
+		for (const touch of [false, true]) {
+			const K = await Session.open(browser, NAME + '-k' + (touch ? 'p' : 'd'), touch ? { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true } : { viewport: { width: 1400, height: 900 } });
+			await open(K, JSON.stringify(proj4));
+			const kt = tools(K), kcdp = touch ? await K.page.context().newCDPSession(K.page) : null;
+			const press = async (p) => {
+				if (touch) {
+					await kcdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: p.x, y: p.y, id: 1 }] });
+					await sleep(60);
+					await kcdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+					await K.settle(600);
+				} else { await kt.click(p); }
+			};
+			const who = touch ? 'a tap' : 'a click';
+			for (const [lid, typ, linkRow, nodeRow, what] of cases4) {
+				const jc = await kt.centre('#lpn_canvas [data-node="' + lid + 'j"]');
+				await press(jc);
+				ok(who + ' on ' + what + ' opens a box of the junction and the ' + typ, J((await kt.rows()).slice().sort()) === J([linkRow, nodeRow].sort()), J(await kt.rows()));
+				ok('...with the junction first (what a plain ' + (touch ? 'tap' : 'click') + ' selects) and nothing selected yet', (await kt.rows())[0] === nodeRow && (await kt.selected()).length === 0, J([await kt.rows(), await kt.selected()]));
+				const lr = await kt.rowBtn(linkRow), lb = await lr.boundingBox();
+				await press({ x: lb.x + lb.width / 2, y: lb.y + lb.height / 2 });
+				ok('...and choosing the ' + typ + ' selects it, which that ' + (touch ? 'tap' : 'click') + ' could not reach before', J(await kt.selected()) === J(['link:' + lid]), J(await kt.selected()));
+				await kt.closeProps();
+				await press({ x: touch ? 195 : 700, y: touch ? 800 : 880 });
+			}
+			// Not an overlap: a junction 8 map units (28 px) from the symbol is clear of it.
+			for (const [lid, typ] of [['PN', 'pump'], ['VN', 'valve']]) {
+				const jn = await kt.centre('#lpn_canvas [data-node="' + lid + 'j"]');
+				await press(jn);
+				ok(who + ' on a junction clear of a ' + typ + ' symbol opens no box and selects the junction', !(await kt.chooserOpen()) && J(await kt.selected()) === J(['node:' + lid + 'j']), J([await kt.rows(), await kt.selected()]));
+				await kt.closeProps();
+				await press({ x: touch ? 195 : 700, y: touch ? 800 : 880 });
+			}
+			// The link's LINE is not a symbol: the line well clear of the symbol selects the pump, no box.
+			const ga = await K.page.evaluate(() => { const r = document.querySelector('#lpn_canvas path.lpn-link-symbol-hit[data-link="PA"]').getBoundingClientRect(), n = document.querySelector('#lpn_canvas circle.lpn-node[data-node="PAa"]').getBoundingClientRect(); return { x: (r.left + n.right) / 2 - 6, y: r.top + r.height / 2 }; });
+			await press({ x: ga.x - (touch ? 0 : 0), y: ga.y });
+			ok(who + ' on the pump\'s line, away from its symbol, opens no box', !(await kt.chooserOpen()), J([ga, await kt.rows(), await kt.selected()]));
+			await K.page.close();
+		}
 
 		ok('no page error', errors.length === 0, errors.join(' | '));
 	} finally {
