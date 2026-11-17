@@ -70,7 +70,7 @@ async function main() {
 	}
 	const browser = await chromium.launch({ executablePath });
 	try {
-		const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 } });
+		let a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 } });
 		await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 		const P = (fn, arg) => a.page.evaluate(fn, arg);
 		const dismiss = () => P(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
@@ -267,6 +267,82 @@ async function main() {
 			await a.settle(300);
 			const r2 = await rows();
 			ok('...and Move to top then acts on the rule that was selected', r2.length === now.length && r2[0] === now[now.length - 1], JSON.stringify([now.slice(-1), r2.slice(0, 1)]));
+		}
+		// ---- 9. a comment is a row of its own (Task 859, Tom 2026-11-16): Net3 ---------------------------------------------------------
+		console.log('\n--- comment rows (Net3) ---');
+		{
+			// a page of its own, on Net3 (the first one was opened on Net1)
+			await a.context.close().catch(() => {});
+			a = await Session.open(browser, NAME + '-net3', { viewport: { width: 1400, height: 900 } });
+			await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+			await a.goto('Looped-Network.php');
+			await a.answerTrainingPanel().catch(() => {});
+			await dismiss();
+			await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
+			await a.settle(2500);
+			const LAKE = 'Lake source operates only part of the day';
+			const kind = () => P(() => Array.prototype.map.call(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry'),
+				(e) => e.classList.contains('lpn-lib-comment-entry') ? 'C:' + e.querySelector('textarea').value.replace(/\s+/g, ' ').slice(0, 24) : 'k'));
+			await openLib('controls');
+			let k0 = await kind();
+			ok('Net3 Controls lists a comment row, two controls, a comment row, four controls', k0.length === 8 && k0.map((x) => x[0]).join('') === 'CkkCkkkk' && k0[0] === 'C:' + LAKE.slice(0, 24), JSON.stringify(k0));
+			ok('...the comment rows carry the Comment field and a Delete, and the controls carry no description above them',
+				await P(() => Array.prototype.every.call(document.querySelectorAll('#lpn_libbox_content .lpn-lib-comment-entry'), (e) => e.querySelector('.lpn-lib-del') && e.querySelector('input[type=text]') === null)));
+			// select the second control and move it up: the comment rows are where they were
+			await a.page.locator('#lpn_libbox_content .lpn-lib-entry').nth(2).click({ position: { x: 4, y: 4 } });
+			const before = await rows();
+			await a.page.locator('#lpn_lib_move_up').click();
+			await a.settle(300);
+			const after = await rows(), k1 = await kind();
+			ok('Move up on a control swaps it with the control above, and both comment rows stay where they were',
+				k1.join() === k0.join() && after[1] === before[2] && after[2] === before[1] && after[0] === before[0] && after[3] === before[3], JSON.stringify([before.slice(0, 4), after.slice(0, 4)]));
+			await a.page.keyboard.press('Control+z');
+			await a.settle(300);
+			ok('...and one Ctrl+Z puts it back', JSON.stringify(await rows()) === JSON.stringify(before));
+			// a comment row selects and moves on its own
+			await a.page.locator('#lpn_libbox_content .lpn-lib-entry').nth(0).click({ position: { x: 4, y: 4 } });
+			await a.page.locator('#lpn_lib_move_down').click();
+			await a.settle(300);
+			const k2 = await kind();
+			ok('a comment row moves down on its own, past the control below it', k2[0] === 'k' && k2[1] === k0[0], JSON.stringify(k2));
+			await a.page.keyboard.press('Control+z');
+			await a.settle(300);
+			// edit a comment, close and reopen the box: it is the stored text
+			const ta = a.page.locator('#lpn_libbox_content .lpn-lib-comment-entry').nth(0).locator('textarea');
+			await ta.fill('Lake source runs part of the day');
+			await ta.blur();
+			await a.settle(300);
+			await a.page.locator('#lpn_libbox_content .lpn-lib-entry').nth(1).click({ position: { x: 4, y: 4 } });
+			await a.settle(200);
+			await openLib('rules');
+			await openLib('controls');
+			k0 = await kind();
+			ok('an edited comment is kept when the box is built again', k0[0] === 'C:Lake source runs part of', JSON.stringify(k0));
+			// delete the second comment row
+			await a.page.locator('#lpn_libbox_content .lpn-lib-comment-entry').nth(1).locator('.lpn-lib-del').click();
+			await a.settle(300);
+			let k3 = await kind();
+			ok('Delete on a comment row removes that row and nothing else', k3.length === 7 && k3.filter((x) => x[0] === 'C').length === 1, JSON.stringify(k3));
+			// add one
+			await a.page.getByRole('button', { name: await a.lang('lpn_library_comment_add') }).click();
+			await a.settle(300);
+			k3 = await kind();
+			ok('Add a comment puts an empty comment row last', k3.length === 8 && k3[7] === 'C:', JSON.stringify(k3));
+			// emptying a comment deletes it
+			const last = a.page.locator('#lpn_libbox_content .lpn-lib-comment-entry').last().locator('textarea');
+			await last.fill('temporary');
+			await last.blur();
+			await last.fill('');
+			await last.blur();
+			await a.settle(600);
+			k3 = await kind();
+			ok('a comment emptied is deleted, not kept as an empty line', k3.length === 7, JSON.stringify(k3));
+			// Rules: a comment is a row of its own as well
+			await openLib('rules');
+			await a.page.getByRole('button', { name: await a.lang('lpn_library_comment_add') }).click();
+			await a.settle(300);
+			const rk = await P(() => Array.prototype.map.call(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry'), (e) => e.classList.contains('lpn-lib-comment-entry') ? 'C' : 'r').join(''));
+			ok('Rules: Add a comment adds a comment row (a comment is a row there too)', /C$/.test(rk), rk);
 		}
 		const alive = await P(() => !!document.getElementById('lpn_library_box'));
 		ok('the page is still alive', alive);

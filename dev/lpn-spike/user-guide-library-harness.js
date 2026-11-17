@@ -11,7 +11,8 @@
 //      use is not deleted, Undo reverses an edit, an edit made in a scenario is the same in Base, a
 //      control that names an inactive asset is named in its section, and File, Import, Import
 //      libraries is where the chapter sends the reader.
-//   5. A page in another language renders the same entry.
+//   5. A page in another language renders the same entry; the Controls paragraph marks its two interface labels in bold, and
+//      a bold label renders inside a right-to-left (Arabic) page.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -113,6 +114,15 @@ async function main() {
 		ok('...and the table of what each section holds, one row for each of the six sections, in the order of the box\'s list',
 			!!en && en.tables.length === 1 && en.tables[0].length === 6 && JSON.stringify(en.tables[0].map((r) => r[0])) === JSON.stringify(await Promise.all(['lpn_library_patterns', 'lpn_library_curves', 'lpn_library_pipetypes', 'lpn_library_fittings', 'lpn_library_controls', 'lpn_library_rules'].map(T))), en && JSON.stringify(en.tables[0].map((r) => r[0])));
 		ok('a search for "Table 3.3" shows the Libraries entry', await searchFinds(a, 'lpn_library_box', 'Table 3.3'));
+		// Interface labels in the manual are bold, not quoted (Tom, 2026-11-16, baby step: the Controls paragraph first).
+		const boldOf = (pg) => pg.evaluate(() => {
+			const e = document.getElementById('lpn_guide_b_lpn_library_box');
+			return Array.from(e.querySelectorAll('strong')).map((x) => ({ text: x.textContent, weight: +getComputedStyle(x).fontWeight, plainWeight: +getComputedStyle(x.parentNode).fontWeight }));
+		});
+		const bold = await boldOf(P);
+		ok('the Controls paragraph marks "Add a control" and "Total run time" in bold, each a single span, in the language file\'s words',
+			JSON.stringify(bold.map((x) => x.text)) === JSON.stringify([await T('lpn_library_control_add'), await T('lpn_time_duration')]) && bold.every((x) => x.weight >= 600 && x.weight > x.plainWeight), JSON.stringify(bold));
+		ok('...and the entry no longer quotes either label', !/"(Add a control|Total run time)"/.test(en.text), en.text.slice(0, 0));
 		await P.keyboard.press('Escape');
 		await settle(300);
 
@@ -299,6 +309,31 @@ async function main() {
 		ok('...titled by the Spanish box title', !!es && es.title.trim() === await b.lang('lpn_library_menu'), es && es.title);
 		ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.context.close().catch(() => {});
+
+		// ---- 8. bold inside a right-to-left page --------------------------------------------------
+		console.log('\n8. A bold label in an entry on a right-to-left page (Arabic)');
+		const r = await Session.open(browser, NAME + '-ar', { locale: 'ar', viewport: { width: 1400, height: 900 } });
+		await r.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+		await r.goto('Looped-Network.php?lang=ar');
+		await r.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await r.openExampleCard(await r.lang('lpn_ex_net1_title'));
+		await r.settle(1200);
+		await openGuide(r);
+		// The Arabic sentence has not been retranslated, so the English one is put into the Arabic entry as it is, beside the Arabic one.
+		const rtl = await r.page.evaluate((html) => {
+			const e = document.getElementById('lpn_guide_b_lpn_library_box');
+			const p = document.createElement('p');
+			p.innerHTML = html;
+			e.appendChild(p);
+			const st = Array.from(p.querySelectorAll('strong')), er = e.getBoundingClientRect(), bad = [];
+			st.forEach((x) => { const q = x.getBoundingClientRect(); if (q.width <= 0 || q.left < er.left - 1 || q.right > er.right + 1) { bad.push(x.textContent); } });
+			const out = { dir: getComputedStyle(e).direction, n: st.length, weights: st.map((x) => +getComputedStyle(x).fontWeight), bad: bad, scroll: document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1 };
+			p.remove();
+			return out;
+		}, enString('lpn_guide_lib_ctl_def'));
+		ok('the Arabic entry is right to left and a bold label in it is bold, inside the entry, with no sideways scroll', rtl.dir === 'rtl' && rtl.n === 2 && rtl.weights.every((w) => w >= 600) && rtl.bad.length === 0 && rtl.scroll, JSON.stringify(rtl));
+		ok('no page errors (Arabic)', r.errors.length === 0, r.errors.slice(0, 2).join(' | '));
+		await r.context.close().catch(() => {});
 	} catch (e) {
 		console.error(e && e.stack || e);
 		ok('the harness ran to the end', false, String(e && e.message));
