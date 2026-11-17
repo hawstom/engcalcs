@@ -414,11 +414,6 @@ Help for translators with one string at a time, where the English of that one st
 - English: Zoom to fit
 - Plain: Zoom in or out until the whole network fits in the window, to see everything at once.
 
-### lpn_new_text
-
-- English: Text
-- Plain: Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words
-
 ### lpn_examples_open
 
 - English: Open
