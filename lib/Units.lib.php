@@ -125,7 +125,7 @@ $ec_unit_families = Array(
     // (US utilities report storage in gallons, and million gallons for a large tank; 'volume' opens
     // on cubic feet for the drain-time and seepage pages). Results only: a typed Minimum volume
     // stays in the Length unit cubed, as EPANET's file states it.
-    'volume_tank'      => Array('gal', 'mgal', 'ft3', 'acft', 'm3', 'l', 'ml'),
+    'volume_tank'      => Array('gal', 'mgal', 'ft3', 'acft', 'm3', 'l', 'megaliter'),
     'unit_discharge'   => Array('m2ps', 'ft2ps'),
     'application_rate' => Array('mmph', 'inph'),
     'power'            => Array('kw', 'mw', 'hp'),
@@ -375,7 +375,7 @@ $ec_units['acft']=0.00081071319378991241;       // 1/(43560*0.3048^3)
 $ec_units['gal']=264.17205235814842;            // 1000/3.785411784 -- US gallon, exact definition
 $ec_units['mgal']=0.00026417205235814842;       // million US gallons
 $ec_units['l']=1000;                            // exact
-$ec_units['ml']=0.001;                          // megalitre, 1000 m3 -- exact
+$ec_units['megaliter']=0.001;                          // megalitre, 1000 m3 -- exact
 
 $ec_units['mh2o']=1;
 $ec_units['mmh2o']=1000;

@@ -9289,7 +9289,7 @@ var EngCalcs = EngCalcs || {};
 		lpn_u_gradient: { gradePercent: 2, grade: 4 },
 		// A tank's Available volume (a results column; it has no label row). Whole gallons and litres,
 		// the unit's own size for the rest, so a million-gallon figure is not printed to the cent.
-		lpn_u_volume: { gal: 0, mgal: 3, ft3: 0, acft: 2, m3: 1, l: 0, ml: 3 }
+		lpn_u_volume: { gal: 0, mgal: 3, ft3: 0, acft: 2, m3: 1, l: 0, megaliter: 3 }
 	};
 	// **THE GUESS FROM THE FACTOR, for a unit the table above does not list** (Tom's first half of
 	// R-328). A typical magnitude of each quantity in SI, times the unit's own factor, is what the
@@ -9297,13 +9297,12 @@ var EngCalcs = EngCalcs || {};
 	// 0.01 m3/s flow reads 0.19 in imperial MGD (3 places) and 36 in m3/h (1 place).
 	var LPN_LABEL_TYPICAL_SI = {
 		lpn_u_flow: 0.01, lpn_u_length: 100, lpn_u_diameter: 0.2, lpn_u_elevhead: 30,
-		lpn_u_pressure: 40, lpn_u_velocity: 1, lpn_u_gradient: 0.005, lpn_u_volume: 500
+		lpn_u_pressure: 40, lpn_u_velocity: 1, lpn_u_gradient: 0.005
 	};
 	// **WHEN NO UNIT IS SHOWING YET** -- the selects are not on the page, which happens only outside a
 	// browser -- a count is the US preset's, the same US a page with no Accept-Language opens on.
 	var LPN_LABEL_UNIT_US = { lpn_u_flow: 'gpm', lpn_u_length: 'ft', lpn_u_diameter: 'in',
-		lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_velocity: 'ftps', lpn_u_gradient: 'gradePercent',
-		lpn_u_volume: 'gal' };
+		lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_velocity: 'ftps', lpn_u_gradient: 'gradePercent' };
 	function labelDecimalsForUnit(sel, key) {
 		var row = LPN_UNIT_DECIMALS[sel] || {}, f, typ = LPN_LABEL_TYPICAL_SI[sel], d;
 		if (!key) { key = LPN_LABEL_UNIT_US[sel]; }
@@ -30476,7 +30475,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						get: function (n) { return effective(n, 'tankDiameter'); },
 						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
 					// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** (audit 2026-11). The volume is in the
-					// Length unit cubed, so its heading names that, as the Available volume column does.
+					// Length unit cubed, so its heading names that; the Available volume column beside it
+					// is a result and follows the Volume selector.
 					(function () {
 						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume',
 							get: function (n) { return effective(n, 'minVolume'); },
@@ -61656,6 +61656,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// matched branch would leave one document's unknown unit refusing to solve the next one.
 		unresolvedUnits = {};
 		if (!units) { return false; }
+		// A project saved before the Volume selector existed names none: take the one that goes with
+		// its Length unit (feet: gallons; metres: cubic metres), as an .inp import does, never whatever
+		// the last project left showing.
+		if (!units.lpn_u_volume && units.lpn_u_length) {
+			units.lpn_u_volume = units.lpn_u_length === 'm' ? 'm3' : (/ft/.test(units.lpn_u_length) ? 'gal' : undefined);
+			if (!units.lpn_u_volume) { delete units.lpn_u_volume; }
+		}
 		var changed = false;
 		LPN_UNIT_SELECTS.forEach(function (name) {
 			var want = units[name], sel = unitEl(name), i;
@@ -76024,8 +76031,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				function () { return effective(n, 'tankDiameter'); },
 				function (v) { setProp(n, 'tankDiameter', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
-			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is in the Length unit cubed, as the
-			// Available volume below it is; blank is EPANET's 0, "use the diameter".
+			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is a typed file number in the Length
+			// unit cubed, so no selector converts it (Available volume below it follows the Volume
+			// selector); blank is EPANET's 0, "use the diameter".
 			numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankMinVolumeUnitText() + ')',
 				effective(n, 'minVolume'),
 				function (v) { setProp(n, 'minVolume', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
@@ -76064,7 +76072,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
 				colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
 			readonlyField(fields, (pc.lpn_result_tank_volume || 'Available volume') + ' (' + tankVolumeUnitText() + ')',
-				colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
+				colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip,
+				labelDecimalsForUnit('lpn_u_volume', unitKey('lpn_u_volume')));
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return effective(n, 'elev'); },

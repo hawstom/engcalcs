@@ -96,7 +96,7 @@ $expected = array(
     // volume
     'm3' => 1.0, 'ft3' => 1 / pow($FT, 3), 'acft' => 1 / ($ACRE * $FT),
     // a tank's volume (Task 857): the US gallon, a million of them, the litre and the megalitre
-    'gal' => 1 / $GAL, 'mgal' => 1 / (1e6 * $GAL), 'l' => 1000.0, 'ml' => 0.001,
+    'gal' => 1 / $GAL, 'mgal' => 1 / (1e6 * $GAL), 'l' => 1000.0, 'megaliter' => 0.001,
     // head and pressure -- all six from 1 m H2O = 1000*G Pa
     'mh2o' => 1.0, 'mmh2o' => 1000.0,
     'fth2o' => 1 / $FT, 'inh2o' => 1 / $IN,

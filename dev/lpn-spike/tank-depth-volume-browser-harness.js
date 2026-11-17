@@ -233,8 +233,8 @@ async function main() {
 		// Independent constants, typed here from the definitions (1 ft3 = 28.316846592 L; 1 US gal = 3.785411784 L),
 		// NOT read from the suite's factor table.
 		const perFt3 = { gal: 28.316846592 / 3.785411784, mgal: 28.316846592 / 3.785411784 / 1e6, ft3: 1,
-			acft: 1 / 43560, m3: 0.028316846592, l: 28.316846592, ml: 28.316846592 / 1e6 };
-		const mark = { gal: 'gal', mgal: 'MG', ft3: 'ft^3', acft: 'ac-ft', m3: 'm^3', l: 'L', ml: 'ML' };
+			acft: 1 / 43560, m3: 0.028316846592, l: 28.316846592, megaliter: 28.316846592 / 1e6 };
+		const mark = { gal: 'gal', mgal: 'MG', ft3: 'ft^3', acft: 'ac-ft', m3: 'm^3', l: 'L', megaliter: 'ML' };
 		for (const u of Object.keys(perFt3)) {
 			await setVol(a, u);
 			const row = (await table(a))[0];

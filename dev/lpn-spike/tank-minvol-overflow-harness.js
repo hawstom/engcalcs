@@ -261,8 +261,32 @@ console.log('\n--- 7. the Volume selector (Task 857): results only, saved with t
 	L.applyUnitSelections(old);
 	ok('an old project opens on the preset default (US: gallons)', L.unitKey('lpn_u_volume') === 'gal', L.unitKey('lpn_u_volume'));
 	setUnitSet('si');
+	old.lpn_u_length = 'm'; delete old.lpn_u_volume;
 	L.applyUnitSelections(old);
 	ok('...and SI: cubic metres', L.unitKey('lpn_u_volume') === 'm3', L.unitKey('lpn_u_volume'));
+	// The coordinator's fix 1: no stored volume unit falls back from the stored Length unit, never
+	// from what the last project left showing. Both orders.
+	setUnitSet('us');
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_volume: 'l' });
+	L.applyUnitSelections({ lpn_u_length: 'm', lpn_u_diameter: 'mm' });
+	ok('an SI project with no volume unit, opened after another unit was showing: cubic metres', L.unitKey('lpn_u_volume') === 'm3', L.unitKey('lpn_u_volume'));
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in' });
+	ok('...and a US one opened after that: gallons', L.unitKey('lpn_u_volume') === 'gal', L.unitKey('lpn_u_volume'));
+	L.applyUnitSelections({ lpn_u_length: 'm', lpn_u_volume: 'ft3' });
+	ok('a project that states its volume unit keeps it', L.unitKey('lpn_u_volume') === 'ft3');
+	// The coordinator's fix 3: Properties and the Tanks column print the same decimals.
+	open(TXT);
+	['gal', 'mgal', 'acft', 'm3', 'megaliter'].forEach((u) => {
+		sel(u);
+		popup();
+		const row = labelled(/^Available volume/);
+		const span = row && (row.children || []).filter((c) => c._tag === 'span').pop();
+		const col = L.tableCols('tanks').filter((c) => c.key === 'volume')[0];
+		const d = col.dec();
+		const shown = span && span.textContent;
+		const decs = shown && shown.indexOf('.') >= 0 ? shown.length - shown.indexOf('.') - 1 : 0;
+		ok(u + ': Properties prints ' + d + ' decimals like the Tanks column (' + shown + ')', !!row && decs === d, shown);
+	});
 	setUnitSet('us');
 }
 
