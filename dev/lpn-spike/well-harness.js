@@ -448,7 +448,7 @@ console.log('\n--- 10. the Well button ---');
 	const lang = require('fs').readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
 	ok('the Well tip lists its five members and the Well with tank tip says three points', lang.indexOf("$ec_lang['lpn_tool_add_well_tip']='Add a well: its groundwater reservoir, drawdown valve, pump node, pump, and discharge node at one point.") >= 0 && lang.indexOf("$ec_lang['lpn_tool_add_welltank_tip']='Add a well with a tank: a well, a tee, and a tank, each at a point you specify") >= 0);
 	const src = require('fs').readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-	ok('Well and Well with tank are the third and fourth forms of the Pump button, after Pump and Pump+', /slot: 'add-pump'[\s\S]{0,700}mode: 'add-pump'[\s\S]{0,400}mode: 'add-pumpplus'[\s\S]{0,400}mode: 'add-well'[\s\S]{0,400}mode: 'add-welltank'/.test(src));
+	ok('Well, Well with tank and Well with pressure tank are the third to fifth forms of the Pump button, after Pump and Pump+', /slot: 'add-pump'[\s\S]{0,700}mode: 'add-pump'[\s\S]{0,400}mode: 'add-pumpplus'[\s\S]{0,400}mode: 'add-well'[\s\S]{0,400}mode: 'add-welltank'[\s\S]{0,400}mode: 'add-welltankp'/.test(src));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

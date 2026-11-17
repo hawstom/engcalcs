@@ -42,6 +42,7 @@ const L = loadLoopedNetwork(
 	"\t\tassemblyOfNode: assemblyOfNode, explode: explodeAssembly, snap: saveUndoSnapshot, syncWellControls: syncWellControls,\n" +
 	"\t\tlastNotice: function () { return lastNoticeText; }, pending: function () { return wellTankPending; },\n" +
 	"\t\tcurrentModel: function () { return assembleModel(); }, scnLabels: scnLabels, nodeLines: nodeLabelFieldLines,\n" +
+	"\t\tassemblyById: assemblyById, curveById: curveById, pressureTankPoints: pressureTankPoints, pressureTankSI: pressureTankSI, syncPressureTank: syncPressureTank, toSI: toSI,\n" +
 	"\t\tresetIds: function () { nextId = newNextId(); }, linkAutoLength: linkAutoLength, wellHasTank: wellHasTank,\n" +
 	"\t\tsetScale: function (s) { state.s = s; state.tx = 0; state.ty = 0; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -354,6 +355,82 @@ console.log('\n--- 8. the solvers ---');
 	L.runSolve();
 	await wait(1500);
 	ok('the page solved it', true);
+}
+
+console.log('\n--- 9. the Well with pressure tank (round 11) ---');
+{
+	const icons = require('fs').readFileSync(ROOT + 'lib/Icons.lib.php', 'utf8');
+	ok('the Well with tank icon draws no stub and no cap: its riser turns into the run, and the file has no capped stub', !/capped stub/.test(icons.replace(/Tom's[^\n]*\n/g, '')) && !/\$run - 1\.3/.test(icons) && /ecWellTankIcon\(\) \{[\s\S]*?V' \. \$run \. 'H' \. \$tx/.test(icons));
+	ok('and the pressure tank has an icon of its own', /'welltankp'\s*=>\s*ecWellPressureTankIcon\(\)/.test(icons));
+	const NATIVE = L.toSI(1, 'lpn_u_pressure');
+	ok('a psi is 0.70307 m of head in the page\'s pressure unit', Math.abs(L.toSI(1, 'lpn_u_pressure') * 1 - NATIVE) < 1e-12 && NATIVE > 0, String(NATIVE));
+	// Boyle, checked against the published well tank: 44 gal total, 38 psig precharge, 40/60 switch: drawdown = V (1 - P0/P) between cut-in and cut-out.
+	const psi = 0.70307, gal = 0.003785411784;
+	const pts = L.pressureTankPoints({ vol: 44 * gal, pre: 38 * psi, on: 40 * psi, off: 60 * psi });
+	const vAt = (h) => { let v = 0; for (let i = 1; i < pts.length; i++) { if (h <= pts[i][0] + 1e-12) { v = pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * (h - pts[i - 1][0]) / (pts[i][0] - pts[i - 1][0]); return v; } } return pts[pts.length - 1][1]; };
+	const draw44 = (vAt(60 * psi) - vAt(40 * psi)) / gal;
+	ok('the curve starts at (0, 0), is zero up to the precharge, and rises', pts[0][0] === 0 && pts[0][1] === 0 && pts[1][1] === 0 && Math.abs(pts[1][0] - 38 * psi) < 1e-9 && pts.every((q, i) => !i || (q[0] > pts[i - 1][0] && q[1] >= pts[i - 1][1])), JSON.stringify(pts.slice(0, 3)));
+	ok('44 gal, 38 psig precharge, 40/60: drawdown 11.35 gal by Boyle (44 x 0.2579), within 4% of the 11.8 gal on the Amtrol-based Next Generation sheet', Math.abs(draw44 - 44 * (52.7 / 54.7 - 52.7 / 74.7)) < 0.02 && Math.abs(draw44 - 11.8) / 11.8 < 0.04, draw44.toFixed(3));
+	const draw32 = (function () { const q = L.pressureTankPoints({ vol: 32 * gal, pre: 38 * psi, on: 40 * psi, off: 60 * psi }); const f = (h) => { for (let i = 1; i < q.length; i++) { if (h <= q[i][0] + 1e-12) { return q[i - 1][1] + (q[i][1] - q[i - 1][1]) * (h - q[i - 1][0]) / (q[i][0] - q[i - 1][0]); } } return q[q.length - 1][1]; }; return (f(60 * psi) - f(40 * psi)) / gal; }());
+	ok('32 gal, same switch: 8.25 gal', Math.abs(draw32 - 8.25) < 0.05, draw32.toFixed(3));
+	ok('inputs that are not a tank give no curve', L.pressureTankPoints({ vol: 1, pre: 1, on: 5, off: 3 }) === null && L.pressureTankPoints({ vol: 0, pre: 1, on: 2, off: 3 }) === null);
+
+	// Inserting it: three presses, the same wizard.
+	const doc = fresh();
+	L.setMode('add-welltankp');
+	press(200, 150); press(500, 150);
+	ok('the tank prompt for the pressure form says pressure tank', /pressure tank/i.test(L.lastNotice()) && /pressure tank/i.test(byId.lpn_mode_hint.textContent), L.lastNotice());
+	L.setMode('add-welltankp'); // no-op: same mode
+	const tk0 = L.addNode('tank', 800, 300);
+	press(800, 300, hitNode(tk0.id));
+	ok('an existing tank is refused for a pressure tank, and the wizard waits', L.pending() && L.pending().stage === 'tank' && /new/i.test(L.lastNotice()), L.lastNotice());
+	press(500, 400);
+	const a = doc.assemblies[0], t = L.nodeById('T2') || L.nodeById(a.tank);
+	ok('the third press makes the tank, the group is a Well with a tank and a pressure tank', a.kind === 'well' && a.tank === t.id && !!a.pt && a.tee === 'J1' && doc.assemblies.length === 1, JSON.stringify(a));
+	ok('typed in the project\'s units: 40 and 60 psi are 28 and 42 m in SI, volume 0.08 m3, empty pressure follows (absent)', a.pt.on === 28 && a.pt.off === 42 && a.pt.vol === 0.08 && a.pt.pre === undefined, JSON.stringify(a.pt));
+	const c = L.curveById(a.pt.curve);
+	ok('the VOLUME curve is in the document, written by the group', !!c && c.kind === 'volume' && c.points.length > 12 && c.id === 'W1TV', c && JSON.stringify(c.points.slice(0, 3)));
+	ok('the tank stands on the ground: minimum level 0, maximum level the pump-off head, on the curve, starting between', t.minLevel === 0 && Math.abs(t.maxLevel - 42) < 1e-6 && t.volCurve === c.id && t._level > 28 && t._level < 42, JSON.stringify([t.minLevel, t.maxLevel, t.volCurve, t._level]));
+	ok('the curve reaches the maximum level and the drawdown water at pump-off, by Boyle (precharge 28 m less 2 psi, atmosphere 14.7 psi)', Math.abs(c.points[c.points.length - 1][0] - 42) < 1e-6 && Math.abs(c.points[c.points.length - 1][1] - 0.08 * (1 - (28 - 2 * psi + 10.33509) / (42 + 10.33509))) < 1e-6, JSON.stringify(c.points[c.points.length - 1]));
+	ok('its controls are in pressure head: pump on below 28 and pump off above 42, written for the pump and the tank', a.pumpOn === 28 && a.pumpOff === 42 && doc.controls.filter((x) => x.asm === 'W1' && x.condition.node === t.id).length === 2, JSON.stringify(doc.controls.map((x) => x.raw)));
+	// follows the well's elevation, at ground
+	L.setProp(L.nodeById('W1'), 'elev', 123);
+	ok('the tank follows the Well\'s elevation (ground), and so does the tee', L.nodeById(a.tank).elev === 123 && L.nodeById('J1').elev === 123 && a.tankFollow === true, L.nodeById(a.tank).elev);
+	// an edit rewrites everything
+	L.setMode('select'); L.openPopup('W1', 10, 10);
+	const labels = boxLabels();
+	console.log('        box: ' + labels.join(' | '));
+	ok('the box asks pump on, pump off, empty pressure and tank volume once, on the well, and shows the two heads', ['Pump on below', 'Pump off above', 'Empty pressure', 'Tank volume', 'Pump on pressure head', 'Pump off pressure head'].every((w) => labels.filter((x) => x.indexOf(w) === 0).length === 1), '');
+	a.pt.on = 30; a.pt.pre = 25; L.syncPressureTank(a);
+	ok('an edit writes the curve, the limits and the controls again', Math.abs(L.curveById('W1TV').points[1][0] - 25) < 1e-3 && a.pumpOn === 30 && doc.controls.filter((x) => x.asm === 'W1').length === 2, JSON.stringify([a.pumpOn, L.curveById('W1TV').points[1]]));
+	a.pt.on = 50; a.pt.off = 40; L.syncPressureTank(a);
+	ok('pump on above pump off writes no controls (and leaves the curve)', doc.controls.filter((x) => x.asm === 'W1').length === 0 && a.pumpOn === undefined);
+	a.pt.on = 28; a.pt.off = 42; delete a.pt.pre; L.syncPressureTank(a);
+
+	// .inp round trip
+	const out = EC.lpnExportInp(L.serializeProject(), {});
+	const line = (out.inp.match(/^;ASSEMBLY.*$/m) || [''])[0];
+	ok('the assembly comment carries PT= with the numbers and the curve', / PT=0\.08,,28,42,W1TV$/.test(line), line);
+	ok('the curve and the tank row are in the file as EPANET reads them', /\[CURVES\][\s\S]*W1TV/.test(out.inp) && /;VOLUME:/.test(out.inp) && /W1TV/.test((out.inp.match(/\[TANKS\][^[]*/) || [''])[0]));
+	const parsed = EC.lpnInpParse(out.inp);
+	ok('read back with nothing reported', parsed.ok && parsed.assemblies[0].pt && parsed.assemblies[0].pt.curve === 'W1TV' && !(parsed.dropped || []).some((d) => /^assembly/.test(d.code)), JSON.stringify(parsed.assemblies[0] && parsed.assemblies[0].pt));
+	L.applyUnitSelections(L.inpUnitSelections(parsed));
+	L.applySaved(L.migrateSaved(L.docFromInp(parsed, ''))); L.buildDom();
+	const b = L.getDoc().assemblies[0];
+	ok('the group is back: pt, both controls, and the curve is the group\'s', b.pt && b.pt.on === 28 && b.pt.off === 42 && b.pt.pre === undefined && b.pumpOn === 28 && L.getDoc().controls.filter((x) => x.asm === 'W1').length === 2 && !!L.curveById('W1TV'), JSON.stringify(b));
+	const out2 = EC.lpnExportInp(L.serializeProject(), {}).inp, p2 = EC.lpnInpParse(out2); L.applyUnitSelections(L.inpUnitSelections(p2)); L.applySaved(L.migrateSaved(L.docFromInp(p2, ''))); L.buildDom();
+	const again = EC.lpnExportInp(L.serializeProject(), {}).inp, out_ = out2; if (again !== out_) { const A = out_.split('\n'), B = again.split('\n'); const i = A.findIndex((x, k) => x !== B[k]); console.log('        differs at line ' + i + ': ' + A[i] + ' | ' + B[i]); }
+	ok('export, import, export, import, export is byte-identical from the second export', again === out_);
+	const sv = JSON.parse(JSON.stringify(L.serializeProject())); L.applySaved(L.migrateSaved(sv)); L.buildDom();
+	ok('the project file round trip keeps pt', L.getDoc().assemblies[0].pt.curve === 'W1TV' && L.getDoc().assemblies[0].pt.vol === 0.08);
+
+	// Explode and regroup
+	L.snap(); L.explode('W1');
+	ok('Explode ends the group; the tank, the curve and the controls stay as ordinary elements', L.getDoc().assemblies.length === 0 && !!L.curveById('W1TV') && L.getDoc().controls.length === 2 && L.getDoc().controls.every((x) => !x.asm) && L.nodeById(b.tank).volCurve === 'W1TV');
+	L.undo();
+	ok('Undo regroups it, pressure tank and all', L.getDoc().assemblies.length === 1 && !!L.getDoc().assemblies[0].pt && L.getDoc().controls.filter((x) => x.asm === 'W1').length === 2);
+	L.deleteElement('node', L.getDoc().assemblies[0].tank);
+	ok('deleting the tank ends the group; the curve is then an ordinary curve', L.getDoc().assemblies.length === 0 && !!L.curveById('W1TV'));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

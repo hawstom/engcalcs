@@ -75,15 +75,28 @@ function ecWellDrawing($cx = 12, $gy = 4, $k = 1) {
 		. 'M' . $X(22) . ' ' . $Y($c0) . 'C' . $X(17) . ' ' . $Y($c0) . ' ' . $X($b + .5) . ' ' . $Y($c0 + .5) . ' ' . $X($b) . ' ' . $Y($ly) . '"/>'
 		. '<path class="ec-water" stroke-linecap="butt" d="M' . $X($a) . ' ' . $Y($ly) . 'H' . $X($b) . '"/>';
 }
-// **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (B7 of the 2026-11-14 proofs, Tom's pick): the Well's own drawing at 0.55 on the
-// left under a ground line; a riser from its head to a tee; a short capped stub leaving the tee to the left; and the run to a wide, flat tank (2 to 1, rounded)
-// standing on the ground line. A ground tank's outlet is at its floor or a few inches above it (Mary's finding, WV 64-77-9 and WI NR 811.64; Tom, round 8: a
-// pipe drains a tank only from the bottom), so the run is lowered to within a stroke of the ground line and enters just above the tank's floor.
+// **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (B7 of the 2026-11-14 proofs, Tom's pick; the stub and its cap were struck, his
+// verdict on round 10, 2026-11-16: "it's non-physical and not helpful"): the Well's own drawing at 0.55 on the left under a ground line; a riser from its head that turns
+// at the tee into the run; and the run to a wide, flat tank (2 to 1, rounded) standing on the ground line. A ground tank's outlet is at its floor or a few inches above
+// it (Mary's finding, WV 64-77-9 and WI NR 811.64; Tom, round 8: a pipe drains a tank only from the bottom), so the run is lowered to within a stroke of the ground line
+// and enters just above the tank's floor. The Well with pressure tank draws the same well and run into a small upright vessel (a pressure tank stands tall), so the two
+// share ecWellTankHead() and differ in the vessel alone.
+function ecWellTankHead($cx, $gy, $k) {
+	return '<g stroke-width="1.2">' . ecWellDrawing($cx, $gy, $k) . '</g>';
+}
 function ecWellTankIcon() {
 	$k = .55; $cx = 6.4; $gy = 13.5; $run = 11.7; $tx = 12.5; $tw = 10.4; $th = 5.2;
-	return '<g stroke-width="1.2">' . ecWellDrawing($cx, $gy, $k) . '</g>'
-		. '<g stroke-width="1.6"><path d="M' . $cx . ' ' . $gy . 'V' . $run . 'M' . ($cx - 3) . ' ' . $run . 'H' . $tx . 'M' . ($cx - 3) . ' ' . ($run - 1.3) . 'V' . ($run + 1.3) . '"/>'
+	return ecWellTankHead($cx, $gy, $k)
+		. '<g stroke-width="1.6"><path d="M' . $cx . ' ' . $gy . 'V' . $run . 'H' . $tx . '"/>'
 		. '<rect x="' . $tx . '" y="' . ($gy - $th) . '" width="' . $tw . '" height="' . $th . '" rx="1"/></g>';
+}
+// **WELL WITH PRESSURE TANK**: the same well and run, ending in an upright vessel on the ground line, a capsule with the diaphragm drawn across it.
+function ecWellPressureTankIcon() {
+	$k = .55; $cx = 6.4; $gy = 13.5; $run = 10.6; $tx = 13.2; $tw = 6.4; $th = 10.5;
+	return ecWellTankHead($cx, $gy, $k)
+		. '<g stroke-width="1.6"><path d="M' . $cx . ' ' . $gy . 'V' . $run . 'H' . $tx . '"/>'
+		. '<rect x="' . $tx . '" y="' . ($gy - $th) . '" width="' . $tw . '" height="' . $th . '" rx="2.6"/>'
+		. '<path d="M' . $tx . ' ' . ($gy - $th * .55) . 'H' . ($tx + $tw) . '" stroke-width="1.2"/></g>';
 }
 
 $ec_icons = array(
@@ -291,6 +304,8 @@ $ec_icons = array(
 	'well'       => ecWellDrawing(),
 	// **WELL WITH TANK**: see ecWellTankIcon().
 	'welltank'   => ecWellTankIcon(),
+	// **WELL WITH PRESSURE TANK**: see ecWellPressureTankIcon().
+	'welltankp'  => ecWellPressureTankIcon(),
 	'valveplus'  => '<path d="M3 3v18l9-9z"/><path d="M21 3v18l-9-9z"/><path d="M19 0V10M14 5H24"/>',
 	'pumpplus'   => '<path d="M9 7H22.5V13H15A6 6 0 1 1 9 7Z"/><path d="M19 0V10M14 5H24"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',

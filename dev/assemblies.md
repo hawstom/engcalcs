@@ -295,7 +295,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   - **Still open:** the pressure tank (Boyle's law; Tom's 2026-10-25 notes: total volume, pump-on and pump-off pressure, empty pressure). Only the
     open-air tank is built.
   - **The toolbar icon** for Well with tank is `ecWellTankIcon()` in `lib/Icons.lib.php` (B7 of the proofs, Tom's pick): the Well's own drawing at 0.55 under a ground
-    line, a riser to a tee, a short capped stub to the left, and the run to a wide, flat, rounded tank (2 to 1) standing on the ground line. The run is lowered to within a
+    line, a riser that turns into the run (no stub, no cap: Tom, 2026-11-16, "it's non-physical and not helpful"), and the run to a wide, flat, rounded tank (2 to 1) standing on the ground line. The run is lowered to within a
     stroke of the ground line, so it enters just above the tank's floor, because a ground tank's outlet is at its floor or a few inches above it (Tom, round 8; state rules
     WV 64-77-9 and WI NR 811.64 per the market researcher). A tank raised to the run, and one on legs, were drawn and read worse at 17 px.
 - **Morph** (*"I think we need to have on our checklist to ensure that Morph works with the + assemblies before we merge this."*): a Morph of ANY member
@@ -361,3 +361,17 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **The pressure tank** for Well with tank (Boyle's law curve; total volume, pump-on and pump-off pressure, empty pressure; see Slice 2 above). The three-point form with an open-air tank is built (Round 7).
 - **Auto curve** (*"especially when there are no curves available, to offer 'Auto curve' that creates a reasonable curve given the nearby or project diameters"*), seeded from Jacob's s = BQ + CQ^2.
 - **Whether the Well's controls should be overridable by scenario** (*"Probably they should be [overridable by scenario], but do we currently have a controls alternative category? And what does WTG do?"*).
+
+### Round 11: Well with pressure tank (Tom, 2026-11-16; `well-tank-three-point-harness.js` section 9, `well-controls-harness.js`)
+
+- **Third form of the Pump button**, beside Well and Well with tank (Tom: "It's a lot. But let's go with a third additional form."). Same wizard, same group;
+  `pt` on the group is `{ vol, pre, on, off, curve }` as typed. `syncPressureTank()` is the one writer of everything derived from it.
+- **The model:** the tank is a fixed head at its gas pressure, so its level IS the gauge pressure head. It stands on the ground (follows the Well), minimum level 0,
+  maximum level the pump-off head, a VOLUME curve from Boyle's law (water held at gauge head h is V (1 - P0/P), absolute pressures, atmosphere 14.7 psi used only for
+  that), zero up to the precharge, and the pump controls are ordinary `BELOW`/`ABOVE` tank-level controls in pressure head. Pump on and off are typed in the Pressure
+  unit, shown again as head; empty pressure (gauge) blank follows pump on less 2 psi; volume is in the Length unit cubed. A new tank is the 20-gallon class (2.7 ft^3,
+  0.08 m^3), 40 and 60 psi. A pressure tank is made new (an existing tank is refused: the group rewrites its limits and curve).
+- **Check:** 44 gal, 38 psig, 40/60 gives 11.35 gal drawdown by the formula; Amtrol-based sheets for the WX-250 print 11.8, 12.9 and 13.0 (they disagree with each other), so
+  the harness holds the formula to within 4% of 11.8 and does not claim a table match. 32 gal gives 8.25 gal.
+- **The curve is the group's:** read-only in the Libraries box (`curveWriterAsm()`), restored from `PT=vol,pre,on,off,curve` on the `;ASSEMBLY:` line, a plain curve
+  after Explode. Not done: the tank's own Properties box still lets its limits and curve be edited, and the next edit of the group overwrites them.

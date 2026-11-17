@@ -100,7 +100,8 @@ async function main() {
 			// Where the level line is, and where air above it is, at the casing's centre column, in the 24-unit frame: the Well fills the frame; the Well with tank's well is
 			// drawn at 0.55 from (6.4, 13.5) (ecWellTankIcon()), so its level is at y 13.5 + .55 * (17 - 4) and its air at 13.5 + .55 * (12.5 - 4).
 			const where = { well: { cx: 12, level: 17, air: 12.5 }, welltank: { cx: 6.4, level: 13.5 + .55 * 13, air: 13.5 + .55 * 8.5 } }, out = {};
-			for (const name of ['well', 'welltank']) {
+			where.welltankp = where.welltank;
+			for (const name of ['well', 'welltank', 'welltankp']) {
 				for (const size of [17, 21, 24]) {
 					const svg = EngCalcs.iconOpenTag.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" ').replace('stroke="currentColor"', 'stroke="#000"') + EngCalcs.icons[name] + '</svg>';
 					const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
@@ -113,7 +114,7 @@ async function main() {
 			}
 			return out;
 		});
-		for (const name of ['well', 'welltank']) { for (const size of [17, 21, 24]) { const r = px[name + size]; ok('at ' + size + ' px the ' + name + ' icon\'s level line shows in the casing, clearly darker than the air above it', r.level > 0.5 && r.level - r.air > 0.3, JSON.stringify(r)); } }
+		for (const name of ['well', 'welltank', 'welltankp']) { for (const size of [17, 21, 24]) { const r = px[name + size]; ok('at ' + size + ' px the ' + name + ' icon\'s level line shows in the casing, clearly darker than the air above it', r.level > 0.5 && r.level - r.air > 0.3, JSON.stringify(r)); } }
 		if (process.env.EC_WELL_SHOT) {   // a picture of the Well's symbol, for a review: EC_WELL_SHOT=/path/to.png
 			const c = await wc();
 			if (process.env.EC_WELL_THEME) { await P.evaluate((t) => { document.documentElement.setAttribute('data-theme', t); }, process.env.EC_WELL_THEME); await a.settle(500); }   // EC_WELL_THEME=dark for the picture in a dark theme

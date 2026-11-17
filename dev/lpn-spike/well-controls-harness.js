@@ -29,6 +29,7 @@ const L = loadLoopedNetwork(
 	"\t\tnodeById: nodeById, linkById: linkById,\n" +
 	"\t\tsetProp: setProp, openPopup: openPopup, openLinkPopup: openLinkPopup,\n" +
 	"\t\tserializeProject: serializeProject, applySaved: applySaved, migrateSaved: migrateSaved,\n" +
+	"\t\tsyncPressureTank: syncPressureTank,\n" +
 	"\t\texplode: explodeAssembly, assemblyById: assemblyById, libReadControl: libReadControl,\n" +
 	"\t\trenderFields: renderAssemblyFields, renderControls: function (h) { return rebuildLibraryBox(); },\n" +
 	"\t\tcurrentModel: function () { return assembleModel(); },\n" +
@@ -186,6 +187,61 @@ console.log('\n--- Explode ---');
 	ok('after Explode: two ordinary controls, none owned', d3.controls.length === 2 && d3.controls.every((c) => !c.asm), JSON.stringify(d3.controls.map((c) => c.raw + '|' + c.asm)));
 	const inp = EC.lpnExportInp(L.serializeProject(), {}).inp;
 	ok('and no ON= on the file', !/ON=/.test(inp) && /LINK W1P OPEN IF NODE T1 BELOW 3/.test(inp));
+}
+
+console.log('\n--- the Well with pressure tank, in both engines (round 11) ---');
+{
+	// A well, a tee on the well's own point, a pressure tank 200 away, and a small demand on a pipe from the well.
+	function pnet(withTank) {
+		const d = fresh();
+		L.setMode(withTank ? 'add-welltankp' : 'add-well');
+		press(200, 150);
+		if (withTank) { press(200, 150, hitNode('W1')); press(400, 150); L.linkById(d.assemblies[0].branch[1]).virtual = true; }
+		const j = L.addNode('junction', 600, 150); j._demand = 0.2;
+		L.addLink('pipe', 'W1', j.id, []);
+		d.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) });
+		d.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
+		L.setProp(L.linkById('W1DV'), 'curveId', 'DD1'); L.setProp(L.linkById('W1P'), 'curveId', 'PC1');
+		[['W1', 150], ['J1', 150], ['W1R', 120]].forEach(([id, e]) => { if (L.nodeById(id)) { L.setProp(L.nodeById(id), 'elev', e); } });
+		if (withTank) { L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById(d.assemblies[0].tank), 'elev', 150); }
+		return d;
+	}
+	async function both(label, step, dur) {
+		const model = L.currentModel();
+		model.time = Object.assign({}, model.time || {}, { times: Object.assign(EC.lpnTimesDefaults(), { duration: dur, hydraulicStep: step, reportStep: step }) });
+		model.hydraulics = Object.assign({}, model.hydraulics, { accuracy: 1e-5 });
+		const nat = EC.lpnNativeRun(JSON.parse(JSON.stringify(model))), epa = await EC.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
+		ok(label + ': both engines ran', nat.ok && epa.ok, JSON.stringify([nat.error, epa.error, nat.issues, epa.issues]).slice(0, 300));
+		return { nat, epa };
+	}
+	const headsOf = (r, k) => r.frames[k].heads;
+	let r0, r1;
+	{
+		pnet(false);
+		r0 = await both('before: the well alone, steady', 3600, 0);
+		const w = r0.epa.frames[0].heads, n = r0.nat.frames[0].heads;
+		ok('before: the two engines agree on every head to 1e-4 m', Object.keys(w).every((id) => Math.abs(w[id] - n[id]) < 1e-4), JSON.stringify(w));
+	}
+	{
+		const d = pnet(true);
+		r1 = await both('after: with the pressure tank inserted, steady', 3600, 0);
+		const w = r1.epa.frames[0].heads, n = r1.nat.frames[0].heads;
+		ok('after: the two engines agree on every head to 2 mm (the stand-in EPANET uses for a virtual pipe)', Object.keys(w).every((id) => Math.abs(w[id] - n[id]) < 2e-3), JSON.stringify(Object.keys(w).map((id) => [id, w[id] - n[id]])));
+		const tid = d.assemblies[0].tank;
+		ok('inserting the tank leaves the demand node\'s head where it was, within the tank\'s hold (the tank is a fixed head at its start level and the pump runs)', Math.abs(r1.epa.frames[0].heads.J1 - r0.epa.frames[0].heads.J1) < 15, r0.epa.frames[0].heads.J1.toFixed(2) + ' -> ' + r1.epa.frames[0].heads.J1.toFixed(2));
+		ok('the tank\'s head is the ground plus its start pressure head (150 + 35 m)', Math.abs(r1.epa.frames[0].heads[tid] - 185) < 1e-4 && Math.abs(r1.nat.frames[0].heads[tid] - 185) < 1e-4, r1.epa.frames[0].heads[tid]);
+		// An EPS run that cycles the pump on and off: 0.2 L/s drains the 23.6 L of drawdown in about two minutes; a 10 s step.
+		const e = await both('the pump cycles', 10, 1800);
+		const sn = switches(e.nat, 'W1P'), se = switches(e.epa, 'W1P');
+		console.log('        switches built-in ' + sn.length + ' EPANET ' + se.length);
+		ok('the pump switches on and off several times in 30 minutes, in both engines', se.length >= 4 && sn.length >= 4, sn.length + ' ' + se.length);
+		const lv = e.epa.frames.map((f) => f.levels[tid]), lo = Math.min.apply(null, lv), hi = Math.max.apply(null, lv);
+		ok('the tank level stays between pump-on and pump-off (28 and 42 m) within one step\'s drift, and it moves', lo > 26 && hi < 43.5 && hi - lo > 5, lo.toFixed(2) + ' .. ' + hi.toFixed(2));
+		let worst = 0; e.nat.frames.forEach((f, k) => { worst = Math.max(worst, Math.abs(f.levels[tid] - e.epa.frames[k].levels[tid])); });
+		ok('the two engines\' tank levels agree within 0.1 m at every step', worst <= 0.1, worst.toFixed(4));
+		console.log('        level range ' + lo.toFixed(2) + ' .. ' + hi.toFixed(2) + ', engine disagreement ' + worst.toFixed(4) + ' m');
+		ok('and neither engine is refused for it', !(EC.lpnDiagnose(L.currentModel(), {}).issues || []).length);
+	}
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

@@ -467,7 +467,8 @@
 					// `ON=3 OFF=6` after a well's ids: the pump-on and pump-off tank depths its two controls were written from.
 					// `TEE=` `TANK=` `PIPES=a,b` after a Well with tank's ids: its tee, its tank and the two pipes between them (Round 7).
 					// `ID=` the Well's own id, written where it is not the pump's (Round 8: the outlet node's, W1, the pump being W1P).
-					gt = gt.filter(function (tk) { var kv = /^(ID|ON|OFF|TEE|TANK|PIPES)=(.+)$/i.exec(tk); if (kv) { gOpt[kv[1].toLowerCase()] = kv[2]; return false; } return true; });
+					// `PT=vol,pre,on,off,curve` a Well with pressure tank's own numbers as typed (the empty pressure blank while it follows its default), and the VOLUME curve it wrote.
+					gt = gt.filter(function (tk) { var kv = /^(ID|ON|OFF|TEE|TANK|PIPES|PT)=(.+)$/i.exec(tk); if (kv) { gOpt[kv[1].toLowerCase()] = kv[2]; return false; } return true; });
 					if (gm[1].toUpperCase() === 'VIRTUAL') { markVirtual = markVirtual.concat(gt); }
 					else if (gt[0].toLowerCase() === 'well') {
 						// `;ASSEMBLY: well R D P V W` is the Well: groundwater reservoir, drawdown node, pump outlet, drawdown valve, pump. A Well with tank
@@ -1449,7 +1450,7 @@
 		markVirtual.forEach(function (vid) { if (linkIndex[vid] && linkIndex[vid].type === 'pipe') { linkIndex[vid].virtual = true; } });
 		var assemblies = [], assemblyBad = [], wellTankOld = [];
 		markAssemblies.forEach(function (a) {
-			var un, dn, wn, good, w, pipes, opt;
+			var un, dn, wn, good, w, pipes, opt, ptf;
 			if (a.kind === 'well') {
 				wn = a.nodes.map(function (id) { return nodeIndex[id]; });
 				// A Well is R, D, P: a reservoir and two junctions. When the third is a tank the file is a one-point Well with a tank, a form that is no
@@ -1465,6 +1466,11 @@
 					if (nodeIndex[opt.tee] && nodeIndex[opt.tee].type === 'junction' && nodeIndex[opt.tank] && nodeIndex[opt.tank].type === 'tank' && pipes.length === 2 &&
 						pipes.every(function (id) { return !!linkIndex[id]; })) {
 						w.tee = opt.tee; w.tank = opt.tank; w.branch = pipes;
+						ptf = String(opt.pt || '').split(',');
+						if (ptf.length === 5 && ptf[4] && [ptf[0], ptf[2], ptf[3]].every(function (x) { return x !== '' && isFinite(+x); }) && (ptf[1] === '' || isFinite(+ptf[1]))) {
+							w.pt = { vol: +ptf[0], on: +ptf[2], off: +ptf[3], curve: ptf[4] };
+							if (ptf[1] !== '') { w.pt.pre = +ptf[1]; }
+						}
 					}
 					assemblies.push(w);
 				} else { assemblyBad.push(a.links[0]); }
@@ -3883,7 +3889,8 @@
 				if (ends.concat(tail.slice(0, 2)).some(function (id) { return omitted[id]; }) || !a.links.concat(tail.slice(2)).every(function (id) { return live[id]; })) { return; }
 				out += ';ASSEMBLY: ' + [a.kind || 'pump'].concat(ends, a.links).join(' ') +
 					(a.kind === 'well' && a.idBy === 'node' ? ' ID=' + a.id : '') + (a.kind === 'well' && wellOwns(a, 'open') ? ' ON=' + a.pumpOn : '') + (a.kind === 'well' && wellOwns(a, 'closed') ? ' OFF=' + a.pumpOff : '') +
-					(tail.length ? ' TEE=' + tail[0] + ' TANK=' + tail[1] + ' PIPES=' + tail[2] + ',' + tail[3] : '') + '\n';
+					(tail.length ? ' TEE=' + tail[0] + ' TANK=' + tail[1] + ' PIPES=' + tail[2] + ',' + tail[3] : '') +
+					(tail.length && a.pt && a.pt.curve ? ' PT=' + [a.pt.vol, a.pt.pre === undefined ? '' : a.pt.pre, a.pt.on, a.pt.off, a.pt.curve].join(',') : '') + '\n';
 			});
 			return out ? out + '\n' : '';
 		}

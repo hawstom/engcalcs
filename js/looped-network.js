@@ -23889,7 +23889,8 @@ var EngCalcs = EngCalcs || {};
 			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: null, label: 'Pump' },
 			{ mode: 'add-pumpplus', key: 'lpn_tool_add_pumpplus', icon: 'pumpplus', tip: 'lpn_tool_add_pumpplus_tip', label: 'Pump+' },
 			{ mode: 'add-well', key: 'lpn_tool_add_well', icon: 'well', tip: 'lpn_tool_add_well_tip', label: 'Well' },
-			{ mode: 'add-welltank', key: 'lpn_tool_add_welltank', icon: 'welltank', tip: 'lpn_tool_add_welltank_tip', label: 'Well with tank' }
+			{ mode: 'add-welltank', key: 'lpn_tool_add_welltank', icon: 'welltank', tip: 'lpn_tool_add_welltank_tip', label: 'Well with tank' },
+			{ mode: 'add-welltankp', key: 'lpn_tool_add_welltankp', icon: 'welltankp', tip: 'lpn_tool_add_welltankp_tip', label: 'Well with pressure tank' }
 		] }
 	];
 	function toolFormsFor(mode) {
@@ -40577,7 +40578,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'select': 'lpn_mode_select', 'delete': 'lpn_mode_delete',
 		'add-junction': 'lpn_mode_add_junction', 'add-reservoir': 'lpn_mode_add_reservoir',
 		'add-tank': 'lpn_mode_add_tank',
-		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump', 'add-virtual': 'lpn_mode_add_virtual', 'add-pumpplus': 'lpn_mode_add_pumpplus', 'add-valveplus': 'lpn_mode_add_valveplus', 'add-well': 'lpn_mode_add_well', 'add-welltank': 'lpn_mode_add_welltank',
+		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump', 'add-virtual': 'lpn_mode_add_virtual', 'add-pumpplus': 'lpn_mode_add_pumpplus', 'add-valveplus': 'lpn_mode_add_valveplus', 'add-well': 'lpn_mode_add_well', 'add-welltank': 'lpn_mode_add_welltank', 'add-welltankp': 'lpn_mode_add_welltankp',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
 		'add-text': 'lpn_mode_add_text', 'add-chain': 'lpn_mode_add_chain', 'add-shape': 'lpn_mode_add_shape',
 		'vertices': 'lpn_mode_vertices',
@@ -40587,7 +40588,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var el = document.getElementById('lpn_mode_hint'); if (!el) { return; }
 		var pc = EngCalcs.pageConfig || {}, key = MODE_HINT_KEYS[mode];
 		// A Well with tank half made says what it waits for, here as well as in the status bar's notice, which expires (wellTankStep()).
-		if (mode === 'add-welltank' && wellTankPending) { key = wellTankPending.stage === 'tee' ? 'lpn_welltank_tee_prompt' : 'lpn_welltank_tank_prompt'; }
+		if (isWellTankMode(mode) && wellTankPending) { key = wellTankPending.stage === 'tee' ? 'lpn_welltank_tee_prompt' : wellTankPending.form === 'pressure' ? 'lpn_welltankp_tank_prompt' : 'lpn_welltank_tank_prompt'; }
 		el.textContent = key ? (pc[key] || '') : '';
 		placeLegends();
 	}
@@ -40626,7 +40627,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// a preview left on the map by a tool that is no longer running is a shape nothing can
 		// finish (Task 247).
 		if (mode === 'add-meter' && newMode !== 'add-meter') { setPendingMeter(null); }
-		if (mode === 'add-welltank' && newMode !== 'add-welltank') { wellTankCancel(); }
+		if (isWellTankMode(mode) && newMode !== mode) { wellTankCancel(); }
 		// The snap glyph belongs to the tool that showed it (Task 782).
 		hideSnapMark();
 		// A half-drawn Shape dies with its tool, as a half-drawn pipe does (Task 779).
@@ -40923,6 +40924,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						if (a.teeFollow) { w.teeFollow = true; }
 						if (a.tankFollow) { w.tankFollow = true; }
 						if (a.followOff && typeof a.followOff === 'object') { w.followOff = JSON.parse(JSON.stringify(a.followOff)); }
+						// A pressure tank's own numbers; the curve, the limits and the controls are in the file already and are not rewritten here.
+						if (a.pt && typeof a.pt === 'object' && ['vol', 'on', 'off'].every(function (k) { return typeof a.pt[k] === 'number'; })) {
+							w.pt = { vol: a.pt.vol, on: a.pt.on, off: a.pt.off };
+							if (typeof a.pt.pre === 'number') { w.pt.pre = a.pt.pre; }
+							if (typeof a.pt.curve === 'string') { w.pt.curve = a.pt.curve; }
+						}
 					} else { w.pumpOn = undefined; w.pumpOff = undefined; }
 					out.push(w);
 				}
@@ -41139,6 +41146,76 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **A WELL HAS A TANK ONLY IF IT WAS MADE WITH ONE** (Task 822; Tom, round 6 pass): "Cramming a tank into that point makes no sense", so the tank is
 	// not a member at the well's point; `tank` on the grouping names an ordinary tank elsewhere, on a pipe from an ordinary tee.
 	function wellHasTank(a) { return !!(a && a.kind === 'well' && a.tank && nodeById(a.tank)); }
+	// **THE WELL WITH PRESSURE TANK IS THE WELL WITH TANK WHOSE TANK IS A BLADDER TANK** (Task 822; Tom, round 10 pass, 2026-11-16: "It's a lot. But let's go with a third
+	// additional form."). The group is the same Well, tee, tank and two pipes, and `pt` on it is what marks the form: `{ vol, pre, on, off, curve }`, typed in the
+	// project's own units (the volume in the Length unit cubed, as every tank volume here is; the three pressures GAUGE, in the Pressure unit; `pre`, the empty (precharge)
+	// pressure, absent while it follows its default, pump on less 2 psi; `curve`, the ID of the VOLUME curve the group wrote). Everything else is derived and
+	// written by syncPressureTank(), so it is never typed twice: the tank is a fixed head at its gas pressure (EngCalcs.lpnIsFixedHead), its level IS the gauge
+	// pressure head, so the tank stands on the ground with minimum level 0 and maximum level at the pump-off head, and the pump's two controls are the ordinary
+	// tank-level controls, `BELOW` the pump-on head and `ABOVE` the pump-off head. The VOLUME curve is Boyle's law, P(abs) x V(gas) = P0(abs) x V(total),
+	// so the water the tank holds at gauge head h is V x (1 - P0/P), zero up to the precharge. Atmospheric pressure, 14.7 psi, is used only to turn gauge into absolute.
+	var PT_PSI_M = 4.4482216152605 / (0.0254 * 0.0254) / (1000 * EngCalcs.G),   // one psi as metres of water head, from lbf, in and g
+		PT_ATM_M = 14.7 * PT_PSI_M, PT_GAP_M = 2 * PT_PSI_M, PT_STEPS = 12;
+	// The curve's rows in SI, [[level m, volume m3], ...], from SI gauge heads and a SI vessel volume; null when the inputs are not a tank.
+	function pressureTankPoints(s) {
+		var pts = [[0, 0]], hs = [], i;
+		if (!s || !(s.vol > 0) || !(s.pre >= 0) || !(s.on > 0) || !(s.off > s.on) || !(s.pre < s.off)) { return null; }
+		if (s.pre > 0) { pts.push([s.pre, 0]); }
+		for (i = 1; i <= PT_STEPS; i++) { hs.push(s.pre + (s.off - s.pre) * i / PT_STEPS); }
+		if (s.on > s.pre && s.on < s.off) { hs.push(s.on); }
+		hs.sort(function (x, y) { return x - y; });
+		hs.forEach(function (x) {
+			if (x <= pts[pts.length - 1][0] + 1e-12) { return; }
+			pts.push([x, s.vol * (1 - (s.pre + PT_ATM_M) / (x + PT_ATM_M))]);
+		});
+		return pts;
+	}
+	// The typed numbers as SI (metres of head, cubic metres), or null while any is missing or they are not a tank.
+	function pressureTankSI(a) {
+		var p = a && a.pt, on, off, pre, vol;
+		if (!p) { return null; }
+		on = toSI(p.on, 'lpn_u_pressure'); off = toSI(p.off, 'lpn_u_pressure');
+		pre = typeof p.pre === 'number' ? toSI(p.pre, 'lpn_u_pressure') : on - PT_GAP_M;
+		vol = p.vol / tankVolumeFactor();
+		if (![on, off, pre, vol].every(function (x) { return typeof x === 'number' && isFinite(x); }) || !pressureTankPoints({ vol: vol, pre: pre, on: on, off: off })) { return null; }
+		return { vol: vol, pre: pre, on: on, off: off };
+	}
+	// What a new pressure tank opens on: a reasonable single-home size, the 20-gallon class (2.7 ft^3, or 80 L), a 40 to 60 psi switch, precharge following.
+	function pressureTankDefaults() {
+		var k = unitKey('lpn_u_length');
+		return { vol: k === 'ft' ? 2.7 : k === 'm' ? 0.08 : +(0.0757 * tankVolumeFactor()).toPrecision(2),
+			on: niceDefault('lpn_u_pressure', 'psi', 40, 28), off: niceDefault('lpn_u_pressure', 'psi', 60, 42) };
+	}
+	// The group that wrote this curve, if any: it is read-only in the Library and changed in that group's Properties box.
+	function curveWriterAsm(id) {
+		var list = assemblyList(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].pt && list[i].pt.curve === id && wellHasTank(list[i])) { return list[i]; } }
+		return null;
+	}
+	function ptCurveId(a) {
+		var base = a.id + 'TV', id = base, n = 1;
+		while (curveById(id)) { id = base + (++n); }
+		return id;
+	}
+	// **THE ONE WRITER OF EVERYTHING DERIVED FROM `pt`**: the VOLUME curve, the tank's limits and the two pump controls. Called after any edit of `pt`, a unit change and
+	// the wizard's last press. With inputs that are not a tank (a blank, a pump on above pump off) it leaves the curve and writes no control.
+	function syncPressureTank(a) {
+		var tank = wellHasTank(a) && a.pt ? nodeById(a.tank) : null, s, fh, pts, c;
+		if (!tank) { return; }
+		s = pressureTankSI(a);
+		if (!s) { delete a.pumpOn; delete a.pumpOff; syncWellControls(a); return; }
+		fh = unitFactor('lpn_u_elevhead');
+		pts = pressureTankPoints(s).map(function (q) { return [+(q[0] * fh).toPrecision(8), +(q[1] * fh * fh * fh).toPrecision(8)]; });
+		c = a.pt.curve ? curveById(a.pt.curve) : null;
+		if (c) { c.points = pts; delete c.src; delete c.tok; }
+		else { a.pt.curve = ptCurveId(a); docCurves().push({ id: a.pt.curve, kind: 'volume', points: pts }); }
+		tank.minLevel = 0; tank.maxLevel = +(s.off * fh).toPrecision(8); tank.volCurve = a.pt.curve;   // base-write: the group's own tank, written by the group in Base
+		tank._level = +((s.on + s.off) / 2 * fh).toPrecision(8);   // base-write: it opens between the two switch points
+		a.pumpOn = +(s.on * fh).toFixed(4); a.pumpOff = +(s.off * fh).toFixed(4);
+		syncWellControls(a);
+		updateNode(tank.id, true);
+	}
+	function syncAllPressureTanks() { assemblyList().forEach(function (a) { if (a.pt) { syncPressureTank(a); } }); }
 	function completeWell(d, x, y) {
 		var ground = d ? d.elev : undefined,
 			base = mintGroupBase('W', ['R', 'D', 'DV', 'P']),
@@ -41180,6 +41257,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The wizard's state is one object; each press checks that the well it names is still there (Undo may have removed it), and the act is one undo step.
 	var wellTankPending = null;   // { id: the Well's assembly id, stage: 'tee' | 'tank', tee: node id }
 	function wellTankPrompt(key, fallback) { setNotice(String((EngCalcs.pageConfig || {})[key] || fallback)); }
+	function isWellTankMode(m) { return m === 'add-welltank' || m === 'add-welltankp'; }
 	function wellTankCancel() { if (wellTankPending) { wellTankPending = null; setNotice(''); updateModeHint(); } }
 	// A pipe of no length is a virtual pipe, and one drawn between coincident points says so.
 	function wellTankPipe(from, to) {
@@ -41213,10 +41291,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			wellTankPending.tee = tee.id; wellTankPending.stage = 'tank'; wellTankPending.teeFollow = teeFollows;
 			wellTankPending.pipe1 = wellTankPipe(wellOut.id, tee.id).id;
-			wellTankPrompt('lpn_welltank_tank_prompt', 'Now specify the tank: a tank or a point on the map. Press Escape to stop with the well and its tee.');
+			if (wellTankPending.form === 'pressure') { wellTankPrompt('lpn_welltankp_tank_prompt', 'Now specify the pressure tank: a point on the map. Press Escape to stop with the well and its tee.'); }
+			else { wellTankPrompt('lpn_welltank_tank_prompt', 'Now specify the tank: a tank or a point on the map. Press Escape to stop with the well and its tee.'); }
 			updateModeHint();
 			return true;
 		}
+		// A pressure tank is made new: the group writes its limits, its volume curve and its start level, which an existing tank's own numbers must not be overwritten by.
+		if (hit && wellTankPending.form === 'pressure') { wellTankPrompt('lpn_welltankp_tank_refused', 'A pressure tank is made new. Specify a point on the map, not an existing tank.'); return true; }
 		if (hit && hit.type === 'tank' && !assemblyOfNode(hit.id) && wellTankNotOurs(a, hit.id)) { tank = hit; }
 		else if (hit) { wellTankPrompt('lpn_welltank_tank_refused', 'The tank must be a tank that is not part of another assembly. Specify the tank again.'); return true; }
 		else {
@@ -41228,6 +41309,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (wellTankPending.teeFollow) { a.teeFollow = true; }
 		if (tankFollows) { a.tankFollow = true; }
 		assemblyIndexDirty();
+		if (wellTankPending.form === 'pressure') { a.pt = pressureTankDefaults(); syncPressureTank(a); }
 		wellTankPending = null;
 		setNotice('');
 		updateModeHint();
@@ -41240,22 +41322,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function wellTankNotOurs(a, id) { var ids = assemblyTankIds(a); return ids.nodes.indexOf(id) < 0 && ids.links.indexOf(id) < 0; }
 	function assemblyTap(kind, e, w, t) {
 		var pid = tapLinkId(t), pipe = pid ? linkById(pid) : null, a;
-		if (kind === 'welltank' && wellTankPending) {
+		var tankKind = kind === 'welltank' || kind === 'welltankp';
+		if (tankKind && wellTankPending) {
 			// The second and third presses of the wizard, inside the first press's undo step.
 			if (wellTankStep(e, w, t)) { return; }
 		}
-		if (kind !== 'welltank') { wellTankPending = null; }
+		if (!tankKind) { wellTankPending = null; }
 		saveUndoSnapshot();
 		logLpnFirstAction('element');
 		if (pipe && pipe.type === 'pipe' && inBaseScenario() && nodeById(pipe.from) && nodeById(pipe.to) &&
 			(function () { var f = Geom.nearestFractionOnPolyline(linkPointList(pipe), w.x, w.y).f; return f > 1e-9 && f < 1 - 1e-9; }())) {
-			a = kind === 'well' || kind === 'welltank' ? spliceWell(pipe, w.x, w.y) : spliceAssembly(kind, pipe, w.x, w.y);
+			a = kind === 'well' || tankKind ? spliceWell(pipe, w.x, w.y) : spliceAssembly(kind, pipe, w.x, w.y);
 		} else {
-			a = kind === 'well' || kind === 'welltank' ? addWell(w.x, w.y) : addAssembly(kind, w.x, w.y);
+			a = kind === 'well' || tankKind ? addWell(w.x, w.y) : addAssembly(kind, w.x, w.y);
 		}
 		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[a.kind === 'well' ? 1 : 0] }));
-		if (kind === 'welltank') {
-			wellTankPending = { id: a.id, stage: 'tee' };
+		if (tankKind) {
+			wellTankPending = { id: a.id, stage: 'tee', form: kind === 'welltankp' ? 'pressure' : 'open' };
 			wellTankPrompt('lpn_welltank_tee_prompt', 'Now specify the tee: a junction, a point on a pipe, or the well\'s own point. Press Escape to stop with the well alone.');
 			updateModeHint();
 		}
@@ -41502,7 +41585,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_field_well_static_tip, { el: r, prop: 'elev' });
 		curveChooser(fields, g, 'curveId', 'headloss', pc.lpn_well_drawdown_curve || 'Drawdown curve', pc.lpn_well_drawdown_curve_tip);
 		curveChooser(fields, pump, 'curveId', 'head', pc.lpn_pump_curve_source || 'Pump head curve', pc.lpn_well_pump_curve_tip);
-		if (tankForm) {
+		if (tankForm && a.pt) { wellPressureTankFields(fields, a, pc); }
+		else if (tankForm) {
 			// The pump's automatic control, asked as tank depths; blank means none. Written as two ordinary controls (syncWellControls()).
 			[['pumpOn', pc.lpn_field_well_pump_on || 'Pump on below', pc.lpn_field_well_pump_on_tip],
 				['pumpOff', pc.lpn_field_well_pump_off || 'Pump off above', pc.lpn_field_well_pump_off_tip]].forEach(function (k) {
@@ -41547,6 +41631,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		lpnPropsGrid(fields);
 		tipsIn(fields);
+	}
+	// **THE PRESSURE TANK'S FIELDS, IN THE SAME PLACE THE OPEN-AIR TANK'S ARE** (Tom, round 10 pass: "Do it like the open-air assembly."): the pump's switch points in the
+	// project's Pressure unit, the empty pressure (gauge; blank follows pump on less 2 psi), the vessel's volume, and the two switch points again as the pressure head the
+	// pump's controls and the tank's level are written in. An edit rewrites the curve, the tank's limits and the controls (syncPressureTank()).
+	function wellPressureTankFields(fields, a, pc) {
+		var p = a.pt, apply = function () { syncPressureTank(a); scheduleSolve(); refreshPopupIfOpen(); },
+			s = pressureTankSI(a);
+		[['on', pc.lpn_field_well_pump_on || 'Pump on below', pc.lpn_field_well_pt_on_tip], ['off', pc.lpn_field_well_pump_off || 'Pump off above', pc.lpn_field_well_pt_off_tip]].forEach(function (k) {
+			unitNumberField(fields, k[1], 'lpn_u_pressure', function () { return p[k[0]]; }, function (v) { p[k[0]] = v; apply(); }, k[2]);
+		});
+		unitNumberFieldBlank(fields, pc.lpn_field_well_pt_empty || 'Empty pressure', 'lpn_u_pressure', function () { return p.pre; },
+			function (v) { if (v === undefined || !isFinite(v)) { delete p.pre; } else { p.pre = v; } apply(); },
+			typeof p.on === 'number' ? toDisplay(toSI(p.on, 'lpn_u_pressure') - PT_GAP_M, 'lpn_u_pressure') : undefined, pc.lpn_field_well_pt_empty_tip);
+		numberFieldPlain(fields, (pc.lpn_curve_kind_volume || 'Tank volume') + ' (' + tankVolumeUnitText() + ')', p.vol, function (v) { p.vol = v; apply(); }, pc.lpn_field_well_pt_volume_tip);
+		if (s) {
+			readonlyUnitField(fields, pc.lpn_field_well_pt_on_head || 'Pump on pressure head', 'lpn_u_elevhead', s.on, pc.lpn_field_well_pt_head_tip);
+			readonlyUnitField(fields, pc.lpn_field_well_pt_off_head || 'Pump off pressure head', 'lpn_u_elevhead', s.off, pc.lpn_field_well_pt_head_tip);
+		}
 	}
 	// A NEW VALVE'S SETTING, PER TYPE, because the setting is a different QUANTITY for each one (see
 	// js/lpn-epanet.js): a pressure for a PRV or PSV, a flow for an FCV, a dimensionless loss
@@ -56781,6 +56883,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ icon: 'pumpplus', pointerOnly: true, label: pc.lpn_tool_add_pumpplus || 'Pump+', tip: pc.lpn_tool_add_pumpplus_tip, fn: function () { setMode('add-pumpplus'); } },
 			{ icon: 'well', pointerOnly: true, label: pc.lpn_tool_add_well || 'Well', tip: pc.lpn_tool_add_well_tip, fn: function () { setMode('add-well'); } },
 			{ icon: 'welltank', pointerOnly: true, label: pc.lpn_tool_add_welltank || 'Well with tank', tip: pc.lpn_tool_add_welltank_tip, fn: function () { setMode('add-welltank'); } },
+			{ icon: 'welltankp', pointerOnly: true, label: pc.lpn_tool_add_welltankp || 'Well with pressure tank', tip: pc.lpn_tool_add_welltankp_tip, fn: function () { setMode('add-welltankp'); } },
 			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve'), hotkey: toolKeyFor('add-valve'), fn: function () { setMode('add-valve'); } },
 			{ icon: 'valveplus', pointerOnly: true, label: pc.lpn_tool_add_valveplus || 'Valve+', tip: pc.lpn_tool_add_valveplus_tip, fn: function () { setMode('add-valveplus'); } },
 			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
@@ -61634,8 +61737,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			else if (mode === 'add-chain') {
 				chainTap(e, w, t);
 			}
-			else if (mode === 'add-pumpplus' || mode === 'add-valveplus' || mode === 'add-well' || mode === 'add-welltank') {
-				assemblyTap(mode === 'add-valveplus' ? 'valve' : mode === 'add-well' ? 'well' : mode === 'add-welltank' ? 'welltank' : 'pump', e, w, t);
+			else if (mode === 'add-pumpplus' || mode === 'add-valveplus' || mode === 'add-well' || isWellTankMode(mode)) {
+				assemblyTap(mode === 'add-valveplus' ? 'valve' : mode === 'add-well' ? 'well' : mode === 'add-welltank' ? 'welltank' : mode === 'add-welltankp' ? 'welltankp' : 'pump', e, w, t);
 			}
 			else if (mode === 'add-shape') {
 				shapeToolTap(e, w, snapHit);
@@ -62916,6 +63019,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				k = k1 * k1 * k1;
 				doc.nodes.forEach(function (nd) { conv(nd, 'minVolume'); });
 				convOverrides('minVolume');
+				assemblyList().forEach(function (a) { if (a.pt) { conv(a.pt, 'vol'); } });
 				k = k1;
 			}());
 		} else if (name === 'lpn_u_diameter') {
@@ -62951,6 +63055,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// text token behind, and lpnNumText() drops it by itself because it no longer parses
 			// to the new value.
 			convSetting('minPressure'); convSetting('reqPressure');
+			assemblyList().forEach(function (a) { if (a.pt) { conv(a.pt, 'on'); conv(a.pt, 'off'); conv(a.pt, 'pre'); } });
 			doc.links.forEach(function (l) {
 				if (l.type !== 'valve') { return; }
 				var t = String(l.valveType || 'TCV').toUpperCase();
@@ -63154,6 +63259,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// decimals count that just followed the unit shows its new number in an open panel.
 		refreshUseUnitsBoxes();
 		refreshLabelNumberBoxes();
+		// A pressure tank's curve, limits and controls are written in these units, so they are written again in the new ones.
+		syncAllPressureTanks();
 		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
 		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
 		// costs nothing and a future input to the cap might not be so lucky.
@@ -72979,7 +73086,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
 		}
-		list.forEach(function (c) { buildCurveEntry(host, c); });
+		list.forEach(function (c) {
+			var writer = curveWriterAsm(c.id), own;
+			// A curve a pressure tank wrote is shown as its name and the group that owns it, read-only, as a well's control is.
+			if (writer) {
+				own = libEl('div', 'lpn-lib-entry lpn-lib-owned');
+				own.appendChild(libEl('div', 'lpn-lib-verdict', c.id + ' (' + (pc.lpn_curve_kind_volume || 'Tank volume') + ')'));
+				own.appendChild(libEl('div', 'lpn-lib-note', (pc.lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', writer.id)));
+				host.appendChild(own);
+				return;
+			}
+			buildCurveEntry(host, c);
+		});
 	}
 	// EPANET's four, in EPANET's own order, as `[value, langKey, fallback]`. One table, read by the
 	// Library's kind select and by nothing else that could disagree with it.

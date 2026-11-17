@@ -323,13 +323,43 @@
      "parent": "Insert"
     },
     {
+     "id": "project/menu_insert/tool_add_virtual",
+     "label": "Virtual pipe",
+     "parent": "Insert"
+    },
+    {
      "id": "project/menu_insert/tool_add_pump",
      "label": "Pump",
      "parent": "Insert"
     },
     {
+     "id": "project/menu_insert/tool_add_pumpplus",
+     "label": "Pump+",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_well",
+     "label": "Well",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_welltank",
+     "label": "Well with tank",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_welltankp",
+     "label": "Well with pressure tank",
+     "parent": "Insert"
+    },
+    {
      "id": "project/menu_insert/tool_add_valve",
      "label": "Valve",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_valveplus",
+     "label": "Valve+",
      "parent": "Insert"
     },
     {
@@ -345,31 +375,6 @@
     {
      "id": "project/menu_insert/tool_add_shape",
      "label": "Shape",
-     "parent": "Insert"
-    },
-    {
-     "id": "project/menu_insert/tool_add_pumpplus",
-     "label": "Pump+",
-     "parent": "Insert"
-    },
-    {
-     "id": "project/menu_insert/tool_add_valveplus",
-     "label": "Valve+",
-     "parent": "Insert"
-    },
-    {
-     "id": "project/menu_insert/tool_add_well",
-     "label": "Well",
-     "parent": "Insert"
-    },
-    {
-     "id": "project/menu_insert/tool_add_welltank",
-     "label": "Well with tank",
-     "parent": "Insert"
-    },
-    {
-     "id": "project/menu_insert/tool_add_virtual",
-     "label": "Virtual pipe",
      "parent": "Insert"
     },
     {
@@ -724,26 +729,6 @@
     {
      "id": "tb/add-shape",
      "label": "Shape",
-     "parent": ""
-    },
-    {
-     "id": "tb/add-pumpplus",
-     "label": "Pump+",
-     "parent": ""
-    },
-    {
-     "id": "tb/add-valveplus",
-     "label": "Valve+",
-     "parent": ""
-    },
-    {
-     "id": "tb/add-well",
-     "label": "Well",
-     "parent": ""
-    },
-    {
-     "id": "tb/add-welltank",
-     "label": "Well with tank",
      "parent": ""
     },
     {
