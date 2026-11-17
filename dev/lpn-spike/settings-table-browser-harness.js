@@ -430,7 +430,19 @@ async function main() {
 		// Graphs > Contour never writes the node colouring since e1aaca674 (Tom, 2026-10-29): the plot spreads pressure, the nodes stay as they were.
 		ok('Graphs > Contour in Peak: the nodes\' own colouring is left alone (not marked, still No color)', ncP && !ncP.local &&
 			ncP.cells.st_value === await L('lpn_color_none'), JSON.stringify(ncP && ncP.cells));
-		ok('...and turns its contours on, there', (await H.findRow(await L('lpn_settings_row_contour_fill'), 'Peak')).local);
+		// Graphs > Contour checks Show plot in the open scenario and nothing else (Task 858): Fill and the rest stay as they were.
+		const CS = await L('lpn_settings_row_contour_show');
+		const csRow = await H.findRow(CS, 'Peak');
+		ok('...and turns Show plot on, there', csRow && csRow.local && csRow.cells.st_value === await L('lpn_settings_table_yes'), JSON.stringify(csRow && csRow.cells));
+		ok('...and changes nothing else of the contour: Fill is not marked, there', !(await H.findRow(await L('lpn_settings_row_contour_fill'), 'Peak')).local);
+		// The box's own Show plot tick writes the scenario's own value.
+		await a.menuClickSub(await L('lpn_graphs_menu'), await L('lpn_contour_menu'), 'project');
+		await a.settle(1500);
+		await page.evaluate(() => { const c = document.getElementById('lpn_contour_show'); if (c) { c.click(); } });
+		await a.settle(800);
+		await page.evaluate(() => { const x = document.getElementById('lpn_contour_close'); if (x) { x.click(); } });
+		const csOff = await H.findRow(CS, 'Peak');
+		ok('...and unticking Show plot in the box writes Peak\'s own value', csOff && csOff.local && csOff.cells.st_value !== csRow.cells.st_value, JSON.stringify(csOff && csOff.cells));
 		ok('...and Base is unchanged, row for row', JSON.stringify((await H.settingRows()).filter((r) => r.cells.scn_name === base)
 			.filter((r) => JSON.parse(baseRowsBefore).some((b) => b[0] === r.key)).map((r) => [r.key, r.cells.st_value])) === baseRowsBefore);
 		// The ID prefix's Apply to all renames the drawing: refused in a scenario, as the new-asset push is.
