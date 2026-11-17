@@ -5011,3 +5011,11 @@ OBSERVED (re-verify; real Chromium via the branch's own env.js server, Net1 well
 - Old fixture (dev/lpn-spike/assembly-before-round8.lwn, not fixtures/) opens with W1R/W1V/W1D/W1/W1P, tank well W2 with L5/J3/L6/T1; Explode+Undo ok. Pump+ and Valve+: headings Junction/Pump|Valve/Junction, Explode and Undo ok. .inp export of a Well and a Well with tank carries ID= TEE= TANK= PIPES=; reimport gives the same IDs, headings, flows, pressures.
 - Symbol tint equals reservoir and tank (same class, one colour). Phone 390x844: box fits, no sideways scroll, Well label hidden at the opening view.
 - NOT DONE: scenario in the browser (my New-scenario click made no scenario), Tables and Find renames, rename refusal wording (the harness answers dialogs, a plain junction shows none either), builder's harness mutation test, light/dark.
+
+## 2026-11-16 feat/volume-unit (Task 857)
+OBSERVED (re-verify; real Chromium via the branch's own env.js server, scratchpad scripts p1-p4):
+- Net3 US run, 9:00: Tanks table, Properties and time-series graph agree for tanks 1 and 3 in all seven units; hand check 125,239 ft^3 = 936,849 gal = 3546.4 m^3 = 2.88 ac-ft. Graph axis title and ticks follow the selector.
+- Net2 US opens on gal, Net3 SI after US opens on m^3, Net1 US after SI opens on gal (selector resets with the project). Saved ML round-trips. Pre-857 project (no volume unit) with ft opens gal, with m opens m^3.
+- 390 px: Settings opens, Available volume sits last in Units, no sideways scroll. ?lang=es: "Volumen disponible (gal)", options pies^3, no errors.
+- CONCERN (judgement): Tanks table and Properties show "Minimum volume (ft^3)" beside "Available volume (gal)" under the US default.
+- NOT DONE: mutation test, map colouring, .inp import in the browser, Net2 graph, light/dark.
