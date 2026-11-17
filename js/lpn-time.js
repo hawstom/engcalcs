@@ -1241,6 +1241,8 @@
 	 * time step without clicking the toolbar.
 	 */
 	EC.lpnTimeGoTo = function (t) { setTime(t); };
+	/** A press on the graph's time line takes the clock in hand: playback stops, or the next tick moves the line from under the finger. */
+	EC.lpnTimePause = function () { if (state.playing) { pause(); } };
 
 	/**
 	 * **WHAT THE PUMPS COST OVER THE RUN IN HAND, OR NULL** (Task 566; dev/pump-energy.md).

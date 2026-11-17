@@ -7432,6 +7432,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 /* Where the transport is parked. Dashed and grey on purpose: it is the one mark on the chart that
    is not a reading, so it must not read as a series. */
 .lpn-ts-now { stroke: var(--ec-gray-888); stroke-width: 1; stroke-dasharray: 3, 3; }
+/* The time line is a handle: a wide transparent stroke over it takes the press (a finger cannot hit 1 px), and the
+   browser may not take the gesture for a scroll. */
+.lpn-ts-now-hit { stroke: transparent; stroke-width: 24px; fill: none; pointer-events: visible; cursor: ew-resize; touch-action: none; }
 /* The two pull-downs sit on the control row's baseline with the chips and the buttons, so they take
    the row's own type size rather than the browser's default form size. */
 .lpn-ts-pick { font: inherit; font-size: .95em; max-width: 12em; }

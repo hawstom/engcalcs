@@ -39033,6 +39033,68 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// reads; the label is then the transport's own format, so the axis and the scrubber say the same
 	// thing about the same moment.
 	function tsHours(t) { return (t || 0) / 3600; }
+	// **THE TIME LINE IS A HANDLE** (Tom, 2026-11-14, Ida's second door to the time: the transport is the
+	// only way to change the instant on a phone, and the chart already says which moment it is). A press on
+	// the dashed line and a drag along the chart steps the run to the reporting step nearest the pointer,
+	// by the transport's own seek, EngCalcs.lpnTimeGoTo(), which is also what Back, Forward and the time
+	// selector end in. A wide invisible stroke carries the press (a finger cannot hit a 1 px line) and
+	// `touch-action: none` on it keeps a finger from scrolling the pane instead.
+	//
+	// **THE CHART IS REDRAWN ON EVERY STEP, SO THE DRAG LIVES ON THE DOCUMENT**, not on the line that was
+	// pressed: that line is replaced under the pointer by the redraw this very seek causes. What the move
+	// needs to know (the drawn svg, its axis, its frames) is kept per host and refreshed by every redraw.
+	var tsNowCtx = (typeof WeakMap === 'function') ? new WeakMap() : null, tsNowCtxById = {}, tsNowDrag = null;
+	// **A CHART'S CONTAINER CAN BE REPLACED BY ITS OWN REDRAW** (the Properties box builds a new one every
+	// time), so what the drag holds is the container's id when it has one, and the container itself when
+	// it does not (a map bubble's persists). Each redraw re-registers under the same key.
+	function tsNowKey(host) { return host.id || host; }
+	function tsNowGet(key) { return typeof key === 'string' ? tsNowCtxById[key] : tsNowCtx.get(key); }
+	function tsNowSeek(e) {
+		var c = tsNowDrag && tsNowGet(tsNowDrag.key), pt, p, hrs, best = null, i;
+		if (!c || !c.svg.isConnected || !c.svg.getScreenCTM || !EngCalcs.lpnTimeGoTo) { return; }
+		pt = c.svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+		p = pt.matrixTransform(c.svg.getScreenCTM().inverse());
+		hrs = c.xB.min + (p.x - c.box.left) / (c.box.width || 1) * (c.xB.max - c.xB.min);
+		for (i = 0; i < c.frames.length; i++) {
+			if (best === null || Math.abs(tsHours(c.frames[i].t) - hrs) < Math.abs(tsHours(best) - hrs)) { best = c.frames[i].t; }
+		}
+		if (best === null || best === tsNowDrag.last) { return; }
+		tsNowDrag.last = best;
+		EngCalcs.lpnTimeGoTo(best);
+	}
+	function tsNowEnd(e) {
+		if (!tsNowDrag || (e && e.pointerId !== tsNowDrag.id)) { return; }
+		document.removeEventListener('pointermove', tsNowMove, true);
+		document.removeEventListener('pointerup', tsNowEnd, true);
+		document.removeEventListener('pointercancel', tsNowEnd, true);
+		tsNowDrag = null;
+	}
+	function tsNowMove(e) {
+		if (!tsNowDrag || e.pointerId !== tsNowDrag.id) { return; }
+		e.preventDefault();
+		tsNowSeek(e);
+	}
+	function tsNowHandle(host, svg, x, box, xB, frames) {
+		var hit;
+		if (!tsNowCtx) { return; }
+		if (host.id) { tsNowCtxById[host.id] = { svg: svg, box: box, xB: xB, frames: frames }; } else { tsNowCtx.set(host, { svg: svg, box: box, xB: xB, frames: frames }); }
+		hit = el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-ts-now-hit' }, svg);
+		// **`touch-action` IS NOT HONOURED ON AN SVG SHAPE** (measured: a sideways finger drag from the line
+		// took the browser's swipe-back and left the page), so the finger's touchstart is claimed here too.
+		// The pointer events that do the work still fire.
+		hit.addEventListener('touchstart', function (e) { e.preventDefault(); }, { passive: false });
+		hit.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button > 0) { return; }
+			e.preventDefault();
+			tsNowEnd(null);
+			if (EngCalcs.lpnTimePause) { EngCalcs.lpnTimePause(); }
+			tsNowDrag = { id: e.pointerId, key: tsNowKey(host), last: null };
+			document.addEventListener('pointermove', tsNowMove, true);
+			document.addEventListener('pointerup', tsNowEnd, true);
+			document.addEventListener('pointercancel', tsNowEnd, true);
+			tsNowSeek(e);
+		});
+	}
 	function tsWaitingText(pc) {
 		var why;
 		if (EngCalcs.lpnTimeIsExtended && !effectiveTimesExtended()) {
@@ -39216,6 +39278,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (now >= xB.min && now <= xB.max) {
 			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
 				class: 'lpn-ts-now' }, svg);
+			tsNowHandle(host, svg, X(now), box, xB, frames);
 		}
 
 		dots = frames.length <= LPN_TS_DOT_MAX;
@@ -40248,6 +40311,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (now >= xB.min && now <= xB.max) {
 			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
 				class: 'lpn-ts-now' }, svg);
+			tsNowHandle(host, svg, X(now), box, xB, frames);
 		}
 		dots = frames.length <= LPN_TS_DOT_MAX;
 		ttlName = { produced: pc.lpn_sysflow_produced || 'Produced', consumed: pc.lpn_sysflow_consumed || 'Consumed' };
