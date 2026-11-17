@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Přiblížit výběr';
 $ec_lang['lpn_tool_zoom_window']='Přiblížit okno';
 $ec_lang['lpn_zoom_in']='Přiblížit';
 $ec_lang['lpn_zoom_out']='Oddálit';
-$ec_lang['lpn_new_text']='Text';
 $ec_lang['lpn_field_text_bold']='Tučný text';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Vrstevnice';
 $ec_lang['lpn_contour_tip']='Zobrazí na mapě vrstevnicový graf: barvy uzlů se rozprostřou podél potrubí i vedle něj a doplní je popsané vrstevnice. Otevře okno pro jeho doladění nebo vypnutí.';
 $ec_lang['lpn_contour_plot']='Vrstevnicový graf';
 $ec_lang['lpn_contour_show']='Zobrazit graf';
-$ec_lang['lpn_contour_show_tip']='Zrušením zaškrtnutí skryjete výplň i vrstevnice; zaškrtnutím je vrátíte tak, jak byly. Barvy uzlů zůstávají.';
 $ec_lang['lpn_contour_fill']='Výplň';
 $ec_lang['lpn_contour_fill_tip']='Plynulá přechází z barvy jedné třídy do druhé. Pásy vykreslí každou třídu barevné legendy jednolitě.';
 $ec_lang['lpn_contour_fill_smooth']='Plynulá';

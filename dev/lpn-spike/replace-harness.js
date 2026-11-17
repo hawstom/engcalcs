@@ -288,6 +288,8 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 	// A mixed scope has no single property to set. Nothing is offered, and it is SAID.
 	ok('the all-elements scope offers nothing to set', L.specFields('all').length === 0);
 	ok('a Text scope offers nothing to set either', L.specFields('text').length === 0);
+	// A Text always has words (Task 854), so Replace must never offer to set a Text's words, in any scope.
+	ok('no scope offers Text words to set', ['junction', 'pipe', 'all', 'text'].every((sc) => L.specFields(sc).indexOf('text') < 0));
 
 	// The searched property is what the write offers first: "find every 6 inch main, make it 8"
 	// names one property twice.

@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='缩放至所选';
 $ec_lang['lpn_tool_zoom_window']='窗口缩放';
 $ec_lang['lpn_zoom_in']='放大';
 $ec_lang['lpn_zoom_out']='缩小';
-$ec_lang['lpn_new_text']='文字';
 $ec_lang['lpn_field_text_bold']='粗体文字';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='等值线';
 $ec_lang['lpn_contour_tip']='在地图上显示等值线图：节点的颜色沿管道及其两侧扩散，并带有标注的等值线。打开一个框可调整它或将其关闭。';
 $ec_lang['lpn_contour_plot']='等值线图';
 $ec_lang['lpn_contour_show']='显示等值线图';
-$ec_lang['lpn_contour_show_tip']='取消勾选可隐藏填充和等值线；勾选可按原样恢复。节点颜色保持不变。';
 $ec_lang['lpn_contour_fill']='填充';
 $ec_lang['lpn_contour_fill_tip']='“平滑”使颜色从一个等级渐变到下一个等级。“分级”将色键的每个等级以单一颜色填平。';
 $ec_lang['lpn_contour_fill_smooth']='平滑';

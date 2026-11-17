@@ -781,6 +781,8 @@ $ec_lang['lpn_pane_paste_bad_cell']='Row {row}: {text} is not a valid {col}.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
 $ec_lang['lpn_pane_paste_text_no_position']='Row {row}: a new Text needs both {first} and {second}.';
+// A pasted row for a new Text that states no words.
+$ec_lang['lpn_pane_paste_text_no_words']='Row {row}: a new Text needs its words.';
 // {id} is what the Text table's own Attached to cell named.
 $ec_lang['lpn_pane_paste_no_anchor']='Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.';
 $ec_lang['lpn_pane_paste_customer_no_position']='Row {row}: a new Customer needs both {first} and {second}.';
@@ -822,7 +824,6 @@ $ec_lang['lpn_tool_zoom_selection']='Zoom to selection';
 $ec_lang['lpn_tool_zoom_window']='Zoom Window';
 $ec_lang['lpn_zoom_in']='Zoom in';
 $ec_lang['lpn_zoom_out']='Zoom out';
-$ec_lang['lpn_new_text']='Text';
 $ec_lang['lpn_field_text_bold']='Bold text';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -1006,7 +1007,7 @@ $ec_lang['lpn_guide_text_find_popup']='Finds the assets that meet a condition, s
 $ec_lang['lpn_guide_text_settings_box']='Holds the settings of the open project and of this browser, arranged in sections. Choose Water, Settings to open it. Two buttons, Restore defaults and Start fresh, reset them. The box is searchable: type one or more words in Search settings to list only the settings that mention all of them. The position and size of this box are kept in this browser only.';
 $ec_lang['lpn_guide_text_library_box']='Holds the project\'s patterns, curves, pipe types, fittings lists, controls, and rules, one section each. Choose Water, Libraries to open it. An asset refers to a pattern, curve, pipe type, or fittings list by the ID of that item, and the item is created, edited, and deleted here. All are saved with the project, and Undo reverses an edit made here. The position and size of the box are kept in this browser only.';
 $ec_lang['lpn_guide_text_energy_box']='Reports the energy use, peak power, and cost of each pump over the last extended period simulation, using each pump\'s efficiency and the energy price set under Settings, Energy. It needs a Total run time in Settings and a solved network. It does not change the network.';
-$ec_lang['lpn_guide_text_contour_box']='Controls the contour plot drawn on the map from the node value chosen in Color nodes by: the color scheme, the fill and its opacity, the contour line interval and labels, and how far the color reaches from each pipe. Turning it off hides the plot and leaves the node colors. It changes only the display, not the network.';
+$ec_lang['lpn_guide_text_contour_box']='Controls the contour plot drawn on the map from the node property chosen in Color nodes by, in the color scheme chosen in Settings, Symbology, Node colors: the fill and its opacity, how far the color reaches from each pipe, and the contour line interval and labels. With No color chosen there is no property to plot and nothing is drawn. Show plot draws or hides the plot and changes no other setting; it leaves the node colors. It changes only the display, not the network.';
 $ec_lang['lpn_guide_text_scncmp_box']='Solves each scenario that is checked in the Scenario manager, all of them unless checks have been cleared, from a copy of the drawing, and tabulates for each the number of overrides, the demand multiplier, the total run time, the hydraulic time step, the lowest pressure, and the highest velocity. Choose Water, Reports, Scenario comparison to open it. The comparison starts when it opens and starts again after each edit while it remains open.\n\nIt does not change the project, and the scenario that is open is left as it was.';
 $ec_lang['lpn_guide_text_rptbox']='Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.';
 $ec_lang['lpn_guide_text_status_box']='Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step.';
@@ -1162,10 +1163,10 @@ $ec_lang['lpn_guide_en_set_def']='<p>Settings, Energy holds the Pump efficiency 
 $ec_lang['lpn_guide_en_example_def']='<p>Open the Net1 example, which has a total run time of 24:00, and calculate. Choose Water, Reports, Pump energy. Pump L9 runs for 65.71% of the run at an efficiency of 75%, and uses 96.22 kW on average, 96.71 kW at the peak, and 1518 kWh. No price is stated, so the cost is 0 and the report says so. Enter 0.12 for Price of power in Settings, Energy, and calculate again: the cost of L9 is 182, the Total cost.</p>';
 // The Contour plot chapter (Task 785). Held by dev/lpn-spike/user-guide-contour-harness.js.
 $ec_lang['lpn_guide_ct_what_term']='What the plot is';
-$ec_lang['lpn_guide_ct_what_def']='<p>Choose Water, Graphs, Contour. The row turns the plot on in the open scenario, as a smooth fill with labeled lines, using the pressure if the nodes are not colored yet, and opens the box. The plot spreads the node colors along the pipes and up to a set multiple of the median pipe length beside them, fading out over the outer part. It does not color across pumps, valves, or closed links. The line under the color key states how many nodes and pipes the plot uses, the reach beside the pipes, and the interval of the lines. With too few nodes, it says so.</p>';
+$ec_lang['lpn_guide_ct_what_def']='<p>Choose Water, Graphs, Contour. The row checks Show plot in the open scenario and opens the box; the plot is drawn with the Fill and the contour lines as the box has them set, which for a new project is a smooth fill with labeled lines. The plot spreads the node colors along the pipes and up to a set multiple of the median pipe length beside them, fading out over the outer part. Its property is the one chosen in Color nodes by, in Settings, Symbology, Node colors; with No color there is nothing to plot, and the box says so. It does not color across pumps, valves, or closed links. The line under the color key states how many nodes and pipes the plot uses, the reach beside the pipes, and the interval of the lines. With too few nodes, it says so.</p>';
 $ec_lang['lpn_guide_ct_box_term']='The box';
-$ec_lang['lpn_guide_ct_box_def']='<p>Show plot, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class in one solid color), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer (× median pipe length). In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network\'s area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.</p>';
-$ec_lang['lpn_guide_ct_example_def']='<p>Open the Net1 example and choose Water, Graphs, Contour. The contour plot shows pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. The nodes keep the colors they had, before the plot and after Show plot is cleared.</p>';
+$ec_lang['lpn_guide_ct_box_def']='<p>The first line of the box states Follows project "Node colors" settings, and Node colors is a link that opens Settings at Symbology, Node colors. The plot spreads the node property chosen in Color nodes by, in the Color scheme, both there; the box has no property or scheme of its own, and a change in Settings shows in the plot at once. With No color chosen, a second line says there is nothing to plot, nothing is drawn, and the plot returns when a property is chosen again. Show plot draws or hides the plot and changes nothing else: when it is cleared, the Fill, Show contour lines, Labels, and the other settings keep their values and have no effect, and when it is checked they act as set; the node colors stay either way. The box holds the Fill (None, Smooth, or Bands, which paints each class in one solid color), the Fill opacity, the Buffer (× median pipe length), and Show contour lines, with its Interval and Labels. In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network\'s area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.</p>';
+$ec_lang['lpn_guide_ct_example_def']='<p>Open the Net1 example, choose Settings, Symbology, Node colors, and under Color nodes by choose Pressure. Then choose Water, Graphs, Contour. The contour plot shows pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. The nodes keep their colors after Show plot is cleared, and the Fill and the contour lines keep their settings for when it is checked again.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='What the report holds';
 $ec_lang['lpn_guide_rr_what_def']='<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.</p>';
@@ -2129,14 +2130,15 @@ $ec_lang['lpn_freq_axis_percent']='Percent less than';
 $ec_lang['lpn_contour_menu']='Contour';
 $ec_lang['lpn_contour_tip']='Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.';
 $ec_lang['lpn_contour_plot']='Contour plot';
+$ec_lang['lpn_contour_follows']='Follows project "{link}" settings.';
+$ec_lang['lpn_contour_none_note']='Nothing to plot: "Color nodes by" is set to "No color".';
 $ec_lang['lpn_contour_show']='Show plot';
-$ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; check to bring them back as they were. Node colors stay.';
 $ec_lang['lpn_contour_fill']='Fill';
 $ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
 $ec_lang['lpn_contour_fill_smooth']='Smooth';
 $ec_lang['lpn_contour_fill_bands']='Bands';
 $ec_lang['lpn_contour_opacity']='Fill opacity';
-$ec_lang['lpn_contour_lines']='Contour lines';
+$ec_lang['lpn_contour_lines']='Show contour lines';
 $ec_lang['lpn_contour_interval']='Interval';
 $ec_lang['lpn_contour_buffer']='Buffer (× median pipe length)';
 $ec_lang['lpn_contour_buffer_unit']='× median pipe length';
@@ -3620,6 +3622,7 @@ $ec_lang['lpn_settings_row_customer_max_width']='Show customer labels when zoome
 $ec_lang['lpn_settings_row_quality_step']='Quality time step';
 $ec_lang['lpn_settings_row_view']='Map view (center and scale)';
 $ec_lang['lpn_settings_row_bubbles']='Time series graphs on the map';
+$ec_lang['lpn_settings_row_contour_show']='Show contour plot';
 $ec_lang['lpn_settings_row_contour_fill']='Contour fill';
 $ec_lang['lpn_settings_row_contour_opacity']='Contour fill opacity';
 $ec_lang['lpn_settings_row_contour_interval']='Contour interval';
@@ -3912,6 +3915,8 @@ $ec_lang['lpn_settings_legend_bottom_right']='Bottom right';
 $ec_lang['lpn_settings_color_node_field']='Node color';
 $ec_lang['lpn_settings_color_link_field']='Pipe color';
 $ec_lang['lpn_settings_color_ramp']='Color scheme';
+$ec_lang['lpn_settings_color_node_field_tip']='Colors the nodes by this property. The contour plot follows it.';
+$ec_lang['lpn_settings_color_ramp_node_tip']='Colors the nodes, the contour plot and its key.';
 $ec_lang['lpn_settings_color_credits']='Credits';
 $ec_lang['lpn_color_ramp_epanet']='Blue to red (EPANET)';
 $ec_lang['lpn_color_ramp_viridis']='Purple to yellow (easier to tell one color from the next)';
@@ -5337,6 +5342,11 @@ $ec_lang['lpn_result_delivered_demand_tip']='The flow this junction actually rec
 $ec_lang['lpn_result_demand_deficit']='Demand deficit';
 $ec_lang['lpn_result_demand_deficit_tip']='The demand at this junction that is not delivered, because the pressure is below the required pressure.';
 $ec_lang['lpn_pda_deficit_note']='Junctions receiving less than their demand: {n}.';
+$ec_lang['lpn_velocity_warn']='⚠ Pipe {id} velocity is {velocity} at {time}.';
+$ec_lang['lpn_velocity_warn_steady']='⚠ Pipe {id} velocity is {velocity}.';
+$ec_lang['lpn_velocity_warn_more']='⚠ And more pipes ({n}) above {limit}.';
+$ec_lang['lpn_settings_velocity_limit']='Velocity warning limit';
+$ec_lang['lpn_settings_velocity_limit_tip']='The velocity above which a run reports the fastest pipe and how many other pipes also exceed it. Blank uses the default. Zero turns the warning off.';
 $ec_lang['lpn_diag_pda_pressures']='Required pressure must be greater than Minimum pressure. Change one of them in Settings.';
 $ec_lang['lpn_inp_drop_pressure_unit']='This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
 

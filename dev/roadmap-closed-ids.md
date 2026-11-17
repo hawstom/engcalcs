@@ -22,6 +22,9 @@ sentence**, so every close moves it — that is the whole connection, and it cos
 red builds on 2026-09-15 before anybody wrote it down.
 
 
+- 0|864| CLOSED 2026-11-16: the run warns of the fastest pipe over the project's "Velocity warning limit" (Settings, Hydraulics; blank 10 ft/sec or 3.05 m/s, zero off) with a count of the others; merged on Tom's "Merge feat/velocity-warning." `velocity-warning-harness.js`, `velocity-limit-browser-harness.js`.
+- 0|854| CLOSED 2026-11-16: a new Text starts empty and is removed if left empty; first words in a scenario go to Base; a blanked Text table cell deletes it; merged on Tom's "Merge feat/text-empty."
+- 0|858| CLOSED 2026-11-16: the Contour box follows project Node colors with a standing line and link, Show plot changes nothing else and carries no tip; merged on Tom's "Merge feat/contour-controls after removing the tip from "Show plot"." `contour-controls-browser-harness.js`.
 - 0|800| CLOSED 2026-10-18 (shipped 2026-10-16 with `feat/bentley-interop`; Tom asked "Done?"): List overrides shows one scenario's own overrides by category, inherited ones neither listed nor counted.
 - 0|721| CLOSED 2026-10-18 (stages 3 to 6 merged 2026-10-16 with `feat/bentley-interop`; Tom asked "Done?"): Bentley's scenario tree with alternatives per category, plus Calculation and the view (Presentation), Basic mode, the Scenario manager and the Scenarios table. Record: `dev/scenario-alternatives.md`; its advisers' list stays there for any later stage.
 - 0|815| CLOSED 2026-10-18 (merged on Tom's word, `feat/command-usage`): spock.php's Map commands used, most used first, by menu with unused commands named; one row per command per page load, never its inputs.
