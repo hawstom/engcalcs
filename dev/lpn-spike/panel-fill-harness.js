@@ -540,10 +540,10 @@ console.log('\n--- a box that fills the screen has to be scrollable by finger --
 	// still never a zero.
 	ok('...and blank still means "the file did not say"',
 		/input\.value = home\(\)\[key\] === undefined \? '' :/.test(body('hydNumberRow')));
-	ok('...and the row has one home, the hydraulics object the Settings box seam points it at',
+	ok('...and the row has one home, the hydraulics object (or `settings` itself for a `top` row) the Settings box seam points it at',
 		// In a scenario the box's seam (withSetboxView(), setboxEditEnd()) shows the scenario's value
 		// and sends an edit to the scenario, the demand multiplier included (stage 3b).
-		/var home = function \(\) \{ return settings\.hydraulics \|\| \(settings\.hydraulics = \{\}\); \};/
+		/var home = function \(\) \{ return o\.top \? settings : \(settings\.hydraulics \|\| \(settings\.hydraulics = \{\}\)\); \};/
 			.test(body('hydNumberRow')));
 	ok('an unset hydraulics row shows NO number: no placeholder is set',
 		!/input\.placeholder\s*=/.test(body('hydNumberRow')));

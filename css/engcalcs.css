@@ -3835,6 +3835,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 }
 /* The contour box: the Find box's shell, a little wider for a name column and a number with its
    unit. */
+/* The Contour box's one line for No color: across both columns of the grid, above the rows. */
+.lpn-contour-box-note { grid-column: 1 / -1; padding: .3em .5em; font-size: .9em; line-height: 1.3; }
 .lpn-contourbox { width: min(25.5rem, calc(100vw - 8px)); --lpn-g-valmax: 9.5rem; }
 .lpn-snipbox { width: min(18rem, calc(100vw - 8px)); min-width: var(--lpn-box-min-w, 5rem); --lpn-set-name: 8.5rem; --lpn-set-col: 6rem; }
 .lpn-snipbox .lpn-set-row { margin: 7px 0; }

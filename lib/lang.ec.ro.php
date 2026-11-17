@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Încadrează selecția';
 $ec_lang['lpn_tool_zoom_window']='Zoom fereastră';
 $ec_lang['lpn_zoom_in']='Mărire';
 $ec_lang['lpn_zoom_out']='Micșorare';
-$ec_lang['lpn_new_text']='Text';
 $ec_lang['lpn_field_text_bold']='Text îngroșat';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Contur';
 $ec_lang['lpn_contour_tip']='Afișează pe hartă un grafic de contur: culorile nodurilor se întind de-a lungul și lângă conducte, cu curbe de nivel etichetate. Deschide o casetă pentru reglaj sau dezactivare.';
 $ec_lang['lpn_contour_plot']='Contur: grafic';
 $ec_lang['lpn_contour_show']='Afișează graficul';
-$ec_lang['lpn_contour_show_tip']='Debifați pentru a ascunde umplerea și liniile curbelor de nivel; bifați pentru a le readuce așa cum erau. Culorile nodurilor rămân.';
 $ec_lang['lpn_contour_fill']='Umplere';
 $ec_lang['lpn_contour_fill_tip']='Neted amestecă culorile de la o clasă la alta. Benzi vopsește uniform fiecare clasă a cheii de culori.';
 $ec_lang['lpn_contour_fill_smooth']='Neted';

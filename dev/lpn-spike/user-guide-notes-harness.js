@@ -81,6 +81,13 @@ async function main() {
 		await P.evaluate(() => document.querySelector('#lpn_rptbox .lpn-popover-x').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 
 		console.log('\n5. Color bands');
+		// The contour plot's key is Color nodes by's (Tom, 2026-11-14), so Pressure is chosen first.
+		await a.toolbarClick(await T('lpn_tool_settings'));
+		await settle(500);
+		await P.evaluate(() => { const n = document.getElementById('lpn_set_color_node'); n.value = 'pressure'; n.dispatchEvent(new Event('change', { bubbles: true })); });
+		await settle(500);
+		await P.keyboard.press('Escape');
+		await settle(300);
 		await a.menuClickSub(await T('lpn_graphs_menu'), await T('lpn_contour_menu'), 'project');
 		await settle(1500);
 		const legend = () => P.evaluate(() => { const e = document.getElementById('lpn_color_legend'); return e ? e.innerText.split('\n').filter((l) => /\d/.test(l) && /[<≥–]/.test(l)).join(' | ') : ''; });

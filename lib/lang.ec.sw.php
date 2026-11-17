@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Kuza hadi Uteuzi';
 $ec_lang['lpn_tool_zoom_window']='Kuza Eneo';
 $ec_lang['lpn_zoom_in']='Kuza';
 $ec_lang['lpn_zoom_out']='Punguza';
-$ec_lang['lpn_new_text']='Maandishi';
 $ec_lang['lpn_field_text_bold']='Maandishi mazito';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Kontua';
 $ec_lang['lpn_contour_tip']='Onyesha mchoro wa kontua kwenye ramani: rangi za vifundo zinaenea kando ya mabomba na pembeni mwake, pamoja na mistari ya kontua yenye lebo. Hufungua kisanduku cha kuurekebisha au kuuzima.';
 $ec_lang['lpn_contour_plot']='Kontua: mchoro';
 $ec_lang['lpn_contour_show']='Onyesha mchoro';
-$ec_lang['lpn_contour_show_tip']='Ondoa alama ili kuficha rangi ya kujaza na mistari ya kontua; chagua ili kuzirejesha kama zilivyokuwa. Rangi za vifundo hubaki.';
 $ec_lang['lpn_contour_fill']='Kujaza';
 $ec_lang['lpn_contour_fill_tip']='Laini huchanganya rangi kutoka daraja moja hadi jingine. Bendi hupaka kila daraja la ufunguo wa rangi rangi moja tambarare.';
 $ec_lang['lpn_contour_fill_smooth']='Laini';

@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Zoom sulla selezione';
 $ec_lang['lpn_tool_zoom_window']='Zoom finestra';
 $ec_lang['lpn_zoom_in']='Aumenta zoom';
 $ec_lang['lpn_zoom_out']='Riduci zoom';
-$ec_lang['lpn_new_text']='Testo';
 $ec_lang['lpn_field_text_bold']='Testo in grassetto';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Curve di livello';
 $ec_lang['lpn_contour_tip']='Mostra sulla mappa un tracciato a curve di livello: i colori dei nodi si estendono lungo e accanto alle tubazioni, con curve di livello etichettate. Apre un riquadro per regolarlo o disattivarlo.';
 $ec_lang['lpn_contour_plot']='Curve di livello: tracciato';
 $ec_lang['lpn_contour_show']='Mostra tracciato';
-$ec_lang['lpn_contour_show_tip']='Deseleziona per nascondere il riempimento e le isolinee; seleziona per ripristinarli com\'erano. I colori dei nodi restano.';
 $ec_lang['lpn_contour_fill']='Riempimento';
 $ec_lang['lpn_contour_fill_tip']='Sfumato fonde i colori da una classe alla successiva. Bande dipinge ogni classe della legenda dei colori con un colore uniforme.';
 $ec_lang['lpn_contour_fill_smooth']='Sfumato';

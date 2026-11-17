@@ -149,12 +149,14 @@ function compareRow(tableId, id, heads, wantRow, bad) {
 const net3 = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'water-network-examples', 'Net3.lwn'), 'utf8'));
 L.applySaved(JSON.parse(JSON.stringify(net3)));
 L.refreshAll();
+// This loader keeps Net3's words under their saved name; the page reads `_text`. A Text always has words.
+L.getDoc().labels.forEach((lb) => { if (!lb._text) { lb._text = lb.text || 'Note'; } });
 const someJ = L.getDoc().nodes.filter((n) => n.type === 'junction').slice(0, 2).map((n) => n.id);
 L.addLink('valve', someJ[0], someJ[1], [], 'PRV-1');   // Net3 carries no valve; TCV by default, so its km cell is plain
 const somePipe = L.getDoc().links.filter((l) => l.type === 'pipe')[0];
 L.addCustomer(0, 0, { link: somePipe.id, t: 0.5 });   // Net3 carries no customer
-L.addText(0, 0, someJ[0]);            // anchored to a NODE: align/valign plain ("Attached"), Attached to = the node's id
-L.addText(0, 0, null, { link: somePipe.id, t: 0.25 });   // anchored to a PIPE
+L.addText(0, 0, someJ[0])._text = 'Pump house';            // anchored to a NODE: align/valign plain ("Attached"), Attached to = the node's id
+L.addText(0, 0, null, { link: somePipe.id, t: 0.25 })._text = 'Old main';   // anchored to a PIPE
 
 console.log('\n--- every table copies from Net3 (plus what it lacked) ---');
 const tableIds = L.tableIds();
@@ -207,16 +209,16 @@ console.log('\n--- a Text row naming a missing anchor, or naming none with no po
 	const heads = L.headings('text').map((h) => h.key);
 	function textRow(o) { return heads.map((k) => (o[k] === undefined ? '' : String(o[k]))).join('\t'); }
 	const d0 = L.undoDepth();
-	let res = pasteIntoEmpty('text', textRow({ id: 'X1', anchor: 'NOPE' }));
+	let res = pasteIntoEmpty('text', textRow({ id: 'X1', text: 'Note', anchor: 'NOPE' }));
 	report(L.notice() === say('lpn_pane_paste_refused', { reasons: say('lpn_pane_paste_no_anchor', { row: 1, id: 'NOPE' }) }),
 		'an anchor naming nothing in the network refuses, by name', L.notice());
 	report(!L.labelById('X1'), '...and creates nothing');
-	res = pasteIntoEmpty('text', textRow({ id: 'X1' }));
+	res = pasteIntoEmpty('text', textRow({ id: 'X1', text: 'Note' }));
 	report(L.notice() === say('lpn_pane_paste_refused', { reasons: say('lpn_pane_paste_text_no_position', { row: 1, first: PC.lpn_field_x, second: PC.lpn_field_y }) }),
 		'no anchor and no position refuses too', L.notice());
 	report(!L.labelById('X1'), '...and creates nothing');
 	report(L.undoDepth() === d0, 'and neither refusal took an undo snapshot', d0 + ' -> ' + L.undoDepth());
-	res = pasteIntoEmpty('text', textRow({ id: 'X1', anchor: 'J1' }));
+	res = pasteIntoEmpty('text', textRow({ id: 'X1', text: 'Note', anchor: 'J1' }));
 	report(!!L.labelById('X1') && L.labelById('X1').anchorNode === 'J1', 'a real anchor creates it, attached', res && res.prevented);
 	report(L.undoDepth() === d0 + 1, 'as ONE undo step', d0 + ' -> ' + L.undoDepth());
 	L.undo();
