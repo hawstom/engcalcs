@@ -569,11 +569,6 @@
             "ruled": "2026-10-05",
             "answer": "OK."
         },
-        "lpn_contour_show_tip": {
-            "on": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
-            "ruled": "2026-10-05",
-            "answer": "OK."
-        },
         "lpn_contour_support": {
             "on": "Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.",
             "ruled": "2026-10-03",

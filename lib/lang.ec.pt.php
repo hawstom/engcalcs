@@ -2060,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Isolinhas';
 $ec_lang['lpn_contour_tip']='Mostra um mapa de isolinhas: as cores dos nós se espalham ao longo e ao lado dos tubos, com isolinhas rotuladas. Abre uma caixa para ajustá-lo ou desativá-lo.';
 $ec_lang['lpn_contour_plot']='Isolinhas: mapa';
 $ec_lang['lpn_contour_show']='Mostrar gráfico';
-$ec_lang['lpn_contour_show_tip']='Desmarque para ocultar o preenchimento e as isolinhas; marque para trazê-los de volta como estavam. As cores dos nós permanecem.';
 $ec_lang['lpn_contour_fill']='Preenchimento';
 $ec_lang['lpn_contour_fill_tip']='Suave mistura as cores de uma classe para a seguinte. Faixas pinta cada classe da legenda de cores com uma cor uniforme.';
 $ec_lang['lpn_contour_fill_smooth']='Suave';

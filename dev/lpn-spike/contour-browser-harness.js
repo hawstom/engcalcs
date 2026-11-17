@@ -7,7 +7,7 @@
 //   2. (e) The box: interval 10 redraws the lines at multiples of 10; opacity 30 sets the image to
 //      0.3; the label count follows Labels.
 //   3. A zoom re-places the labels at the same size on screen.
-//   3a. Show contours: cleared hides fill, lines and labels; ticked restores them as they were.
+//   3a. Show contours: cleared hides fill, lines and labels and leaves every other control as set; ticked draws them as set.
 //   3c. The box's size fits its contents (no scrolling, within 600 x 600, on screen) in en, de, ru,
 //      fr at 1400 x 900, with no saved state AND with a stale small saved size that lacks
 //      `userSized`; with `userSized: true` the saved size wins; a drag of the corner sets the flag.
@@ -186,7 +186,7 @@ async function sectionDesk(Session, browser) {
 			boxOpen: getComputedStyle(document.getElementById('lpn_contour_box')).display !== 'none',
 			fill: document.getElementById('lpn_contour_fill').value, lines: document.getElementById('lpn_contour_lines').checked
 		}));
-		ok('...the box stays open, its Fill None and lines cleared', hidden.boxOpen && hidden.fill === '' && !hidden.lines, JSON.stringify(hidden));
+		ok('...the box stays open, its Fill and lines left as set (Tom, 2026-11-16)', hidden.boxOpen && hidden.fill === 'bands' && hidden.lines, JSON.stringify(hidden));
 		await setBox(a, 'lpn_contour_show', true);
 		f = await layerFacts(a.page);
 		const back = await a.page.evaluate(() => document.getElementById('lpn_contour_fill').value);

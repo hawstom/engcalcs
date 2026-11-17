@@ -2060,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Eş eğri';
 $ec_lang['lpn_contour_tip']='Haritada bir eş eğri grafiği gösterin: düğüm renkleri boruların boyunca ve yanlarında yayılır, etiketli eş eğri çizgileriyle birlikte. Ayarlamak veya kapatmak için bir kutu açar.';
 $ec_lang['lpn_contour_plot']='Eş eğri grafiği';
 $ec_lang['lpn_contour_show']='Grafiği göster';
-$ec_lang['lpn_contour_show_tip']='Dolguyu ve eş eğri çizgilerini gizlemek için işareti kaldırın; olduğu gibi geri getirmek için işaretleyin. Düğüm renkleri kalır.';
 $ec_lang['lpn_contour_fill']='Dolgu';
 $ec_lang['lpn_contour_fill_tip']='Yumuşak, renkleri bir sınıftan ötekine harmanlar. Bantlar, renk anahtarının her sınıfını düz boyar.';
 $ec_lang['lpn_contour_fill_smooth']='Yumuşak';

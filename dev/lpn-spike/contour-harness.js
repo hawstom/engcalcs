@@ -421,7 +421,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	const d = L.docFromInp(parsed, 'net3');
 	L.setDoc(d); L.setSettings(d.settings); L.applyUnitSelections(d.units);
 	d.settings.autoRun = false;
-	check(!d.settings.contourFill && !d.settings.contourLines, 'a project opens with no contour plot');
+	check(!d.settings.contourShow, 'a project opens with no contour plot');
 	L.runSolve();
 	await waitFor(() => L.lastResult());
 	check(!!L.lastResult(), 'Net3 solved');
@@ -430,7 +430,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	check(layerAll().length === 0, 'colouring the nodes alone draws no contour');
 	L.showContour();
 	const S = L.contourStats();
-	check(d.settings.contourFill === 'smooth' && d.settings.contourLines === true, 'Graphs > Contour turns on a smooth fill and contour lines');
+	check(d.settings.contourShow === true && d.settings.contourFill === 'smooth' && d.settings.contourLines === true, 'Graphs > Contour turns on a smooth fill and contour lines');
 	check(findIn(byId.lpn_contour_body, 'lpn_contour_interval') !== null, '...and opens the contour box');
 	const fillSel = findIn(byId.lpn_contour_body, 'lpn_contour_fill');
 	check(!!fillSel && fillSel.children.filter((o) => o.selected).map((o) => o.value).join() === 'smooth', '...and the box\'s Fill selector has Smooth selected (the default fill)');
@@ -580,7 +580,8 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	check(layerOf('lpn-contour-label').length === 0 && layerOf('lpn-contour-line').length > 0, 'labels off: lines without labels');
 	q('lpn_contour_labels').checked = true; fireEl(q('lpn_contour_labels'), 'change');
 	q('lpn_contour_lines').checked = false; fireEl(q('lpn_contour_lines'), 'change');
-	check(layerAll().length === 0, 'fill None and lines off: the plot is off');
+	check(layerOf('lpn-contour-fill').length === 0 && layerOf('lpn-contour-line').length === 0 && layerOf('lpn-contour-label').length === 0, 'fill None and lines off: nothing is drawn');
+	check(L.contourStats() === null && L.contourField() === null, '...and nothing is computed either: no corridor field, no stats line');
 	q('lpn_contour_lines').checked = true; fireEl(q('lpn_contour_lines'), 'change');
 	q('lpn_contour_fill').value = 'smooth'; fireEl(q('lpn_contour_fill'), 'change');
 	q('lpn_contour_opacity').value = '60'; fireEl(q('lpn_contour_opacity'), 'change');
@@ -588,7 +589,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	q('lpn_contour_buffer').value = '1.5'; fireEl(q('lpn_contour_buffer'), 'change');
 	check(d.settings.contourBuffer === 1.5 && L.contourStats().k === 1.5, 'the buffer box sets the reach');
 	q('lpn_contour_buffer').value = '2.5'; fireEl(q('lpn_contour_buffer'), 'change');
-	check(q('lpn_set_ramp_node_contour') !== null, 'the colour scheme picker is the node colouring\'s own, with ids of its own');
+	check(q('lpn_contour_field') === null && q('lpn_contour_node_colors') === null && q('lpn_set_ramp_node_contour') === null, 'the box holds no property, scheme or node-color control of its own: the plot follows Settings');
 
 	head('8. RECALCULATE OFF IS A SNAPSHOT');
 	const before = allD();
@@ -687,7 +688,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	ids.forEach((id, k) => { heads[id] = 100; pressures[id] = 100 - groundM(lon0 + (k % 4) * dLon, lat0 + Math.floor(k / 4) * dLat); });
 	L.setResult({ ok: true, converged: true, heads, pressures, flows: {}, headlosses: {}, velocities: {}, statuses: {} });
 	S2.colorNodeField = 'pressure';
-	S2.contourLines = true; S2.contourFill = '';
+	S2.contourShow = true; S2.contourLines = true; S2.contourFill = '';
 	S2.contourTerrain = true;
 	function pixelLonLat(tile, p) {
 		const n = Math.pow(2, tile.z);
@@ -760,7 +761,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 		const jl = L.addLink(joinType, grid[2 * 6 + 5], grid[36 + 2 * 6]);
 		if (closed) { jl._status = 'closed'; }
 		S3.colorNodeField = 'elev';
-		S3.contourFill = 'smooth'; S3.contourLines = true;
+		S3.contourShow = true; S3.contourFill = 'smooth'; S3.contourLines = true;
 		L.refreshValueColors();
 		return 5 + gap / 2;
 	}
@@ -793,7 +794,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	const S4 = L.getSettings(), N = 40, gid = [];
 	for (let r = 0; r < N; r++) { for (let c = 0; c < N; c++) { const n = L.addNode('junction', 0, 0); n.x = c * 100 + (rnd() - 0.5) * 30; n.y = r * 100 + (rnd() - 0.5) * 30; n.elev = 50 + 20 * Math.sin(c / 6) + 15 * Math.cos(r / 5); gid.push(n.id); } }
 	for (let r = 0; r < N; r++) { for (let c = 0; c < N; c++) { const k = r * N + c; if (c < N - 1 && rnd() > 0.1) { L.addLink('pipe', gid[k], gid[k + 1]); } if (r < N - 1 && rnd() > 0.1) { L.addLink('pipe', gid[k], gid[k + N]); } } }
-	S4.colorNodeField = 'elev'; S4.contourFill = 'smooth'; S4.contourLines = true;
+	S4.colorNodeField = 'elev'; S4.contourShow = true; S4.contourFill = 'smooth'; S4.contourLines = true;
 	L.setView(rect.width / 4000, 0, 0);
 	let big = Infinity;
 	for (let i = 0; i < 3; i++) { S4.contourBuffer = 2.5 + (i + 1) * 1e-9; L.refreshValueColors(); big = Math.min(big, L.contourStats().ms); }

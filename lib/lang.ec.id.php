@@ -2060,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Kontur';
 $ec_lang['lpn_contour_tip']='Tampilkan plot kontur pada peta: warna simpul menyebar di sepanjang dan di samping pipa, dengan garis kontur berlabel. Membuka kotak untuk menyetelnya atau mematikannya.';
 $ec_lang['lpn_contour_plot']='Plot kontur';
 $ec_lang['lpn_contour_show']='Tampilkan plot';
-$ec_lang['lpn_contour_show_tip']='Hapus centang untuk menyembunyikan isian dan garis kontur; centang untuk menampilkannya kembali seperti semula. Warna simpul tetap.';
 $ec_lang['lpn_contour_fill']='Isian';
 $ec_lang['lpn_contour_fill_tip']='Halus memadukan warna dari satu kelas ke kelas berikutnya. Pita mewarnai setiap kelas pada kunci warna secara rata.';
 $ec_lang['lpn_contour_fill_smooth']='Halus';
