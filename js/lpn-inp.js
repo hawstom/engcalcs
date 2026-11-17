@@ -1481,7 +1481,7 @@
 			else { lostComments.CONTROLS = lostComments.CONTROLS.concat(sectionFoot.CONTROLS); }
 		}
 		if (ctlItems.length) { delete ctlItems[0].gap; }
-		controls = ctlItems;
+		controls = ctlItems.filter(function (c) { return !c.comment; });
 		// **WHAT FOLLOWS THE LAST PATTERN** stays with it as `foot`, written back after it.
 		(function () {
 			var foot = sectionFoot.PATTERNS, last = patterns[patterns.length - 1];
@@ -1726,6 +1726,8 @@
 			defaultPattern: defaultPattern,
 			times: times,
 			controls: controls,
+			// The controls and the comment rows between them, in the file's order (Task 859); what a document keeps.
+			controlItems: ctlItems,
 			nodes: nodes,
 			links: links,
 			labels: labels,

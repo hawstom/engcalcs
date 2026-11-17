@@ -47892,7 +47892,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// low with every number on screen looking reasonable.
 			defaultPattern: parsed.defaultPattern || null,
 			times: parsed.times || null,
-			controls: parsed.controls || [],
+			controls: parsed.controlItems || parsed.controls || [],
 			// [RULES] as text (Task 248.03). Not modelled, not edited, and no longer thrown away.
 			rules: parsed.rules || [],
 			// EVERY OTHER SECTION THE FILE STATED AND THIS PAGE DOES NOT READ, VERBATIM -- [ENERGY],

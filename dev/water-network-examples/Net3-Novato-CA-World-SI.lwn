@@ -2826,6 +2826,12 @@
 	},
 	"controls": [
 		{
+			"comment": true,
+			"lines": [
+				";Lake source operates only part of the day"
+			]
+		},
+		{
 			"link": "10",
 			"raw": "Link 10 OPEN AT TIME 1",
 			"action": {
@@ -2837,8 +2843,7 @@
 			},
 			"text": {
 				"time": "1"
-			},
-			"note": "Lake source operates only part of the day"
+			}
 		},
 		{
 			"link": "10",
@@ -2855,6 +2860,14 @@
 			}
 		},
 		{
+			"comment": true,
+			"lines": [
+				";Pump 335 controlled by level in Tank 1",
+				";When pump is closed, bypass pipe is opened"
+			],
+			"gap": 1
+		},
+		{
 			"link": "335",
 			"raw": "Link 335 OPEN IF Node 1 BELOW 5.212",
 			"action": {
@@ -2869,12 +2882,7 @@
 			},
 			"text": {
 				"value": "5.212"
-			},
-			"note": "Pump 335 controlled by level in Tank 1 When pump is closed, bypass pipe is opened",
-			"noteSrc": [
-				";Pump 335 controlled by level in Tank 1",
-				";When pump is closed, bypass pipe is opened"
-			]
+			}
 		},
 		{
 			"link": "335",
