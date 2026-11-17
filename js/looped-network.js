@@ -70625,7 +70625,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		curves: { read: libCurvesRead, write: libCurves, byId: true },
 		pipetypes: { read: libPipeTypesRead, write: libPipeTypes, byId: true },
 		fittings: { read: libFittingSetsRead, write: libFittingSets, byId: true },
-		controls: { read: libControlsRead, write: libControls, byId: false, slotted: ['gap'] },
+		controls: { read: libControlsRead, write: libControls, byId: false },
 		rules: { byId: false }
 	};
 	var LIB_MOVES = [
@@ -70669,9 +70669,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function libOrderTarget(how, i, n, first) {
 		return how === 'top' ? first : how === 'bottom' ? n - 1 : how === 'up' ? Math.max(first, i - 1) : Math.min(n - 1, i + 1);
 	}
-	// **WHAT THE FILE KEPT AT A POSITION STAYS AT IT**: a pattern's `head` (a heading above it) and `foot` (what follows the last one), and the blank lines
-	// (`gap`) before an item of Controls. Only the item itself moves, so a section's trailing comments are never written mid-section after a move and read
-	// back as something else. A comment in Controls or Rules is an item of its own and moves like any other.
+	// **WHAT THE FILE KEPT AT A POSITION STAYS AT IT**: a pattern's `head` (a heading above it) and `foot` (what follows the last one). Only the item
+	// itself moves, so a section's trailing comments are never written mid-section after a move and read back as something else. A comment in
+	// Controls or Rules is an item of its own and moves like any other, and the blank lines before an item (`gap`) are the item's: they move with it.
 	function libArrayMove(arr, from, to, slotted) {
 		var slots = slotted ? arr.map(function (x) { var o = {}; slotted.forEach(function (f) { o[f] = x[f]; }); return o; }) : null;
 		arr.splice(to, 0, arr.splice(from, 1)[0]);
@@ -72916,13 +72916,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return libRuleItemsText(items);
 	}
-	// Rule `from` moved to position `to`. The items are permuted and the blank lines stay at their positions, so no line is
-	// added, dropped or changed.
+	// Rule `from` moved to position `to`. The items are permuted, each with the blank lines before it, so no line is
+	// dropped or changed (a blank line is added only where two comment rows would otherwise meet).
 	function libRulesMoved(lines, from, to, items) {
-		var its = items || libRuleItems(lines), gaps = its.map(function (it) { return it.gap; });
+		var its = items || libRuleItems(lines);
 		if (from === to || !its[from] || !its[to]) { return lines.slice(); }
 		its.splice(to, 0, its.splice(from, 1)[0]);
-		its.forEach(function (it, k) { it.gap = gaps[k]; });
 		return libRuleItemsText(its);
 	}
 	// What a rule in the box means right now: an { ok, block, missing } verdict, where `missing` is

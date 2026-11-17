@@ -326,7 +326,7 @@ head('4b2. rules: a heading above the first rule (a blank line between) and what
 	// A comment directly above a RULE line, with no blank line, is a row of its own and does not travel with the rule.
 	const rules = ['; at the top', 'RULE A', 'IF SYSTEM CLOCKTIME >= 5 AM', 'THEN PUMP 10 STATUS IS OPEN', '', 'RULE B', 'IF SYSTEM CLOCKTIME >= 6 AM', 'THEN PUMP 10 STATUS IS OPEN'];
 	const moved = L.libRulesMoved(rules, 1, 2);
-	ok('a comment directly above a rule stays put when the rule moves', moved[0] === '; at the top' && moved.indexOf('RULE B') === 1 && moved.indexOf('RULE A') > moved.indexOf('RULE B'), JSON.stringify(moved));
+	ok('a comment directly above a rule stays put when the rule moves, and the blank line before RULE B goes with B', moved[0] === '; at the top' && moved[1] === '' && moved.indexOf('RULE B') === 2 && moved.indexOf('RULE A') > moved.indexOf('RULE B'), JSON.stringify(moved));
 }
 
 head('4b3. controls: a comment is a row of its own, and Net3 reads, moves and writes it that way');
@@ -344,7 +344,25 @@ head('4b3. controls: a comment is a row of its own, and Net3 reads, moves and wr
 	ok('moving a control changes only the two controls: both comment rows are still where they were', kinds(d) === 'C1,k,k,C2,k,k,k,k' && d.controls[0].lines[0] === ';Lake source operates only part of the day' && d.controls[3].lines.length === 2);
 	const o1 = sec(EngCalcs.lpnExportInp(d).inp), s1 = sec(net3);
 	ok('...and the file reads Link 10 CLOSED before Link 10 OPEN, under the same comment', o1[0] === s1[0] && o1[1] === s1[2] && o1[2] === s1[1] && same(o1.slice(3), s1.slice(3)), JSON.stringify(o1.slice(0, 4)));
-	// a comment row moves on its own, and what stays at a position is the blank line
+	// the Pump 335 comment (row 3, a blank line before it) moves down one: the blank line goes with it, so none is left between controls
+	{
+		const dd = importNet('Net3.inp');
+		L.libOrderSelect('controls', 3);
+		L.libOrderMove('controls', 'down');
+		const o = sec(EngCalcs.lpnExportInp(dd).inp);
+		ok('a moved comment row takes its blank line with it: no stray blank between the Link 10 and Link 335 controls, one before the comment',
+			o.indexOf('') === o.findIndex((l) => /^;Pump 335/.test(l)) - 1 && o.slice(0, o.indexOf('')).length === 4 && o.filter((l) => !l.trim()).length === 1, JSON.stringify(o));
+		L.libOrderSelect('controls', 4);
+		L.libOrderMove('controls', 'top');
+		const o3 = sec(EngCalcs.lpnExportInp(dd).inp);
+		ok('moved to the top, the comment row has no blank above it, and it does not run into the comment below (a blank line separates them)', o3[0].indexOf(';Pump 335') === 0 && importNet('t.inp', EngCalcs.lpnExportInp(dd).inp).controls.length === dd.controls.length, JSON.stringify(o3.slice(0, 5)));
+		// delete: the blank line of a deleted row passes to the next
+		const d4 = importNet('Net3.inp');
+		L.libItemGapPass(d4.controls, 3); d4.controls.splice(3, 1);
+		ok('deleting a comment row hands its blank line to the next row', d4.controls[3].gap === 1);
+		L.setDoc(d);
+	}
+	// a comment row moves on its own
 	L.libOrderSelect('controls', 0);
 	L.libOrderMove('controls', 'down');
 	ok('a comment row moves down by itself, past one control', d.controls[0].comment !== true && d.controls[1].comment === true && d.controls[1].lines[0] === ';Lake source operates only part of the day', kinds(d));
@@ -476,7 +494,7 @@ head('5. rules and the comments between them move as rows');
 		order.splice(to, 0, order.splice(from, 1)[0]);
 		ok('move row ' + from + ' to ' + to + ': the rows read in the new order', kinds(out) === order.join(''), kinds(out) + ' vs ' + order.join(''));
 		ok('...no line added, dropped or changed', out.length === RULES.length && sortedLines(out) === sortedLines(RULES));
-		ok('...and the blank lines stay at the same positions in the list', gapsOf(out) === gapsOf(RULES), gapsOf(out) + ' vs ' + gapsOf(RULES));
+		ok('...and every blank line travels with the row it precedes (the same blank lines, in a new place)', gapsOf(out).split(',').sort().join() === gapsOf(RULES).split(',').sort().join(), gapsOf(out) + ' vs ' + gapsOf(RULES));
 	});
 	{
 		// Consecutive comment lines are one row, so two comment rows moved against each other are written with a blank line between.
