@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-11-01",
-    "count": 3283,
+    "count": 3282,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -6902,7 +6902,6 @@
         "lpn_contour_opacity": "bc7b9a208b5edfcb8abd970849e73e89fddd34ab",
         "lpn_contour_plot": "d708b174a0e64380136a667c558020798f258fc7",
         "lpn_contour_show": "1c89a72bdc3791bc1db7aec4280eb7064cb5f886",
-        "lpn_contour_show_tip": "5a3d781a7d2d22ff6d02cb9663d325f5130331d2",
         "lpn_contour_support": "6c63cdc5c71aafdd53cb5bd1ed7c2bf5b82fc58b",
         "lpn_contour_support_dem": "e48840d0d47b61924e0364b54ad0832c833e14a9",
         "lpn_contour_support_lines": "83cb6df3575f1ce1812a9f6a75a47af0c6e34f7b",
@@ -11419,10 +11418,6 @@
         "lpn_contour_show": {
             "words": 2,
             "ends_sentence": false
-        },
-        "lpn_contour_show_tip": {
-            "words": 20,
-            "ends_sentence": true
         },
         "lpn_contour_support": {
             "words": 27,

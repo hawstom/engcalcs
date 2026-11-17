@@ -2061,7 +2061,6 @@ $ec_lang['lpn_contour_menu']='Courbes de niveau';
 $ec_lang['lpn_contour_tip']='Affiche un tracé de courbes de niveau sur la carte : les couleurs des nœuds se diffusent le long des conduites et de part et d\'autre, avec des courbes de niveau étiquetées. Ouvre une boîte pour le régler ou le désactiver.';
 $ec_lang['lpn_contour_plot']='Courbes de niveau : tracé';
 $ec_lang['lpn_contour_show']='Afficher le tracé';
-$ec_lang['lpn_contour_show_tip']='Décochez pour masquer le remplissage et les isolignes ; cochez pour les rétablir tels qu\'ils étaient. Les couleurs des nœuds restent.';
 $ec_lang['lpn_contour_fill']='Remplissage';
 $ec_lang['lpn_contour_fill_tip']='Dégradé fond les couleurs d\'une classe à la suivante. Bandes peint chaque classe de la légende des couleurs d\'un aplat.';
 $ec_lang['lpn_contour_fill_smooth']='Dégradé';

@@ -2061,7 +2061,6 @@ $ec_lang['lpn_contour_menu']='ኮንቱር';
 $ec_lang['lpn_contour_tip']='በካርታው ላይ የኮንቱር ሥዕል ያሳያል፦ የነጥቦቹ ቀለሞች በቧንቧዎቹ ላይና በአጠገባቸው ተሰራጭተው፣ ምልክት ከተደረገባቸው የኮንቱር መስመሮች ጋር። ለማስተካከል ወይም ለማጥፋት ሳጥን ይከፍታል።';
 $ec_lang['lpn_contour_plot']='የኮንቱር ሥዕል';
 $ec_lang['lpn_contour_show']='ሥዕሉን አሳይ';
-$ec_lang['lpn_contour_show_tip']='መሙያውንና የኮንቱር መስመሮችን ለመደበቅ ያጽዱት፤ እንደነበሩ ለመመለስ ይምረጡት። የነጥብ ቀለሞች ይቀራሉ።';
 $ec_lang['lpn_contour_fill']='መሙያ';
 $ec_lang['lpn_contour_fill_tip']='ለስላሳ ቀለሞቹን ከአንዱ ክልል ወደ ሌላው ያዋህዳል። ባንዶች እያንዳንዱን የቀለም መመሪያ ክልል በአንድ ቀለም ይሞላል።';
 $ec_lang['lpn_contour_fill_smooth']='ለስላሳ';

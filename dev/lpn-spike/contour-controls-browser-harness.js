@@ -10,7 +10,7 @@
 //   5. in a child scenario time steps leave an open pull-down alone (no rebuild); a re-solve that changes the
 //      default interval shows in the box.
 //   6. a 390-wide phone: the box fits.
-//   7. round 5: the Show plot tip is the language file's; a standing line "Follows project "Node colors" settings." heads the
+//   7. round 5: Show plot has no tip; a standing line "Follows project "Node colors" settings." heads the
 //      box with Node colors a link into Settings at Symbology, Node colors; Show plot changes no other control (Fill,
 //      Opacity, Buffer, Lines, Interval, Labels), off draws nothing, on draws them as set; undo, save and reopen, and a
 //      child scenario agree.
@@ -144,20 +144,12 @@ async function main0(Session, browser) {
 		ok('there is no Property to plot, Color scheme or Show node colors control', ['lpn_contour_field', 'lpn_contour_node_colors', 'lpn_set_ramp_node_contour'].every((id) => f.ctrls.indexOf(id) < 0) && f.ctrls.indexOf('ramp') < 0 && (await a.page.$('#lpn_contour_body .lpn-ramp-btn')) === null);
 		ok('...and none of those three names is on the box', !/Property to plot|Color scheme|Show node colors|Color nodes by/.test(f.text), f.text.slice(0, 140));
 		ok('Net3 opens colored by pressure and the plot is drawn', f.fill && f.coloured > 0 && /Pressure/.test(f.legend), JSON.stringify({ fill: f.fill, c: f.coloured }));
+		// Tom, 2026-11-16: "Merge feat/contour-controls after removing the tip from "Show plot"." The standing line says it.
 		const tip = await a.page.evaluate(() => {
-			const row = document.getElementById('lpn_contour_show').closest('.lpn-grow'), l = row.querySelector('.ec-help');
-			return { want: EngCalcs.pageConfig.lpn_contour_show_tip, title: l ? (l.title || l.getAttribute('data-bs-original-title') || '') : null, tips: row.querySelectorAll('.ec-tip').length };
+			const row = document.getElementById('lpn_contour_show').closest('.lpn-grow');
+			return { key: 'lpn_contour_show_tip' in EngCalcs.pageConfig, tips: row.querySelectorAll('.ec-tip, .ec-help').length };
 		});
-		ok('the Show plot tip is the language file\'s sentence, which quotes Node colors, and is on the label once', !!tip.want && tip.want.indexOf('"Node colors"') > 0 && tip.title === tip.want && tip.tips === 1, JSON.stringify(tip));
-		// A picture of the tip, opened the way a visitor opens it: a click on the ?.
-		const bb = await (await a.page.$('.lpn-grow:has(#lpn_contour_show) .ec-tip')).boundingBox();
-		await a.page.mouse.move(bb.x - 20, bb.y + bb.height / 2);
-		await a.page.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2, { steps: 4 });
-		await a.page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2);
-		await a.settle(800);
-		ok('clicking the ? opens that sentence', await a.page.evaluate(() => Array.from(document.querySelectorAll('.tooltip-inner, .tooltip')).some((e) => e.offsetParent !== null && e.textContent.indexOf(EngCalcs.pageConfig.lpn_contour_show_tip) >= 0)));
-		await shot(a.page, 'show-plot-tip-r5');
-		await a.page.keyboard.press('Escape');
+		ok('Show plot carries no tip and no ?', !tip.key && tip.tips === 0, JSON.stringify(tip));
 		await a.settle(300);
 		await shot(a.page, 'contour-box-r5');
 		noErrors(a);

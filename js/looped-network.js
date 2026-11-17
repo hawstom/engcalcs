@@ -14189,7 +14189,7 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_contour_show || 'Show plot', check('lpn_contour_show', contourIsOn(), function (on) {
 			settings.contourShow = on;
 			contourChanged();
-		}), pc.lpn_contour_show_tip);
+		}));
 		// **NO PROPERTY, SCHEME OR NODE-COLOR SWITCH HERE** (Tom, 2026-11-14, Task 858): the plot follows Color nodes by and
 		// Color scheme in Settings, Symbology, Node colors. Tom's order: Show plot, Fill, opacity, buffer, Show contour
 		// lines, interval, labels, Ground.

@@ -2061,7 +2061,6 @@ $ec_lang['lpn_contour_menu']='Kontua';
 $ec_lang['lpn_contour_tip']='Onyesha mchoro wa kontua kwenye ramani: rangi za vifundo zinaenea kando ya mabomba na pembeni mwake, pamoja na mistari ya kontua yenye lebo. Hufungua kisanduku cha kuurekebisha au kuuzima.';
 $ec_lang['lpn_contour_plot']='Kontua: mchoro';
 $ec_lang['lpn_contour_show']='Onyesha mchoro';
-$ec_lang['lpn_contour_show_tip']='Ondoa alama ili kuficha rangi ya kujaza na mistari ya kontua; chagua ili kuzirejesha kama zilivyokuwa. Rangi za vifundo hubaki.';
 $ec_lang['lpn_contour_fill']='Kujaza';
 $ec_lang['lpn_contour_fill_tip']='Laini huchanganya rangi kutoka daraja moja hadi jingine. Bendi hupaka kila daraja la ufunguo wa rangi rangi moja tambarare.';
 $ec_lang['lpn_contour_fill_smooth']='Laini';

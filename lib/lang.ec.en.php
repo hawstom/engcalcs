@@ -2132,7 +2132,6 @@ $ec_lang['lpn_contour_plot']='Contour plot';
 $ec_lang['lpn_contour_follows']='Follows project "{link}" settings.';
 $ec_lang['lpn_contour_none_note']='Nothing to plot: "Color nodes by" is set to "No color".';
 $ec_lang['lpn_contour_show']='Show plot';
-$ec_lang['lpn_contour_show_tip']='When showing, follows project "Node colors" settings.';
 $ec_lang['lpn_contour_fill']='Fill';
 $ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
 $ec_lang['lpn_contour_fill_smooth']='Smooth';
