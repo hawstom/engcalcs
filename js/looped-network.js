@@ -6131,6 +6131,8 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function setProp(el, prop, value) {
+		// A pressure tank's own limits, start level and volume curve are the Well's (syncPressureTank()): an edit through any door (Properties, Tables, Find and replace) is refused and says whose they are.
+		if (PT_OWNED[prop] && elGroup(el) === 'node' && pressureTankOwner(el)) { setNotice(String((EngCalcs.pageConfig || {}).lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', pressureTankOwner(el).id)); return; }
 		if (prop === 'elev' && elGroup(el) === 'node' && !assemblyWriting) { wellTankFollow(assemblyOfAnyMember('node', el.id), el, value); }
 		// **THE TWO NODES OF AN ASSEMBLY SHARE ELEVATION AND PLACE** (Task 822): the partner is written
 		// by the same call, whichever door (Properties, Tables, the marker's tick) the edit came by.
@@ -9241,16 +9243,16 @@ var EngCalcs = EngCalcs || {};
 			// **FOUR TANK SCALARS (gap #4).** All four are overridable (the geometry since
 			// 2026-10-12), so each has its `prop`; each `set` is the push's bare Base write, marked.
 			{ key: 'level', group: 'node', field: 'level', prop: 'level', label: pc.lpn_field_tank_level || 'Water depth',
-				applies: function (n) { return n.type === 'tank'; },
+				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
 				get: function (n) { return effective(n, 'level'); }, set: function (n, v) { n._level = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'bottomElev', group: 'node', field: 'bottomElev', prop: 'bottomElev', label: pc.lpn_field_tank_base_elev || 'Base elevation',
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return effective(n, 'bottomElev'); }, set: function (n, v) { setTankBottom(n, v); } },
 			{ key: 'minLevel', group: 'node', field: 'minLevel', prop: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Lowest water depth',
-				applies: function (n) { return n.type === 'tank'; },
+				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
 				get: function (n) { return effective(n, 'minLevel'); }, set: function (n, v) { n.minLevel = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'maxLevel', group: 'node', field: 'maxLevel', prop: 'maxLevel', label: pc.lpn_field_tank_maxlevel || 'Highest water depth',
-				applies: function (n) { return n.type === 'tank'; },
+				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
 				get: function (n) { return effective(n, 'maxLevel'); }, set: function (n, v) { n.maxLevel = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', prop: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
 				applies: function (n) { return n.type === 'tank'; },
@@ -40900,11 +40902,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// grouping is not, and any control it wrote becomes an ordinary control. The ids are collected in `oldWellTanks` so the caller can say so.
 	var oldWellTanks = [];
 	function assembliesFromSaved(list, d) {
-		var nodeIds = {}, linkIds = {}, out = [];
-		oldWellTanks = [];
+		var nodeIds = {}, linkIds = {}, out = [], nodeType = {}, linkType = {};
+		oldWellTanks = []; assemblyWrongKind = [];
 		if (!Array.isArray(list)) { return out; }
-		(d.nodes || []).forEach(function (n) { nodeIds[n.id] = 1; });
-		(d.links || []).forEach(function (l) { linkIds[l.id] = 1; });
+		(d.nodes || []).forEach(function (n) { nodeIds[n.id] = 1; nodeType[n.id] = n.type; });
+		(d.links || []).forEach(function (l) { linkIds[l.id] = 1; linkType[l.id] = l.type; });
 		list.forEach(function (a) {
 			var wellOk, w;
 			if (!a || !Array.isArray(a.links) || !a.links.length) { return; }
@@ -40915,6 +40917,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					return;
 				}
 				wellOk = Array.isArray(a.nodes) && a.nodes.length === 3 && a.links.length === 2 && a.nodes.every(function (id) { return nodeIds[id]; });
+				// Each element must be the kind the group needs: a reservoir, two junctions, a valve and a pump (or the pipe a curveless pump reads back as); a tee that is a junction, a tank that is a tank, two pipes.
+				if (wellOk && !(nodeType[a.nodes[0]] === 'reservoir' && nodeType[a.nodes[1]] === 'junction' && nodeType[a.nodes[2]] === 'junction' && linkType[a.links[0]] === 'valve' && (linkType[a.links[1]] === 'pump' || linkType[a.links[1]] === 'pipe') &&
+					(!(a.tee || a.tank || a.branch) || (nodeType[a.tee] === 'junction' && nodeType[a.tank] === 'tank' && Array.isArray(a.branch) && a.branch.length === 2 && a.branch.every(function (id) { return linkType[id] === 'pipe'; }))))) {
+					assemblyWrongKind.push(a.id !== undefined ? a.id : a.links[1]); return;
+				}
 				if (wellOk) {
 					w = { id: a.id !== undefined ? a.id : a.links[1], kind: 'well', idBy: a.idBy === 'node' && a.id === a.nodes[2] ? 'node' : undefined, nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: a.staticTyped ? true : undefined,
 						pumpOn: typeof a.pumpOn === 'number' ? a.pumpOn : undefined, pumpOff: typeof a.pumpOff === 'number' ? a.pumpOff : undefined };
@@ -40936,14 +40943,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return;
 			}
 			if (!nodeIds[a.up] || !nodeIds[a.down]) { return; }
+			if (nodeType[a.up] !== 'junction' || nodeType[a.down] !== 'junction' || !a.links.every(function (id) { return linkType[id] === (a.kind || 'pump') || ((a.kind || 'pump') === 'pump' && linkType[id] === 'pipe'); })) { assemblyWrongKind.push(a.id !== undefined ? a.id : a.links[0]); return; }
 			out.push({ id: a.id !== undefined ? a.id : a.links[0], kind: a.kind || 'pump', up: a.up, down: a.down, links: a.links.slice() });
 		});
 		// Group IDs are unique across every group (EngCalcs.lpnGroupIdFix(), shared with the .inp reader); a clash is not grouped and is said out loud by the caller.
 		var fix = EngCalcs.lpnGroupIdFix(out);
 		groupIdClashed = fix.clashed;
+		groupIdRenamed = fix.renamed;
 		return fix.kept;
 	}
-	var groupIdClashed = [];
+	var groupIdClashed = [], groupIdRenamed = [], assemblyWrongKind = [];
 	// The elements an assembly is made of, as selection refs, with `lastRef` last so it stays the subject.
 	// **A DRAG OF ONE NODE OF AN ASSEMBLY MOVES THE OTHER TOO** (Task 822): equal x and y, in Base and in
 	// a scenario alike, because the position is read back through the same door a typed one uses.
@@ -41148,14 +41157,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function wellHasTank(a) { return !!(a && a.kind === 'well' && a.tank && nodeById(a.tank)); }
 	// **THE WELL WITH PRESSURE TANK IS THE WELL WITH TANK WHOSE TANK IS A BLADDER TANK** (Task 822; Tom, round 10 pass, 2026-11-16: "It's a lot. But let's go with a third
 	// additional form."). The group is the same Well, tee, tank and two pipes, and `pt` on it is what marks the form: `{ vol, pre, on, off, curve }`, typed in the
-	// project's own units (the volume in the Length unit cubed, as every tank volume here is; the three pressures GAUGE, in the Pressure unit; `pre`, the empty (precharge)
+	// project's own units (the volume in the Elevation/Head unit cubed, the one family a VOLUME curve is read in (lpn-time.js), so the number typed and the curve's own axis agree; the three pressures GAUGE, in the Pressure unit; `pre`, the empty (precharge)
 	// pressure, absent while it follows its default, pump on less 2 psi; `curve`, the ID of the VOLUME curve the group wrote). Everything else is derived and
 	// written by syncPressureTank(), so it is never typed twice: the tank is a fixed head at its gas pressure (EngCalcs.lpnIsFixedHead), its level IS the gauge
 	// pressure head, so the tank stands on the ground with minimum level 0 and maximum level at the pump-off head, and the pump's two controls are the ordinary
 	// tank-level controls, `BELOW` the pump-on head and `ABOVE` the pump-off head. The VOLUME curve is Boyle's law, P(abs) x V(gas) = P0(abs) x V(total),
 	// so the water the tank holds at gauge head h is V x (1 - P0/P), zero up to the precharge. Atmospheric pressure, 14.7 psi, is used only to turn gauge into absolute.
-	var PT_PSI_M = 4.4482216152605 / (0.0254 * 0.0254) / (1000 * EngCalcs.G),   // one psi as metres of water head, from lbf, in and g
-		PT_ATM_M = 14.7 * PT_PSI_M, PT_GAP_M = 2 * PT_PSI_M, PT_STEPS = 12;
+	var PT_STEPS = 12;
+	// One psi as metres of water head: the page's own psi (EngCalcs.unitFactors, the one the Pressure unit reads), so a typed 40 psi and the 14.7 psi atmosphere are the same psi;
+	// from lbf, in and g only where the table is absent.
+	function ptPsiM() { var f = (EngCalcs.unitFactors || {}).psi; return f > 0 ? 1 / f : 4.4482216152605 / (0.0254 * 0.0254) / (1000 * EngCalcs.G); }
+	function ptAtmM() { return 14.7 * ptPsiM(); }
+	function ptGapM() { return 2 * ptPsiM(); }
 	// The curve's rows in SI, [[level m, volume m3], ...], from SI gauge heads and a SI vessel volume; null when the inputs are not a tank.
 	function pressureTankPoints(s) {
 		var pts = [[0, 0]], hs = [], i;
@@ -41166,7 +41179,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		hs.sort(function (x, y) { return x - y; });
 		hs.forEach(function (x) {
 			if (x <= pts[pts.length - 1][0] + 1e-12) { return; }
-			pts.push([x, s.vol * (1 - (s.pre + PT_ATM_M) / (x + PT_ATM_M))]);
+			pts.push([x, s.vol * (1 - (s.pre + ptAtmM()) / (x + ptAtmM()))]);
 		});
 		return pts;
 	}
@@ -41175,18 +41188,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var p = a && a.pt, on, off, pre, vol;
 		if (!p) { return null; }
 		on = toSI(p.on, 'lpn_u_pressure'); off = toSI(p.off, 'lpn_u_pressure');
-		pre = typeof p.pre === 'number' ? toSI(p.pre, 'lpn_u_pressure') : on - PT_GAP_M;
-		vol = p.vol / tankVolumeFactor();
+		pre = typeof p.pre === 'number' ? toSI(p.pre, 'lpn_u_pressure') : on - ptGapM();
+		vol = p.vol / (unitFactor('lpn_u_elevhead') * unitFactor('lpn_u_elevhead') * unitFactor('lpn_u_elevhead'));
 		if (![on, off, pre, vol].every(function (x) { return typeof x === 'number' && isFinite(x); }) || !pressureTankPoints({ vol: vol, pre: pre, on: on, off: off })) { return null; }
 		return { vol: vol, pre: pre, on: on, off: off };
 	}
 	// What a new pressure tank opens on: a reasonable single-home size, the 20-gallon class (2.7 ft^3, or 80 L), a 40 to 60 psi switch, precharge following.
 	function pressureTankDefaults() {
-		var k = unitKey('lpn_u_length');
-		return { vol: k === 'ft' ? 2.7 : k === 'm' ? 0.08 : +(0.0757 * tankVolumeFactor()).toPrecision(2),
+		var k = unitKey('lpn_u_elevhead'), f = unitFactor('lpn_u_elevhead');
+		return { vol: k === 'fth2o' ? 2.7 : k === 'mh2o' ? 0.08 : +(0.0757 * f * f * f).toPrecision(2),
 			on: niceDefault('lpn_u_pressure', 'psi', 40, 28), off: niceDefault('lpn_u_pressure', 'psi', 60, 42) };
 	}
 	// The group that wrote this curve, if any: it is read-only in the Library and changed in that group's Properties box.
+	var PT_OWNED = { level: 1, minLevel: 1, maxLevel: 1, volCurve: 1 };
+	// The group whose pressure tank this node is, else null.
+	function pressureTankOwner(n) {
+		var a = n && n.type === 'tank' ? assemblyIndex().anyNode[n.id] : null;
+		return a && a.pt && a.tank === n.id && wellHasTank(a) ? a : null;
+	}
 	function curveWriterAsm(id) {
 		var list = assemblyList(), i;
 		for (i = 0; i < list.length; i++) { if (list[i].pt && list[i].pt.curve === id && wellHasTank(list[i])) { return list[i]; } }
@@ -41214,6 +41233,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		a.pumpOn = +(s.on * fh).toFixed(4); a.pumpOff = +(s.off * fh).toFixed(4);
 		syncWellControls(a);
 		updateNode(tank.id, true);
+	}
+	// The pressure tank's volume is typed in the Elevation/Head unit cubed; its mark.
+	function elevVolumeUnitText() {
+		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_elevhead');
+		return k === 'fth2o' ? (pc.u_ft3 || 'ft^3') : k === 'mh2o' ? (pc.u_m3 || 'm^3') : unitLabel('lpn_u_elevhead') + '^3';
 	}
 	function syncAllPressureTanks() { assemblyList().forEach(function (a) { if (a.pt) { syncPressureTank(a); } }); }
 	function completeWell(d, x, y) {
@@ -41274,11 +41298,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		hit = wellTankHitNode(e, t);
 		if (wellTankPending.stage === 'tee') {
 			if (hit && assemblyOfNode(hit.id) === a) { tee = addNode('junction', wellOut.x, wellOut.y); if (typeof wellOut.elev === 'number') { tee.elev = wellOut.elev; } teeFollows = true; }   // base-write: construction: the tee stands where the well does, at its elevation, and follows it (the same ground, so the DEM rule below does not apply)
-			else if (hit && hit.type === 'junction' && !assemblyOfNode(hit.id) && wellTankNotOurs(a, hit.id)) { tee = hit; }
+			else if (hit && hit.type === 'junction' && !assemblyIndex().anyNode[hit.id] && wellTankNotOurs(a, hit.id)) { tee = hit; }   // anyNode: another Well's tee or tank is in a group too
 			else if (hit) { wellTankPrompt('lpn_welltank_tee_refused', 'The tee must be a junction that is not part of another assembly. Specify the tee again.'); return true; }
 			else {
 				pid = tapLinkId(t); pipe = pid ? linkById(pid) : null;
-				if (pipe && pipe.type === 'pipe' && inBaseScenario() && wellTankNotOurs(a, pipe.id) && nodeById(pipe.from) && nodeById(pipe.to)) {
+				if (pipe && pipe.type === 'pipe' && inBaseScenario() && !assemblyIndex().anyLink[pipe.id] && wellTankNotOurs(a, pipe.id) && nodeById(pipe.from) && nodeById(pipe.to)) {
 					r = breakPipeAtPoint(pipe, 'junction', w.x, w.y, null); tee = r.node;
 				} else {
 					tee = addNode('junction', w.x, w.y);
@@ -41298,7 +41322,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		// A pressure tank is made new: the group writes its limits, its volume curve and its start level, which an existing tank's own numbers must not be overwritten by.
 		if (hit && wellTankPending.form === 'pressure') { wellTankPrompt('lpn_welltankp_tank_refused', 'A pressure tank is made new. Specify a point on the map, not an existing tank.'); return true; }
-		if (hit && hit.type === 'tank' && !assemblyOfNode(hit.id) && wellTankNotOurs(a, hit.id)) { tank = hit; }
+		if (hit && hit.type === 'tank' && !assemblyIndex().anyNode[hit.id] && wellTankNotOurs(a, hit.id)) { tank = hit; }
 		else if (hit) { wellTankPrompt('lpn_welltank_tank_refused', 'The tank must be a tank that is not part of another assembly. Specify the tank again.'); return true; }
 		else {
 			tank = addNode('tank', w.x, w.y);
@@ -41371,13 +41395,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Well with tank count as members. A scenario's morph separates the group in every scenario, because the grouping belongs to the document.
 	// Morphing an ordinary element never touches a group.
 	var morphExploded = [];
-	function assemblyOfAnyMember(group, id) {
-		var list = assemblyList(), i;
-		for (i = 0; i < list.length; i++) {
-			if ((group === 'node' ? assemblyAllNodeIds(list[i]) : assemblyAllLinkIds(list[i])).indexOf(id) >= 0) { return list[i]; }
-		}
-		return null;
-	}
+	function assemblyOfAnyMember(group, id) { return (group === 'node' ? assemblyIndex().anyNode : assemblyIndex().anyLink)[id] || null; }
 	function explodeForMorph(el) {
 		var a = assemblyOfAnyMember(elGroup(el), el.id);
 		if (!a) { return; }
@@ -41643,8 +41661,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		unitNumberFieldBlank(fields, pc.lpn_field_well_pt_empty || 'Empty pressure', 'lpn_u_pressure', function () { return p.pre; },
 			function (v) { if (v === undefined || !isFinite(v)) { delete p.pre; } else { p.pre = v; } apply(); },
-			typeof p.on === 'number' ? toDisplay(toSI(p.on, 'lpn_u_pressure') - PT_GAP_M, 'lpn_u_pressure') : undefined, pc.lpn_field_well_pt_empty_tip);
-		numberFieldPlain(fields, (pc.lpn_curve_kind_volume || 'Tank volume') + ' (' + tankVolumeUnitText() + ')', p.vol, function (v) { p.vol = v; apply(); }, pc.lpn_field_well_pt_volume_tip);
+			typeof p.on === 'number' ? toDisplay(toSI(p.on, 'lpn_u_pressure') - ptGapM(), 'lpn_u_pressure') : undefined, pc.lpn_field_well_pt_empty_tip);
+		numberFieldPlain(fields, (pc.lpn_curve_kind_volume || 'Tank volume') + ' (' + elevVolumeUnitText() + ')', p.vol, function (v) { p.vol = v; apply(); }, pc.lpn_field_well_pt_volume_tip);
 		if (s) {
 			readonlyUnitField(fields, pc.lpn_field_well_pt_on_head || 'Pump on pressure head', 'lpn_u_elevhead', s.on, pc.lpn_field_well_pt_head_tip);
 			readonlyUnitField(fields, pc.lpn_field_well_pt_off_head || 'Pump off pressure head', 'lpn_u_elevhead', s.off, pc.lpn_field_well_pt_head_tip);
@@ -45545,6 +45563,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		doc.defaultPattern = saved.defaultPattern || null;
 		doc.times = saved.times || null;
 		doc.controls = saved.controls || [];
+		// A Well that took its pump's ID because its outlet's was another group's takes its controls with it (they are found by the tank and the pump they name).
+		groupIdRenamed.forEach(function (r) {
+			doc.controls.forEach(function (c) { if (c && c.asm === r.from && c.link === r.pump && c.condition && c.condition.node === r.tank) { c.asm = r.to; } });
+		});
 		// A control a Well wrote belongs to it only while that Well is in the project (a one-point Well with tank is not any more); else it is the user's.
 		doc.controls.forEach(function (c) { if (c && c.asm !== undefined && !assemblyById(c.asm)) { delete c.asm; } });
 		doc.rules = saved.rules || [];
@@ -45819,7 +45841,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		openDocVersion = (typeof saved.v === 'number') ? saved.v : LPN_STORAGE_VERSION;
 		pendingV2Restore = openDocVersion < LPN_DECLARATIVE_VERSION;
 		if (groupIdClashed.length && !oldWellTanks.length) {
-			setNotice(String((EngCalcs.pageConfig || {}).lpn_inp_drop_assembly_id || 'These groups share an ID with another group, so they were not restored. Their nodes and links came in as plain elements.'));
+			setNotice(String((EngCalcs.pageConfig || {}).lpn_inp_drop_assembly_id || 'These groups share an ID with another group, so they were not restored. Their nodes and links came in as plain elements.') + ' ' + groupIdClashed.join(', '));
+		}
+		if (assemblyWrongKind.length) {
+			setNotice(String((EngCalcs.pageConfig || {}).lpn_inp_drop_assembly_kind || 'These groups name an element that is not the kind the group needs, such as a pump that is not a pump or a tank that is not a tank, so they were not restored. Their nodes and links are kept as plain elements.') + ' ' + assemblyWrongKind.join(', '));
 		}
 		if (oldWellTanks.length) {
 			setNotice(String((EngCalcs.pageConfig || {}).lpn_inp_drop_well_tank || 'These are one-point wells with a tank, a form this page no longer draws. Their reservoir, drawdown valve, pump, tee, virtual pipe, and tank are kept as ordinary elements, and their pump controls as ordinary controls.') + ' ' + oldWellTanks.join(', '));
@@ -49341,6 +49366,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// sentence names the Text and never the other word.
 			case 'label-anchor-missing': return pc.lpn_inp_drop_anchor_missing || 'This text was attached to a junction, reservoir, or tank that is not in the file. It was imported as free text at the location stated in the file and is not attached to any asset.';
 			case 'assembly-well-tank': return pc.lpn_inp_drop_well_tank || 'These are one-point wells with a tank, a form this page no longer draws. Their reservoir, drawdown valve, pump, tee, virtual pipe, and tank are kept as ordinary elements, and their pump controls as ordinary controls.';
+			case 'assembly-kind': return pc.lpn_inp_drop_assembly_kind || 'These groups name an element that is not the kind the group needs, such as a pump that is not a pump or a tank that is not a tank, so they were not restored. Their nodes and links are kept as plain elements.';
+			case 'assembly-malformed': return pc.lpn_inp_drop_assembly_malformed || 'These ;ASSEMBLY lines are not in a form this page writes, so no group was restored from them.';
 			case 'assembly-id-clash': return pc.lpn_inp_drop_assembly_id || 'These groups share an ID with another group, so they were not restored. Their nodes and links came in as plain elements.';
 			case 'assembly-unresolved': return pc.lpn_inp_drop_assembly || 'The file groups these pumps with nodes it does not contain, so the group was not restored. The nodes and pumps that are there came in as plain elements.';
 			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every value before using the results.';
@@ -63019,7 +63046,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				k = k1 * k1 * k1;
 				doc.nodes.forEach(function (nd) { conv(nd, 'minVolume'); });
 				convOverrides('minVolume');
-				assemblyList().forEach(function (a) { if (a.pt) { conv(a.pt, 'vol'); } });
 				k = k1;
 			}());
 		} else if (name === 'lpn_u_diameter') {
@@ -63043,6 +63069,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				conv(nd, 'maxLevel'); conv(nd, '_head');
 			});
 			convOverrides('level'); convOverrides('head');
+			// A pressure tank's volume is in this unit cubed, as its curve's axis is.
+			(function () { var k1 = k; k = k1 * k1 * k1; assemblyList().forEach(function (a) { if (a.pt) { conv(a.pt, 'vol'); } }); k = k1; }());
 			// Overridable since 2026-10-12, so a scenario's own ground and depth limits move too.
 			convOverrides('elev'); convOverrides('bottomElev'); convOverrides('minLevel'); convOverrides('maxLevel');
 			// Head error limit is a head typed in this unit (Task 762 pass: it was missed here).
@@ -77203,7 +77231,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A tank's four depth and size inputs, in the order a person builds one: how much water is in it, how far it can go
 	// either way, and how wide it is. The one place they are drawn, for a tank's own box and for a well's.
 	function tankDepthFields(fields, n, nodeId) {
-		var pc = EngCalcs.pageConfig || {};
+		var pc = EngCalcs.pageConfig || {}, owner = pressureTankOwner(n), eu = ' (' + unitLabel('lpn_u_elevhead') + ')';
+		// A pressure tank's initial depth, limits and volume curve are the Well's, shown as it set them (syncPressureTank()), with whose they are.
+		if (owner) {
+			readonlyField(fields, (pc.lpn_field_tank_level_short || 'Initial depth') + eu, effective(n, 'level'), pc.lpn_field_tank_level_short_tip, 4);
+			readonlyField(fields, (pc.lpn_field_tank_minlevel_short || 'Minimum depth') + eu, effective(n, 'minLevel'), pc.lpn_field_tank_minlevel_short_tip, 4);
+			readonlyField(fields, (pc.lpn_field_tank_maxlevel_short || 'Maximum depth') + eu, effective(n, 'maxLevel'), pc.lpn_field_tank_maxlevel_short_tip, 4);
+			readonlyField(fields, pc.lpn_curve_kind_volume || 'Tank volume', effective(n, 'volCurve') || '');
+			readonlyField(fields, String(pc.lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', owner.id), '');
+		}
+		if (!owner) {
 		unitNumberField(fields, pc.lpn_field_tank_level_short || 'Initial depth', 'lpn_u_elevhead',
 			function () { return effective(n, 'level'); },
 			function (v) { setProp(n, 'level', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
@@ -77218,6 +77255,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function () { return effective(n, 'maxLevel'); },
 			function (v) { setProp(n, 'maxLevel', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_maxlevel_short_tip, { el: n, prop: 'maxLevel' }), valueWarnText('maxLevel', n, effective(n, 'maxLevel')));
+		}
 		// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
 		// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
 		// and NOT the pipe-diameter unit either, or inches/millimetres would put a 15 m tank on
@@ -83607,8 +83645,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		roughnessNote = roughnessNoteText(model);
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
-			// A refusal says why there is no new answer; it does not take the last one away (the snapshot rule:
-			// stale results stay on screen until Calculate or a deliberate Clear).
+			// **A SOLVE THAT WAS ASKED FOR AND REFUSED LEAVES NO ANSWER** (master's rule, dev/lpn-rulings.md): the snapshot rule keeps stale results where NO solve ran
+			// (Recalculate off, an edit), but here one did, with Recalculate on or by Calculate, and old results left on screen would read as this network's.
+			lastSolveResult = null;
 			issues.forEach(function (issue) { logLpnDiag(issue.code); });
 			setStatus(issues.map(diagIssueText).join(' '), issues[0].code, true);
 			refreshLabelText();

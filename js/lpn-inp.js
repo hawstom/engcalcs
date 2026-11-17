@@ -398,13 +398,13 @@
 	// the file keeps the ID; a later Well that took its ID from its outlet falls back to its pump's ID (the form a file before Round 8 has) if that is free; any
 	// other is not grouped (its elements stay, as for every unresolved group) and its ID is returned in `clashed` for the caller to say so.
 	EngCalcs.lpnGroupIdFix = function (list) {
-		var seen = {}, kept = [], clashed = [];
+		var seen = {}, kept = [], clashed = [], renamed = [];
 		(list || []).forEach(function (a) {
-			if (seen[a.id] && a.kind === 'well' && a.idBy === 'node' && a.links && !seen[a.links[1]]) { a.id = a.links[1]; delete a.idBy; }
+			if (seen[a.id] && a.kind === 'well' && a.idBy === 'node' && a.links && !seen[a.links[1]]) { renamed.push({ from: a.id, to: a.links[1], pump: a.links[1], tank: a.tank }); a.id = a.links[1]; delete a.idBy; }
 			if (seen[a.id]) { clashed.push(a.id); return; }
 			seen[a.id] = 1; kept.push(a);
 		});
-		return { kept: kept, clashed: clashed };
+		return { kept: kept, clashed: clashed, renamed: renamed };
 	};
 	EngCalcs.lpnInpParse = function (text) {
 		var lines = String(text == null ? '' : text).split(/\r\n|\r|\n/),
@@ -413,7 +413,7 @@
 			seen = {},          // name -> row count, for the ones we only count
 			i, line, semi, toks, cmt, titleLines = [];
 
-		var markVirtual = [], markAssemblies = [];
+		var markVirtual = [], markAssemblies = [], assemblyMalformed = [];
 		var carried = {};   // section name -> the file's own lines, for every section not read below
 		// The `;PUMP:`-style line last seen inside [CURVES], waiting for the row it describes.
 		var pendingCurveType = null;
@@ -461,24 +461,31 @@
 			// **THE GROUPING COMMENTS THIS PAGE WRITES** (Task 822): `;VIRTUAL: id ...` and
 			// `;ASSEMBLY: kind up down link ...`, read wherever they sit and never carried as text.
 			if (semi >= 0 && !line.trim()) {
-				var gm = /^(VIRTUAL|ASSEMBLY)\s*:\s*(.*)$/i.exec(cmt);
+				var gm = /^(VIRTUAL|ASSEMBLY): (.*)$/.exec(cmt);   // exactly as this page writes them: a user's `;Virtual: ...` or `;VIRTUAL:text` is an ordinary comment
 				if (gm) {
 					var gt = gm[2].split(/\s+/).filter(Boolean), gOpt = {};
 					// `ON=3 OFF=6` after a well's ids: the pump-on and pump-off tank depths its two controls were written from.
 					// `TEE=` `TANK=` `PIPES=a,b` after a Well with tank's ids: its tee, its tank and the two pipes between them (Round 7).
 					// `ID=` the Well's own id, written where it is not the pump's (Round 8: the outlet node's, W1, the pump being W1P).
 					// `PT=vol,pre,on,off,curve` a Well with pressure tank's own numbers as typed (the empty pressure blank while it follows its default), and the VOLUME curve it wrote.
-					gt = gt.filter(function (tk) { var kv = /^(ID|ON|OFF|TEE|TANK|PIPES|PT)=(.+)$/i.exec(tk); if (kv) { gOpt[kv[1].toLowerCase()] = kv[2]; return false; } return true; });
-					if (gm[1].toUpperCase() === 'VIRTUAL') { markVirtual = markVirtual.concat(gt); }
-					else if (gt[0].toLowerCase() === 'well') {
+					if (gm[1] === 'VIRTUAL') {
+						// `id` or `id=length|diameter|roughness|minor`: the pipe's own typed numbers, which the stand-in row replaced (written by this page).
+						gt.forEach(function (tk) { var eq = tk.indexOf('='); markVirtual.push(eq < 0 ? { id: tk } : { id: tk.slice(0, eq), tok: tk.slice(eq + 1).split('|') }); });
+						continue;
+					}
+					gt = gt.filter(function (tk) { var kv = /^(ID|ON|OFF|TEE|TANK|PIPES|PT)=(.+)$/.exec(tk); if (kv) { gOpt[kv[1].toLowerCase()] = kv[2]; return false; } return true; });
+					if (!gt.length) { assemblyMalformed.push(cmt); continue; }
+					if (gt[0] === 'well') {
 						// `;ASSEMBLY: well R D P V W` is the Well: groundwater reservoir, drawdown node, pump outlet, drawdown valve, pump. A Well with tank
 						// adds `TEE=x TANK=y PIPES=a,b`. Two older forms put the tank at the Well's own point and are read as their elements, with a
 						// report: `well R S T D G P B` (reservoir, pump's upstream node, tank, tee, drawdown valve, pump, virtual pipe) and the
 						// earlier `well R S T G P` (no tee). Anything else is not one.
 						if (gt.length === 6) { markAssemblies.push({ kind: 'well', nodes: gt.slice(1, 4), links: gt.slice(4), opt: gOpt }); }
 						else if (gt.length === 8) { markAssemblies.push({ kind: 'well', nodes: gt.slice(1, 5), links: gt.slice(5), opt: gOpt }); }
+						else { assemblyMalformed.push(cmt); }
 					}
-					else if (gt.length >= 4) { markAssemblies.push({ kind: gt[0].toLowerCase(), up: gt[1], down: gt[2], links: gt.slice(3) }); }
+					else if ((gt[0] === 'pump' || gt[0] === 'valve') && gt.length >= 4) { markAssemblies.push({ kind: gt[0], up: gt[1], down: gt[2], links: gt.slice(3) }); }
+					else { assemblyMalformed.push(cmt); }
 					continue;
 				}
 			}
@@ -1447,8 +1454,20 @@
 		// Read after every link kind is in, the valves last, so a Valve+ finds its valve.
 		// A pipe named by `;VIRTUAL:` comes back virtual; an assembly comes back only if every element it
 		// names is in the file as the right kind. One that is not is reported, never half-restored.
-		markVirtual.forEach(function (vid) { if (linkIndex[vid] && linkIndex[vid].type === 'pipe') { linkIndex[vid].virtual = true; } });
-		var assemblies = [], assemblyBad = [], wellTankOld = [];
+		markVirtual.forEach(function (mv) {
+			var vp = linkIndex[mv.id], tk = mv.tok;
+			if (!vp || vp.type !== 'pipe') { return; }
+			vp.virtual = true;
+			// The typed numbers the stand-in row replaced, put back as the characters they were written with.
+			if (tk) {
+				[['length', 0], ['diameter', 1], ['roughness', 2], ['k', 3]].forEach(function (f) {
+					var t = tk[f[1]];
+					if (t !== undefined && t !== '' && isFinite(parseFloat(t))) { vp[f[0]] = mergeTok(vp, f[0], t, num(t)); }
+				});
+			}
+		});
+		var assemblies = [], assemblyBad = [], wellTankOld = [], assemblyKind = [];
+		function isType(coll, id, type) { return !!coll[id] && coll[id].type === type; }
 		markAssemblies.forEach(function (a) {
 			var un, dn, wn, good, w, pipes, opt, ptf;
 			if (a.kind === 'well') {
@@ -1458,11 +1477,17 @@
 				if (wn[0] && wn[1] && wn[2] && wn[0].type === 'reservoir' && wn[1].type === 'junction' && (wn[2].type === 'tank' ? (a.nodes.length < 4 || (wn[3] && wn[3].type === 'junction')) : (wn[2].type === 'junction' && a.nodes.length === 3)) &&
 					a.links.every(function (id) { return !!linkIndex[id]; })) {
 					if (wn[2].type === 'tank') { wellTankOld.push(a.links[1]); return; }
+					// The two links must be a general purpose valve and a pump (a pump with no curve is written, and so read back, as a pipe: pump-no-curve-as-pipe), or it is not a Well.
+					if (!isType(linkIndex, a.links[0], 'valve') || !(isType(linkIndex, a.links[1], 'pump') || isType(linkIndex, a.links[1], 'pipe'))) { assemblyKind.push(a.links[1]); return; }
 					opt = a.opt || {};
 					// The group's id is the outlet node's when the file says so (`ID=`), else the pump's, as a file written before Round 8 has it.
 					w = { id: opt.id === a.nodes[2] ? a.nodes[2] : a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: true, _opt: opt };
 					if (opt.id === a.nodes[2]) { w.idBy = 'node'; }
 					pipes = String(opt.pipes || '').split(',');
+					if (opt.tee || opt.tank || opt.pipes) {
+						// A tee, a tank and two pipes named but of the wrong kinds: the whole grouping is dropped and reported, never half-restored.
+						if (!(isType(nodeIndex, opt.tee, 'junction') && isType(nodeIndex, opt.tank, 'tank') && pipes.length === 2 && pipes.every(function (id) { return isType(linkIndex, id, 'pipe'); }))) { assemblyKind.push(a.links[1]); return; }
+					}
 					if (nodeIndex[opt.tee] && nodeIndex[opt.tee].type === 'junction' && nodeIndex[opt.tank] && nodeIndex[opt.tank].type === 'tank' && pipes.length === 2 &&
 						pipes.every(function (id) { return !!linkIndex[id]; })) {
 						w.tee = opt.tee; w.tank = opt.tank; w.branch = pipes;
@@ -1478,6 +1503,7 @@
 			}
 			un = nodeIndex[a.up]; dn = nodeIndex[a.down];
 			good = !!un && !!dn && un.type === 'junction' && dn.type === 'junction' && a.links.every(function (id) { return !!linkIndex[id]; });
+			if (good && !a.links.every(function (id) { return linkIndex[id].type === a.kind || (a.kind === 'pump' && linkIndex[id].type === 'pipe'); })) { assemblyKind.push(a.links[0]); return; }
 			if (good) { assemblies.push({ id: a.links[0], kind: a.kind, up: a.up, down: a.down, links: a.links.slice() }); }
 			else { assemblyBad.push(a.links[0]); }
 		});
@@ -1486,6 +1512,8 @@
 		if (idFix.clashed.length) { drop('assembly-id-clash', idFix.clashed, null, 'link'); }
 		if (assemblyBad.length) { drop('assembly-unresolved', assemblyBad, null, 'link'); }
 		if (wellTankOld.length) { drop('assembly-well-tank', wellTankOld, null, 'link'); }
+		if (assemblyKind.length) { drop('assembly-kind', assemblyKind, null, 'link'); }
+		if (assemblyMalformed.length) { drop('assembly-malformed', assemblyMalformed, null); }
 
 		if (activeValveIds.length) { drop('valve-active', activeValveIds, null, 'link'); }
 
@@ -3359,7 +3387,8 @@
 					// A VIRTUAL PIPE (Task 822) goes out as the stand-in a curveless pump uses: EPANET
 					// refuses length 0, so 0.01 of a very wide, very smooth pipe, whose loss is below
 					// solver tolerance. The `;VIRTUAL:` line below is what lets it come back as virtual.
-					virtualIds.push(lk.id);
+					// The typed length, diameter, roughness and minor loss ride on the `;VIRTUAL:` line, as the characters an ordinary row would carry, so they survive a round trip.
+					virtualIds.push(lk.id + '=' + [n(cLen, lk, '_length', eff(lk, 'length') || 0), dia, n(cRough, lk, '_roughness', eff(lk, 'roughness') || 0), minorLossText(lk)].join('|'));
 					pipes.push(row([lk.id, lk.from, lk.to, '0.01', standInDia,
 						roughStandIn(settings.method), '0', pipeStatus]) + descOf(lk));
 				} else {
@@ -3882,7 +3911,15 @@
 		function assemblyComments() {
 			var out = '', live = {};
 			doc.links.forEach(function (l2) { if (!offLink[l2.id]) { live[l2.id] = 1; } });
-			if (virtualIds.length) { out += ';VIRTUAL: ' + virtualIds.join(' ') + '\n'; }
+			// Several lines, none over 254 characters (EPANET reads a line to 255).
+			(function () {
+				var line = '';
+				virtualIds.forEach(function (v) {
+					if (line && (';VIRTUAL: ' + line + ' ' + v).length > 254) { out += ';VIRTUAL: ' + line + '\n'; line = ''; }
+					line += (line ? ' ' : '') + v;
+				});
+				if (line) { out += ';VIRTUAL: ' + line + '\n'; }
+			}());
 			(doc.assemblies || []).forEach(function (a) {
 				var ends = a && a.kind === 'well' ? a.nodes : a && [a.up, a.down], tail = a && a.kind === 'well' && a.tank && a.tee && a.branch ? [a.tee, a.tank].concat(a.branch) : [];
 				if (!a || !ends || !ends.every(Boolean) || !a.links || !a.links.length) { return; }

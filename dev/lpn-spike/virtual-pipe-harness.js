@@ -133,7 +133,7 @@ function worst(a, b, ids, field) {
 	const o1 = open(inp(1));
 	const out1 = EC.lpnExportInp(L.serializeProject(), {});
 	ok('export succeeds', out1.ok, JSON.stringify(out1.error));
-	ok('it names the virtual pipe on one ;VIRTUAL: line', /^;VIRTUAL: V1$/m.test(out1.inp));
+	ok('it names the virtual pipe on one ;VIRTUAL: line, carrying its own typed numbers', /^;VIRTUAL: V1=\S+$/m.test(out1.inp));
 	const exRow = out1.inp.split('\n').find((l) => /^V1\s/.test(l.trim()) || /^\s*V1\s/.test(l)) || '';
 	ok('and writes V1 as the stand-in row (the widest ordinary pipe, 250 mm)', /^V1\s+JA\s+J1\s+0\.01\s+250\s+150\s+0\s+Open/.test(exRow.trim()), JSON.stringify(exRow));
 	const back = EC.lpnInpParse(out1.inp);
@@ -169,7 +169,7 @@ function worst(a, b, ids, field) {
 	const t0 = EC.lpnToInp(plain0.model).inp;
 	ok('EPANET\'s text carries P2 as 0.01 m of 250 mm, the widest ordinary pipe', /^\s*P2\s+J1\s+J2\s+0\.01\s+250\s+150\s+0\s+Open/m.test(t0), JSON.stringify(t0.split('\n').find((l) => /^\s*P2\s/.test(l))));
 	const x0 = EC.lpnExportInp(L.serializeProject(), {});
-	ok('export writes the same stand-in row and a ;VIRTUAL: line naming P2', x0.ok && /^;VIRTUAL: P2$/m.test(x0.inp) && /^P2\s+J1\s+J2\s+0\.01\s+250\s+150/m.test(x0.inp.split('\n').map((l) => l.trim()).join('\n')), JSON.stringify(x0.error));
+	ok('export writes the same stand-in row and a ;VIRTUAL: line naming P2', x0.ok && /^;VIRTUAL: P2=\S+$/m.test(x0.inp) && /^P2\s+J1\s+J2\s+0\.01\s+250\s+150/m.test(x0.inp.split('\n').map((l) => l.trim()).join('\n')), JSON.stringify(x0.error));
 	open(x0.inp);
 	ok('reopened, P2 is virtual again, with length 0 in the model', L.getDoc().links.find((l) => l.id === 'P2').virtual === true && L.currentModel().links.find((l) => l.id === 'P2').length === 0);
 	ok('a second export is byte-identical', EC.lpnExportInp(L.serializeProject(), {}).inp === x0.inp);

@@ -42,6 +42,8 @@ const L = loadLoopedNetwork(
 	"\t\tassemblyOfNode: assemblyOfNode, explode: explodeAssembly, snap: saveUndoSnapshot, syncWellControls: syncWellControls,\n" +
 	"\t\tlastNotice: function () { return lastNoticeText; }, pending: function () { return wellTankPending; },\n" +
 	"\t\tcurrentModel: function () { return assembleModel(); }, scnLabels: scnLabels, nodeLines: nodeLabelFieldLines,\n" +
+	"\t\tassemblyOfAnyMember: assemblyOfAnyMember, effective: effective, createScenario: createScenario, switchScenario: switchScenario, getScenarios: function () { return scenarios; },\n" +
+	"\t\tlastResult: function () { return lastSolveResult; }, setLastResult: function (r) { lastSolveResult = r; }, notices: function () { return lastNoticeText; }, convertUnits: convertUnitValues, applyOneUnit: applyOneUnit,\n" +
 	"\t\tassemblyById: assemblyById, curveById: curveById, pressureTankPoints: pressureTankPoints, pressureTankSI: pressureTankSI, syncPressureTank: syncPressureTank, toSI: toSI,\n" +
 	"\t\tresetIds: function () { nextId = newNextId(); }, linkAutoLength: linkAutoLength, wellHasTank: wellHasTank,\n" +
 	"\t\tsetScale: function (s) { state.s = s; state.tx = 0; state.ty = 0; },\n" +
@@ -365,7 +367,7 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	const NATIVE = L.toSI(1, 'lpn_u_pressure');
 	ok('a psi is 0.70307 m of head in the page\'s pressure unit', Math.abs(L.toSI(1, 'lpn_u_pressure') * 1 - NATIVE) < 1e-12 && NATIVE > 0, String(NATIVE));
 	// Boyle, checked against the published well tank: 44 gal total, 38 psig precharge, 40/60 switch: drawdown = V (1 - P0/P) between cut-in and cut-out.
-	const psi = 0.70307, gal = 0.003785411784;
+	const psiT = 1 / EC.unitFactors.psi, psi = 0.70307, gal = 0.003785411784;
 	const pts = L.pressureTankPoints({ vol: 44 * gal, pre: 38 * psi, on: 40 * psi, off: 60 * psi });
 	const vAt = (h) => { let v = 0; for (let i = 1; i < pts.length; i++) { if (h <= pts[i][0] + 1e-12) { v = pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * (h - pts[i - 1][0]) / (pts[i][0] - pts[i - 1][0]); return v; } } return pts[pts.length - 1][1]; };
 	const draw44 = (vAt(60 * psi) - vAt(40 * psi)) / gal;
@@ -391,7 +393,7 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	const c = L.curveById(a.pt.curve);
 	ok('the VOLUME curve is in the document, written by the group', !!c && c.kind === 'volume' && c.points.length > 12 && c.id === 'W1TV', c && JSON.stringify(c.points.slice(0, 3)));
 	ok('the tank stands on the ground: minimum level 0, maximum level the pump-off head, on the curve, starting between', t.minLevel === 0 && Math.abs(t.maxLevel - 42) < 1e-6 && t.volCurve === c.id && t._level > 28 && t._level < 42, JSON.stringify([t.minLevel, t.maxLevel, t.volCurve, t._level]));
-	ok('the curve reaches the maximum level and the drawdown water at pump-off, by Boyle (precharge 28 m less 2 psi, atmosphere 14.7 psi)', Math.abs(c.points[c.points.length - 1][0] - 42) < 1e-6 && Math.abs(c.points[c.points.length - 1][1] - 0.08 * (1 - (28 - 2 * psi + 10.33509) / (42 + 10.33509))) < 1e-6, JSON.stringify(c.points[c.points.length - 1]));
+	ok('the curve reaches the maximum level and the drawdown water at pump-off, by Boyle (precharge 28 m less 2 psi, atmosphere 14.7 psi)', Math.abs(c.points[c.points.length - 1][0] - 42) < 1e-6 && Math.abs(c.points[c.points.length - 1][1] - 0.08 * (1 - (28 - 2 * psiT + 14.7 * psiT) / (42 + 14.7 * psiT))) < 1e-6, JSON.stringify(c.points[c.points.length - 1]));
 	ok('its controls are in pressure head: pump on below 28 and pump off above 42, written for the pump and the tank', a.pumpOn === 28 && a.pumpOff === 42 && doc.controls.filter((x) => x.asm === 'W1' && x.condition.node === t.id).length === 2, JSON.stringify(doc.controls.map((x) => x.raw)));
 	// follows the well's elevation, at ground
 	L.setProp(L.nodeById('W1'), 'elev', 123);
@@ -431,6 +433,136 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	ok('Undo regroups it, pressure tank and all', L.getDoc().assemblies.length === 1 && !!L.getDoc().assemblies[0].pt && L.getDoc().controls.filter((x) => x.asm === 'W1').length === 2);
 	L.deleteElement('node', L.getDoc().assemblies[0].tank);
 	ok('deleting the tank ends the group; the curve is then an ordinary curve', L.getDoc().assemblies.length === 0 && !!L.curveById('W1TV'));
+}
+
+console.log('\n--- 10. round 11 review fixes ---');
+{
+	// 1. A solve that was asked for and refused leaves no answer.
+	const doc = fresh();
+	const a = place3(200, 150, 500, 150, 500, 400);
+	curves(doc, a);
+	L.setLastResult({ heads: {}, flows: {}, pressures: {}, velocities: {}, headlosses: {} });
+	a.pumpOn = 9999; a.pumpOff = 10000; L.syncWellControls(a);
+	L.runSolve();
+	ok('a refused solve (levels outside the tank) clears the results instead of leaving the old ones as current', L.lastResult() === null, JSON.stringify(L.lastResult()));
+}
+{
+	// 2. Another Well's tee or tank is not available as this one's.
+	const doc = fresh();
+	const a1 = place3(200, 150, 500, 150, 500, 400);
+	L.setMode('add-welltank'); press(200, 600);
+	press(500, 150, hitNode('J1'));
+	ok('another Well\'s tee is refused as a tee', L.pending() && L.pending().stage === 'tee' && /junction/i.test(L.lastNotice()), L.lastNotice());
+	press(300, 650);
+	press(500, 400, hitNode('T1'));
+	ok('another Well\'s tank is refused as a tank', L.pending() && L.pending().stage === 'tank' && doc.assemblies[1] && !doc.assemblies[1].tank && /tank/i.test(L.lastNotice()), L.lastNotice());
+	// 10. one index answers membership
+	ok('any member of a group, tee, tank and branch pipes included, is found by the one index', L.assemblyOfAnyMember('node', 'J1') === a1 && L.assemblyOfAnyMember('node', 'T1') === a1 && L.assemblyOfAnyMember('link', a1.branch[1]) === a1 && L.assemblyOfAnyMember('node', 'nope') === null);
+	L.setMode('select');
+}
+{
+	// 3, 4. Kinds and malformed lines.
+	const doc = fresh();
+	const a = place3(200, 150, 500, 150, 500, 400);
+	curves(doc, a);
+	const inp = EC.lpnExportInp(L.serializeProject(), {}).inp;
+	const bad = EC.lpnInpParse(inp.replace('TANK=T1', 'TANK=J1'));
+	ok('a Well whose tank is a junction is not restored, and the report says so', bad.assemblies.length === 0 && bad.dropped.some((d) => d.code === 'assembly-kind' && d.ids.indexOf('W1P') >= 0), JSON.stringify(bad.dropped.map((d) => d.code)));
+	const bad2 = EC.lpnInpParse(inp.replace(/PIPES=(\S+),/, 'PIPES=W1P,'));
+	ok('so is one whose branch is a pump', bad2.assemblies.length === 0 && bad2.dropped.some((d) => d.code === 'assembly-kind'));
+	const bad3 = EC.lpnInpParse(inp.replace(/^;ASSEMBLY: well W1R W1D W1 W1DV W1P/m, ';ASSEMBLY: well W1R W1D W1 W1P W1DV'));
+	ok('and one whose valve and pump are swapped', bad3.assemblies.length === 0 && bad3.dropped.some((d) => d.code === 'assembly-kind'));
+	const mal = EC.lpnInpParse(inp.replace(/^;ASSEMBLY: well W1R W1D W1 W1DV W1P/m, ';ASSEMBLY: well W1R W1D'));
+	ok('a malformed ;ASSEMBLY line (wrong token count) is reported, never dropped silently', mal.assemblies.length === 0 && mal.dropped.some((d) => d.code === 'assembly-malformed' && /well W1R W1D/.test(d.ids[0])), JSON.stringify(mal.dropped.map((d) => d.code)));
+	const mal2 = EC.lpnInpParse(inp.replace(/^;ASSEMBLY: well /m, ';ASSEMBLY: spigot '));
+	ok('and so is an unknown kind', mal2.dropped.some((d) => d.code === 'assembly-malformed'));
+	const sv = JSON.parse(JSON.stringify(L.serializeProject()));
+	sv.nodes.find((n) => n.id === 'T1').type = 'junction';
+	L.applySaved(L.migrateSaved(sv));
+	ok('a project file whose tank is not a tank loses the grouping and says so', L.getDoc().assemblies.length === 0 && /W1/.test(L.notices()) && /kind/i.test(L.notices()), L.notices());
+	// 5. grouping comments are matched exactly
+	const own = EC.lpnInpParse(inp.replace('[END]', ';Virtual: pipes for the plant bypass\n;assembly: well W1R\n;VIRTUAL:no space\n\n[END]'));
+	ok('a user\'s ;Virtual: and ;assembly: comments, or one without the space, are never read as IDs or groupings', own.assemblies.length === 1 && !(own.dropped || []).some((d) => /^assembly/.test(d.code)) && !own.links.some((l) => l.virtual && l.id === 'pipes'));
+}
+{
+	// 6, 9. A virtual pipe carries its typed numbers, in lines under 255 characters.
+	const doc = fresh();
+	const n1 = L.addNode('junction', 0, 0), n2 = L.addNode('junction', 100, 0);
+	const ids = [];
+	for (let i = 0; i < 14; i++) { const p = L.addLink('pipe', n1.id, n2.id, [], 'VIRTUAL_PIPE_WITH_A_LONG_NAME_' + i + '_' + 'x'.repeat(20)); p.virtual = true; ids.push(p.id); }
+	const p0 = L.linkById(ids[0]); p0._length = 123.5; p0._diameter = 200; p0._roughness = 130; p0._k = 0.5;
+	const out = EC.lpnExportInp(L.serializeProject(), {}).inp;
+	const vl = out.split('\n').filter((l) => /^;VIRTUAL: /.test(l));
+	ok('the virtual pipes go out on several lines, each under 255 characters', vl.length >= 2 && vl.every((l) => l.length < 255), vl.map((l) => l.length).join(','));
+	ok('the pipe\'s typed numbers ride on its entry', vl.some((l) => l.indexOf(ids[0] + '=123.5|200|130|0.5') >= 0), vl[0].slice(0, 120));
+	const back = EC.lpnInpParse(out);
+	const b0 = back.links.find((l) => l.id === ids[0]);
+	ok('re-imported, every virtual pipe is virtual and the first has its own length, diameter, roughness and minor loss back, not the stand-in\'s', back.links.filter((l) => l.virtual).length === 14 && b0.length === 123.5 && b0.diameter === 200 && b0.roughness === 130 && b0.k === 0.5, JSON.stringify([b0.length, b0.diameter, b0.roughness, b0.k]));
+	L.applyUnitSelections(L.inpUnitSelections(back)); L.applySaved(L.migrateSaved(L.docFromInp(back, ''))); L.buildDom();
+	const o2 = EC.lpnExportInp(L.serializeProject(), {}).inp;
+	ok('and the next export is byte-identical', o2 === out);
+}
+{
+	// 7. One volume family: Length in metres, Elevation/Head in feet.
+	const doc = fresh();
+	L.applyOneUnit('lpn_u_length', 'm'); L.applyOneUnit('lpn_u_elevhead', 'fth2o'); L.applyOneUnit('lpn_u_pressure', 'psi');
+	L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
+	const a = doc.assemblies[0];
+	const ft = 0.3048, c = L.curveById(a.pt.curve), last = c.points[c.points.length - 1];
+	ok('the volume is typed in the Elevation/Head unit cubed: a new tank is 2.7 ft^3 here, whatever the Length unit', a.pt.vol === 2.7 && a.pt.on === 40 && a.pt.off === 60, JSON.stringify(a.pt));
+	const exp = 2.7 * (1 - (38 + 14.7) / (60 + 14.7));
+	ok('the curve\'s volume axis is in that same unit: at the pump-off head the water is V (1 - P0/P) in ft^3', Math.abs(last[1] - exp) < 1e-3 && Math.abs(last[0] - 60 / EC.unitFactors.psi / ft) < 1e-3, last[0] + ' ' + last[1] + ' vs ' + exp);
+	ok('and in SI it is the same vessel: 2.7 ft^3 is 0.0765 m^3', Math.abs(L.pressureTankSI(a).vol - 2.7 * ft * ft * ft) < 1e-9);
+	L.applyOneUnit('lpn_u_length', 'ft'); L.applyOneUnit('lpn_u_elevhead', 'mh2o'); L.applyOneUnit('lpn_u_pressure', 'kpa');
+	setUnitSet('si');
+}
+{
+	// 8. A Well that takes its pump's ID takes its controls with it.
+	const doc = fresh();
+	const a = place3(200, 150, 500, 150, 500, 400);
+	curves(doc, a); a.pumpOn = 3; a.pumpOff = 6; L.syncWellControls(a);
+	const sv = JSON.parse(JSON.stringify(L.serializeProject()));
+	const u = { id: 'U9', type: 'junction', x: 900, y: 900, elev: 0 }, d = { id: 'D9', type: 'junction', x: 900, y: 900, elev: 0 };
+	sv.nodes.push(u, d); sv.links.push({ id: 'W1', type: 'pump', from: 'U9', to: 'D9', verts: [] });
+	sv.assemblies = [{ id: 'W1', kind: 'pump', up: 'U9', down: 'D9', links: ['W1'] }].concat(sv.assemblies);
+	L.applySaved(L.migrateSaved(sv));
+	const ids = L.getDoc().assemblies.map((g) => g.id);
+	ok('the Pump+ keeps W1 and the Well falls back to its pump\'s ID', JSON.stringify(ids) === '["W1","W1P"]', JSON.stringify(ids));
+	ok('and the Well\'s two controls are retagged with it', L.getDoc().controls.filter((c) => c.asm === 'W1P').length === 2 && L.getDoc().controls.filter((c) => c.asm === 'W1').length === 0, JSON.stringify(L.getDoc().controls.map((c) => c.asm)));
+	// A clash that cannot be repaired is dropped and the notice names the ID.
+	const sv2 = JSON.parse(JSON.stringify(L.serializeProject()));
+	sv2.nodes.push({ id: 'X1', type: 'junction', x: 1, y: 1, elev: 0 }, { id: 'X2', type: 'junction', x: 1, y: 1, elev: 0 });
+	sv2.links.push({ id: 'W1P', type: 'pump', from: 'X1', to: 'X2', verts: [] });
+	sv2.assemblies = sv2.assemblies.concat([{ id: 'W1P', kind: 'pump', up: 'X1', down: 'X2', links: ['W1P'] }]);
+	L.applySaved(L.migrateSaved(sv2));
+	ok('a group that clashes and cannot be renamed is not restored, and the notice names its ID', /W1P/.test(L.notices()) && /share an ID/.test(L.notices()), L.notices());
+}
+{
+	// A, B. The pressure tank's own box and scenarios.
+	const doc = fresh();
+	L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
+	const a = doc.assemblies[0];
+	const tk = L.nodeById(a.tank);
+	L.setMode('select'); L.openPopup(a.tank, 10, 10);
+	const labels = boxLabels();
+	console.log('        tank box: ' + labels.join(' | '));
+	ok('the pressure tank\'s box shows its depths and curve as the Well set them, with whose they are', labels.some((x) => /^Written by well W1/.test(x)) && labels.filter((x) => /^(Initial|Minimum|Maximum) depth/.test(x)).length === 3 && !(function () { let inputs = 0; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL' && /^(Initial|Minimum|Maximum) depth/.test((e.textContent || '').trim())) { (e.children || e.childNodes || []).forEach((c) => { if (c.tagName === 'INPUT') { inputs++; } }); } }); return inputs; }()));
+	const before = JSON.stringify([tk.minLevel, tk.maxLevel, tk._level, tk.volCurve]);
+	L.setProp(tk, 'maxLevel', 5); L.setProp(tk, 'volCurve', 'NOPE');
+	ok('an edit of an owned property through the one write door is refused and says whose it is', JSON.stringify([tk.minLevel, tk.maxLevel, tk._level, tk.volCurve]) === before && /W1/.test(L.notices()), L.notices());
+	ok('the diameter, which the Well does not set, stays the user\'s', (function () { L.setProp(tk, 'tankDiameter', 7); return tk._tankDiameter === 7 || tk.tankDiameter === 7; }()));
+	// scenarios: like the open-air Well with tank, the group writes Base (its controls are document data, its numbers are Base's); an owned property is not overridable.
+	L.createScenario('Dry year');
+	const scn = L.getScenarios()[L.getScenarios().length - 1];
+	L.switchScenario(scn.id);
+	L.setProp(tk, 'maxLevel', 5);
+	ok('in a child scenario an owned property still cannot be overridden: no override, same value', L.effective(tk, 'maxLevel') === tk.maxLevel && !JSON.stringify(scn.overrides || {}).includes('maxLevel'));
+	a.pt.off = 50; L.syncPressureTank(a);
+	ok('an edit of the group inside a scenario writes Base and the document, as the open-air Well\'s pump levels do', tk.maxLevel === 50 && a.pumpOff === 50 && L.effective(tk, 'maxLevel') === 50 && doc.controls.filter((c) => c.asm === 'W1').length === 2);
+	L.setProp(L.nodeById('W1'), 'elev', 77);
+	ok('the Well\'s ground elevation overridden in the scenario reaches the tank as for the open-air form', L.effective(tk, 'elev') === 77, L.effective(tk, 'elev'));
+	L.switchScenario('base');
+	ok('back in Base the tank and the group are as Base had them', tk.maxLevel === 50 && L.effective(tk, 'elev') !== 77);
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));
