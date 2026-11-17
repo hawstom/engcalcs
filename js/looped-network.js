@@ -8127,7 +8127,7 @@ var EngCalcs = EngCalcs || {};
 	// friction method."*). A pipe still holds one roughness number; a scenario's method
 	// REINTERPRETS it and never converts it, the rule a unit change already follows.
 	['calculation', ['engine', 'autoRun', 'hydraulics', 'emitterExponent', 'tolerance', 'quality',
-		'qualityOptions', 'method']],
+		'qualityOptions', 'method', 'velocityLimit']],
 	// Document-wide values that belong with element properties already in a category.
 	['constituent', ['reactions']], ['energy', ['energy']],
 	// **NEW-ASSET SETTINGS** (Tom, 2026-10-06: *"Leave the creativity to the users. Give them
@@ -8360,9 +8360,11 @@ var EngCalcs = EngCalcs || {};
 	// scenario's own block, a stored alternative, a calculation set -- at once. Only a stated value
 	// moves; an inherited one follows its parent. `to` null (a delete) CLEARS the holder's own value,
 	// so the scenario inherits again, rather than holding "none" over its parent.
+	// Every holder of a scenario's settings block: each scenario, stored alternative and calculation set.
+	function scenarioSettingHolders() { return scenarios.concat(doc.alternatives || [], doc.calcSets || []); }
 	function repointScenarioSetting(path, was, to) {
 		var p = settingPath(path);
-		scenarios.concat(doc.alternatives || [], doc.calcSets || []).forEach(function (o) {
+		scenarioSettingHolders().forEach(function (o) {
 			var node = o && !o.isBase ? o.settings : null, i;
 			if (settingGet(node, p) !== was) { return; }
 			touchTree('repointScenarioSetting');
@@ -9418,6 +9420,14 @@ var EngCalcs = EngCalcs || {};
 		// units are already the new ones here, so the seed reads the built-in value for them.
 		seedDefaultInputs();
 		if (set.lpn_u_length) { labelSettings.customerMaxWidth = defaultLabelSettings().customerMaxWidth; }
+		// A velocity limit typed in the old unit would read as another number in the new one: blank is the default for the unit.
+		if (set.lpn_u_velocity) {
+			delete settings.velocityLimit;
+			scenarioSettingHolders().forEach(function (o) {
+				if (o && !o.isBase && settingGet(o.settings, ['settings', 'velocityLimit']) !== undefined) { settingDelete(o, ['settings', 'velocityLimit']); }
+			});
+			touchTree('resetUnitBearingDefaultsFor');
+		}
 		for (group in LPN_LABEL_FIELD_UNIT) {
 			if (!Object.prototype.hasOwnProperty.call(LPN_LABEL_FIELD_UNIT, group)) { continue; }
 			for (field in LPN_LABEL_FIELD_UNIT[group]) {
@@ -9430,6 +9440,8 @@ var EngCalcs = EngCalcs || {};
 				}
 			}
 		}
+		// The Settings rows were built before the reset: show what it left (a limit's unit and default, the new-asset values).
+		rebuildSettingsBox();
 	}
 	// The unit selects the wizard actually left DIFFERENT from the project it was opened on --
 	// only those it can answer for (both sides must have a value) count as "changed".
@@ -32052,7 +32064,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}({
 		idPrefixes: 'lpn_settings_id_prefixes', textSize: 'lpn_settings_text_size', symbolSize: 'lpn_settings_symbol_size',
 		linkWidth: 'lpn_settings_link_width', symbolOpacity: 'lpn_settings_symbol_opacity',
-		labelMaxWidth: 'lpn_settings_label_max_width', alignPipeLabels: 'lpn_settings_align_labels',
+		velocityLimit: 'lpn_settings_velocity_limit', labelMaxWidth: 'lpn_settings_label_max_width', alignPipeLabels: 'lpn_settings_align_labels',
 		labelFlipLeftOfVertical: 'lpn_settings_readability_bias', maskLabels: 'lpn_settings_mask_labels', textHalo: 'lpn_settings_text_halo',
 		showArrows: 'lpn_settings_show_arrows', leaderSnapDeg: 'lpn_settings_leader_snap',
 		legendPosition: 'lpn_settings_legend_position', basemapStyle: 'lpn_settings_basemap_style',
@@ -32309,6 +32321,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		[['settings', 'energy', 'globalEfficiency'], 75], [['settings', 'energy', 'globalPrice'], 0],
 		[['settings', 'energy', 'globalPattern'], undefined], [['settings', 'energy', 'demandCharge'], 0],
 		[['settings', 'energy', 'currency'], undefined],
+		[['settings', 'velocityLimit'], undefined],
 		[['defaultPattern'], undefined], [['view'], undefined], [['bubbles'], undefined],
 		[['project', 'basemap'], 'osm']
 	];
@@ -32386,6 +32399,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (/^settings\.defaults\.(nodeElev|tankLevel|tankMinLevel|tankMaxLevel)$/.test(s) || s === 'settings.hydraulics.headError') { return 'lpn_u_elevhead'; }
 		if (s === 'settings.defaults.tankDiameter') { return 'lpn_u_length'; }
 		if (s === 'settings.defaults.demand' || s === 'settings.hydraulics.flowChange') { return 'lpn_u_flow'; }
+		if (s === 'settings.velocityLimit') { return 'lpn_u_velocity'; }
 		if (s === 'settings.hydraulics.minPressure' || s === 'settings.hydraulics.reqPressure') { return 'lpn_u_pressure'; }
 		return null;
 	}
@@ -32579,6 +32593,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (row.path.join('.') === 'settings.labelMaxWidth' || row.path.join('.') === 'labelSettings.customerMaxWidth') {
 				return pc.lpn_settings_label_always || 'Always show';
 			}
+			if (row.path.join('.') === 'settings.velocityLimit') { return settingTableDefaultText(velocityLimitDefaultText()); }
 			if (row.dflt === undefined) { return pc.lpn_settings_option_unset || 'Not stated'; }
 			s = typeof row.dflt === 'number' ? settingTableNum(row.dflt) : String(row.dflt);
 			return settingTableDefaultText(u ? s + ' ' + u : s);
@@ -32621,6 +32636,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return { ok: false };
 		}
 		if (u && t.length > u.length && t.slice(-u.length) === u) { t = t.slice(0, -u.length).trim(); }
+		// The same rule the Settings box holds this limit to: blank inherits, otherwise zero or more.
+		if (row.path.join('.') === 'settings.velocityLimit') {
+			if (t === '') { return { ok: true, v: null }; }
+			return velocityLimitValid(+t) ? { ok: true, v: +t } : { ok: false };
+		}
 		switch (row.kind) {
 			case 'time':
 				if (!EngCalcs.lpnParseTime || t === '') { return { ok: false }; }
@@ -61714,6 +61734,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pc.lpn_settings_min_pressure || 'Minimum pressure',
 				pc.lpn_settings_req_pressure || 'Required pressure'];
 		}
+		if (name === 'lpn_u_velocity') { return [pc.lpn_settings_velocity_limit || 'Velocity warning limit']; }
 		if (name === 'lpn_u_flow') {
 			return [pc.lpn_field_base_demand || 'Base demand', pc.lpn_field_valve_setting_flow || 'Flow setting',
 				(pc.lpn_result_flow || 'Flow') + ' (pump curve)',
@@ -61844,6 +61865,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					conv(ov, 'setting');
 				});
 			});
+		} else if (name === 'lpn_u_velocity') {
+			// The velocity warning limit is typed in this unit; a scenario's own is the same number in the same unit.
+			velocityLimitHolders().forEach(function (h) { h.velocityLimit = +(h.velocityLimit * k).toPrecision(6); n++; });
+			// A scenario's settings are read through a resolved-tree cache: the written numbers must be re-read.
+			if (n) { touchTree('convertUnitValues'); }
 		} else if (name === 'lpn_u_flow') {
 			convSetting('flowChange');   // a flow typed in this unit
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
@@ -62032,6 +62058,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// decimals count that just followed the unit shows its new number in an open panel.
 		refreshUseUnitsBoxes();
 		refreshLabelNumberBoxes();
+		// The velocity warning row names its unit and its default in the label and tip, both fixed when the box was built.
+		rebuildSettingsBox();
 		// The symbol cap is a ratio and a percentile, neither unit-bearing (Task 705), so this is
 		// cheap insurance rather than a real dependency -- left in because clearing a stale cap
 		// costs nothing and a future input to the cap might not be so lucky.
@@ -65756,7 +65784,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// max-day into the document.
 			// ONE HOME NOW: the box's seam (withSetboxView(), setboxEditEnd()) sends a scenario's edit to
 			// the scenario, the demand multiplier included, and shows the value the scenario uses.
-			var home = function () { return settings.hydraulics || (settings.hydraulics = {}); };
+			// `o.top` is a setting that lives on `settings` itself, not among the [OPTIONS] in `settings.hydraulics`.
+			var home = function () { return o.top ? settings : (settings.hydraulics || (settings.hydraulics = {})); };
 			input.value = home()[key] === undefined ? '' : String(home()[key]);
 			input.addEventListener('change', function () {
 				var t = input.value.trim(), h = home();
@@ -65770,6 +65799,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				else { input.value = h[key] === undefined ? '' : String(h[key]); return; }
 				if (o.perScenario) { touchTree('demandMultiplier'); }
 				if (key === 'emitterExponent') { settings.emitterExponent = settings.hydraulics[key] === undefined ? 0.5 : settings.hydraulics[key]; }
+				if (o.onChange) { saveToStorage(); o.onChange(); return; }
 				// The scenario menu shows an override COUNT beside every name, and this row can now
 				// change it. Refreshed here rather than left to the next scenario switch, so the
 				// badge is never one edit behind what the box says.
@@ -65801,7 +65831,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tipText = (tipText ? tipText + ' ' : '')
 					+ (pc.lpn_settings_default_is || 'The default is {n}.').replace('{n}', String(dflt));
 			}
-			setboxTag(row(compBody, labelText, input, tipText), [['settings', 'hydraulics', key]].concat(key === 'emitterExponent' ? [['settings', 'emitterExponent']] : []));
+			setboxTag(row(compBody, labelText, input, tipText), [o.top ? ['settings', key] : ['settings', 'hydraulics', key]].concat(key === 'emitterExponent' ? [['settings', 'emitterExponent']] : []));
 		}
 		if (!settings.hydraulics) { settings.hydraulics = {}; }
 		// **THE TWO SWITCHES COME FIRST UNDER Hydraulics, and Tom put them there** (2026-09-05:
@@ -66033,6 +66063,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'lpn_settings_flow_change_tip', 0, { allowZero: true, unitOf: 'lpn_u_flow' });
 		hydNumberRow('dampLimit', 'lpn_settings_damp_limit', 'Damping starts at',
 			'lpn_settings_damp_limit_tip', 0, { allowZero: true });
+		// **THE VELOCITY WARNING LIMIT** (Task 864; Tom: "Yes", a project setting). Not an EPANET option, so it
+		// lives at `settings.velocityLimit` (`top`), never in `hydraulics` (which the .inp exporter writes out). A number
+		// typed in the project's velocity unit; BLANK is the default for that unit, ZERO is no warning. A change
+		// re-reads the run in hand and starts no solve (velocityLimitChanged()).
+		hydNumberRow('velocityLimit', 'lpn_settings_velocity_limit', 'Velocity warning limit',
+			'lpn_settings_velocity_limit_tip', velocityLimitDefaultText(),
+			{ allowZero: true, unitOf: 'lpn_u_velocity', top: true, onChange: velocityLimitChanged });
 		// Energy, then Quality LAST -- the reading order the markup sets, and the reasoning is in
 		// Looped-Network.php beside the sections themselves. Build order does not decide what a
 		// reader meets first (the hosts are already in the page), but keeping the two in step means
@@ -82314,7 +82351,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		if (n === 0) { return ''; }
 		return ((EngCalcs.pageConfig || {}).lpn_roughness_method_note ||
-			'\u26a0 Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.')
+			'⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.')
 			.replace('{method}', frictionMethodLabel()).replace('{n}', String(n));
 	}
 	// A status line with the standing notes beneath it, unless already there.
@@ -89540,6 +89577,68 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return out;
 	}
 
+	// **THE FASTEST PIPE, NAMED** (Task 864). One sentence for the pipe with the highest velocity above the project's
+	// limit in any reporting step of the run (or in the one solve), giving its largest velocity and when, then one line
+	// counting the other pipes over the limit (Tom: "List only the worst plus the count of others"). Scrubbing the
+	// transport re-asks every frame, so the answer is kept until the run in hand, the unit or the limit changes.
+	var velNoteCache = { token: null, key: '', text: '' };
+	// The one rule for a typed limit, in the box and in the Settings table: a number, zero or more.
+	function velocityLimitValid(v) { return typeof v === 'number' && isFinite(v) && v >= 0; }
+	// Every object holding a typed `velocityLimit`: the project's settings, and each scenario's, stored alternative's and
+	// calculation set's own block (a scenario's lives at .settings.settings, see setScenarioSetting()).
+	function velocityLimitHolders() {
+		var out = [];
+		if (velocityLimitValid(settings.velocityLimit)) { out.push(settings); }
+		scenarioSettingHolders().forEach(function (o) {
+			var blk = o && !o.isBase && o.settings && o.settings.settings;
+			if (blk && velocityLimitValid(blk.velocityLimit)) { out.push(blk); }
+		});
+		return out;
+	}
+	// The limit a blank setting means, in the unit showing: EngCalcs.LPN_VELOCITY_WARN (10 ft/s), as the fire flow
+	// box's own criterion is shown, so SI reads 3.05 m/s in both places.
+	function velocityLimitDefault() { return +ffNum(toDisplay(EngCalcs.LPN_VELOCITY_WARN, 'lpn_u_velocity')); }
+	function velocityLimitDefaultText() { return ffNum(velocityLimitDefault()) + ' ' + unitSymbol('lpn_u_velocity'); }
+	// The limit in the project's velocity unit as displayed (not m/s); 0 is "no warning".
+	function velocityLimitShown() {
+		var v = scnSetting('velocityLimit');
+		return velocityLimitValid(v) ? v : velocityLimitDefault();
+	}
+	// A typed limit changed: re-read the run in hand and redraw the status line, as a scrub does. No solve, with
+	// Recalculate on or off. The note's cache key holds the limit, so it is read afresh.
+	function velocityLimitChanged() {
+		if (lastSolveResult) { applySolveResult(lastSolveResult); }
+	}
+	function velocityNote(result) {
+		var pc = EngCalcs.pageConfig || {}, token = EngCalcs.lpnTimeRunToken ? EngCalcs.lpnTimeRunToken() : null,
+			frames, peaks, p, key, extended, parts = [], more, shown = velocityLimitShown(), limit;
+		if (shown === 0) { return ''; }
+		limit = toSI(shown, 'lpn_u_velocity');
+		key = unitLabel('lpn_u_velocity') + '|' + shown;
+		if (token && velNoteCache.token === token && velNoteCache.key === key) { return velNoteCache.text; }
+		frames = token && EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		extended = frames.length > 1;
+		if (!frames.length) { frames = [result]; }
+		peaks = EngCalcs.lpnVelocityPeaks(frames, function (id) { var l = linkById(id); return !!l && l.type === 'pipe'; }, limit);
+		if (peaks.length) {
+			p = peaks[0];
+			// split/join, not .replace(): a pipe id may hold `$&`, which .replace() takes for a pattern of its own, and
+			// the id goes in LAST so that an id holding the text `{velocity}` is not filled a second time.
+			parts.push((extended && typeof p.t === 'number'
+				? (pc.lpn_velocity_warn || '⚠ Pipe {id} velocity is {velocity} at {time}.').split('{time}').join(dsTimeText(p.t))
+				: (pc.lpn_velocity_warn_steady || '⚠ Pipe {id} velocity is {velocity}.'))
+				.split('{velocity}').join(ffQty(p.v, 'lpn_u_velocity')).split('{id}').join(p.id));
+			more = peaks.length - 1;
+			if (more > 0) {
+				parts.push((pc.lpn_velocity_warn_more || '⚠ And more pipes ({n}) above {limit}.')
+					.split('{n}').join(String(more)).split('{limit}').join(ffQty(limit, 'lpn_u_velocity')));
+			}
+		}
+		ffLastNum = null;   // ffQty() leaves its last number for a table cell to pick up; none here is one
+		parts = parts.join(' ');
+		if (token) { velNoteCache = { token: token, key: key, text: parts }; }
+		return parts;
+	}
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
 		tsbRefresh();
@@ -89689,7 +89788,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([result.stoppedNote || '', notConvergedNote, engineRouteNote, pdaNote, omittedNote, roughnessNote,
+		setStatus([result.stoppedNote || '', notConvergedNote, engineRouteNote, pdaNote, omittedNote, roughnessNote, velocityNote(result),
 			// A one-point GPV curve, read as a line through the origin (EngCalcs.lpnGpvCurveProblem),
 			// said whichever engine answered: both give it the code.
 			droppedNote('gpv-one-point', 'lpn_gpv_one_point_note',
