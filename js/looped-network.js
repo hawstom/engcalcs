@@ -10563,19 +10563,23 @@ var EngCalcs = EngCalcs || {};
 	// the desktop design. The ONE KNOB is still one knob -- reachPx(e) answers per press for both
 	// hands at every call site -- it is the PRECEDENCE that a finger gets and a pointer does not.
 	function touchNodeOver(cx, cy, hit) {
-		var n, hn, best = null, bestPx = Infinity, i, d, w;
+		var n, hn, best = null, bestPx = Infinity, i, d, w, r, far;
 		if (hit && hit.dataset && hit.dataset.node !== undefined) {
 			// A node's band was hit. Where the press is on that node's own ink it stays; where it is not
 			// but IS on another node's ink (a band drawn on top of a neighbour's centre), the finger
 			// meant the one under it, the nearest centre if several.
 			hn = nodeById(hit.dataset.node);
-			if (!hn || nodeInkDistPx(hn, cx, cy) === 0) { return hit; }
+			r = svg.getBoundingClientRect();
+			if (!hn || nodeInkDistPx(hn, cx, cy, r) === 0) { return hit; }
 			w = screenToWorld(cx, cy);
+			// Only a node whose centre is within the largest symbol of the press can have ink under it.
+			far = Math.max(nodeSymbolSize({ type: 'tank' }).w, nodeSymbolSize({ type: 'reservoir' }).w, 2 * JUNCTION_R * symbolFactor());
 			for (i = 0; i < doc.nodes.length; i++) {
 				n = doc.nodes[i];
-				if (!nodeEls[n.id] || !nodeEls[n.id].circle || nodeInkDistPx(n, cx, cy) !== 0) { continue; }
+				if (!nodeEls[n.id] || !nodeEls[n.id].circle) { continue; }
 				d = Math.hypot(nodeDrawX(n) - w.x, nodeDrawY(n) - w.y);
-				if (d < bestPx) { best = n; bestPx = d; }
+				if (d > far || d >= bestPx || !hitIsVisible(nodeEls[n.id].circle) || nodeInkDistPx(n, cx, cy, r) !== 0) { continue; }
+				best = n; bestPx = d;
 			}
 			return best ? nodeEls[best.id].circle : hit;
 		}
@@ -10817,9 +10821,8 @@ var EngCalcs = EngCalcs || {};
 	// What a press at this screen point lands on among the Shapes. A grip of a SELECTED Shape first
 	// (it outranks every asset, see above), then the nearest Shape whose line or point is in reach.
 	// Returns { shape, pidx } with pidx -1 for the line, or null.
-	// With `all`, every Shape whose line or point is within reach, grips left out (the chooser's rows).
-	function shapeHitNear(cx, cy, px, gripsOnly, all) {
-		var w = screenToWorld(cx, cy), tolW = px / (state.s || 1), best = null, bestD = tolW, list = docShapesRead(), i, j, s, d, n, out = [];
+	function shapeHitNear(cx, cy, px, gripsOnly) {
+		var w = screenToWorld(cx, cy), best = null, bestD = px / (state.s || 1), list = docShapesRead(), i, j, s, d, n;
 		for (i = 0; i < list.length; i++) {
 			s = list[i];
 			if (!isSelected('shape', s.id) || !shapeEls[s.id]) { continue; }
@@ -10828,16 +10831,15 @@ var EngCalcs = EngCalcs || {};
 				if (d <= bestD) { best = { shape: s, pidx: j }; bestD = d; }
 			}
 		}
-		if (!all && (best || gripsOnly)) { return best; }
+		if (best || gripsOnly) { return best; }
 		for (i = 0; i < list.length; i++) {
 			s = list[i]; n = s.pts.length;
 			if (!shapeEls[s.id] || !n) { continue; }
 			if (n === 1) { d = Math.hypot(s.pts[0].x - w.x, s.pts[0].y - w.y); }
 			else { d = Geom.pointToPolylineDistance(s.closed ? s.pts.concat([s.pts[0]]) : s.pts, w.x, w.y); }
-			if (all) { if (d <= tolW) { out.push({ shape: s, pidx: -1 }); } continue; }
 			if (d <= bestD) { best = { shape: s, pidx: -1 }; bestD = d; }
 		}
-		return all ? out : best;
+		return best;
 	}
 	// The hit a press resolves to once Shapes are counted: `t` is what mapHitAt() found. A selected
 	// Shape's grip overrules it; otherwise an asset or a label stays the hit and a Shape is found only
@@ -16771,10 +16773,8 @@ var EngCalcs = EngCalcs || {};
 	// Not e.target on a pointerdown either: elementsFromPoint() is a document query and is unaffected
 	// by the setPointerCapture() retargeting that made pointerup use elementFromPoint() in the first
 	// place, so one call serves every gesture.
-	// With `all`, every confirmed hit under the point, topmost first (the chooser's Text rows).
-	function mapHitsAt(cx, cy) { return mapHitAt(cx, cy, null, true); }
-	function mapHitAt(cx, cy, skip, all) {
-		var list = document.elementsFromPoint(cx, cy) || [], i, t, out = [];
+	function mapHitAt(cx, cy, skip) {
+		var list = document.elementsFromPoint(cx, cy) || [], i, t;
 		for (i = 0; i < list.length; i++) {
 			if (list[i] === svg) { break; }
 			if (skip && list[i] === skip) { continue; }   // see gripClickHandsThrough()
@@ -16784,9 +16784,9 @@ var EngCalcs = EngCalcs || {};
 			// and the walk is here precisely so a rejected candidate does not take the real hit
 			// beneath it away with it.
 			if (!hitIsVisible(t)) { continue; }
-			if (hitConfirmed(t, cx, cy)) { if (!all) { return t; } out.push(t); }
+			if (hitConfirmed(t, cx, cy)) { return t; }
 		}
-		return all ? out : svg;
+		return svg;
 	}
 	/**
 	 * **THE GRIP IS FOR DRAGGING; A CLICK ON IT GOES TO WHAT IS UNDER IT** (Perry's pre-review of
@@ -61125,8 +61125,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			cx: px + ox * ux - oy * uy, cy: py + ox * uy + oy * ux, hw: (ink.x1 - ink.x0) * k / 2, hh: (ink.y1 - ink.y0) * k / 2, ux: ux, uy: uy } };
 	}
 	// A node's distance in client px from a press to its drawn extent (0 on the ink).
-	function nodeInkDistPx(n, cx, cy) {
-		var r = svg.getBoundingClientRect(), s = state.s || 1;
+	function nodeInkDistPx(n, cx, cy, rect) {
+		var r = rect || svg.getBoundingClientRect(), s = state.s || 1;
 		return Geom.pickExtentDistance(pickNodeItem(n, s, r.left + state.tx + nodeDrawX(n) * s, r.top + state.ty + nodeDrawY(n) * s), cx, cy);
 	}
 	// Every SYMBOL the page drew near a press, as a client-px extent for Geom.pickSymbols(): a
@@ -61138,33 +61138,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// is what the reader sees overlap. Every kind is bounded by the press, `reach` and the largest
 	// symbol before anything is measured.
 	function pickItemsNear(cx, cy, reach) {
-		var items = [], r = svg.getBoundingClientRect(), s = state.s || 1, i, n, ne, l, le, lb, shp, px, py, b, pl, pts, fa, fb, len, qx, qy,
+		var items = [], at = {}, r = svg.getBoundingClientRect(), s = state.s || 1, i, n, l, le, lb, shp, px, py, b, pl, pts, fa, fb, len, qx, qy,
 			big = Math.max(pumpSymbolSize('pump'), nodeSymbolSize({ type: 'tank' }).w, nodeSymbolSize({ type: 'reservoir' }).w, 2 * JUNCTION_R * symbolFactor()) * s,
 			near = reach + big, textNear = reach + 600;
 		function sx(wx) { return r.left + state.tx + wx * s; }
 		function sy(wy) { return r.top + state.ty + wy * s; }
 		function rectOf(box) { return box.width > 0 || box.height > 0 ? { l: box.left, t: box.top, r: box.right, b: box.bottom } : null; }
 		function inNear(x, y, w) { return Math.abs(x - cx) <= w && Math.abs(y - cy) <= w; }
+		// One pass over the nodes holds every drawn position, so the links never ask for one again.
 		for (i = 0; i < doc.nodes.length; i++) {
-			n = doc.nodes[i]; ne = nodeEls[n.id];
-			if (!ne) { continue; }
-			px = sx(nodeDrawX(n)); py = sy(nodeDrawY(n));
-			if (inNear(px, py, near)) { items.push(pickNodeItem(n, s, px, py)); }
+			n = doc.nodes[i];
+			px = nodeDrawX(n); py = nodeDrawY(n);
+			at[n.id] = { x: px, y: py, r: nodeRadius(n) };
+			if (nodeEls[n.id] && inNear(sx(px), sy(py), near)) { items.push(pickNodeItem(n, s, sx(px), sy(py))); }
 		}
 		for (i = 0; i < doc.links.length; i++) {
-			l = doc.links[i]; le = linkEls[l.id]; fa = nodeById(l.from); fb = nodeById(l.to);
+			l = doc.links[i]; le = linkEls[l.id]; fa = at[l.from]; fb = at[l.to];
 			if (!le || !fa || !fb) { continue; }
 			if (le.symbolHit) {
+				// With no bend the symbol is at the chord's middle: a link whose middle is far off is not looked at further.
+				if (!(l.verts && l.verts.length) && !inNear(sx((fa.x + fb.x) / 2), sy((fa.y + fb.y) / 2), near)) { continue; }
 				pl = linkSymbolPlace(l);
 				if (pl && inNear(sx(pl.x), sy(pl.y), near)) { items.push(pickGlyphItem(l, pl, s, sx(pl.x), sy(pl.y))); }
 				continue;
 			}
-			if (!inNear(sx(nodeDrawX(fa)), sy(nodeDrawY(fa)), near + 2 * nodeRadius(fa) * s)) { continue; }
-			pts = linkPointList(l);
-			len = Geom.polylineLength(pts) * s;
 			// A visible line is never a row. A pipe is a point only when its two ends are at one point
 			// in the drawing (ZERO_LEN_EPS, at any zoom): an exploded assembly's zero-length pipe.
-			if (Math.hypot(nodeDrawX(fa) - nodeDrawX(fb), nodeDrawY(fa) - nodeDrawY(fb)) > ZERO_LEN_EPS) { continue; }
+			if (Math.hypot(fa.x - fb.x, fa.y - fb.y) > ZERO_LEN_EPS || !inNear(sx(fa.x), sy(fa.y), near + 2 * fa.r * s)) { continue; }
 			pts = linkPointList(l);
 			len = Geom.polylineLength(pts) * s;
 			pl = Geom.pointAlongPolyline(pts, 0.5); qx = sx(pl.x); qy = sy(pl.y);
@@ -61172,9 +61172,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		for (i = 0; i < (doc.labels || []).length; i++) {
 			lb = doc.labels[i]; le = labelEls[lb.id];
-			if (!le || !le.text || !hitIsVisible(le.text)) { continue; }
+			if (!le || !le.text) { continue; }
 			pl = textLabelPoint(lb);
-			if (!pl || !inNear(sx(pl.x), sy(pl.y), textNear)) { continue; }
+			if (!pl || !inNear(sx(pl.x), sy(pl.y), textNear) || !hitIsVisible(le.text)) { continue; }
 			b = rectOf(le.text.getBoundingClientRect());
 			if (b) { items.push({ kind: 'label', id: lb.id, type: lb.type, rank: PICK_KIND_RANK.label, rect: b }); }
 		}
@@ -61206,6 +61206,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return (pc.lpn_tool_add_text || 'Text') + ' ' + ((words && words !== (pc.lpn_tool_add_text || 'Text') && words !== (pc.lpn_new_text || 'Text')) ? words : c.id);
 		}
 		return reportTypeNoun(c.kind, c.type) + ' ' + c.id;
+	}
+	// The rows' words, no two alike: a Text whose first words match another row's is named by its ID too.
+	function pickRowLabels(list) {
+		var out = list.map(pickRowLabel), seen = {}, i;
+		out.forEach(function (w) { seen[w] = (seen[w] || 0) + 1; });
+		for (i = 0; i < list.length; i++) {
+			if (seen[out[i]] > 1 && list[i].kind === 'label') { out[i] = out[i] + ' (' + list[i].id + ')'; }
+		}
+		return out;
 	}
 	var pickPress = null;
 	// The press that may become a chooser: Select mode, the main button, on bare map, a junction, a
@@ -61262,24 +61271,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// wholly in the window. A box taller than the window is pinned to its top and scrolls.
 	function pickPlace(menu, p) {
 		var r = menu.getBoundingClientRect(), vw = window.innerWidth || 0, vh = window.innerHeight || 0,
-			gap = p.touch ? 28 : 8, pad = 4, xs = [p.x + gap, p.x - gap - r.width], ys = [p.y + gap, p.y - gap - r.height], i, j, x, y;
-		for (j = 0; j < 2; j++) {
+			gap = p.touch ? 28 : 8, pad = 4;
+		// One axis at a time: the side of the press that fits whole, else the side kept clear of the press
+		// and pinned to the window edge. The box then clears the press on at least one axis whenever it can.
+		function axis(at, size, room) {
+			var c = [at + gap, at - gap - size], i, v;
+			for (i = 0; i < 2; i++) { if (c[i] >= pad && c[i] + size <= room - pad) { return { v: c[i], fit: true }; } }
 			for (i = 0; i < 2; i++) {
-				x = xs[i]; y = ys[j];
-				if (x >= pad && y >= pad && x + r.width <= vw - pad && y + r.height <= vh - pad) {
-					menu.style.left = x + 'px'; menu.style.top = y + 'px';
-					return;
-				}
+				v = Math.max(pad, Math.min(c[i], room - pad - size));
+				if (v > at || v + size < at) { return { v: v, fit: false }; }
 			}
+			return { v: Math.max(pad, Math.min(c[0], room - pad - size)), fit: false };
 		}
-		x = Math.max(pad, Math.min(xs[0], vw - pad - r.width));
-		if (x < p.x && x + r.width > p.x) { x = Math.max(pad, xs[1]); }
-		menu.style.left = x + 'px'; menu.style.top = pad + 'px';
+		menu.style.left = axis(p.x, r.width, vw).v + 'px';
+		menu.style.top = axis(p.y, r.height, vh).v + 'px';
 	}
 	function openPickChooser(p) {
 		var pc = EngCalcs.pageConfig || {};
-		openMapContextMenu(p.x, p.y, p.list.map(function (c) {
-			return { label: pickRowLabel(c), enabled: true, hover: function (on) { pickHover(c, on); },
+		var words = pickRowLabels(p.list);
+		openMapContextMenu(p.x, p.y, p.list.map(function (c, i) {
+			return { label: words[i], enabled: true, hover: function (on) { pickHover(c, on); },
 				run: function () { pickChoose(c, p); } };
 		}), { cls: 'lpn-pick-chooser', ghostMs: p.touch ? GHOST_CLICK_MS : 0,
 			place: function (menu) { pickPlace(menu, p); },

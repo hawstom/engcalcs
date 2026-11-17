@@ -986,25 +986,6 @@ EngCalcs.lpnGeom = (function () {
 		if (m.rect) { return Math.min(m.rect.r - m.rect.l, m.rect.b - m.rect.t); }
 		return 2 * Math.min(m.quad.hw, m.quad.hh);
 	}
-	// The depth two convex boxes sit in one another (separating-axis: the least overlap on any edge normal).
-	function pickBoxDepth(a, b) {
-		var ca = pickCorners(a), cb = pickCorners(b), depth = Infinity, k, i, p, axes = [];
-		[ca, cb].forEach(function (c) {
-			for (i = 0; i < 2; i++) { axes.push({ x: -(c[i + 1].y - c[i].y), y: c[i + 1].x - c[i].x }); }
-		});
-		for (k = 0; k < axes.length; k++) {
-			var len = Math.hypot(axes[k].x, axes[k].y) || 1, lo = [Infinity, Infinity], hi = [-Infinity, -Infinity];
-			[ca, cb].forEach(function (c, j) {
-				for (p = 0; p < 4; p++) {
-					var v = (c[p].x * axes[k].x + c[p].y * axes[k].y) / len;
-					if (v < lo[j]) { lo[j] = v; } if (v > hi[j]) { hi[j] = v; }
-				}
-			});
-			depth = Math.min(depth, Math.min(hi[0], hi[1]) - Math.max(lo[0], lo[1]));
-			if (depth <= 0) { return 0; }
-		}
-		return depth;
-	}
 	// Does a segment cross, or lie in, a rect?
 	function pickSegInRect(a, b, r) {
 		var t0 = 0, t1 = 1, dx = b.x - a.x, dy = b.y - a.y, p = [-dx, dx, -dy, dy], q = [a.x - r.l, r.r - a.x, a.y - r.t, r.b - a.y], k, u;
@@ -1094,10 +1075,11 @@ EngCalcs.lpnGeom = (function () {
 	// Two symbols one of which is a glyph: they overlap when ANY piece of one is `deepGlyph` of the
 	// narrower piece deep in any piece of the other.
 	function pickGlyphOverlaps(a, b, deepGlyph) {
-		var pa = pickPartsOf(a), pb = pickPartsOf(b), i, j;
+		var pa = pickPartsOf(a), pb = pickPartsOf(b), i, j, d;
 		for (i = 0; i < pa.length; i++) {
 			for (j = 0; j < pb.length; j++) {
-				if (pickPartDepth(pa[i], pb[j]) >= deepGlyph * Math.min(pickPartWidth(pa[i]), pickPartWidth(pb[j])) && pickPartDepth(pa[i], pb[j]) > 0) { return true; }
+				d = pickPartDepth(pa[i], pb[j]);
+				if (d > 0 && d >= deepGlyph * Math.min(pickPartWidth(pa[i]), pickPartWidth(pb[j]))) { return true; }
 			}
 		}
 		return false;
@@ -1133,7 +1115,7 @@ EngCalcs.lpnGeom = (function () {
 			return Math.min(a.rect.r, b.rect.r) - Math.max(a.rect.l, b.rect.l) >= deep * Math.min(a.rect.r - a.rect.l, b.rect.r - b.rect.l) &&
 				Math.min(a.rect.b, b.rect.b) - Math.max(a.rect.t, b.rect.t) >= deep * Math.min(a.rect.b - a.rect.t, b.rect.b - b.rect.t);
 		}
-		return pickBoxDepth(a, b) >= deep * Math.min(pickMinSide(a), pickMinSide(b));
+		return pickPartDepth({ poly: pickCorners(a) }, { poly: pickCorners(b) }) >= deep * Math.min(pickMinSide(a), pickMinSide(b));
 	}
 	function pickSymbols(items, x, y, opts) {
 		var o = opts || {}, reach = o.reach === undefined ? 6 : o.reach, cap = o.cap === undefined ? 6 : o.cap,

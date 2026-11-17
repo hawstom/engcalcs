@@ -28,6 +28,8 @@
 //   K. Round 4: a pump's or valve's symbol is a symbol. A junction over a pump's middle or tail end, or a
 //      valve's middle or edge, opens a box of the two, with a mouse and a finger; a junction 28 px clear
 //      opens none; the pump's line away from its symbol opens none.
+//   M. A 390 px phone, taps at x = 180 near the top, middle and bottom on the pile: the box has no row
+//      under the press and lies wholly on screen.
 //   E. Review fixes: a finger's tap near the right and bottom edges opens the box with no row under the
 //      press and no row answering the lift's compatibility click; a pipe a finger taps within reach of
 //      the pile is not a row; a right-click or a long press that dismisses the box opens no
@@ -548,6 +550,27 @@ async function main() {
 			await press({ x: ga.x - (touch ? 0 : 0), y: ga.y });
 			ok(who + ' on the pump\'s line, away from its symbol, opens no box', !(await kt.chooserOpen()), J([ga, await kt.rows(), await kt.selected()]));
 			await K.page.close();
+		}
+
+
+		// =========================================================== a narrow phone: the box never sits under the press
+		console.log('\nM. A 390 px phone, a tap at x = 180 near the top, the middle and the bottom: no row under the finger, the box on screen');
+		for (const [name, Y] of [['near the top', 72], ['in the middle', 420], ['near the bottom', 742]]) {
+			const pj = JSON.parse(project); pj.view = { cx: 60 - (180 - 195) / 3.5, cy: -40 + (Y - 422) / 3.5, s: 3.5 };
+			const M = await Session.open(browser, NAME + '-m', { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+			await open(M, JSON.stringify(pj));
+			const mt = tools(M);
+			const pile4 = await mt.centre('#lpn_canvas [data-node="J1"]');
+			await M.page.touchscreen.tap(pile4.x, pile4.y);
+			await M.settle(700);
+			const geo4 = await M.page.evaluate((p) => {
+				const b = document.querySelector('.lpn-pick-chooser'); if (!b) { return null; }
+				const r = b.getBoundingClientRect();
+				return { n: b.querySelectorAll('button').length, under: p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom, inView: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight };
+			}, pile4);
+			ok('a tap at x = ' + Math.round(pile4.x) + ', y = ' + Math.round(pile4.y) + ' (' + name + ') opens the box of five rows', !!geo4 && geo4.n === 5, J([geo4, pile4]));
+			ok('...with no row under the press point and the whole box on screen', !!geo4 && geo4.under === false && geo4.inView, J(geo4));
+			await M.page.close();
 		}
 
 		ok('no page error', errors.length === 0, errors.join(' | '));

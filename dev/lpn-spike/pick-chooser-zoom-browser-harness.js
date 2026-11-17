@@ -184,6 +184,30 @@ async function main() {
 		ok('...every box lists two to six rows and no pipe (Net3 has no zero-length pipe)', r.shortBoxes === 0 && r.maxRows <= 6 && r.pipeRows === 0, JSON.stringify(r));
 		ok('...and every tap without a box selects the node it is on', r.quietWrong === 0, JSON.stringify(r));
 		await T.page.close();
+
+		console.log('\nB2. Phone, the opening view: the Lake is off the left edge until panned; a real tap on the Lake over Pump 10 opens the box');
+		const P = await Session.open(browser, NAME + '-p2', { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+		await open(P);
+		const lakeBox = () => P.page.evaluate(() => {
+			const r = (s) => document.querySelector(s).getBoundingClientRect(), a = r('#lpn_canvas circle.lpn-node[data-node="Lake"]'), b = r('#lpn_canvas path.lpn-link-symbol-hit[data-link="10"]');
+			return { a: [a.left, a.top, a.right, a.bottom], b: [b.left, b.top, b.right, b.bottom] };
+		});
+		const before = await lakeBox();
+		ok('at the opening view on a phone the Lake is off the left edge (a tap there is a tap on nothing)', before.a[2] < 0, JSON.stringify(before));
+		const pcdp = await P.page.context().newCDPSession(P.page);
+		await pcdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 60, y: 600, id: 1 }] });
+		for (let i = 1; i <= 10; i++) { await pcdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 60 + i * 30, y: 600, id: 1 }] }); await sleep(25); }
+		await pcdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+		await P.settle(600);
+		const lk = await lakeBox();
+		const at = { x: (Math.max(lk.a[0], lk.b[0]) + Math.min(lk.a[2], lk.b[2])) / 2, y: (Math.max(lk.a[1], lk.b[1]) + Math.min(lk.a[3], lk.b[3])) / 2 };
+		ok('...panned by a finger, the Lake is on screen', at.x > 0 && at.x < 390, JSON.stringify(at));
+		await P.page.touchscreen.tap(at.x, at.y);
+		await P.settle(700);
+		const lrows = await P.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => b.textContent.trim()));
+		ok('a tap (touchscreen.tap) where the reservoir overlaps the pump opens the box of the two', lrows.length === 2 && lrows.some((x) => /Lake/.test(x)) && lrows.some((x) => /Pump 10/.test(x)), JSON.stringify(lrows));
+		await P.page.close();
+
 		ok('no page error', errors.length === 0, errors.join(' | '));
 	} finally {
 		await browser.close();
