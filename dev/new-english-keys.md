@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**66 still to read on master**, of 75 untranslated keys, of 3353 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**77 still to read on master**, of 86 untranslated keys, of 3362 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -45,8 +45,14 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   *Current plain sentence:* Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else.
   @@ NEEDS RULING
 
-## lpn_  (74, 65 to read @@ NEEDS RULING)
+## lpn_  (85, 76 to read @@ NEEDS RULING)
 
+- **`lpn_contour_follows`**
+  > Follows project "{link}" settings.
+  @@ NEEDS RULING
+- **`lpn_contour_none_note`**
+  > Nothing to plot: "Color nodes by" is set to "No color".
+  @@ NEEDS RULING
 - **`lpn_diag_builtin_error`**
   > An error occurred in the built-in solver: {message}
   @@ NEEDS RULING
@@ -158,6 +164,9 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 - **`lpn_ovm_push_tip`**
   > Push override upward
   @@ NEEDS RULING
+- **`lpn_pane_paste_text_no_words`**
+  > Row {row}: a new Text needs its words.
+  @@ NEEDS RULING
 - **`lpn_popup_boxtitle_of`**
   > Properties: {asset}
   @@ NEEDS RULING
@@ -167,8 +176,23 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 - **`lpn_quality_diffusivity_tip`**
   > EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²/s for US flow units and m²/s for SI flow units. Blank uses the EPANET default of 1.0.
   @@ NEEDS RULING
+- **`lpn_settings_color_node_field_tip`**
+  > Colors the nodes by this property. The contour plot follows it.
+  @@ NEEDS RULING
+- **`lpn_settings_color_ramp_node_tip`**
+  > Colors the nodes, the contour plot and its key.
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_show`**
+  > Show contour plot
+  @@ NEEDS RULING
 - **`lpn_settings_solver`**
   > Solver
+  @@ NEEDS RULING
+- **`lpn_settings_velocity_limit`**
+  > Velocity warning limit
+  @@ NEEDS RULING
+- **`lpn_settings_velocity_limit_tip`**
+  > The velocity above which a run reports the fastest pipe and how many other pipes also exceed it. Blank uses the default. Zero turns the warning off.
   @@ NEEDS RULING
 - **`lpn_settings_viscosity`**
   > Viscosity
@@ -181,6 +205,15 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   _Ruled OK 2026-11-03._
 - **`lpn_time_epanet_fallback_why`**
   > The built-in solver ran this network, because the EPANET solver could not be used. {reason}
+  @@ NEEDS RULING
+- **`lpn_velocity_warn`**
+  > ⚠ Pipe {id} velocity is {velocity} at {time}.
+  @@ NEEDS RULING
+- **`lpn_velocity_warn_more`**
+  > ⚠ And more pipes ({n}) above {limit}.
+  @@ NEEDS RULING
+- **`lpn_velocity_warn_steady`**
+  > ⚠ Pipe {id} velocity is {velocity}.
   @@ NEEDS RULING
 - **`lpn_wtg_export_exported`**
   > Exported {zip}, holding {wtg} and {sqlite}.
@@ -280,7 +313,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 
 # Strings waiting on a branch
 
-**72 still to read**, of 72 new keys across 7 unmerged branch(es).
+**66 still to read**, of 66 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -291,7 +324,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/assembly (`342c3a0fc`) — 51 new, 51 to read @@ NEEDS RULING
+### feat/assembly (`df00da7fa`) — 51 new, 51 to read @@ NEEDS RULING
 
 - **`lpn_assembly_down_head`**
   > Downstream head
@@ -447,19 +480,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > The tee must be a junction that is not part of another assembly. Specify the tee again.
   @@ NEEDS RULING
 
-### feat/contour-controls (`d67b75482`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/graph-scrub (`c6149d0cf`) — adds no English strings
 
-- **`lpn_contour_none_note`**
-  > Nothing to plot: choose a property under Color nodes by in Settings, Symbology, Node colors.
-  @@ NEEDS RULING
-- **`lpn_settings_color_node_field_tip`**
-  > Colors the nodes by this property. The contour plot follows it.
-  @@ NEEDS RULING
-- **`lpn_settings_color_ramp_node_tip`**
-  > Colors the nodes, the contour plot and its key.
-  @@ NEEDS RULING
-
-### feat/library-order (`d90c3ffde`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/library-order (`6560cc2d9`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_guide_lib_order_none`**
   > The order of patterns, curves, pipe types, and fittings lists never changes a run.
@@ -501,28 +524,14 @@ build for that would be a gate nobody keeps. Refresh it with
   > Move to top
   @@ NEEDS RULING
 
-### feat/pick-chooser (`8c2130c6d`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/pick-chooser (`72759a44c`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pick_chooser_label`**
   > Select one of the elements here
   @@ NEEDS RULING
 
-### feat/transport-slim (`2f7678858`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/transport-slim (`c5b33e463`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_time_more`**
   > More time controls
   @@ NEEDS RULING
-
-### feat/velocity-warning (`2ad68c694`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_velocity_warn`**
-  > ⚠ Pipe {id} velocity is {velocity} at {time}.
-  @@ NEEDS RULING
-- **`lpn_velocity_warn_more`**
-  > ⚠ And more pipes ({n}) above {limit}.
-  @@ NEEDS RULING
-- **`lpn_velocity_warn_steady`**
-  > ⚠ Pipe {id} velocity is {velocity}.
-  @@ NEEDS RULING
-
-### fix/diffusivity (`5d0b057c4`) — adds no English strings

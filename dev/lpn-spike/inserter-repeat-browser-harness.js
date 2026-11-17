@@ -119,7 +119,9 @@ async function main() {
 			// 1. key 9: one pick, three clicks, three Texts.
 			let before = await nT();
 			await pick('9');
-			for (let i = 0; i < 3; i++) { await click(row(i)); }
+			// A new Text starts empty with the caret in it and is removed if left empty (Task 854), so each gets words.
+			for (let i = 0; i < 3; i++) { await click(row(i)); await P.keyboard.type('Note ' + (i + 1)); await a.settle(100); }
+			await P.keyboard.press('Control+Enter'); await a.settle(300);
 			ok('Text (key 9): three clicks after one pick place three', (await nT()) - before === 3, before + ' -> ' + (await nT()));
 			ok('Text (key 9): the tool is still armed', (await P.evaluate(() => document.querySelector('#lpn_toolbar button[aria-pressed=true]') && document.querySelector('#lpn_toolbar button[aria-pressed=true]').getAttribute('aria-label'))) === 'Text');
 			// Esc ends the repeat.
@@ -130,8 +132,15 @@ async function main() {
 			// 2. toolbar: one pick, three clicks, three Texts.
 			await P.keyboard.press('Escape');
 			await a.toolbarClick('Text'); await a.settle(200);
-			for (let i = 0; i < 3; i++) { await click({ x: box.x + 150 + i * 140, y: box.y + 560 }); }
+			for (let i = 0; i < 3; i++) { await click({ x: box.x + 150 + i * 140, y: box.y + 560 }); await P.keyboard.type('Tool note ' + (i + 1)); await a.settle(100); }
+			await P.keyboard.press('Control+Enter'); await a.settle(300);
 			ok('Text (toolbar): three clicks after one pick place three', (await nT()) - before === 3, before + ' -> ' + (await nT()));
+			// 2b. clicks with no words typed place nothing: each empty Text is removed when the next click goes elsewhere.
+			before = await nT();
+			for (let i = 0; i < 3; i++) { await click({ x: box.x + 150 + i * 140, y: box.y + 640 }); }
+			await P.keyboard.press('Escape'); await a.settle(300);
+			ok('Text (toolbar): three clicks with nothing typed leave none', (await nT()) === before, before + ' -> ' + (await nT()));
+			await a.toolbarClick('Text'); await a.settle(200);
 			// 3. another tool ends it.
 			await a.toolbarClick('Select'); await a.settle(200);
 			before = await nT();

@@ -87,10 +87,11 @@ setUnitSet('us');
 	ok('a solved head reads in the elevation selector', L.resultUnit('elevhead') === 'lpn_u_elevhead');
 	ok('a solved pressure reads in the pressure selector', L.resultUnit('pressure') === 'lpn_u_pressure');
 	ok('a solved flow reads in the flow selector', L.resultUnit('flow') === 'lpn_u_flow');
-	// Velocity and gradient decide no typed number, which is why they still change with no fanfare
-	// without a list anywhere saying so -- unitChangeNeedsDialog() finds nothing to count.
-	['lpn_u_velocity', 'lpn_u_gradient'].forEach(n =>
-		ok(n + ' decides no typed field -- it was never an input', L.unitServes(n).length === 0));
+	// Gradient decides no typed number, which is why it still changes with no fanfare without a list
+	// anywhere saying so -- unitChangeNeedsDialog() finds nothing to count. Velocity decides one: the
+	// velocity warning limit (Task 864), a Settings number typed in it.
+	ok('lpn_u_gradient decides no typed field -- it was never an input', L.unitServes('lpn_u_gradient').length === 0);
+	ok('lpn_u_velocity decides exactly one typed field: the velocity warning limit', L.unitServes('lpn_u_velocity').join() === 'Velocity warning limit', L.unitServes('lpn_u_velocity').join());
 	['lpn_u_length', 'lpn_u_diameter', 'lpn_u_roughness', 'lpn_u_elevhead', 'lpn_u_pressure',
 		'lpn_u_flow'].forEach(n =>
 		ok(n + ' names the fields it decides', L.unitServes(n).length > 0,

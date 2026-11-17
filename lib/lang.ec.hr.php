@@ -817,7 +817,6 @@ $ec_lang['lpn_tool_zoom_selection']='Zumiraj na odabir';
 $ec_lang['lpn_tool_zoom_window']='Zumiraj prozor';
 $ec_lang['lpn_zoom_in']='Uvećaj';
 $ec_lang['lpn_zoom_out']='Umanji';
-$ec_lang['lpn_new_text']='Tekst';
 $ec_lang['lpn_field_text_bold']='Podebljani tekst';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -2061,7 +2060,6 @@ $ec_lang['lpn_contour_menu']='Izolinije';
 $ec_lang['lpn_contour_tip']='Prikažite na karti prikaz izolinija: boje čvorova šire se uzduž cijevi i pored njih, s označenim izolinijama. Otvara okvir za podešavanje ili isključivanje.';
 $ec_lang['lpn_contour_plot']='Izolinije: prikaz';
 $ec_lang['lpn_contour_show']='Prikaži crtež';
-$ec_lang['lpn_contour_show_tip']='Isključite da sakrijete ispunu i izolinije; uključite da ih vratite kakve su bile. Boje čvorova ostaju.';
 $ec_lang['lpn_contour_fill']='Ispuna';
 $ec_lang['lpn_contour_fill_tip']='Glatko stapa boje iz jednog razreda u drugi. Pojasevi boje svaki razred legende boja jednolično.';
 $ec_lang['lpn_contour_fill_smooth']='Glatko';

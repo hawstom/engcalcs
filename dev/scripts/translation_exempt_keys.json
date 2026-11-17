@@ -462,15 +462,6 @@
             ],
             "reason": "Messages -- the French word is Messages."
         },
-        "lpn_new_text": {
-            "category": "cognate",
-            "languages": [
-                "cs",
-                "de",
-                "ro"
-            ],
-            "reason": "Text -- the default contents of a newly placed text label. Same word and same evidence as lpn_tool_add_text. Added ro, Task 251 wave 3, 2026-08-13: text is the ordinary Romanian noun and OK is universal; the ro agent kept them while translating every other Latin-script term, and its one genuine false cognate (Auto, which reads automotive in Romanian) was caught separately and changed to Automat."
-        },
         "lpn_pane_tab_tanks": {
             "category": "cognate",
             "languages": [
