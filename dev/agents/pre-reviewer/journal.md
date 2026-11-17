@@ -5018,3 +5018,12 @@ OBSERVED (re-verify; real Chromium via the branch's own env.js server, Net1 well
 - Old fixture (dev/lpn-spike/assembly-before-round8.lwn, not fixtures/) opens with W1R/W1V/W1D/W1/W1P, tank well W2 with L5/J3/L6/T1; Explode+Undo ok. Pump+ and Valve+: headings Junction/Pump|Valve/Junction, Explode and Undo ok. .inp export of a Well and a Well with tank carries ID= TEE= TANK= PIPES=; reimport gives the same IDs, headings, flows, pressures.
 - Symbol tint equals reservoir and tank (same class, one colour). Phone 390x844: box fits, no sideways scroll, Well label hidden at the opening view.
 - NOT DONE: scenario in the browser (my New-scenario click made no scenario), Tables and Find renames, rename refusal wording (the harness answers dialogs, a plain junction shows none either), builder's harness mutation test, light/dark.
+
+## 2026-11-16 feat/library-order round 5 (c5ae4391a), Task 859: comment rows, bold labels
+OBSERVED (re-verify; real Chromium via the branch's env.js server, Net3 gallery example, scratchpad s2.js/s3.js/cmp.php):
+- Five browser harnesses run alone: user-guide-library 50 pass, library-description-browser all passed, import-export-menu 60/60, table-export-dialog 81/81, box-view-visible all passed. inp-export 4497 and inp-roundtrip-net3 pass.
+- Net3 Controls: 2 comment rows + 6 control rows; comment rows have a plain "Comment" label, no Understood tick, no bordered input. Move top/up/down/bottom each work on a comment row; Add a comment appends an empty row; Delete works. Export of the untouched example: [CONTROLS] lines identical to reference Net3.inp, one blank line at the end where the reference has two (section order differs).
+- After moving a comment, its old blank line stays at the old list position (blank between Link 10 OPEN and CLOSED), not with the comment.
+- Bold in the Controls ? entry: weight 700, inside the entry, no sideways scroll, in en, es, ar, he. Bold words differ from the language file's label strings in 14 files: add-label differs in ar bg bn cs fa km my ps pt tr ur; time label differs in he my ps ru uk ur. In ar, bg, cs the button itself reads "rule" (Add a rule) while the bold says "control".
+- No "EPANET engine only" claim in lib/ or guide text; only a code comment in js/looped-network.js.
+- NOT DONE: other 22 languages visually, Arabic glyphs (headless font lacks them, boxes only), phone, import-from-another-project path, harness mutation tests.
