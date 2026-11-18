@@ -12048,6 +12048,19 @@ var EngCalcs = EngCalcs || {};
 	function wellKindOf(a) { return a && a.tank ? (a.pt ? 'welltankp' : 'welltank') : 'well'; }
 	function wellSymbolKind(n) { var a = n ? assemblyOfNode(n.id) : null; return a && a.kind === 'well' ? wellKindOf(a) : 'well'; }
 	function wellSilhouette(kind) { return wellGeometry(kind || 'well').d; }
+	// A joined symbol's two grab shapes: the circle (the Well's) and the vessel (the tank's). The silhouette is the circle's subpath, then the vessel's.
+	function wellCircleD(kind) { var d = wellGeometry(kind || 'well').d, i = d.indexOf('Z'); return i < 0 ? d : d.slice(0, i + 1); }
+	function wellVesselD(kind) { var d = wellGeometry(kind || 'well').d, i = d.indexOf('Z'); return i < 0 || i === d.length - 1 ? '' : d.slice(i + 1); }
+	// The grab shape of a Well (its circle when joined, else its silhouette) or of the tank drawn with it (the vessel).
+	function wellGrabD(n) {
+		if (wellRoleOf(n.id) === 'T') { return wellSymbolKind(n) === 'well' ? wellSilhouette('well') : wellCircleD(wellSymbolKind(n)); }
+		return wellVesselD(wellKindOf(hostWellOfTank(n)));
+	}
+	// The Well whose joined symbol draws this tank, else null: the tank is drawn with the Well, at its outlet.
+	function hostWellOfTank(n) {
+		var a = wellTankOwner(n);
+		return a && nodeById(a.nodes[2]) && nodeEls[a.nodes[2]] ? a : null;
+	}
 	// How far the Well's drawing reaches from the node, in the symbol's own 24-unit frame: the farthest corner of its bounds from the circle's centre.
 	function wellReach(kind) {
 		var g = wellGeometry(kind);
@@ -12093,7 +12106,7 @@ var EngCalcs = EngCalcs || {};
 	// path rides a transform into the symbol's own box, exactly as positionNodeSymbol() places the
 	// drawing, so there is one opinion about where a reservoir is.
 	function nodeHitSilhouette(n) {
-		if (n && wellRoleOf(n.id) === 'T') { return wellSilhouette(wellSymbolKind(n)); }
+		if (n && (wellRoleOf(n.id) === 'T' || hostWellOfTank(n))) { return wellGrabD(n); }
 		return (n && (n.type === 'reservoir' || n.type === 'tank')) ? SYMBOL_SILHOUETTE[n.type] : null;
 	}
 	// Where in a symbol's 24-unit frame the node stands: the middle, except a Well's, whose circle stands on it and whose vessel reaches out to one side.
@@ -12101,9 +12114,12 @@ var EngCalcs = EngCalcs || {};
 	function syncNodeHit(n, hitEl) {
 		var ne = nodeEls[n.id],
 			hit = hitEl || (ne && ne.hit),
-			s = state.s || 1, box, kx, ky, an;
+			s = state.s || 1, box, kx, ky, an, hw, tn;
 		if (!hit) { return; }
 		if (String(hit.tagName || '').toLowerCase() === 'path') {
+			// A tank drawn with its Well has its grab shape on the joined symbol's vessel, so it is placed as the Well's symbol is.
+			hw = hostWellOfTank(n);
+			if (hw) { tn = n; n = nodeById(hw.nodes[2]); }
 			box = nodeSymbolSize(n);
 			kx = box.w / 24; ky = box.h / 24;
 			an = symbolAnchor(n);
@@ -41223,6 +41239,38 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
 			if (le && le.symbolG) { le.symbolG.classList.toggle('lpn-asm-hid', !!wellLinks[l.id]); }
+		});
+		hideJoinedTanks();
+	}
+	// **A WELL WITH A TANK IS ONE POINT ON THE MAP** (Tom, round 13, option a): the joined symbol draws the tank, so the tank node's own symbol and label are not drawn, nor
+	// are its short pipes and the tee when nothing else joins the tee. Picking: the circle is the Well's and the vessel is the tank's (the tank's grab shape moves to it).
+	// Explode, or a lost member, draws every element as itself again. The tank's results are in the Well's box and its block.
+	function hideJoinedTanks() {
+		var nodes = {}, links = {};
+		assemblyList().forEach(function (a) {
+			var tee = a.tee && incidentLinks[a.tee];
+			if (a.kind !== 'well' || !wellHasTank(a) || !nodeEls[a.nodes[2]]) { return; }
+			nodes[a.tank] = 1;
+			(a.branch || []).forEach(function (id) { links[id] = 1; });
+			if (a.tee && nodeById(a.tee) && tee && tee.every(function (id) { return (a.branch || []).indexOf(id) >= 0; })) { nodes[a.tee] = 1; }
+		});
+		function hid(e, on) { if (!e) { return; } if (e.length !== undefined && !e.classList) { Array.prototype.forEach.call(e, function (x) { hid(x, on); }); return; } if (e.classList) { e.classList.toggle('lpn-asm-hid', on); } }
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id], on = !!nodes[n.id], a = on ? wellTankOwner(n) : null;
+			if (!ne) { return; }
+			if (on || ne.joinedHid) {
+				[ne.circle, ne.symbolG, ne.symbol, ne.text, ne.leader, ne.lblHit].forEach(function (e) { hid(e, on); });
+				ne.joinedHid = on;
+				if (!a && ne.hit && on) { hid(ne.hit, true); }
+				if (!on && ne.hit) { hid(ne.hit, false); }
+			}
+			if (hostWellOfTank(n) && ne.hit) { ne.hit.setAttribute('d', nodeHitSilhouette(n)); syncNodeHit(n, ne.hit); if (ne.hit.parentNode === nodesLayer) { nodesLayer.appendChild(ne.hit); } }
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id], on = !!links[l.id];
+			if (!le || !(on || le.joinedHid)) { return; }
+			[le.line, le.halo, le.hit, le.handles, le.arrows, le.text, le.leader, le.lblHit, le.symbolG].forEach(function (e) { hid(e, on); });
+			le.joinedHid = on;
 		});
 	}
 	// A node a split has just made takes the group's ID, and the counter its own prefix advanced for it is given back.

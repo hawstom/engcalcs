@@ -146,15 +146,29 @@ async function main() {
 			const m = mine[0] && mine[0].box;
 			// the circle (left edge at x 2.7 of 24, centre at 7, the whole drawing 19.8 wide) stands on the well's press
 			ok(label + ': the circle stands on the point the Well was placed at, the vessel reaching out to the right', !!m && Math.abs((pts[0].x - m.l) / m.w - 4.3 / 19.8) < 0.03 && m.w > m.h * 0.9, JSON.stringify([m, pts[0]]));
-			// picking: a press on the vessel part selects the Well; a press on the tank node's own symbol selects the tank (what the branch selected before)
+			// **ONE POINT ON THE MAP** (Tom, round 13, option a): while assembled the tank draws only as the joined symbol's vessel, so its own symbol, its label and the two short
+			// pipes are not drawn at the tank's own point; a press on the circle selects the Well and a press on the vessel selects the tank.
+			const nearTank = () => P.evaluate((q) => {
+				const vis = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && getComputedStyle(e).display !== 'none' && !e.closest('.lpn-asm-hid') && Math.hypot(r.left + r.width / 2 - q.x, r.top + r.height / 2 - q.y) < 30; };
+				return { symbols: Array.from(document.querySelectorAll('#lpn_canvas .lpn-node-symbol-tank')).filter(vis).length, pipes: Array.from(document.querySelectorAll('#lpn_canvas polyline.lpn-link')).filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && getComputedStyle(e).display !== 'none' && !e.closest('.lpn-asm-hid') && r.left <= q.x + 4 && r.right >= q.x - 4 && Math.abs(r.top + r.height / 2 - q.y) < 12 && r.width < 400 && (r.left > q.x0 + 20); }).length };
+			}, { x: pts[2].x, y: pts[2].y, x0: pts[0].x });
+			const hidden = await nearTank();
+			ok(label + ': the tank\'s own symbol is not drawn at its point while assembled, and no pipe is drawn into it', hidden.symbols === 0 && hidden.pipes === 0, JSON.stringify(hidden));
+			await P.mouse.click(pts[0].x, pts[0].y); await a.settle(700);
+			const wsel = await P.evaluate(() => ({ explode: !!document.querySelector('[data-assembly-explode]') }));
+			ok(label + ': a press on the circle selects the Well (its box with Explode)', wsel.explode, JSON.stringify(wsel));
+			await P.keyboard.press('Escape'); await a.settle(300);
 			await P.mouse.click(m.l + m.w * 0.85, m.t + m.h * 0.5); await a.settle(700);
-			const sel = await P.evaluate(() => ({ explode: !!document.querySelector('[data-assembly-explode]'), head: (document.querySelector('#lpn_popup_fields .lpn-asm-head') || {}).textContent }));
-			ok(label + ': a press on its vessel selects the Well (its box with Explode)', sel.explode, JSON.stringify(sel));
-			await P.keyboard.press('Escape'); await a.settle(300);
-			await P.mouse.click(pts[2].x, pts[2].y); await a.settle(700);
 			const tsel = await P.evaluate(() => ({ explode: !!document.querySelector('[data-assembly-explode]'), note: !!document.querySelector('#lpn_popup_fields .lpn-owned-note') }));
-			ok(label + ': a press on the tank itself still selects the tank (its box, with the sentence naming the Well)', !tsel.explode && tsel.note, JSON.stringify(tsel));
+			ok(label + ': a press on the vessel selects the tank (its box, with the sentence naming the Well)', !tsel.explode && tsel.note, JSON.stringify(tsel));
 			await P.keyboard.press('Escape'); await a.settle(300);
+			if (kind === 'welltankp') {
+				await P.mouse.click(pts[0].x, pts[0].y); await a.settle(700);
+				await P.evaluate(() => { const b = document.querySelector('[data-assembly-explode]'); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });
+				await a.settle(900); await P.keyboard.press('Escape'); await a.settle(300);
+				const back = await nearTank();
+				ok(label + ': after Explode the tank draws as its own symbol again, at its own point', back.symbols === 1, JSON.stringify(back));
+			}
 			if (process.env.EC_WELL_SHOT_DIR) {   // a picture of the whole assembly on Net1's ground, for Tom: EC_WELL_SHOT_DIR=/path
 				const xs = pts.map((q) => q.x), ys = pts.map((q) => q.y), x0 = Math.max(0, Math.min.apply(null, xs) - 90), y0 = Math.max(0, Math.min.apply(null, ys) - 110);
 				await P.screenshot({ path: path.join(process.env.EC_WELL_SHOT_DIR, 'r13-' + kind + '.png'), clip: { x: x0, y: y0, width: Math.min(1400 - x0, Math.max.apply(null, xs) + 120 - x0), height: Math.min(1000 - y0, Math.max.apply(null, ys) + 110 - y0) } });
