@@ -111,7 +111,8 @@
         "uniqueness_groups": {
             "1": "label, text, description, tag, ID",
             "2": "hydraulic grade line, head loss gradient, colour ramp",
-            "3": "scenario, status"
+            "3": "scenario, status",
+            "4": "control, rule"
         }
     },
     "terms": {
@@ -5335,6 +5336,34 @@
                 "en": "inherit"
             },
             "source": "dev/terms.md"
+        },
+        "control (simple control)": {
+            "term": "control (simple control)",
+            "concept": "control-simple",
+            "plain": "simple control or one-line instruction that opens, closes, or sets one pipe, pump, or valve by time, tank level, or pressure",
+            "definition": "",
+            "symbol": "",
+            "context": "",
+            "translation_notes": "",
+            "translations": {
+                "en": "control"
+            },
+            "source": "dev/terms.md",
+            "uniqueness_group": 4
+        },
+        "rule (rule-based control)": {
+            "term": "rule (rule-based control)",
+            "concept": "control-rule",
+            "plain": "rule-based control or IF, THEN, ELSE rule with conditions and actions",
+            "definition": "",
+            "symbol": "",
+            "context": "",
+            "translation_notes": "",
+            "translations": {
+                "en": "rule"
+            },
+            "source": "dev/terms.md",
+            "uniqueness_group": 4
         }
     }
 }
