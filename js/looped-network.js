@@ -39515,17 +39515,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			flush();
 			if (!dots) { return; }
 			s.points.forEach(function (q) {
-				var c, ttl;
+				var c;
 				if (q.y === undefined) { return; }
-				c = el('circle', { cx: X(tsHours(q.t)), cy: Y(q.y), r: 2,
-					class: 'lpn-ts-dot', fill: s.color }, svg);
-				// A <title>, not a tooltip of our own: it is the one every browser already has, and
-				// it is where the exact number lives -- the axis is rounded to a step a person
-				// reads, which is the whole point of the step.
-				ttl = el('title', {}, c);
-				ttl.appendChild(document.createTextNode(
-					s.id + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(q.t) : q.t) +
-					'   ' + plainRound(q.y, 2)));
+				// No <title>: the crosshair readout gives the value, and two tips for one value are one too many. The
+				// exact number stays on the dot as data, for the harnesses that read what was plotted.
+				c = el('circle', { cx: X(tsHours(q.t)), cy: Y(q.y), r: 2, class: 'lpn-ts-dot', fill: s.color,
+					'data-reading': s.id + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(q.t) : q.t) + '   ' + plainRound(q.y, 2) }, svg);
 			});
 		});
 		// The measured rings, in their asset's own color, drawn last so a line never hides one.
@@ -40541,10 +40536,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			if (!dots && pts.length > 1) { return; }
 			pts.forEach(function (p) {
-				var c = el('circle', { cx: X(tsHours(p.t)), cy: Y(p[key]), r: 2, class: 'lpn-ts-dot', fill: color }, svg),
-					ttl = el('title', {}, c);
-				ttl.appendChild(document.createTextNode(ttlName[key] + '   ' +
-					(EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : p.t) + '   ' + plainRound(p[key], 2)));
+				el('circle', { cx: X(tsHours(p.t)), cy: Y(p[key]), r: 2, class: 'lpn-ts-dot', fill: color,
+					'data-reading': ttlName[key] + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : p.t) + '   ' + plainRound(p[key], 2) }, svg);
 			});
 		});
 		tsNowMark(host, svg, now, X, box, xB, 'hit', function (t) {

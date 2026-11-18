@@ -293,6 +293,14 @@ async function main() {
 				await s.settle(800);
 				await behaveOn('.lpn-tsb .lpn-tsb-chart', 'a graph bubble on the map');
 			}
+			// The Flow balance chart: the same hover readout, click and drag.
+			if (!await s.page.evaluate(() => { const t = document.getElementById('lpn_pane_tab_sysflow'); return !!t; })) { ok(tag + ': there is a Flow balance tab', false); }
+			else {
+				await s.page.evaluate(() => document.getElementById('lpn_pane_tab_sysflow').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+				await s.settle(900);
+				await behaveOn('#lpn_sysflow_chart', 'the Flow balance chart');
+				ok(tag + ': the Flow balance chart has no dot tips (the readout carries the value)', await s.page.evaluate(() => document.querySelectorAll('#lpn_sysflow_chart .lpn-ts-dot title, #lpn_ts_chart .lpn-ts-dot title').length === 0));
+			}
 			ok(tag + ': no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
 			await s.context.close().catch(() => {});
 		}
