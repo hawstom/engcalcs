@@ -11,7 +11,11 @@
 //      and the checks are that every click without a box selects the node it is on, that every box
 //      lists two to six rows with no pipe, and that the opening view opens only the few where a tank
 //      or pump glyph lies over a junction (a pump's or valve's symbol counts like any node's: Net3's pumps 10 and 335 each lie over a junction);
-//   B. phone, 390 x 844 touch, 8 notches out: the same with a finger.
+//   B. phone, 390 x 844 touch, 8 notches out: the same with a finger;
+//   B3. phone, a finger is a disc of the touch reach (Tom, 2026-11-18: "I can't select Pump 335 ... I repeatedly select
+//      N60 or N61"): a tap on Pump 335 near Junctions 60 and 61 gives the box listing the pump and the junctions, at the
+//      opening view and 4 and 8 notches out; a tap on a lone junction far from anything selects it with no box; a tap on
+//      Tank 1 at 4 notches out gives its box.
 // The cases built by hand are in pick-chooser-browser-harness.js.
 //
 //   node dev/lpn-spike/pick-chooser-zoom-browser-harness.js   (takes the browser lock itself)
@@ -268,6 +272,51 @@ async function main() {
 		ok('...and every tap without a box selects the node it is on', r.quietWrong === 0, JSON.stringify(r));
 		await T.page.close();
 
+		console.log('\nB3. Phone, a finger is a disc: Pump 335 beside Junctions 60 and 61, a lone junction, Tank 1');
+		const F = await Session.open(browser, NAME + '-p3', { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+		await open(F);
+		const fRows = () => F.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => b.textContent.trim()));
+		const fSel = () => F.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas .lpn-selected')).map((e) => e.dataset.node ? 'n' + e.dataset.node : (e.dataset.link !== undefined ? 'l' + e.dataset.link : (e.nextElementSibling && e.nextElementSibling.dataset.link !== undefined ? 'l' + e.nextElementSibling.dataset.link : 'x'))).sort().join(','));
+		const fClear = async () => { await F.page.evaluate(() => { document.querySelectorAll('.lpn-pane-ctxmenu').forEach((m) => m.remove()); const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } }); await F.page.touchscreen.tap(380, 835); await F.settle(300); };
+		const mid = (sel) => F.page.evaluate((q) => { const e = document.querySelector(q); if (!e) { return null; } const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }, sel);
+		const pump = async (done) => {
+			const g = await mid('#lpn_canvas path.lpn-link-symbol-hit[data-link="335"]');
+			const was = await fSel();
+			await F.page.touchscreen.tap(g.x, g.y); await F.settle(600);
+			const rr = await fRows(), ss = await fSel();
+			ok(done + ' notches out: a tap on Pump 335 opens the box listing the pump and Junctions 60 and 61, the pump first, and selects nothing yet', rr[0] === 'Pump 335' && rr.includes('Junction 60') && rr.includes('Junction 61') && rr.length <= 6 && ss === was, JSON.stringify([rr, ss, was, g]));
+			await fClear();
+		};
+		// A lone junction at the opening view: no other node, glyph or Text within 34 px of it (past the finger's 24).
+		{
+			const lone = await F.page.evaluate(() => {
+				const pts = [];
+				document.querySelectorAll('#lpn_canvas [data-node], #lpn_canvas path.lpn-link-symbol-hit, #lpn_canvas [data-lbl]').forEach((e) => { const b = e.getBoundingClientRect(); if (b.width > 0) { pts.push({ id: e.dataset.node, junction: e.tagName === 'circle' && e.dataset.node !== undefined, l: b.left, t: b.top, r: b.right, b: b.bottom, x: b.left + b.width / 2, y: b.top + b.height / 2 }); } });
+				const near = (a, o) => Math.max(o.l - a.r, 0, a.l - o.r) < 34 && Math.max(o.t - a.b, 0, a.t - o.b) < 34;
+				return pts.filter((a) => a.junction && a.x > 20 && a.x < 370 && a.y > 20 && a.y < 800 && document.elementsFromPoint(a.x, a.y)[0].dataset.node === a.id && !pts.some((o) => o !== a && o.id !== a.id && near(a, o)))[0] || null;
+			});
+			ok('(at the opening view Net3 has a junction with nothing within 34 px)', !!lone, JSON.stringify(lone));
+			if (lone) {
+				await F.page.touchscreen.tap(lone.x, lone.y); await F.settle(600);
+				const rr = await fRows(), ss = await fSel();
+				ok('a tap on the lone Junction ' + lone.id + ' selects it with no box', rr.length === 0 && ss === 'n' + lone.id, JSON.stringify([rr, ss]));
+				await fClear();
+			}
+		}
+		await pump(0);
+		await zoomOut(F, 4);
+		await pump(4);
+		{
+			const t1 = await mid('#lpn_canvas path.lpn-node-hit[data-node="1"]');
+			await F.page.touchscreen.tap(t1.x, t1.y); await F.settle(600);
+			const rr = await fRows();
+			ok('a tap on Tank 1, 4 notches out, gives its box: the tank and the junction it hides', rr.length >= 2 && rr[0] === 'Tank 1' && rr.includes('Junction 40'), JSON.stringify([rr, t1]));
+			await fClear();
+		}
+		await zoomOut(F, 4);
+		await pump(8);
+		await F.page.close();
+
 		console.log('\nB2. Phone, the opening view: the Lake is off the left edge until panned; a real tap on the Lake over Pump 10 opens the box');
 		const P = await Session.open(browser, NAME + '-p2', { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 		await open(P);
@@ -300,7 +349,7 @@ async function main() {
 		await P.page.touchscreen.tap(at.x, at.y);
 		await P.settle(700);
 		const lrows = await P.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => b.textContent.trim()));
-		ok('a tap (touchscreen.tap) where the reservoir overlaps the pump opens the box of the two', lrows.length === 2 && lrows.some((x) => /Lake/.test(x)) && lrows.some((x) => /Pump 10/.test(x)), JSON.stringify(lrows));
+		ok('a tap (touchscreen.tap) where the reservoir overlaps the pump opens a box with the two (and the junction a finger also covers)', lrows.length >= 2 && lrows.some((x) => /Lake/.test(x)) && lrows.some((x) => /Pump 10/.test(x)), JSON.stringify(lrows));
 		await P.page.close();
 
 		ok('no page error', errors.length === 0, errors.join(' | '));
