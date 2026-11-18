@@ -25,8 +25,8 @@ const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 const SYM = +(process.env.DRAW_SYM || 5), LONG = +(process.env.DRAW_LONG || 6), SHOTS = process.env.DRAW_SHOTS || null;
 const NOTCH_OVERRIDE = process.env.DRAW_NOTCHES ? process.env.DRAW_NOTCHES.split(',').map(Number) : null;
 const SCENES = [
-	{ key: 'novato', file: NOVATO, view: { width: 1920, height: 1000 }, around: '163', notches: range(8, 17), shots: range(10, 16) },
-	{ key: 'net3', file: NET3, view: { width: 390, height: 844 }, around: null, notches: [0, 3, 6, 9], shots: [] },
+	{ key: 'novato', file: NOVATO, view: { width: 1920, height: 1000 }, around: '163', notches: range(8, 17), shots: range(10, 16), symShots: [10] },
+	{ key: 'net3', file: NET3, view: { width: 390, height: 844 }, around: null, notches: [0, 3, 6, 9], shots: [], symShots: [0, 6] },
 	{ key: 'n600', file: N600, view: { width: 1920, height: 1000 }, around: null, notches: [3, 6, 9], shots: [] }
 ];
 function orient(p, q, r) { return (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x); }
@@ -98,6 +98,15 @@ async function run(Session, browser, sc) {
 				const ns = await a.page.evaluate((id) => window.__lpnForm.nodeScreen(id), sc.around);
 				const w = 560, h = 380, x = Math.max(0, Math.min(sc.view.width - w, ns.x - w / 2)), y = Math.max(0, Math.min(sc.view.height - h, ns.y - h / 2));
 				await a.page.screenshot({ path: path.join(SHOTS, sc.key + '-notch' + k + '.png'), clip: { x, y, width: w, height: h } });
+			}
+			if (process.env.DRAW_SYMSHOTS && j.ids.xSymbol.length && (sc.symShots || []).indexOf(k) >= 0) {
+				fs.mkdirSync(process.env.DRAW_SYMSHOTS, { recursive: true });
+				for (const id of j.ids.xSymbol.slice(0, 2)) {
+					const g = S.leaders.find((x) => x.k === id), w = 300, h = 220, cx = (g.a.x + g.b.x) / 2, cy = (g.a.y + g.b.y) / 2;
+					const r = await a.page.evaluate(() => { const b = document.querySelector('svg').getBoundingClientRect(); return { l: b.left, t: b.top }; });
+					const x = Math.max(0, Math.min(sc.view.width - w, cx + r.l - w / 2)), y = Math.max(0, Math.min(sc.view.height - h, cy + r.t - h / 2));
+					await a.page.screenshot({ path: path.join(process.env.DRAW_SYMSHOTS, sc.key + '-notch' + k + '-' + id + '.png'), clip: { x: x, y: y, width: w, height: h } });
+				}
 			}
 			rows.push(j);
 		}
