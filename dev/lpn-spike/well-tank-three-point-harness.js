@@ -567,7 +567,7 @@ console.log('\n--- 10. round 11 review fixes ---');
 	L.setMode('select'); L.openPopup(a.tank, 10, 10);
 	const labels = boxLabels();
 	console.log('        tank box: ' + labels.join(' | '));
-	ok('the pressure tank\'s box shows its depths and curve as the Well set them, with whose they are', (function () { let f = 0; walk(byId.lpn_popup_fields, (e) => { if (e.className === 'lpn-owned-note' && /^Written by well W1/.test(e.textContent || '')) { f++; } }); return f === 1; }()) && labels.filter((x) => /^(Initial|Minimum|Maximum) depth/.test(x)).length === 3 && !(function () { let inputs = 0; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL' && /^(Initial|Minimum|Maximum) depth/.test((e.textContent || '').trim())) { (e.children || e.childNodes || []).forEach((c) => { if (c.tagName === 'INPUT') { inputs++; } }); } }); return inputs; }()));
+	ok('the pressure tank\'s box shows its depths and curve as the Well set them, with whose they are', (function () { let f = 0; walk(byId.lpn_popup_fields, (e) => { if (e.className === 'lpn-owned-note' && /^Associated with Well W1\. Change volume and control properties there\.$/.test(e.textContent || '')) { f++; } }); return f === 1; }()) && labels.filter((x) => /^(Initial|Minimum|Maximum) depth/.test(x)).length === 3 && !(function () { let inputs = 0; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL' && /^(Initial|Minimum|Maximum) depth/.test((e.textContent || '').trim())) { (e.children || e.childNodes || []).forEach((c) => { if (c.tagName === 'INPUT') { inputs++; } }); } }); return inputs; }()));
 	if (process.argv.includes('--write-fixture')) {
 		require('fs').writeFileSync(ROOT + 'dev/lpn-spike/well-pressure-tank-fixture.lwn', JSON.stringify(JSON.parse(JSON.stringify(L.serializeProject()))));
 		console.log('wrote the fixture');
@@ -589,7 +589,7 @@ console.log('\n--- 10. round 11 review fixes ---');
 	const ownedEls = labelEls.filter((e) => owned.some((o) => txt(e).indexOf(o) === 0));
 	ok('the four owned rows that mean something to a pressure tank are listed, none typeable, and diameter, minimum volume and overflow have no row', ownedEls.length === 4 && ownedEls.every((e) => inputsOf(e) === 0) && !labelEls.some((e) => /^(Tank diameter|Minimum volume|Can overflow)/.test(txt(e))), ownedEls.map(txt).join(' | '));
 	const notes = []; walk(byId.lpn_popup_fields, (e) => { if (e.className === 'lpn-owned-note') { notes.push(e); } });
-	ok('the sentence shows exactly once, naming the well', notes.length === 1 && /^Written by well W1\. Change it in the Properties box of the well\.$/.test(txt(notes[0])));
+	ok('the sentence shows exactly once, naming the well', notes.length === 1 && /^Associated with Well W1\. Change volume and control properties there\.$/.test(txt(notes[0])));
 	ok('the tank\'s Elevation and Base elevation are still typeable', ['Elevation', 'Base elevation'].every((o) => labelEls.some((e) => txt(e).indexOf(o) === 0 && inputsOf(e) > 0)));
 	// Tables: the six columns are plain cells for this tank, and typeable for an ordinary tank.
 	const spec = L.paneTables().filter((t) => t.cols.some((c) => c.key === 'tankDiameter'))[0];

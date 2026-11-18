@@ -75038,7 +75038,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'lpn_field_head', 'lpn_result_pressure', 'lpn_result_delivered_demand', 'lpn_result_demand_deficit', '#qresult', '#notes'],
 		reservoir: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', '#coords', 'lpn_field_head', 'lpn_field_head_pattern',
 			'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|', '#qresult', '#notes'],
-		tank: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', 'lpn_field_tank_base_elev', 'lpn_field_tank_diameter',
+		tank: ['#ownednote', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', 'lpn_field_tank_base_elev', 'lpn_field_tank_diameter',
 			'lpn_field_tank_minvol', '#owned', 'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', 'lpn_field_tank_overflow', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
 			'lpn_mixing_model', 'lpn_mixing_fraction', 'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|',
 			'lpn_field_head', 'lpn_result_pressure', 'lpn_result_depth', 'lpn_result_tank_volume', '#qresult', '#notes'],
@@ -77418,20 +77418,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					: mode === 'msx' ? pc.lpn_result_msx_tip
 						: pc.lpn_result_source_share_tip);
 	}
+	// The sentence at the top of a Well's tank's Properties box: whose it is and where its volume and control properties are changed.
+	function ownedTankNote(fields, a) {
+		var note = document.createElement('span');
+		note.className = 'lpn-owned-note';
+		note.__prow = '#ownednote';   // propsReorder() keeps it first
+		note.textContent = String((EngCalcs.pageConfig || {}).lpn_tank_associated || 'Associated with Well {id}. Change volume and control properties there.').replace('{id}', a.id);
+		fields.appendChild(note);
+	}
 	// A tank's four depth and size inputs, in the order a person builds one: how much water is in it, how far it can go
 	// either way, and how wide it is. The one place they are drawn, for a tank's own box and for a well's.
 	function tankDepthFields(fields, n, nodeId) {
 		var pc = EngCalcs.pageConfig || {}, owner = pressureTankOwner(n), eu = ' (' + unitLabel('lpn_u_elevhead') + ')';
 		// A pressure tank's initial depth, limits and volume curve are the Well's, shown as it set them (syncPressureTank()), with whose they are.
 		if (owner) {
-			// The sentence first, across the whole box and wrapping, then the rows it is about. Tank diameter, minimum volume and can overflow mean nothing to a
+			// The sentence stands at the top of the box (renderNodeFields()). Tank diameter, minimum volume and can overflow mean nothing to a
 			// pressure tank (its volume curve sets volume against depth in both engines), so they have no row; the group still writes them.
-			// One tagged group (`#owned`), so propsReorder() keeps the sentence and the four rows it is about together, in place of Minimum depth.
+			// One tagged group (`#owned`), so propsReorder() keeps the four rows together, in place of Minimum depth.
 			popRows(fields, '#owned', function () {
-				var note = document.createElement('span');
-				note.className = 'lpn-owned-note';
-				note.textContent = ownedSentence(owner, pc.lpn_library_control_owned);
-				fields.appendChild(note);
 				readonlyField(fields, (pc.lpn_field_tank_level_short || 'Initial depth') + eu, effective(n, 'level'), pc.lpn_field_tank_level_short_tip, 4);
 				readonlyField(fields, (pc.lpn_field_tank_minlevel_short || 'Minimum depth') + eu, effective(n, 'minLevel'), pc.lpn_field_tank_minlevel_short_tip, 4);
 				readonlyField(fields, (pc.lpn_field_tank_maxlevel_short || 'Maximum depth') + eu, effective(n, 'maxLevel'), pc.lpn_field_tank_maxlevel_short_tip, 4);
@@ -77520,6 +77524,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(n.id, function (newId) { renameNode(nodeId, newId); }, 'node');
 		clearFields(fields);
+		// A tank a Well owns says so first, above every row (Tom, round 12 pass: "at the top of the box").
+		if (pressureTankOwner(n)) { ownedTankNote(fields, pressureTankOwner(n)); }
 		// **POSITION SITS IMMEDIATELY AFTER THE ID, ON TOM'S RULING OF 2026-09-15** -- `idField()`
 		// above writes the popup's header, so first in `fields` IS slot 2. His reason for one order
 		// across the popup AND the tables rather than two: *"one rule, no special case to

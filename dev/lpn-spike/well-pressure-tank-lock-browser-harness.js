@@ -56,7 +56,7 @@ async function main() {
 	const fixture = require('fs').readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'well-pressure-tank-fixture.lwn'), 'utf8');
 	const OWNED = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank volume'];
 	const ABSENT = ['Tank diameter', 'Minimum volume', 'Can overflow'];
-	const SENTENCE = 'Written by well W1. Change it in the Properties box of the well.';
+	const SENTENCE = 'Associated with Well W1. Change volume and control properties there.';
 	try {
 		const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 1000 }, serviceWorkers: 'block' });
 		const P = a.page;
@@ -89,12 +89,12 @@ async function main() {
 		const geo = await P.evaluate(() => {
 			const n = document.querySelector('#lpn_popup_fields .lpn-owned-note'), f = document.getElementById('lpn_popup_fields');
 			if (!n) { return null; }
-			const r = n.getBoundingClientRect(), fr = f.getBoundingClientRect(), first = Array.from(f.querySelectorAll('label')).filter((l) => /^Minimum depth/.test(l.textContent.trim()))[0];
+			const r = n.getBoundingClientRect(), fr = f.getBoundingClientRect(), labels = Array.from(f.querySelectorAll('label')), firstTop = Math.min.apply(null, labels.map((l) => l.getBoundingClientRect().top));
 			const rng = document.createRange(); rng.selectNodeContents(n); const tr = rng.getBoundingClientRect();
-			return { text: n.textContent.trim(), right: tr.right, boxRight: fr.right, left: tr.left, boxLeft: fr.left, above: first ? r.bottom <= first.getBoundingClientRect().top + 1 : false, gap: first ? first.getBoundingClientRect().top - r.bottom : 999, sw: n.scrollWidth, cw: n.clientWidth };
+			return { text: n.textContent.trim(), right: tr.right, boxRight: fr.right, left: tr.left, boxLeft: fr.left, top: r.bottom <= firstTop + 1, sw: n.scrollWidth, cw: n.clientWidth };
 		});
 		ok('the sentence shows once, whole, with its right edge inside the box', !!geo && geo.text === SENTENCE && geo.right <= geo.boxRight + 1 && geo.sw <= geo.cw + 1, JSON.stringify(geo));
-		ok('and stands directly above the first locked row', !!geo && geo.above && geo.gap < 40, JSON.stringify(geo));
+		ok('and stands at the top of the box, above every row', !!geo && geo.top, JSON.stringify(geo));
 		const order = rs.map((r) => r.t.replace(/ \(.*$/, '').replace(/\s*\?.*$/, ''));
 		const at = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank volume'].map((n) => order.findIndex((x) => x.indexOf(n) === 0));
 		ok('the four locked rows stand together, in one run under the sentence', Math.max.apply(null, at) - Math.min.apply(null, at) === 3, JSON.stringify(at));

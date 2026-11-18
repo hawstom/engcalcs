@@ -4487,6 +4487,7 @@ EngCalcs.pageConfig = {
 	lpn_field_well_pump_on_tip: <?=json_encode($ec_lang['lpn_field_well_pump_on_tip'])?>,
 	lpn_field_well_pump_off: <?=json_encode($ec_lang['lpn_field_well_pump_off'])?>,
 	lpn_field_well_pump_off_tip: <?=json_encode($ec_lang['lpn_field_well_pump_off_tip'])?>,
+	lpn_tank_associated: <?=json_encode($ec_lang['lpn_tank_associated'])?>,
 	lpn_library_control_owned: <?=json_encode($ec_lang['lpn_library_control_owned'])?>,
 	lpn_diag_rules_refused: <?=json_encode($ec_lang['lpn_diag_rules_refused'])?>,
 	lpn_diag_control_refused: <?=json_encode($ec_lang['lpn_diag_control_refused'])?>,
