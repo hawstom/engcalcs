@@ -47,7 +47,7 @@ function universe(t) {
 	Object.keys(t).forEach((k) => {
 		const v = t[k];
 		if (!(/^lpn_/.test(k) || SPECFILE.extraLabelKeys.indexOf(k) >= 0)) { return; }
-		if (/^lpn_(guide_|notes_|hotkeys_)/.test(k) && !/_term$|_heading$/.test(k)) { return; }
+		if (/^lpn_(guide_|notes_|hotkeys_)/.test(k)) { return; }   // the manual's own texts, headings included, are not interface labels
 		if (k !== 'lpn_menu_help' && /_(tip|help|intro|body|msg|note|hint|warn|text)$|^lpn_msg/.test(k)) { return; }
 		if (/[<>{}]|\.$|:$|\?$/u.test(v) && !/…$/u.test(v)) { return; }
 		if (v !== v.trim()) { return; }
@@ -126,7 +126,8 @@ fs.readdirSync(LIB).filter((f) => /^lang\.ec\.[a-z]{2}\.php$/.test(f) && f !== '
 		const gotB = (v.match(/<strong>.*?<\/strong>/gsu) || []).map((s) => s.replace(/<\/?strong>/g, ''));
 		gotB.forEach((g, i) => {
 			spans++; checks++;
-			const ok = SPEC[mk].some((e) => [e.key].concat(e.also || []).some((k) => t[k] !== undefined && (t[k] === g || t[k].replace(/…$/u, '') === g || g.indexOf(t[k].replace(/…$/u, '') + ' (') === 0)));
+			const ok = SPEC[mk].some((e) => t[e.key] !== undefined && t[e.key] !== '' && (t[e.key] === g || (e.stripEllipsis && t[e.key].replace(/…$/u, '') === g) ||
+				(e.boldUnit && g.indexOf(t[e.key].replace(/…$/u, '') + ' (') === 0 && /\)$/.test(g))));
 			if (!ok && !EXCEPT[l + ':' + mk + ':' + i]) { fail(l + ' ' + mk + ' span ' + i + ': ' + JSON.stringify(g) + ' is none of its labels'); }
 			if (ok && EXCEPT[l + ':' + mk + ':' + i]) { fail(l + ' ' + mk + ' span ' + i + ' now matches: remove the exception'); }
 		});
