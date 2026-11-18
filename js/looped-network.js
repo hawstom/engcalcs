@@ -61807,6 +61807,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			unresolvedUnits[name] = want;
 		});
+		// **THE UNITS JUST INSTALLED ARE THE ONES THE NEXT CHANGE MOVES FROM.** onUnitChange() compares
+		// against unitPrev, which wireUnitSelects() filled once with the PAGE's defaults; a project (an
+		// example, an .inp, a saved file, a new project, an undo) that opens on a different unit left
+		// it there, so the first change converted from the wrong unit or asked nothing (Task 857).
+		// Here is the one door every document's units pass through, so the memory follows it.
+		rememberUnitSelections();
 		return changed;
 	}
 	// ---- CHANGING A UNIT THAT DECIDES SOMETHING ASKS FIRST (Task 422, narrowed by Task 522) ------
@@ -76178,9 +76184,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				function () { return effective(n, 'tankDiameter'); },
 				function (v) { setProp(n, 'tankDiameter', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
-			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is a typed file number in the Length
-			// unit cubed, so no selector converts it (Available volume below it follows the Volume
-			// selector); blank is EPANET's 0, "use the diameter".
+			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is typed in the Volume unit, as the
+			// Available volume below it is read; blank is EPANET's 0, "use the diameter".
 			numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')',
 				effective(n, 'minVolume'),
 				function (v) { setProp(n, 'minVolume', v); updateNode(nodeId, true); refreshPopupIfOpen(); },

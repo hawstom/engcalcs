@@ -2938,7 +2938,7 @@
 			return cVolMade;
 		}
 		var PLAIN = { same: true, mul: 1 };
-		if ((doc.nodes || []).some(function (x) { return x.type === 'tank' && typeof eff(x, 'minVolume') === 'number'; })) { cVolume(); }
+		if ((doc.nodes || []).some(function (x) { return x.type === 'tank' && eff(x, 'minVolume') > 0; })) { cVolume(); }
 		if (failure) { return failure; }
 
 		// ONE NUMBER, WRITTEN. `rec`/`key` name where the file's own text was kept, and lpnNumText()
@@ -3081,7 +3081,7 @@
 					// MinVol, as the file wrote it unless the Volume unit differs from the file's length
 					// unit cubed. Absent is EPANET's own 0, "no separate minimum volume".
 					(typeof eff(nd, 'minVolume') === 'number' && isFinite(eff(nd, 'minVolume')))
-						? n(cVolume(), nd, 'minVolume', eff(nd, 'minVolume')) : '0'];
+						? n(eff(nd, 'minVolume') === 0 ? PLAIN : cVolume(), nd, 'minVolume', eff(nd, 'minVolume')) : '0'];
 				if (eff(nd, 'volCurve')) {
 					tankRow.push(String(eff(nd, 'volCurve')));
 				} else if (eff(nd, 'overflow')) {

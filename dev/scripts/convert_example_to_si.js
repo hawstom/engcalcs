@@ -68,6 +68,8 @@ d.nodes.forEach((n) => {
 	conv(n, ['x', 'y', 'lx', 'ly'], Dr);
 	conv(n, ['elev', '_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter', 'bottomElev'], L3);
 	conv(n, ['_demand'], Q3);
+	// A typed Minimum volume is in the Volume unit (ft3 in a US example): cubic metres now.
+	if (n.minVolume) { n.minVolume = Number((n.minVolume * FT * FT * FT).toPrecision(DSIG)); delete (n.tok || {}).minVolume; }
 	if (n.demands) { throw new Error('node ' + n.id + ' has a demand list; extend the converter'); }
 });
 d.links.forEach((l) => {

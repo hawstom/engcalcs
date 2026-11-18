@@ -475,6 +475,8 @@ console.log('\n4. The file is written in the project\'s own units');
 	ok('Length (m) does not decide a Volume stated in ft3', volTok(volDoc('ft3', 'm')) === '500.0', volTok(volDoc('ft3', 'm')));
 	ok('Volume in gallons converts to the file\'s cubic feet: ' + 500 / galPerFt3, Math.abs(parseFloat(volTok(volDoc('gal', 'ft'))) - 500 / galPerFt3) < 1e-9);
 	ok('...and says it converted a volume', EngCalcs.lpnExportInp(volDoc('gal', 'ft')).differences.some((d) => d.code === 'unit-converted' && /volume/.test(d.detail)));
+	const zeroDoc = volDoc('gal', 'ft'); zeroDoc.nodes[zeroDoc.nodes.length - 1].minVolume = 0; delete zeroDoc.nodes[zeroDoc.nodes.length - 1].tok;
+	ok('a stated 0 is no volume to convert: no conversion is reported', !EngCalcs.lpnExportInp(zeroDoc).differences.some((d) => /volume/.test(d.detail || '')) && volTok(zeroDoc) === '0');
 	ok('Volume in cubic metres converts to cubic feet', Math.abs(parseFloat(volTok(volDoc('m3', 'ft'))) - 500 * EngCalcs.unitFactors.ft3) < 1e-6);
 	ok('a document with no Volume unit (saved before it existed) still cubes its Length', volTok(volDoc(null, 'm')) === String(500 * Math.pow(EngCalcs.unitFactors.ft / EngCalcs.unitFactors.m, 3)), volTok(volDoc(null, 'm')));
 
