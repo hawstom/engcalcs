@@ -70236,6 +70236,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (!p.clones.length) { return; }
 				var dest = p.spec.write();
 				p.clones.forEach(function (clone) { dest.push(clone); });
+				if (p.kind === 'controls') { EngCalcs.lpnControlsSeparate(dest); }
 			});
 			libCommit();
 			rebuildLibraryBox();
@@ -70760,8 +70761,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// pipe types and fittings lists are looked up by id, so their order never changes a result. The Libraries chapter of the User
 	// Manual says this in the same words as the tips (lpn_guide_lib_ctl_def), and the `?` of Controls and Rules lands on it.
 	//
-	// **A RULE IS A RUN OF LINES IN ONE FLAT TEXT**, so it is moved as its block (its description comments and its
-	// lines) and every blank line and heading between the blocks stays where it was (libRulesMoved()).
+	// **A RULE IS A RUN OF LINES IN ONE FLAT TEXT**, so it is moved as its block (its RULE line through its last line), with the
+	// blank lines before it, and a comment row is an item that moves like any other (libRulesMoved()).
 	//
 	// This is wired from rebuildLibraryBox() after a section is built, not from each section's builder, so the six builders
 	// (and the Curves section another branch is changing) are untouched.
@@ -70838,7 +70839,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			libArrayMove(LIB_ORDER[sec].write(), i, to, LIB_ORDER[sec].slotted);
 			if (sec === 'controls') { EngCalcs.lpnControlsSeparate(doc.controls); }
 		}
-		// Not counted for the rules: two comment rows moved against each other read as one, so the list may now be shorter.
+		// The rules are not counted: their items are cut from the text, and a move can add a blank line between two comment rows.
 		libOrderSelect(sec, to, sec === 'rules' ? { n: undefined } : info);
 		libCommit();
 		rebuildLibraryBox();
@@ -72890,7 +72891,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.appendChild(libButton(pc.lpn_library_comment_add || 'Add a comment', function () {
 			saveUndoSnapshot();
 			// After another comment, a blank line keeps it a row of its own: consecutive comment lines are one row.
-			EngCalcs.lpnControlsSeparate(libControls()); libControls().push({ comment: true, lines: [';'] });
+			libControls().push({ comment: true, lines: [';'] });
 			EngCalcs.lpnControlsSeparate(libControls());
 			libSelForgetIndexed();
 			libCommit();

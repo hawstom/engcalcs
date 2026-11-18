@@ -775,5 +775,17 @@ head('13. importing Controls and Rules brings the comment rows above the copied 
 	check(said('lpn_library_import_comments'), 'the receipt says comment rows were copied in: ' + JSON.stringify(reportLines()));
 }());
 
+head('14. a comment row imported after the last comment row of the open project is set off by a blank line, so the two stay two rows');
+(function () {
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 }, controls: [{ link: '9', raw: 'LINK 9 OPEN AT TIME 1', action: {}, condition: null, text: {} }, { comment: true, lines: [';ours'] }], rules: [] });
+	clearReport();
+	L.libImportRun({ v: 6, units: {}, controls: [
+		{ comment: true, lines: [';theirs'] },
+		{ link: '9', raw: 'LINK 9 CLOSED AT TIME 2', action: {}, condition: null, text: {} }
+	], rules: [] }, 'from.lwn', ['controls']);
+	const c = L.getDoc().controls;
+	check(c.length === 4 && c[1].comment && c[2].comment && c[2].gap === 1, 'Controls: ;ours then ;theirs, the second with one blank line: ' + JSON.stringify(c.map((x) => x.comment ? x.lines[0] + '/' + (x.gap | 0) : x.raw)));
+}());
+
 console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All library-import checks passed.'));
 process.exit(failures ? 1 : 0);
