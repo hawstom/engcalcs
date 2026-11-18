@@ -2589,7 +2589,9 @@
 			}
 			// A tank with no area is a reservoir to EPANET: its level is its head less its elevation, and it reports the water it takes out of the network.
 			if (n.type === 'tank') { f.levels[n.id] = ((res.heads[n.id] || 0) - (n.elev || 0)); }
-			f.demands[n.id] = n.type === 'junction' ? (res.demands && res.demands[n.id] !== undefined ? res.demands[n.id] : (n.demand || 0)) : 0;
+			// EN_DEMAND is the demand plus what the junction's emitter discharges (hydraul.c NodeDemand), as lpnSolve's pressure-driven res.demands already is.
+			f.demands[n.id] = n.type === 'junction' ? (res.demands && res.demands[n.id] !== undefined ? res.demands[n.id]
+				: (n.demand || 0) + (n.emitter > 0 ? n.emitter * Math.pow(Math.max((res.heads[n.id] || 0) - (n.elev || 0), 0), model.emitterExponent || 0.5) : 0)) : 0;
 		});
 		// A pressure-driven run also reports what each junction asked for and did not get (EN_DEMANDDEFICIT).
 		if (res.demandDeficits) { f.demandDeficits = Object.assign({}, res.demandDeficits); }
