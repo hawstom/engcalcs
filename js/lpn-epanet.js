@@ -1671,7 +1671,7 @@
 			converged: false, iterations: 0,
 			// EPANET's words are "Error 110: cannot solve ..."; the wrapper prefixes its own
 			// "EPANET Error 110: ", which put the code on screen twice. Its prefix goes, EPANET's stays.
-			engineError: String((err && err.message) || err || '').replace(/^EPANET Error (\d+): (Error \1:)/, '$2')
+			engineError: String((err && err.message) || err || 'Error: EPANET refused the network and gave no reason.').replace(/^EPANET Error (\d+): (Error \1:)/, '$2')
 		}, k;
 		for (k in (extra || {})) {
 			if (Object.prototype.hasOwnProperty.call(extra, k)) { out[k] = extra[k]; }

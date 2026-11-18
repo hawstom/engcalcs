@@ -80345,6 +80345,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (issue.code === 'builtin-error') { return (pc.lpn_diag_builtin_error || 'An error occurred in the built-in solver: {message}').replace('{message}', String(issue.message || '')); }
 		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
+		if (issue.code === 'pda-pressure-gap') {
+			var gapU = 'lpn_u_pressure', gapN = Number(toDisplay(EngCalcs.EPANET_PDA_MIN_GAP, gapU).toPrecision(3));
+			return (pc.lpn_diag_pda_pressure_gap || 'EPANET does not accept these pressure-driven demand limits: Required pressure must exceed Minimum pressure by at least {limit}.')
+				.replace('{limit}', gapN + ' ' + unitLabel(gapU));
+		}
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
