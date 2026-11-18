@@ -364,8 +364,15 @@ console.log('\n--- 8. the solvers ---');
 console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 {
 	const icons = require('fs').readFileSync(ROOT + 'lib/Icons.lib.php', 'utf8');
-	ok('the Well with tank icon draws no stub and no cap: its riser turns into the run, and the file has no capped stub', !/capped stub/.test(icons.replace(/Tom's[^\n]*\n/g, '')) && !/\$run - 1\.3/.test(icons) && /ecWellTankIcon\(\) \{[\s\S]*?V' \. \$run \. 'H' \. \$tx/.test(icons));
-	ok('and the pressure tank has an icon of its own', /'welltankp'\s*=>\s*ecWellPressureTankIcon\(\)/.test(icons));
+	const icon = (name) => require('child_process').execFileSync('php', ['-r', 'require $argv[1]; echo $ec_icons[$argv[2]];', ROOT + 'lib/Icons.lib.php', name], { encoding: 'utf8' });
+	const [w0, w1, w2] = ['well', 'welltank', 'welltankp'].map(icon);
+	// Tom's sketches, round 12: N1 a circle with a vertical arrow, N2 and N3 that mark joined to a rectangle and a capsule. N1 is "like N2 and N3": the same circle and the same arrow, the head standing clear of the circle.
+	const circle = (svg) => /d="M[\d.]+ 14a4\.3 4\.3 0 1 0 8\.6 0a4\.3 4\.3 0 1 0 -8\.6 0Z/.test(svg), arrow = (svg) => /V3M[\d.]+ 6\.2L[\d.]+ 3L[\d.]+ 6\.2/.test(svg);
+	ok('Well, Well with tank and Well with pressure tank draw one circle and one arrow, the same size in all three (the head 3.5 units clear of the circle)', [w0, w1, w2].every((x) => circle(x) && arrow(x)) && 14 - 4.3 - 6.2 > 3);
+	ok('the Well with tank joins that mark to a rectangle by a short run, the Well with pressure tank to a capsule', /M13\.5 9h9v10h-9Z/.test(w1) && /M11\.3 14H13\.5/.test(w1) && /a4\.5 4\.5 0 0 1 9 0v7a4\.5 4\.5 0 0 1-9 0Z/.test(w2) && /M11\.3 14H13\.5/.test(w2) && !/a4\.5 4\.5/.test(w1));
+	ok('the first path of each is the silhouette (circle and vessel) with the circle\'s centre and the drawing\'s bounds on it, for the map', /^<path data-ax="12" data-ay="14"/.test(w0) && /^<path data-ax="7" data-ay="14" data-x0="2\.7" data-y0="3" data-x1="22\.5" data-y1="21\.5" d="M2\.7 14/.test(w1) && /^<path data-ax="7" data-ay="14"/.test(w2));
+	ok('the old cylinders and their constants are gone from the icon file', !/EC_WELL_UPPER_HALF|EC_WELL_STEP|ecWellDrawing|ec-water/.test(require('fs').readFileSync(ROOT + 'lib/Icons.lib.php', 'utf8')));
+	ok('and the pressure tank has an icon of its own', /'welltankp'\s*=>\s*ecWellPressureTankIcon\(\)/.test(require('fs').readFileSync(ROOT + 'lib/Icons.lib.php', 'utf8')));
 	const NATIVE = L.toSI(1, 'lpn_u_pressure');
 	ok('a psi is 0.70307 m of head in the page\'s pressure unit', Math.abs(L.toSI(1, 'lpn_u_pressure') * 1 - NATIVE) < 1e-12 && NATIVE > 0, String(NATIVE));
 	// Boyle, checked against the published well tank: 44 gal total, 38 psig precharge, 40/60 switch: drawdown = V (1 - P0/P) between cut-in and cut-out.
@@ -688,6 +695,32 @@ console.log('\n--- 10. the open-air Well with tank: the tank\'s inputs are the W
 	L.undo();
 	ok('Undo of Explode locks them again', !!L.ownerOfProp(L.nodeById(a.tank), 'maxLevel'));
 }
+
+console.log('\n--- 11. Explode writes nothing and moves no result (round 13; Tom: "I don\'t understand why the Total tank volume of 1000 ft^3 becomes Minimum volume 1000 ft^3 when exploded") ---');
+for (const form of ['open-air', 'pressure', 'pressure in US units']) {
+	setUnitSet(form === 'pressure in US units' ? 'us' : 'si');
+	const doc = fresh();
+	L.setMode(form === 'open-air' ? 'add-welltank' : 'add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
+	const a = doc.assemblies[0], tk = L.nodeById(a.tank);
+	curves(doc, a);
+	L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'demand', 10);
+	if (a.pt) { a.pt.vol = 1000; L.syncPressureTank(a); } else { a.pumpOn = 3; a.pumpOff = 6; L.syncWellControls(a); }
+	doc.times = EC.lpnTimesDefaults(); doc.times.duration = 6 * 3600;
+	const everyField = () => JSON.stringify({ nodes: doc.nodes, links: doc.links, curves: doc.curves, controls: doc.controls.map((c) => { const k = Object.assign({}, c); delete k.asm; return k; }) });
+	const solveAll = async () => { const m = L.currentModel(); m.hydraulics = Object.assign({}, m.hydraulics, { accuracy: 1e-5 }); return [EC.lpnSolve(L.currentModel()), EC.lpnNativeRun(JSON.parse(JSON.stringify(m))), await EC.lpnEpanetRun(JSON.parse(JSON.stringify(m)))]; };
+	const before = everyField(), r0 = await solveAll();
+	L.snap(); L.explode('W1');
+	const after = everyField(), r1 = await solveAll();
+	ok(form + ': Explode changes no field of any node, link, curve or control (the tags that said the Well wrote the controls aside)', before === after);
+	ok(form + ': and the tank has no Minimum volume either way (the 1000 is the Well\'s Total tank volume, which is not a tank field)', tk.minVolume === undefined && tk._minVolume === undefined);
+	const same = (x, y) => JSON.stringify(x) === JSON.stringify(y);
+	ok(form + ': the steady solve is identical before and after (built-in)', r0[0].ok && r1[0].ok && same(r0[0].heads, r1[0].heads) && same(r0[0].flows, r1[0].flows));
+	ok(form + ': so is the 6 hour run in both engines, every frame', [1, 2].every((i) => r0[i].ok && r1[i].ok && r0[i].frames.length > 2 && same(r0[i].frames.map((f) => [f.t, f.heads, f.flows, f.levels]), r1[i].frames.map((f) => [f.t, f.heads, f.flows, f.levels]))));
+	L.openPopup(a.tank, 10, 10);
+	let mv = null; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL' && /^Minimum volume/.test((e.textContent || '').trim())) { walk(e, (i) => { if (i.tagName === 'INPUT') { mv = i.value; } }); } });
+	ok(form + ': the exploded tank\'s Minimum volume row is blank', mv === '' || mv === undefined || mv === null, JSON.stringify(mv));
+}
+setUnitSet('si');
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));
 process.exit(fails ? 1 : 0);

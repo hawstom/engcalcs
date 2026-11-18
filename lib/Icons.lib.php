@@ -45,59 +45,31 @@
 define('EC_ICON_OPEN_TAG', '<svg class="ec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
 	. ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">');
 
-// **THE WELL'S UPPER CYLINDER IS ONE NUMBER** (Tom, round 6 pass: colleagues are being asked whether it should be much narrower, only a little wider
-// than the deep cylinder). Half its width in the 24-unit frame, either side of the centre line at x = 12.
-// A change here changes the toolbar icons, the map symbol and its grab shape, which JS derives from the icon's first path (wellSilhouette()).
-// A4 and B7 of the 2026-11-14 proofs are narrow over deep, upper half to deep half 1.6 to 1; 3.2 to 2 is that, as far as keeps the casing open at 17 px.
-define('EC_WELL_UPPER_HALF', 3.2);
-// The deep cylinder's half width, and the depth where the upper cylinder ends (A4: a short upper hole over a long casing).
-define('EC_WELL_DEEP_HALF', 2);
-define('EC_WELL_STEP', 8);
-// The water level: the y where the drawdown curves meet the casing walls, and where the level line crosses the casing (A4 of the proofs).
-define('EC_WELL_LEVEL', 17);
-
-// **THE WELL'S DRAWING** (Tom's sketch of 2026-10-25, WELL, and his verdict on round 9: "We were very close to what we needed already. And I suggested A4 and B7."):
-// a ground line across the top that runs past the pit on both sides; a short, narrow upper cylinder; below it a long, narrow casing with a closed bottom;
-// the drawdown curves, which fall from the ground line's ends to meet the casing walls at the water level, and the water level itself, a horizontal line at full
-// stroke weight inside the casing (a hairline vanished at 17 px, a solid water body was refused, and one running beyond the casing read as a flange). The
-// curves and the level line carry class ec-water: the map draws them in a lighter tint of its ink, as the proof draws them blue. The FIRST path is the outline of the two
-// cylinders: JS closes it for the symbol's backdrop and grab shape; the LAST is the level line. The curves start below the step, or they run into the upper
-// hole's walls. At the defaults ($cx 12, $gy 4, $k 1) it fills the 24-unit frame; the Well with tank icon draws the same thing smaller, so one set of numbers moves both.
-function ecWellDrawing($cx = 12, $gy = 4, $k = 1) {
-	$X = function ($dx) use ($cx, $k) { return round($cx + $k * ($dx - 12), 3); };
-	$Y = function ($y) use ($gy, $k) { return round($gy + $k * ($y - 4), 3); };
-	$l = 12 - EC_WELL_UPPER_HALF; $r = 12 + EC_WELL_UPPER_HALF;
-	$a = 12 - EC_WELL_DEEP_HALF; $b = 12 + EC_WELL_DEEP_HALF;
-	$s = EC_WELL_STEP; $ly = EC_WELL_LEVEL; $c0 = 12;
-	return '<path d="M' . $X($l) . ' ' . $Y(4) . 'V' . $Y($s) . 'H' . $X($a) . 'V' . $Y(21.5) . 'H' . $X($b) . 'V' . $Y($s) . 'H' . $X($r) . 'V' . $Y(4) . '"/>'
-		. '<path d="M' . $X(2) . ' ' . $Y(4) . 'H' . $X(22) . '"/>'
-		. '<path class="ec-water" d="M' . $X(2) . ' ' . $Y($c0) . 'C' . $X(7) . ' ' . $Y($c0) . ' ' . $X($a - .5) . ' ' . $Y($c0 + .5) . ' ' . $X($a) . ' ' . $Y($ly)
-		. 'M' . $X(22) . ' ' . $Y($c0) . 'C' . $X(17) . ' ' . $Y($c0) . ' ' . $X($b + .5) . ' ' . $Y($c0 + .5) . ' ' . $X($b) . ' ' . $Y($ly) . '"/>'
-		. '<path class="ec-water" stroke-linecap="butt" d="M' . $X($a) . ' ' . $Y($ly) . 'H' . $X($b) . '"/>';
+// **THE WELL IS A CIRCLE WITH AN ARROW, AND ITS TANK IS JOINED TO IT** (Tom's sketches of 2026-11-17, adopted in round 12: "OK. Adjust the arrow per previous comments."; and
+// "N1 has the arrow too close to the circle. But N2 and N3 are good. Make N1 like N2 and N3."): the Well is a circle on a vertical arrow whose head stands clear of the
+// circle and whose shaft runs through it and out below; a Well with tank is that mark joined to a rectangle; a Well with pressure tank, to a capsule. All three share the
+// circle's size and the arrow's reach, so one set of numbers moves them together. The FIRST path is the silhouette, the circle and the vessel: the map fills it with its tint
+// and uses it as the grab shape. It carries `data-ax data-ay` (the circle's centre, the point the map puts on the node) and `data-x0 data-y0 data-x1 data-y1` (the drawing's
+// bounds, in the 24-unit frame), which JS reads (wellGeometry()) so no number is written twice.
+define('EC_WELL_R', 4.3);          // the circle's radius
+define('EC_WELL_CY', 14);          // the circle's centre, from the top
+define('EC_WELL_ARROW_TOP', 3);    // the arrow's tip
+define('EC_WELL_ARROW_BOTTOM', 21.5);   // where the shaft ends, below the circle
+define('EC_WELL_JOIN_X', 13.5);    // where a vessel begins
+function ecWellMark($cx, $vessel, $join) {
+	$r = EC_WELL_R; $cy = EC_WELL_CY; $t = EC_WELL_ARROW_TOP; $e = EC_WELL_ARROW_BOTTOM; $w = 3; $h = 3.2;
+	$circle = 'M' . ($cx - $r) . ' ' . $cy . 'a' . $r . ' ' . $r . ' 0 1 0 ' . (2 * $r) . ' 0a' . $r . ' ' . $r . ' 0 1 0 ' . (-2 * $r) . ' 0Z';
+	$x1 = $vessel === '' ? $cx + $r : 22.5;
+	return '<path data-ax="' . $cx . '" data-ay="' . $cy . '" data-x0="' . ($cx - $r) . '" data-y0="' . $t . '" data-x1="' . $x1 . '" data-y1="' . $e . '" d="' . $circle . $vessel . '"/>'
+		. '<path d="M' . $cx . ' ' . $e . 'V' . $t . 'M' . ($cx - $w) . ' ' . ($t + $h) . 'L' . $cx . ' ' . $t . 'L' . ($cx + $w) . ' ' . ($t + $h) . '"/>'
+		. ($join ? '<path d="M' . ($cx + $r) . ' ' . $cy . 'H' . EC_WELL_JOIN_X . '"/>' : '');
 }
-// **WELL WITH TANK, THE TOOLBAR ICON, IN ONE SMALL FUNCTION SO IT IS EASY TO SWAP** (B7 of the 2026-11-14 proofs, Tom's pick; the stub and its cap were struck, his
-// verdict on round 10, 2026-11-16: "it's non-physical and not helpful"): the Well's own drawing at 0.55 on the left under a ground line; a riser from its head that turns
-// at the tee into the run; and the run to a wide, flat tank (2 to 1, rounded) standing on the ground line. A ground tank's outlet is at its floor or a few inches above
-// it (Mary's finding, WV 64-77-9 and WI NR 811.64; Tom, round 8: a pipe drains a tank only from the bottom), so the run is lowered to within a stroke of the ground line
-// and enters just above the tank's floor. The Well with pressure tank draws the same well and run into a small upright vessel (a pressure tank stands tall), so the two
-// share ecWellTankHead() and differ in the vessel alone.
-function ecWellTankHead($cx, $gy, $k) {
-	return '<g stroke-width="1.2">' . ecWellDrawing($cx, $gy, $k) . '</g>';
-}
-function ecWellTankIcon() {
-	$k = .55; $cx = 6.4; $gy = 13.5; $run = 11.7; $tx = 12.5; $tw = 10.4; $th = 5.2;
-	return ecWellTankHead($cx, $gy, $k)
-		. '<g stroke-width="1.6"><path d="M' . $cx . ' ' . $gy . 'V' . $run . 'H' . $tx . '"/>'
-		. '<rect x="' . $tx . '" y="' . ($gy - $th) . '" width="' . $tw . '" height="' . $th . '" rx="1"/></g>';
-}
-// **WELL WITH PRESSURE TANK**: the same well and run, ending in an upright vessel on the ground line, a capsule with the diaphragm drawn across it.
-function ecWellPressureTankIcon() {
-	$k = .55; $cx = 6; $gy = 14; $run = 11.4; $tx = 13; $tw = 9.4; $th = 12.5;
-	return ecWellTankHead($cx, $gy, $k)
-		. '<g stroke-width="1.8"><path d="M' . $cx . ' ' . $gy . 'V' . $run . 'H' . $tx . '"/>'
-		. '<rect x="' . $tx . '" y="' . ($gy - $th) . '" width="' . $tw . '" height="' . $th . '" rx="4.4"/>'
-		. '<path d="M' . $tx . ' ' . ($gy - $th * .55) . 'H' . ($tx + $tw) . '" stroke-width="1.5"/></g>';
-}
+// A Well on its own stands at the middle of the frame; with a tank the circle moves left to make room for the vessel.
+function ecWellIcon() { return ecWellMark(12, '', false); }
+// An open-air tank, a rectangle (N2 of the proofs).
+function ecWellTankIcon() { return ecWellMark(7, 'M' . EC_WELL_JOIN_X . ' 9h9v10h-9Z', true); }
+// A pressure tank, an upright capsule (N3).
+function ecWellPressureTankIcon() { return ecWellMark(7, 'M' . EC_WELL_JOIN_X . ' 10a4.5 4.5 0 0 1 9 0v7a4.5 4.5 0 0 1-9 0Z', true); }
 
 $ec_icons = array(
 
@@ -300,8 +272,8 @@ $ec_icons = array(
 	'chain'      => '<circle cx="5.75" cy="5.75" r="4.25"/><path d="M8.8 8.8L15.2 15.2" stroke-dasharray="2.2 1.9" stroke-linecap="butt"/><circle cx="18.25" cy="18.25" r="4.25" stroke-dasharray="2.4 2" stroke-linecap="butt"/>',
 	// **VIRTUAL PIPE** (Task 822; Tom's sketch, 2026-10-25): the pipe icon's two end ticks with the run dotted.
 	'virtual'    => '<path d="M5 12H19" stroke-linecap="butt" stroke-dasharray="1.2 2.4"/><path d="M5 7.5V16.5M19 7.5V16.5"/>',
-	// **WELL**: see ecWellDrawing(). One drawing, which is also the Well's map symbol. Symmetrical; the ground line runs past the pit on both sides.
-	'well'       => ecWellDrawing(),
+	// **WELL**: see ecWellMark(). One drawing, which is also the Well's map symbol.
+	'well'       => ecWellIcon(),
 	// **WELL WITH TANK**: see ecWellTankIcon().
 	'welltank'   => ecWellTankIcon(),
 	// **WELL WITH PRESSURE TANK**: see ecWellPressureTankIcon().

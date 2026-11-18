@@ -1943,9 +1943,6 @@ html[lang="zh"] .ec-welcome {
 .lpn-node-symbol-reservoir, .lpn-node-symbol-tank, .lpn-node-symbol-well { color: var(--lpn-map-ink); }
 /* A Well is drawn as one symbol on its tank's node; its other nodes and both links are not drawn (syncAssemblyGlyphs()). */
 .lpn-asm-hid { display: none; }
-/* A Well's drawdown curves and water level are water, not casing (A4 of the 2026-11-14 proofs, where they are blue against the well's ink): a lighter tint of the symbol's
-   own ink, so the pair reads apart in every theme with no colour of its own. The toolbar icon is one colour and ignores the class. */
-.lpn-node-symbol-well .ec-water { stroke: color-mix(in srgb, currentColor 55%, var(--lpn-map-bg, #fff)); }
 /* THE SAME BLUE AS THE RESERVOIR, deliberately (Task 248). A tank and a reservoir are both
    water bodies, and colour here is decoration, not meaning -- the two are told apart by SHAPE
    (closed and tall against open and wide, lib/Icons.lib.php), which is what still works in

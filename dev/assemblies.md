@@ -261,7 +261,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **One label block per assembly**, on its output node, placed by the ordinary node pass (the assembly's own placer is retired). Headed by the assembly
   ID with the device's values; one row per other member that has values, led by that member's ID; rows shed first-to-last, the heading last. The
   popup opens beside it, not on it. Round 7 states a Well's block exactly (below).
-- **Symbol:** symmetrical, ground line past the pit, no valve symbol; Round 7 redrew it from Tom's sketch.
+- **Symbol:** the circle with a vertical arrow, drawn from the toolbar icon (Round 12 and 13).
 - **Controls editor** redraws when the Well writes or releases a control while it is open.
 
 ### Round 7 (Tom, round 6 pass, from his round 6 browser pass; `well-simple-harness.js`, `well-label-rows-harness.js`, `well-tank-three-point-harness.js`, `assembly-morph-harness.js`)
@@ -272,13 +272,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   are the ordinary fields', so the label settings govern which show. Order of the heading numbers: `WELL_HEADING_FIELDS` (Z then Q then P; he also asked
   *"Do we want to try to put Q first after the W1 ID?"*, so it is a swap if he wants it).
 - **The Properties box:** flow once, above the headings (the pump's); pressure only under the outlet. The reservoir's Pressure row is gone too.
-- **The symbol** (his sketch of 2026-10-25, WELL; round 10 is A4 of the 2026-11-14 proofs, his pick, after he refused round 9's dark water body): a ground line,
-  a short narrow upper cylinder over a long narrow casing with a closed bottom (upper half-width to casing half-width 1.6 to 1, as in the proof), the drawdown
-  curves falling from the ground line to meet the casing walls at the water level, and a full-weight horizontal water-level line inside the casing (a hairline
-  vanished at 17 px; a line running beyond the casing read as a flange). On the map the curves and the level line carry `ec-water` and take a lighter tint of the
-  symbol's ink, as the proof draws them blue. The box at the bottom (it read as a pump) is gone. The numbers are `EC_WELL_UPPER_HALF`, `EC_WELL_DEEP_HALF`, `EC_WELL_STEP`,
-  and `EC_WELL_LEVEL` in `lib/Icons.lib.php`; the map symbol's grab shape and the label-leader avoidance box are derived from the icon's
-  paths, so one number moves all. `well-symbol-browser-harness.js` rasterizes both icons at 17, 21 and 24 px and requires the level line to show.
+- **The symbol:** the circle with a vertical arrow and its two joined forms, as Round 13 states them.
 - **Well with tank is three points** (*"Physically and geographically, a well is a location/point with a reservoir, drawdown, and pump. Cramming a tank into
   that point makes no sense"*): the Pump button cycles Pump, Pump+, Well, Well with tank. Three presses, each prompted in the status bar: the well
   (placed as a Well is, spliced into a pipe or on open ground), the tee, the tank. The tee may be the well's own point (the pipe joining them is then a
@@ -288,16 +282,12 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   - **Grouping:** the Well's grouping gains `tee`, `tank` and `branch` [the two pipes]. They are ordinary elements at their own points: not coincident
     members (clicking the tank selects the tank, a drag of the well moves the well), but the group knows them, so deleting or morphing any of them ends
     the group, a rename follows, and `.inp` and the project file carry them. This is what keeps the pump's controls in one place: the Well's box asks Pump on
-    below / Pump off above once; the tank's own depths are on the tank's own box.
+    below / Pump off above once; the tank's depths and elevations are typed in the tank's section of the Well's box (Round 13).
   - **`.inp`:** `;ASSEMBLY: well R D P V W ON=3 OFF=6 TEE=x TANK=y PIPES=a,b`.
   - **Old files:** a one-point Well with a tank (`well R U T D V P B`, or the earlier `well R S T V P`) opens as its elements, all kept, with its controls as
     ordinary controls; the status bar (project file) or the import report (`.inp`, code `assembly-well-tank`) says so. The one-point form's code is gone.
   - **Still open:** the pressure tank (Boyle's law; Tom's 2026-10-25 notes: total volume, pump-on and pump-off pressure, empty pressure). Only the
     open-air tank is built.
-  - **The toolbar icon** for Well with tank is `ecWellTankIcon()` in `lib/Icons.lib.php` (B7 of the proofs, Tom's pick): the Well's own drawing at 0.55 under a ground
-    line, a riser that turns into the run (no stub, no cap: Tom, 2026-11-16, "it's non-physical and not helpful"), and the run to a wide, flat, rounded tank (2 to 1) standing on the ground line. The run is lowered to within a
-    stroke of the ground line, so it enters just above the tank's floor, because a ground tank's outlet is at its floor or a few inches above it (Tom, round 8; state rules
-    WV 64-77-9 and WI NR 811.64 per the market researcher). A tank raised to the run, and one on legs, were drawn and read worse at 17 px.
 - **Morph** (*"I think we need to have on our checklist to ensure that Morph works with the + assemblies before we merge this."*): a Morph of ANY member
   (nodes and links of Pump+, Valve+, Well and a Well with tank's tee, tank and pipes) first separates the group as Explode does, inside the Morph's own
   undo step, then changes the type as for any element; the status bar says which group was separated; one Undo restores both. In a scenario the type
@@ -341,8 +331,6 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   obstacles, and the Well's own symbol is not an obstacle to its own label. A Well of a file whose labels do not tick Head shows its heading alone, rightly: the
   member rows are Head.
 - **The "box" in the hole was the pump's and the drawdown valve's own symbols** (`well-symbol-browser-harness.js`): choosing a curve rebuilds those links, and a link built after `buildDom()` drew its solid symbol over the Well's (only `syncAssemblyGlyphs()` hid them, once, at the build); `buildLinkEls()` now hides a well link's symbol where it makes it.
-- **Symbol:** the water-level line across the narrow hole at the drawdown, `lib/Icons.lib.php`. The upper hole's tint is the reservoir's and the tank's: one
-  class (`lpn-node-symbol-backdrop`, 18 % of the symbol's ink over paper).
 - **Well with tank elevations:** a tee and a tank the Well's own placing made follow the Well's elevation until the user types one of their own into either
   (`teeFollow`, `tankFollow` on the grouping, true only while following). An existing junction or tank pressed as the tee or tank, a tee on a pipe, a file from
   before this round and an `.inp` import never follow. **Under the DEM elevation source a tee or tank on open ground takes its own ground and does not
@@ -374,23 +362,35 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **Check:** 44 gal, 38 psig, 40/60 gives 11.35 gal drawdown by the formula; Amtrol-based sheets for the WX-250 print 11.8, 12.9 and 13.0 (they disagree with each other), so
   the harness holds the formula to within 4% of 11.8 and does not claim a table match. 32 gal gives 8.25 gal.
 - **The curve is the group's:** read-only in the Libraries box (`curveWriterAsm()`), restored from `PT=vol,pre,on,off,curve` on the `;ASSEMBLY:` line, a plain curve
-  after Explode. The tank's own box shows its owned properties read-only with "Written by well {id}" (Round 12 lists them), and `setProp()` refuses them (so Tables and Find and replace too). Scenarios: like the open-air form, the group writes Base and the document (controls and the curve are document data); an owned property is not overridable; the Well's ground elevation override still reaches the tank. The volume is typed in the Elevation/Head unit cubed, the family a VOLUME curve is read in.
+  after Explode. The tank's own box shows its owned properties read-only under a sentence naming the Well (Round 13), and `setProp()` refuses them (so Tables and Find and replace too). Scenarios: like the open-air form, the group writes Base and the document (controls and the curve are document data); an owned property is not overridable; the Well's ground elevation override still reaches the tank. The volume is typed in the Elevation/Head unit cubed, the family a VOLUME curve is read in.
 - **`.inp` grouping comments (round 11 review):** matched exactly and case-sensitively (`;VIRTUAL: ` and `;ASSEMBLY: `), so a user's `;Virtual: ...` stays a comment. A group is restored only when every named element is the right kind (a curveless pump reads back as a pipe and still counts), else it is reported (`assembly-kind`); a malformed line is reported (`assembly-malformed`). A virtual pipe's export keeps the stand-in row, and its typed length, diameter, roughness and minor loss ride on the `;VIRTUAL:` line as `id=length|diameter|roughness|minor` (several lines, each under 255 characters), so a round trip restores them. No call of Tom's on virtual-pipe export was found; this keeps the stand-in he was shown and loses nothing.
 
-### Round 12: a member whose inputs the group owns is locked (Tom, round 11 pass: "the tank properties can be edited"; `well-tank-three-point-harness.js`, `well-pressure-tank-lock-browser-harness.js`)
+### Round 12 and 13: a member whose inputs the group owns is locked (Tom, round 11 and 12 passes; `well-tank-three-point-harness.js` sections 9 to 11, `well-pressure-tank-lock-browser-harness.js`, `well-symbol-browser-harness.js`)
 
-- **The rule:** one fact gets one door, the Well's Properties box. `PT_OWNED` lists what a pressure tank takes from its Well: initial, minimum and maximum depth, volume
-  curve, tank diameter, minimum volume and can overflow. `setProp()` refuses all seven with the sentence, so a scenario cannot override them and Find and replace, the
-  Settings push and paste cannot write them. Find and replace offers the property, leaves the tank out, and says the sentence instead of "Nothing would change."
-  Explode removes the lock (no group, no owner).
-- **Where it shows:** the tank's Properties box has the sentence "Written by well W1. Change it in the Properties box of the well." (`lpn_library_control_owned`) across
-  the full box width, wrapping, with the four rows that mean something to it (initial depth, minimum depth, maximum depth, volume curve) read-only in one run beneath it.
-  Diameter, minimum volume and overflow mean nothing to a pressure tank (its volume curve sets volume against depth; diameter 15 and 3 give identical steady and 6 hour
-  results in both engines, `well-tank-three-point-harness.js`), so they have no row there; the group still writes them. Tables draws all six cells as plain text (no tip on
-  a cell); a blank would corrupt copy and paste, so they show their stored values.
-- **The Well's own row** for the vessel is "Total tank volume" (`lpn_field_well_pt_volume`; "total tank volume" is in his 2026-10-25 notes), so it is not confused with the tank's "Tank volume" curve row (`lpn_curve_kind_volume`, still used by the Library and Find).
-- **Not locked, the tank's own:** Elevation, Base elevation, position, Description, Tag, reaction, mixing, initial quality. The open-air Well with tank's tank, the tee and the two
-  branch pipes keep every input: Round 7 puts their values in their own boxes, and the Well's box asks only the pump's two levels.
-- **No Select-the-well button:** no such door exists yet (the Controls editor's sentence is text).
-- **Well symbol sketches (Tom, 2026-11-17):** circle with a vertical arrow (Well), joined to a rectangle (with tank) or a capsule (with pressure tank); a diagonal arrow
-  variant reads as the male sign. Proofs only: `_panel/www/img/pump-plus/r12-well-symbol-proofs.png`. The branch's symbols are unchanged until he decides.
+- **The rule:** one fact gets one door, the Well's Properties box. A Well's tank, either form, takes nine inputs from it (`TANK_OWNED`): Elevation, Base elevation, initial, minimum and
+  maximum depth, volume curve, diameter, minimum volume and can overflow. Tom, round 12, asked whether a pressure tank's Elevation and Base elevation should be locked too (a tank
+  may stand below the well's ground): "Or above. Yes."; and of the open-air tank: "Yes." `setProp()` refuses every one with the sentence, so Tables, Find and replace and the Settings
+  push cannot write them. The Well's box writes them through `viaOwnerDoor()`, the only door, so a scenario overrides one from there as before (the override sits in the scenario or
+  its physical alternative, and the tank's own box shows the effective value). The program's own writes (the Well's ground elevation reaching a following tank, the DEM fill) pass.
+  Position, Description, Tag, reaction, mixing and initial quality stay the tank's own. Explode removes the lock (no group, no owner).
+- **Where they are typed:** in the tank's section of the Well's box (the heading "Tank T1"): Elevation and Base elevation for both forms, and for the open-air form its initial, minimum and
+  maximum depth, diameter, minimum volume and can overflow (`wellTankOwnedRows()`). A pressure tank's levels and volume curve are derived from the Well's pressures
+  (`syncPressureTank()`), and its diameter, minimum volume and overflow mean nothing to it (diameter 15 and 3 give identical steady and 6 hour results in both engines), so it has no row for them.
+- **The sentence** (Tom, round 12: "How about the message goes at the top of the box and says, 'Associated with Well W3. Change volume and control properties there'?"):
+  "Associated with Well {id}. Change volume and control properties there." (`lpn_tank_associated`) is the first thing in the tank's Properties box, in either form. The Library and the
+  refusal notice keep "Written by well {id}. Change it in the Properties box of the well." (`lpn_library_control_owned`).
+- **Tables:** a locked cell is plain text with no tip. A pressure tank's diameter, minimum volume and overflow cells say "Not used" (`plainWordIf`), as Properties draws no row.
+- **The Well's own row** for the vessel is "Total tank volume" (`lpn_field_well_pt_volume`), not confused with the tank's "Tank volume" curve row.
+- **Explode writes nothing** (Tom, round 12: "I don't understand why the Total tank volume of 1000 ft^3 becomes Minimum volume 1000 ft^3 when exploded."): section 11 of the three-point harness
+  compares every field of every node, link, curve and control before and after Explode for the open-air tank, the pressure tank, and the pressure tank in US units (equal, apart from the tags
+  that said the Well wrote the controls), and the steady solve and the 6 hour run in both engines (equal in every frame). The tank has no Minimum volume either way: the Well's Total tank volume
+  is a field of the Well, written into the tank's volume curve and nowhere else, and the exploded tank's Minimum volume row is blank (also read in a real Chrome). There is no command that
+  groups them again (Undo restores the Well).
+- **The symbol** (Tom's sketches of 2026-11-17: "OK. Adjust the arrow per previous comments."; "N1 has the arrow too close to the circle. But N2 and N3 are good. Make N1 like N2 and N3."):
+  the Well is a circle on a vertical arrow whose head stands clear of the circle and whose shaft runs through it; Well with tank is that mark joined to a rectangle; Well with pressure tank,
+  to a capsule (a diagonal arrow reads as the male sign and was dropped). One set of numbers (`EC_WELL_*`, `ecWellMark()` in `lib/Icons.lib.php`) draws all three; the first path of each icon is
+  the silhouette (circle and vessel) with `data-ax data-ay` (the circle's centre) and `data-x0 .. data-y1` (the bounds), which the map reads (`wellGeometry()`) for the backdrop, the grab shape,
+  the label-leader avoidance box and the reach. On the map a Well with a tank draws as the one joined symbol on its outlet node, the circle on the node and the vessel reaching to its right,
+  redrawn when the tank is placed; the tank node, the tee and both pipes are drawn and picked as before. The harness rasterizes the three icons at 17, 21 and 24 px (the arrow clear of
+  the circle, and not the pump). Proofs: `_panel/www/img/pump-plus/r13-*.png`.
+- **No Select-the-well button:** no such door exists yet.

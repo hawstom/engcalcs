@@ -952,10 +952,10 @@ var EngCalcs = EngCalcs || {};
 		// pipe runs under, so the pass sheds rows (nodeShedOrder()) and then drops before it crosses; every other label is unchanged.
 		var asmBlock = !!assemblyOfNode(n.id), asmA = asmBlock ? assemblyOfNode(n.id) : null, up, at0 = nodeAt(n);
 		if (asmA && asmA.kind === 'well') {
-			// The Well's deep cylinder runs down the middle of its symbol: candidates whose leader would run over it come after every other.
-			// It is the casing's width from the step down, and the level line's full width, in the symbol's 24-unit frame centred on the node at (12, 12): wellCasingBox().
-			var wsz = nodeSymbolSize(n).w, cb = wellCasingBox(), pad = wsz * 0.04,
-				bx0 = at0.x + wsz * (cb.x0 - 12) / 24 - pad, bx1 = at0.x + wsz * (cb.x1 - 12) / 24 + pad, by0 = at0.y + wsz * (cb.y0 - 12) / 24, by1 = at0.y + wsz * (cb.y1 - 12) / 24 + pad,
+			// The Well's drawing (circle, arrow and any vessel) stands round the node: candidates whose leader would run over it come after every other.
+			// Its bounds are in the symbol's 24-unit frame, with the circle's centre on the node: wellGeometry().
+			var wsz = nodeSymbolSize(n).w, cb = wellGeometry(wellKindOf(asmA)), pad = wsz * 0.04,
+				bx0 = at0.x + wsz * (cb.x0 - cb.ax) / 24 - pad, bx1 = at0.x + wsz * (cb.x1 - cb.ax) / 24 + pad, by0 = at0.y + wsz * (cb.y0 - cb.ay) / 24 - pad, by1 = at0.y + wsz * (cb.y1 - cb.ay) / 24 + pad,
 				onPump = function (c) { var t, x, y; for (t = 0; t <= 1; t += 0.02) { x = at0.x + (c.x - at0.x) * t; y = at0.y + (c.y - at0.y) * t; if (x >= bx0 && x <= bx1 && y >= by0 && y <= by1) { return true; } } return false; };
 			up = sides.filter(function (c) { return !onPump(c); });
 			sides = up.concat(sides.filter(function (c) { return onPump(c); }));
@@ -12024,23 +12024,34 @@ var EngCalcs = EngCalcs || {};
 		pump: 'M9 7H22.5V13H15A6 6 0 1 1 9 7Z',
 		valve: 'M3 3v18l9-9zM21 3v18l-9-9z'
 	};
-	// The Well's two cylinders (lib/Icons.lib.php, ecWellDrawing()), the one body a Well's symbol is: backdrop and grab shape. Not in the table
-	// above, which is the four vessels a node or a link can be on its own. **DERIVED FROM THE ICON'S FIRST PATH, the outline of the two cylinders,
-	// closed along the ground line**, so the width of the upper cylinder (EC_WELL_UPPER_HALF) is one number; the literal is for a page with no icons.
-	function wellSilhouette() {
-		var ic = EngCalcs.icons && EngCalcs.icons.well, m = ic && /d="([^"]+)"/.exec(ic);
-		return m ? m[1] + 'Z' : 'M8.8 4V8H10V21.5H14V8H15.2V4Z';
+	// **A WELL'S SYMBOL IS ITS TOOLBAR ICON** (lib/Icons.lib.php, ecWellMark(); Tom's sketches, round 12): a circle on a vertical arrow, joined to a rectangle (Well with tank) or a
+	// capsule (Well with pressure tank). The icon's FIRST path is the silhouette, the circle and the vessel, and carries the circle's centre (`data-ax`, `data-ay`, the point that
+	// stands on the node) and the drawing's bounds (`data-x0 .. data-y1`), all in the 24-unit frame, so no number is written twice. The silhouette is the backdrop and the grab
+	// shape. The literal is for a page with no icons.
+	var WELL_GEOMETRY_FALLBACK = { d: 'M7.7 14a4.3 4.3 0 1 0 8.6 0a4.3 4.3 0 1 0 -8.6 0Z', ax: 12, ay: 14, x0: 7.7, y0: 3, x1: 16.3, y1: 21.5 };
+	var wellGeometryCache = {};
+	function wellGeometry(kind) {
+		var svgEl, p, g;
+		if (wellGeometryCache[kind]) { return wellGeometryCache[kind]; }
+		svgEl = buildMapIconSvg(kind, '');
+		p = svgEl && svgEl.querySelector ? svgEl.querySelector('path') : null;
+		if (!p) { return WELL_GEOMETRY_FALLBACK; }
+		g = { d: p.getAttribute('d') };
+		['ax', 'ay', 'x0', 'y0', 'x1', 'y1'].forEach(function (k) {
+			var v = p.getAttribute('data-' + k);
+			g[k] = v === null || v === undefined || v === '' ? WELL_GEOMETRY_FALLBACK[k] : +v;
+		});
+		wellGeometryCache[kind] = g;
+		return g;
 	}
-	// What the Well's drawing covers below the step, in the symbol's 24-unit frame, read from the icon's own paths (the first is the outline of the two cylinders, the
-	// last the level line) so a change to the Well's numbers in lib/Icons.lib.php moves it: the box a label's leader is kept off. The literal is for a page with no icons.
-	function wellCasingBox() {
-		var ic = EngCalcs.icons && EngCalcs.icons.well, ds = ic ? ic.match(/d="([^"]+)"/g) : null, o, lv;
-		if (ds && ds.length >= 2) {
-			o = ds[0].match(/-?[\d.]+/g).map(Number); lv = ds[ds.length - 1].match(/-?[\d.]+/g).map(Number);
-			// M l 4 V s H a V bottom H b V s H r V 4 ; M lx ly H rx
-			return { x0: Math.min(o[3], lv[0]), x1: Math.max(o[5], lv[2]), y0: o[2], y1: o[4] };
-		}
-		return { x0: 10, x1: 14, y0: 8, y1: 21.5 };
+	// Which of the three drawings a Well is: alone, with an open-air tank, with a pressure tank.
+	function wellKindOf(a) { return a && a.tank ? (a.pt ? 'welltankp' : 'welltank') : 'well'; }
+	function wellSymbolKind(n) { var a = n ? assemblyOfNode(n.id) : null; return a && a.kind === 'well' ? wellKindOf(a) : 'well'; }
+	function wellSilhouette(kind) { return wellGeometry(kind || 'well').d; }
+	// How far the Well's drawing reaches from the node, in the symbol's own 24-unit frame: the farthest corner of its bounds from the circle's centre.
+	function wellReach(kind) {
+		var g = wellGeometry(kind);
+		return Math.max(Math.hypot(g.x0 - g.ax, g.y0 - g.ay), Math.hypot(g.x1 - g.ax, g.y0 - g.ay), Math.hypot(g.x0 - g.ax, g.y1 - g.ay), Math.hypot(g.x1 - g.ax, g.y1 - g.ay));
 	}
 	var RESERVOIR_HALF_W = 1.9878;
 	var RESERVOIR_HALF_H = 1.9878;
@@ -12082,19 +12093,22 @@ var EngCalcs = EngCalcs || {};
 	// path rides a transform into the symbol's own box, exactly as positionNodeSymbol() places the
 	// drawing, so there is one opinion about where a reservoir is.
 	function nodeHitSilhouette(n) {
-		if (n && wellRoleOf(n.id) === 'T') { return wellSilhouette(); }
+		if (n && wellRoleOf(n.id) === 'T') { return wellSilhouette(wellSymbolKind(n)); }
 		return (n && (n.type === 'reservoir' || n.type === 'tank')) ? SYMBOL_SILHOUETTE[n.type] : null;
 	}
+	// Where in a symbol's 24-unit frame the node stands: the middle, except a Well's, whose circle stands on it and whose vessel reaches out to one side.
+	function symbolAnchor(n) { return wellRoleOf(n.id) === 'T' ? wellGeometry(wellSymbolKind(n)) : null; }
 	function syncNodeHit(n, hitEl) {
 		var ne = nodeEls[n.id],
 			hit = hitEl || (ne && ne.hit),
-			s = state.s || 1, box, kx, ky;
+			s = state.s || 1, box, kx, ky, an;
 		if (!hit) { return; }
 		if (String(hit.tagName || '').toLowerCase() === 'path') {
 			box = nodeSymbolSize(n);
 			kx = box.w / 24; ky = box.h / 24;
+			an = symbolAnchor(n);
 			hit.setAttribute('transform',
-				'translate(' + (nodeDrawX(n) - box.w / 2) + ',' + (nodeDrawY(n) - box.h / 2) + ') scale(' + kx + ',' + ky + ')');
+				'translate(' + (nodeDrawX(n) - (an ? an.ax * kx : box.w / 2)) + ',' + (nodeDrawY(n) - (an ? an.ay * ky : box.h / 2)) + ') scale(' + kx + ',' + ky + ')');
 			// Local units: the path lives inside that scale, so a screen pixel is 1 / (s * kx) of one.
 			hit.style.setProperty('--lpn-nhit', LPN_NODE_HIT_PX / (s * kx));
 			return;
@@ -12115,7 +12129,7 @@ var EngCalcs = EngCalcs || {};
 		// circumscribing radius of what is DRAWN is exactly U for both. One number, and it moves
 		// with the junction unit rather than with the boxes.
 		// The two declared exceptions to the maximum map size (Task 705) -- symbolFactorFull().
-		if (wellRoleOf(n.id) === 'T') { return nodeSymbolSize(n).w * 0.4; }   // a Well's drawing, the one thing at its point that is not a dot
+		if (wellRoleOf(n.id) === 'T') { return nodeSymbolSize(n).w * wellReach(wellSymbolKind(n)) / 24; }   // a Well's drawing, the one thing at its point that is not a dot
 		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
 		return JUNCTION_R * symbolFactor();
 	}
@@ -12132,7 +12146,7 @@ var EngCalcs = EngCalcs || {};
 	// symbol were still at its full, unshrunk screen size -- conservative rather than wrong, since
 	// the true capped size past the fitted scale can only be smaller than what was reserved.
 	function nodeRadiusFull(n) {
-		if (wellRoleOf(n.id) === 'T') { return nodeSymbolSize(n).w * 0.4; }
+		if (wellRoleOf(n.id) === 'T') { return nodeSymbolSize(n).w * wellReach(wellSymbolKind(n)) / 24; }
 		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactorFull(); }
 		return JUNCTION_R * symbolFactorFull();
 	}
@@ -12144,8 +12158,8 @@ var EngCalcs = EngCalcs || {};
 	function positionNodeSymbol(id) {
 		var n = nodeById(id), ne = nodeEls[id];
 		if (!ne || !ne.symbolG) { return; }
-		var s = nodeSymbolSize(n);
-		ne.symbolG.setAttribute('transform', symbolBoxTransform(nodeDrawX(n) - s.w / 2, nodeDrawY(n) - s.h / 2, s.w, s.h));
+		var s = nodeSymbolSize(n), an = symbolAnchor(n);
+		ne.symbolG.setAttribute('transform', symbolBoxTransform(nodeDrawX(n) - (an ? an.ax * s.w / SYMBOL_VIEWBOX : s.w / 2), nodeDrawY(n) - (an ? an.ay * s.h / SYMBOL_VIEWBOX : s.h / 2), s.w, s.h));
 	}
 	// ---- THE 1/60 RULE: A WORLD COORDINATE NEVER GOES ON A NESTED <svg> ------------------------
 	//
@@ -41169,7 +41183,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (n.type !== 'junction' || !ne.hit) { return; }
 		isPath = String(ne.hit.tagName).toLowerCase() === 'path';
 		if (on !== isPath) {
-			shape = on ? el('path', { d: wellSilhouette(), 'class': 'lpn-node-hit', 'data-node': n.id }, nodesLayer) : el('circle', { 'class': 'lpn-node-hit', 'data-node': n.id }, nodesLayer);
+			shape = on ? el('path', { d: wellSilhouette(wellSymbolKind(n)), 'class': 'lpn-node-hit', 'data-node': n.id }, nodesLayer) : el('circle', { 'class': 'lpn-node-hit', 'data-node': n.id }, nodesLayer);
 			nodesLayer.insertBefore(shape, ne.hit);
 			ne.hit.remove(); ne.hit = shape;
 			syncNodeHit(n, ne.hit);
@@ -41188,10 +41202,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A junction that carries the drawing keeps its circle as the selection ring and draws nothing else of it, as a tank's circle does.
 			if (ne.circle) { ne.circle.classList.toggle('lpn-asm-host', isT && n.type === 'junction'); }
 			if (!ne.symbolG || (n.type !== 'tank' && n.type !== 'junction')) { return; }
+			// The drawing follows the form: a Well that has gained its tank (or lost it) is redrawn as the joined symbol (or the Well alone).
+			if (isT && ne.wellSym && ne.wellKind !== wellSymbolKind(n)) { ne.wellSym.remove(); ne.wellSym = null; }
 			if (isT && !ne.wellSym) {
-				ne.wellSym = buildMapIconSvg('well', 'lpn-node-symbol lpn-node-symbol-well');
+				ne.wellKind = wellSymbolKind(n);
+				ne.wellSym = buildMapIconSvg(ne.wellKind, 'lpn-node-symbol lpn-node-symbol-well');
 				sizeSymbolViewport(ne.wellSym);
-				prependSymbolBackdrop(ne.wellSym, 'path', { d: wellSilhouette() }, 'lpn-node-symbol-backdrop');
+				prependSymbolBackdrop(ne.wellSym, 'path', { d: wellSilhouette(ne.wellKind) }, 'lpn-node-symbol-backdrop');
 				ne.symbolG.appendChild(ne.wellSym);
 			}
 			if (ne.wellSym) { ne.wellSym.classList.toggle('lpn-asm-hid', !isT); }

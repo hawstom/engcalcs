@@ -53,7 +53,8 @@ async function main() {
 	const executablePath = env.findChromium();
 	if (!executablePath) { console.error(NAME + ': no Chromium found. SKIPPING.'); env.stopServer(); process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
-	const fixture = require('fs').readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'well-pressure-tank-fixture.lwn'), 'utf8');
+	// The Well's Total tank volume is 1000 here, the number Tom asked about after Explode: nothing on the exploded tank's box may carry it.
+	const fixture = (() => { const f = JSON.parse(require('fs').readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'well-pressure-tank-fixture.lwn'), 'utf8')); f.assemblies.forEach((g) => { if (g.pt) { g.pt.vol = 1000; } }); return JSON.stringify(f); })();
 	const OWNED = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank volume'];
 	const ABSENT = ['Tank diameter', 'Minimum volume', 'Can overflow'];
 	const SENTENCE = 'Associated with Well W1. Change volume and control properties there.';
@@ -125,6 +126,8 @@ async function main() {
 		await P.mouse.click(c2.x, c2.y);
 		await a.settle(900);
 		rs = await rows();
+		const boxValues = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields label')).map((l) => ({ t: l.textContent.replace(/\s+/g, ' ').trim(), v: Array.from(l.querySelectorAll('input, select')).map((i) => i.value).join('/') })));
+		ok('after Explode the tank\'s Minimum volume is blank and no row of its box carries the Well\'s 1000 (Total tank volume is the Well\'s, not a tank field)', boxValues.some((r) => /^Minimum volume/.test(r.t) && r.v === '') && !boxValues.some((r) => r.v === '1000' || /\b1000\b/.test(r.t)), JSON.stringify(boxValues.filter((r) => /volume|1000/i.test(r.t + r.v))));
 		ok('after Explode the inputs are typeable (diameter, minimum volume and overflow are back; an ordinary tank has no volume-curve row) and the sentence is gone', OWNED.filter((o) => o !== 'Tank volume').concat(ABSENT).concat(['Elevation', 'Base elevation']).every((o) => find(o) && find(o).controls > 0) && !(await P.evaluate(() => !!document.querySelector('#lpn_popup_fields .lpn-owned-note'))), OWNED.map((o) => o + ':' + (find(o) ? find(o).controls : 'missing')).join(' '));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();

@@ -365,9 +365,9 @@ console.log('\n--- 7. following: the DEM source, a batch in either order, a scen
 console.log('\n--- 8. source guards from the round 9 review ---');
 {
 	const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8'), icons = fs.readFileSync(ROOT + 'lib/Icons.lib.php', 'utf8');
-	const up = +/EC_WELL_UPPER_HALF', ([\d.]+)/.exec(icons)[1], deep = +/EC_WELL_DEEP_HALF', ([\d.]+)/.exec(icons)[1];
-	const step = +/EC_WELL_STEP', ([\d.]+)/.exec(icons)[1], lit = 'M' + (12 - up) + ' 4V' + step + 'H' + (12 - deep) + 'V21.5H' + (12 + deep) + 'V' + step + 'H' + (12 + up) + 'V4Z';
-	ok('the Well silhouette fallback (a page with no icons) is the icon\'s own outline', src.indexOf("'" + lit + "'") >= 0, lit);
+	const icon = (name) => require('child_process').execFileSync('php', ['-r', 'require $argv[1]; echo $ec_icons[$argv[2]];', ROOT + 'lib/Icons.lib.php', name], { encoding: 'utf8' });
+	const lit = /^<path [^>]*? ?d="([^"]+)"/.exec(icon('well'))[1];
+	ok('the Well silhouette fallback (a page with no icons) is the icon\'s own first path, and its centre and bounds', src.indexOf("'" + lit + "'") >= 0 && /ax: 12, ay: 14, x0: 7\.7, y0: 3, x1: 16\.3, y1: 21\.5/.test(src) && /data-ax="12" data-ay="14" data-x0="7\.7" data-y0="3" data-x1="16\.3" data-y1="21\.5"/.test(icon('well')), lit);
 	ok('the "outlet junction" tip is offered only where the outlet bears the Well\'s ID', /bearer\.group === 'node' \? pc\.lpn_well_identity_tip : undefined\);\s*tagField\(fields, bearerEl, undefined, bearer\.group === 'node'/.test(src));
 }
 
