@@ -61772,7 +61772,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// document's units are installed, so it owns the whole of that state. Clearing only in the
 		// matched branch would leave one document's unknown unit refusing to solve the next one.
 		unresolvedUnits = {};
-		if (!units) { return false; }
+		if (!units) { rememberUnitSelections(); return false; }
 		var changed = false;
 		LPN_UNIT_SELECTS.forEach(function (name) {
 			var want = units[name], sel = unitEl(name), i;
@@ -61790,6 +61790,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			unresolvedUnits[name] = want;
 		});
+		// **THE UNITS JUST INSTALLED ARE THE ONES THE NEXT CHANGE MOVES FROM.** onUnitChange() compares
+		// against unitPrev, which wireUnitSelects() filled once with the PAGE's defaults; a project (an
+		// example, an .inp, a saved file, a new project, an undo) that opens on a different unit left
+		// it there, so the first change converted from the wrong unit or asked nothing (Task 857).
+		// Here is the one door every document's units pass through, so the memory follows it.
+		rememberUnitSelections();
 		return changed;
 	}
 	// ---- CHANGING A UNIT THAT DECIDES SOMETHING ASKS FIRST (Task 422, narrowed by Task 522) ------
