@@ -5035,3 +5035,13 @@ OBSERVED (re-verify; real Chromium via the branch's own env.js server, scratchpa
 - 390 px: Settings opens, Available volume sits last in Units, no sideways scroll. ?lang=es: "Volumen disponible (gal)", options pies^3, no errors.
 - CONCERN (judgement): Tanks table and Properties show "Minimum volume (ft^3)" beside "Available volume (gal)" under the US default.
 - NOT DONE: mutation test, map colouring, .inp import in the browser, Net2 graph, light/dark.
+
+## 2026-11-18 feat/volume-unit round 2 (f49bc5564), Task 857
+OBSERVED (re-verify; real Chromium via the branch's env.js server, Net3 US, scratchpad p3-p9; check_all --fast: only payload freshness failed, as expected):
+- Settings > Units row is "Volume", after Water age, before Roughness; choices gal, MG, ft^3, ac-ft, m^3, L, ML. Net3 US opens on ft^3, new US project on gal, new SI project on m^3, Net1 US on ft^3. A master-saved Net3 (MinVol 20000) reopens on ft^3 / 20000.
+- Tanks table, Properties, Properties-box graph, map bubble and bottom Time series all offer "Available volume" and agree after Calculate (ft^3 73768.52 -> gal 551826.87).
+- DEFECT (data): after opening an example the Volume select reads ft^3 but the page's memory of it is still the page default gal. First change to gal: no question, no refresh. First change to another unit (MG) with 20000 ft^3 typed: question asks, but Destructive converts as if the 20000 were gallons: 0.02 MG instead of 0.1496 MG; Available volume beside it 0.552 MG.
+- DEFECT: that silent change leaves Properties box, Properties graph, bubble and Time series on ft^3 numbers and titles until Calculate.
+- Stale comment left in js/looped-network.js near the Properties-box Minimum volume field: still says the Length unit cubed and no selector.
+- .inp export: ft^3 20000 -> 20000; after gal reinterpret 20000 gal -> 2673.61 ft^3. Right.
+- NOT DONE: mutation test, SI example, phone, other languages, volume-curve tank, scenarios.
