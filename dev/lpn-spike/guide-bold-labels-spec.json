@@ -1091,7 +1091,10 @@
             },
             {
                 "key": "lpn_settings_defaults",
-                "bold": 1
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
             },
             {
                 "key": "lpn_settings_auto_run",
@@ -1238,7 +1241,10 @@
             },
             {
                 "key": "lpn_settings_defaults",
-                "bold": 1
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
             },
             {
                 "key": "lpn_popup_boxtitle",
@@ -1329,7 +1335,7 @@
                 "bold": 3
             },
             {
-                "key": "lpn_pane_shape_closed",
+                "key": "lpn_field_closed",
                 "bold": 2
             },
             {
