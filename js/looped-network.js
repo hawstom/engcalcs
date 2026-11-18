@@ -80345,6 +80345,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (issue.code === 'builtin-error') { return (pc.lpn_diag_builtin_error || 'An error occurred in the built-in solver: {message}').replace('{message}', String(issue.message || '')); }
 		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
+		if (issue.code === 'pda-pressure-gap') {
+			var gapU = 'lpn_u_pressure', gapN = Number(toDisplay(EngCalcs.EPANET_PDA_MIN_GAP, gapU).toPrecision(3));
+			return (pc.lpn_diag_pda_pressure_gap || 'EPANET does not accept these pressure-driven demand limits: Required pressure must exceed Minimum pressure by at least {limit}.')
+				.replace('{limit}', gapN + ' ' + unitLabel(gapU));
+		}
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
@@ -89873,16 +89878,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return true;
 		}
 		var manningNote = noteOnce('manning-constant-differs');
-		// **THE MINOR-LOSS GRAVITY NOTE IS NOT SHOWN, AND THAT IS TOM'S OWN CALL** (2026-09-18:
-		// *"We can't keep showing the gravity message forever. It's just noise. If anything, put
-		// it in settings in the tip for the choice of whether to use the built-in solver when
-		// possible."*). The difference it reported is real and is still REPORTED BY THE ENGINE --
-		// `minor-loss-gravity-differs` is still raised in js/lpn-epanet.js and two harnesses still
-		// assert it -- but a sentence about a rounding in the last digits of a minor loss, on
-		// screen after every solve that has one k value in it, buys the reader nothing and costs
-		// them the attention the notes that DO matter need. Its substance moved to
-		// `lpn_settings_engine_native_tip`, beside the choice it is actually about, where somebody
-		// wondering why two engines disagree will go looking for it.
+		// There is no minor-loss gravity note: the built-in solver uses EPANET's own minor-loss constant, so the two engines agree.
 		// LEADS the status bar, ahead of every other note, because everything after it is a remark
 		// about numbers this sentence says not to trust. Logged under the same diagnostic code the
 		// discard path uses: to a user it is the same dead end, reached with something on screen.

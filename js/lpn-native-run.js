@@ -2589,7 +2589,16 @@
 			}
 			// A tank with no area is a reservoir to EPANET: its level is its head less its elevation, and it reports the water it takes out of the network.
 			if (n.type === 'tank') { f.levels[n.id] = ((res.heads[n.id] || 0) - (n.elev || 0)); }
-			f.demands[n.id] = n.type === 'junction' ? (res.demands && res.demands[n.id] !== undefined ? res.demands[n.id] : (n.demand || 0)) : 0;
+			// EN_DEMAND is the demand plus what the junction's emitter discharges (hydraul.c NodeDemand), as lpnSolve's pressure-driven res.demands already is.
+			f.demands[n.id] = n.type === 'junction' ? (res.demands && res.demands[n.id] !== undefined ? res.demands[n.id]
+				: (n.demand || 0) + (n.emitter > 0 ? n.emitter * Math.pow(Math.max((res.heads[n.id] || 0) - (n.elev || 0), 0), model.emitterExponent || 0.5) : 0)) : 0;
+		});
+		// A reservoir's pressure is its head less its elevation (epanet.c EN_PRESSURE), and EPANET's elevation for a reservoir is its
+		// BASE head: 0 on a steady head, head less base head when a head pattern moves it. lpnSolve answers 0 always.
+		cur.forEach(function (n) {
+			var sg = (model.hydraulics && typeof model.hydraulics.specificGravity === 'number' && isFinite(model.hydraulics.specificGravity))
+				? model.hydraulics.specificGravity : 1;
+			if (n.type === 'reservoir' && n.headPattern && typeof n.headBase === 'number') { f.pressures[n.id] = (res.heads[n.id] - n.headBase) * sg; }
 		});
 		// A pressure-driven run also reports what each junction asked for and did not get (EN_DEMANDDEFICIT).
 		if (res.demandDeficits) { f.demandDeficits = Object.assign({}, res.demandDeficits); }

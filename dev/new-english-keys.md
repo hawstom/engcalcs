@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**77 still to read on master**, of 86 untranslated keys, of 3362 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**78 still to read on master**, of 87 untranslated keys, of 3363 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -45,7 +45,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   *Current plain sentence:* Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else.
   @@ NEEDS RULING
 
-## lpn_  (85, 76 to read @@ NEEDS RULING)
+## lpn_  (86, 77 to read @@ NEEDS RULING)
 
 - **`lpn_contour_follows`**
   > Follows project "{link}" settings.
@@ -68,6 +68,9 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 - **`lpn_diag_energy_refused`**
   > EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:
   _Ruled OK 2026-11-03._
+- **`lpn_diag_pda_pressure_gap`**
+  > EPANET does not accept these pressure-driven demand limits: Required pressure must exceed Minimum pressure by at least {limit}.
+  @@ NEEDS RULING
 - **`lpn_diag_quality_refused`**
   > EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:
   _Ruled OK 2026-11-03._
@@ -313,7 +316,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 
 # Strings waiting on a branch
 
-**66 still to read**, of 66 new keys across 5 unmerged branch(es).
+**93 still to read**, of 93 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -324,7 +327,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/assembly (`df00da7fa`) — 51 new, 51 to read @@ NEEDS RULING
+### chore/audit-eps (`157c24e2d`) — already merged into fix/eps-audit; its strings are listed there
+
+### chore/notes-1118 (`afa4b26ec`) — already merged into fix/eps-audit; its strings are listed there
+
+### feat/assembly (`ed3b9b048`) — 68 new, 68 to read @@ NEEDS RULING
 
 - **`lpn_assembly_down_head`**
   > Downstream head
@@ -362,6 +369,33 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_field_virtual_tip`**
   > A virtual pipe joins two nodes with no length, volume, travel time, velocity or head loss. Both solvers treat it as a direct connection, and the diameter, roughness, minor loss and length below are not used. Cleared, it is an ordinary pipe again.
   @@ NEEDS RULING
+- **`lpn_field_well_pt_empty`**
+  > Empty pressure
+  @@ NEEDS RULING
+- **`lpn_field_well_pt_empty_tip`**
+  > Gauge pressure of the air charge when the tank holds no water, the precharge. Leave blank for 2 psi below the pump on pressure.
+  @@ NEEDS RULING
+- **`lpn_field_well_pt_head_tip`**
+  > The pump on or pump off pressure as a head of water. It is the tank's level, which the pump controls compare.
+  @@ NEEDS RULING
+- **`lpn_field_well_pt_off_head`**
+  > Pump off pressure head
+  @@ NEEDS RULING
+- **`lpn_field_well_pt_off_tip`**
+  > Gauge pressure above which the pump stops. It must be greater than the pump on pressure.
+  @@ NEEDS RULING
+- **`lpn_field_well_pt_on_head`**
+  > Pump on pressure head
+  @@ NEEDS RULING
+- **`lpn_field_well_pt_on_tip`**
+  > Gauge pressure below which the pump starts. The well writes it as a pressure head, the tank's level, in a pump control shown in the Libraries box under Controls.
+  @@ NEEDS RULING
+- **`lpn_field_well_pt_volume`**
+  > Total tank volume
+  @@ NEEDS RULING
+- **`lpn_field_well_pt_volume_tip`**
+  > Total volume of the tank, water and air together. A new tank is 2.7 cubic feet (20 gallons) or 0.08 cubic meters (80 liters), a common single-home size. The well writes the tank's volume curve from this volume, the pressures, and Boyle's law, with atmospheric pressure taken as 14.7 psi.
+  @@ NEEDS RULING
 - **`lpn_field_well_pump_off`**
   > Pump off above
   @@ NEEDS RULING
@@ -392,6 +426,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inp_drop_assembly_id`**
   > These groups share an ID with another group, so they were not restored. Their nodes and links came in as plain elements.
   @@ NEEDS RULING
+- **`lpn_inp_drop_assembly_kind`**
+  > These groups name an element that is not the kind the group needs, such as a pump that is not a pump or a tank that is not a tank, so they were not restored. Their nodes and links are kept as plain elements.
+  @@ NEEDS RULING
+- **`lpn_inp_drop_assembly_malformed`**
+  > These ;ASSEMBLY lines are not in a form this page writes, so no group was restored from them.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_well_tank`**
   > These are one-point wells with a tank, a form this page no longer draws. Their reservoir, drawdown valve, pump, tee, virtual pipe, and tank are kept as ordinary elements, and their pump controls as ordinary controls.
   @@ NEEDS RULING
@@ -413,11 +453,17 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mode_add_welltank`**
   > Mode: Add Well with tank. Specify a point on the map for the well, or specify a pipe to split it and put the well in it. Then specify the tee and the tank. Press Escape or switch to Select mode to stop.
   @@ NEEDS RULING
+- **`lpn_mode_add_welltankp`**
+  > Mode: Add Well with pressure tank. Specify a point on the map for the well, or specify a pipe to split it and put the well in it. Then specify the tee and the tank. Press Escape or switch to Select mode to stop.
+  @@ NEEDS RULING
 - **`lpn_morph_exploded`**
   > Morph separated {ids} into ordinary elements, as Explode does. Undo restores it.
   @@ NEEDS RULING
 - **`lpn_pgraph_which`**
   > Graph which sub-asset?
+  @@ NEEDS RULING
+- **`lpn_tank_associated`**
+  > Associated with Well {id}. Change volume and control properties there.
   @@ NEEDS RULING
 - **`lpn_tool_add_pumpplus`**
   > Pump+
@@ -449,6 +495,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_tool_add_welltank_tip`**
   > Add a well with a tank: a well, a tee, and a tank, each at a point you specify, joined by pipes. The well's pump can be controlled by the tank level. Specify the well first, on the map or on a pipe to split it, then the tee, then the tank. A Well's Description and Tag are those of its discharge node, the junction that shares the Well's ID.
   @@ NEEDS RULING
+- **`lpn_tool_add_welltankp`**
+  > Well with pressure tank
+  @@ NEEDS RULING
+- **`lpn_tool_add_welltankp_tip`**
+  > Add a well with a pressure tank: a well, a tee, and a bladder tank, each at a point you specify, joined by pipes. The tank stands on the ground at the well's elevation. Give the pump on and pump off pressures, the empty pressure and the tank volume. The well writes the tank's volume curve from Boyle's law, and the pump controls from the pressures.
+  @@ NEEDS RULING
 - **`lpn_tool_plus_next`**
   > Press it again for the next one: {next}.
   @@ NEEDS RULING
@@ -479,28 +531,52 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_welltank_tee_refused`**
   > The tee must be a junction that is not part of another assembly. Specify the tee again.
   @@ NEEDS RULING
+- **`lpn_welltankp_tank_prompt`**
+  > Now specify the pressure tank: a point on the map. Press Escape to stop with the well and its tee.
+  @@ NEEDS RULING
+- **`lpn_welltankp_tank_refused`**
+  > A pressure tank is made new. Specify a point on the map, not an existing tank.
+  @@ NEEDS RULING
 
-### feat/graph-scrub (`c6149d0cf`) — adds no English strings
+### feat/graph-scrub (`fa2f689dc`) — adds no English strings
 
-### feat/library-order (`6560cc2d9`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/library-order (`fb990b09f`) — 19 new, 19 to read @@ NEEDS RULING
 
 - **`lpn_guide_lib_order_none`**
   > The order of patterns, curves, pipe types, and fittings lists never changes a run.
   @@ NEEDS RULING
+- **`lpn_inp_drop_control_comments`**
+  > These comments at the end of control lines were not imported, because those controls were not imported. Every control that could be imported was.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_dup_curve`**
-  > These curve IDs are defined in more than one place in this file. EPANET adds the later points after the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start.
+  > These curve IDs are defined in more than one place in this file. EPANET appends the later points to the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start.
   @@ NEEDS RULING
 - **`lpn_inp_drop_dup_pattern`**
-  > These pattern IDs are defined in more than one place in this file. EPANET adds the later multipliers after the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start.
+  > These pattern IDs are defined in more than one place in this file. EPANET appends the later multipliers to the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start.
   @@ NEEDS RULING
 - **`lpn_inp_dup_and`**
   >  and 
+  @@ NEEDS RULING
+- **`lpn_inp_dup_comma`**
+  > , 
   @@ NEEDS RULING
 - **`lpn_inp_dup_curve_entry`**
   > Curve {id} (lines {lines})
   @@ NEEDS RULING
 - **`lpn_inp_dup_pattern_entry`**
   > Pattern {id} (lines {lines})
+  @@ NEEDS RULING
+- **`lpn_library_comment`**
+  > Comment
+  @@ NEEDS RULING
+- **`lpn_library_comment_add`**
+  > Add a comment
+  @@ NEEDS RULING
+- **`lpn_library_import_comments`**
+  > Comment rows copied with the imported items: {n}
+  @@ NEEDS RULING
+- **`lpn_library_import_comments_left`**
+  > Comment rows left out because the item below each was skipped, or nothing follows them: {n}
   @@ NEEDS RULING
 - **`lpn_library_move_bottom`**
   > Move to bottom
@@ -512,19 +588,19 @@ build for that would be a gate nobody keeps. Refresh it with
   > Moves the selected item. Click an item to select it. The order is saved with the project.
   @@ NEEDS RULING
 - **`lpn_library_move_tip_controls`**
-  > When two controls change the same link at the same time, the control lower in the list takes effect.
+  > When two controls change the same link at the same time, the control nearer the bottom of the list is the one applied.
   @@ NEEDS RULING
 - **`lpn_library_move_tip_none`**
   > The order does not change a run.
   @@ NEEDS RULING
 - **`lpn_library_move_tip_rules`**
-  > When two rules call for conflicting actions on the same link, the rule with the higher PRIORITY takes effect, and at equal priority the rule higher in the list takes effect.
+  > When two rules call for conflicting actions on the same link, the rule with the larger PRIORITY number is applied, and at equal PRIORITY the rule nearer the top of the list is applied.
   @@ NEEDS RULING
 - **`lpn_library_move_top`**
   > Move to top
   @@ NEEDS RULING
 
-### feat/pick-chooser (`72759a44c`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/pick-chooser (`50e757d1d`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pick_chooser_label`**
   > Select one of the elements here
@@ -535,3 +611,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_time_more`**
   > More time controls
   @@ NEEDS RULING
+
+### feat/volume-unit (`de8cdf67e`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`u_gal`**
+  > gal
+  @@ NEEDS RULING
+- **`u_l`**
+  > L
+  @@ NEEDS RULING
+- **`u_megaliter`**
+  > ML
+  @@ NEEDS RULING
+- **`u_mgal`**
+  > MG
+  @@ NEEDS RULING
+
+### fix/eps-audit (`99d3fc89a`) — adds no English strings

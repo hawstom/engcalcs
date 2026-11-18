@@ -3770,7 +3770,7 @@ $ec_lang['lpn_settings_engine_native']='Use the built-in solver';
 // refuses is refused by both solvers, and the one-time download, which is the cost a visitor on a
 // slow connection actually pays. No path goes to EPANET whatever the box says (Task 733).
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
+$ec_lang['lpn_settings_engine_native_tip']='Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 $ec_lang['lpn_engine_failed_why']='{reason} Showing the built-in solver instead.';
@@ -5348,6 +5348,7 @@ $ec_lang['lpn_velocity_warn_more']='⚠ And more pipes ({n}) above {limit}.';
 $ec_lang['lpn_settings_velocity_limit']='Velocity warning limit';
 $ec_lang['lpn_settings_velocity_limit_tip']='The velocity above which a run reports the fastest pipe and how many other pipes also exceed it. Blank uses the default. Zero turns the warning off.';
 $ec_lang['lpn_diag_pda_pressures']='Required pressure must be greater than Minimum pressure. Change one of them in Settings.';
+$ec_lang['lpn_diag_pda_pressure_gap']='EPANET does not accept these pressure-driven demand limits: Required pressure must exceed Minimum pressure by at least {limit}.';
 $ec_lang['lpn_inp_drop_pressure_unit']='This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
 
 // Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area larger than its screen size (3x unless the Screenshot box says otherwise).

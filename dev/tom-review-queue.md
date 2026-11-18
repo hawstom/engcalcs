@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-428. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-438. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -166,3 +166,16 @@ judgement and does not belong to a script.
 - [x] R-425 fix/browser-pass-a | ROAD text: "Probably C or revert the hiding decision and leave the overlap in the user's hands." Clean map: "is not for clicking, it's for IO." Customers table: put "Node" in the Connected asset column; "'Added to node' is confusingly too much." -- 3a2117228 (User Text slides instead of hiding; Customers table says Node); Clean map is Task 805, closed
 - [x] R-426 feat/scenario-io | "I am startled by the message 'A DXF drawing is planar, and this project is in latitude and longitude...' In the past, EPP would try to import the shapefile." "Am I hearing that shapes have no alternative or scenarios? ... Don't we need to design them to use our scenario system with respect to 'Is active'?" -- Question: Shapes now honour Is active per scenario (Task 831), but a DXF into a latitude/longitude project is still refused with "Use Convert as..."; do you want that refusal kept? -- Tom 2026-11-14: "Yes." (keep the refusal)
 - [ ] R-427 feat/first-view | "Go on the layout." Only Settings pinned; examples: "Maybe try creating a new design."; logging which example: "Does this mean yes, we can?"; workspaces: "Can it use the same paradigm [as the workspace export/import]?" -- Task 834 closed (first view); Task 823 (starter examples) and Task 824 (log which example) open; workspace-style export/import for layouts has no task yet
+
+## 2026-11-18 (reply to the five-branch report of 2:00 AM)
+
+- [ ] R-428 feat/pick-chooser | (phone) "on my phone I can't select Pump 335 unless I am zoomed in close enough for it to have no overlap with N60 and N61. I repeatedly select N60 or N61 when I try to select Pump 335 while zoomed out. And I never get a chooser box or the pump." -- round 7
+- [ ] R-429 feat/assembly | "How about the message goes at the top of the box and says, 'Associated with Well W3. Change volume and control properties there'?" Lock Elevation and Base elevation: "Or above. Yes." Lock the open-air tank's inputs: "Yes." -- round 13
+- [ ] R-430 feat/assembly | "I don't understand why the Total tank volume of 1000 ft^3 becomes Minimum volume 1000 ft^3 when exploded. Can you please check everything closely and then explain to me if necessary?" -- round 13
+- [ ] R-431 feat/assembly | "For the new well symbol, N1 has the arrow too close to the circle. But N2 and N3 are good. Make N1 like N2 and N3." Q1: "OK. Adjust the arrow per previous comments." -- round 13
+- [?] R-432 feat/assembly | "I am considering moving the well commands to be extensions of the Reservoir toolbar button. So we'd have Res, Well, Well-Tank-Open, Well-Tank-Pressure; Valve, Valve+; Pipe, Virtual pipe; Pump, Pump+ ... Your advice?" -- advice in the 11-18 report; nothing built
+- [x] R-433 feat/library-order | "The decision at hand (baby steps) is simply to bold all label citations in documentation (tips, manual, and any other references)." On the rule as stated: "Yes. That is correct, and that is the task at hand." -- the branch already does exactly that; tips are plain text and cannot carry bold
+- [ ] R-434 feat/graph-scrub | (phone) "I can drag the line, but not the triangle." "Most modern applications find a more intuitive way to do this without a triangle and a heavy line, I think. Maybe they do it on hover or on click or drag on a graph." -- round 3
+- [ ] R-435 feat/volume-unit | (Minimum volume tip) "'0 uses the tank diameter and minimum depth'?" (unit change) "Should it ask simply 'Convert inputs from old unit to new? [Convert] [Keep] [Cancel]'? (2) Also, I think it should ask for the decimals if converting. (3) Should Initial volume be added as a node label option?" -- round 3
+- [?] R-436 - | (testing and audit) "Would a session dedicated to testing and auditing be good? I have the budget. Would an adjustment to my prompts be good to ensure we are not building up code debt or missing any mathematical problems?" -- EPS-vs-EPANET audit started 11-18 on chore/audit-eps; advice in the report
+- [x] R-437 - | (Task 812) "I have noticed multiple times that I really like our best current label placement. I am okay if this shouldn't be done. We can keep researching with our competitive builders. Maybe we should start them with the current state of the art and update our rules and findings." -- recorded on Task 812
