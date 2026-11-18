@@ -2,7 +2,7 @@
 // "only clicking on overlaps would trigger the box"). Real Chromium, a mouse. A junction is slid along and
 // across a pump and a valve at four angles. For each position the junction's CENTRE is pressed: the glyph's
 // silhouette is asked by isPointInFill whether the centre is on its ink, and the click must open a box exactly
-// then (a centre within 1.5 px of the silhouette's edge is printed, not asserted: the page's drawn path and the pick model differ by about a pixel there). The same glyph is also
+// then (a centre within half a pixel of the silhouette's edge is printed, not asserted). The same glyph is also
 // pressed on a point of its own ink well clear of the junction: that is never a box.
 //
 //   node dev/lpn-spike/pick-glyph-contact-browser-harness.js   (takes the browser lock itself)
@@ -67,7 +67,7 @@ async function main() {
 		d.view = { cx: cols * 12 - 12, cy: 60, s: S };   // the 6 rows centred, clear of the bars at the top
 		return JSON.stringify(d);
 	};
-	// Is the junction's centre on the glyph's silhouette (and is that settled to 1.5 px), and a point of the
+	// Is the junction's centre on the glyph's silhouette (and is that settled to half a pixel), and a point of the
 	// glyph's ink well clear of the disc, in the page.
 	const probe = (page, id) => page.evaluate((id) => {
 		const node = document.querySelector('#lpn_canvas circle.lpn-node[data-node="' + id + 'j"]'), glyph = document.querySelector('#lpn_canvas path.lpn-link-symbol-hit[data-link="' + id + '"]');
@@ -75,7 +75,7 @@ async function main() {
 		const nb = node.getBoundingClientRect(), gb = glyph.getBoundingClientRect(), svg = node.ownerSVGElement, gm = glyph.getScreenCTM().inverse(), P = svg.createSVGPoint();
 		const inGlyph = (x, y) => { P.x = x; P.y = y; return glyph.isPointInFill(P.matrixTransform(gm)); };
 		const cx = nb.left + nb.width / 2, cy = nb.top + nb.height / 2, r = nb.width / 2;
-		const here = inGlyph(cx, cy), settled = [[1.5, 0], [-1.5, 0], [0, 1.5], [0, -1.5], [1.1, 1.1], [-1.1, 1.1], [1.1, -1.1], [-1.1, -1.1]].every((d) => inGlyph(cx + d[0], cy + d[1]) === here);
+		const here = inGlyph(cx, cy), settled = [[0.5, 0], [-0.5, 0], [0, 0.5], [0, -0.5]].every((d) => inGlyph(cx + d[0], cy + d[1]) === here);
 		let free = null;
 		for (let x = gb.left; x <= gb.right; x += 0.5) {
 			for (let y = gb.top; y <= gb.bottom; y += 0.5) {
@@ -127,7 +127,7 @@ async function main() {
 					}
 				}
 				tot.mustBox += mustBox; tot.mustNot += mustNot; tot.band += band;
-				ok(type + ' at ' + deg + ' degrees: a box exactly where the press is on both inks, none on free ink (' + mustBox + ' centres on the glyph, ' + mustNot + ' off it, ' + band + ' within 1.5 px of its edge, ' + boxes + ' boxes, free ink pressed ' + tot.free + ' times)', wrong === 0 && mustBox >= (type === 'pump' ? 5 : 1) && mustNot > 5, JSON.stringify(tot.wrong.slice(-4)));
+				ok(type + ' at ' + deg + ' degrees: a box exactly where the press is on both inks, none on free ink (' + mustBox + ' centres on the glyph, ' + mustNot + ' off it, ' + band + ' within half a pixel of its edge, ' + boxes + ' boxes, free ink pressed ' + tot.free + ' times)', wrong === 0 && mustBox >= (type === 'pump' ? 5 : 1) && mustNot > 5, JSON.stringify(tot.wrong.slice(-4)));
 				await S1.page.close();
 			}
 		}

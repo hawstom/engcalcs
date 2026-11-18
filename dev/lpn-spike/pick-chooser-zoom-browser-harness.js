@@ -130,7 +130,20 @@ async function main() {
 			return { a: a && [a.left, a.top, a.right, a.bottom], g: g && [g.left, g.top, g.right, g.bottom] };
 		});
 		ok('the Lake reservoir and the pump glyph are drawn', !!lake.a && !!lake.g, JSON.stringify(lake));
-		const overlap = { x: (Math.max(lake.a[0], lake.g[0]) + Math.min(lake.a[2], lake.g[2])) / 2, y: (Math.max(lake.a[1], lake.g[1]) + Math.min(lake.a[3], lake.g[3])) / 2 };
+		// A point on the ink of both: the reservoir's silhouette (its hit path, a triangle) and the pump's, deepest in both.
+		const overlap = await D.page.evaluate(() => {
+			const r = document.querySelector('#lpn_canvas path.lpn-node-hit[data-node="Lake"]'), g = document.querySelector('#lpn_canvas path.lpn-link-symbol-hit[data-link="10"]');
+			const rb = r.getBoundingClientRect(), gb = g.getBoundingClientRect(), svg = r.ownerSVGElement, P = svg.createSVGPoint(), rm = r.getScreenCTM().inverse(), gm = g.getScreenCTM().inverse();
+			const has = (e, m, x, y, o) => { P.x = x + o[0]; P.y = y + o[1]; return e.isPointInFill(P.matrixTransform(m)); };
+			const offs = [[0, 0], [1.2, 0], [-1.2, 0], [0, 1.2], [0, -1.2]];
+			let best = null;
+			for (let x = Math.max(rb.left, gb.left); x <= Math.min(rb.right, gb.right); x += 0.5) {
+				for (let y = Math.max(rb.top, gb.top); y <= Math.min(rb.bottom, gb.bottom); y += 0.5) {
+					if (offs.every((o) => has(r, rm, x, y, o) && has(g, gm, x, y, o))) { best = { x, y }; }
+				}
+			}
+			return best;
+		});
 		await D.page.mouse.move(overlap.x, overlap.y); await D.page.mouse.click(overlap.x, overlap.y); await D.settle(450);
 		const lakeRows = await rowsNow();
 		ok('a click where the reservoir overlaps the pump opens the box', lakeRows.length >= 2, JSON.stringify(lakeRows));
@@ -177,7 +190,7 @@ async function main() {
 					if (!inG(x, y)) { continue; }
 					const d = Math.hypot(x - cx, y - cy);
 					if (d > r + 4 && (!free || d > free.d)) { free = { x, y }; }
-					if (d < r - 1 && [[1.5, 0], [-1.5, 0], [0, 1.5], [0, -1.5]].every((o) => inG(x + o[0], y + o[1])) && (!over || d < over.d)) { over = { x, y, d }; }   // well inside the glyph, in the disc
+					if (d < r - 0.3 && [[0.6, 0], [-0.6, 0], [0, 0.6], [0, -0.6]].every((o) => inG(x + o[0], y + o[1])) && (!over || d < over.d)) { over = { x, y, d }; }   // well inside the glyph, in the disc
 				} }
 				out[c[0] + '/' + c[1]] = { free, over, centre: { x: cx, y: cy } };
 			});
@@ -199,7 +212,7 @@ async function main() {
 				await D.page.keyboard.press('Escape'); await D.settle(200);
 				await D.page.mouse.click(700, 120); await D.settle(300);
 			} else {
-				// No clear overlap (a sliver under 1.5 px counts as none: the page's drawn path and the pick model differ by about a pixel at an edge): the junction is the junction, pressed at its centre, and no box opens.
+				// No clear overlap (a sliver under 0.6 px counts as none): the junction is the junction, pressed at its centre, and no box opens.
 				await D.page.mouse.move(e.centre.x, e.centre.y); await D.page.mouse.click(e.centre.x, e.centre.y); await D.settle(450);
 				const cr = await rowsNow(), cs = await selNow();
 				ok('Pump ' + lid + ' and Junction ' + nid + ' share no clear overlap at this view: a press on the junction selects it with no box', cr.length === 0 && cs === 'n' + nid, JSON.stringify([cr, cs, e.centre]));
@@ -239,7 +252,7 @@ async function main() {
 			console.log('  NUMBERS ' + label + ': ' + JSON.stringify(r));
 			ok(label + ' (network ' + r.width + ' px wide): ' + r.n + ' node-centre clicks open ' + r.boxes + ' boxes, at most ' + r.maxRows + ' rows', r.n >= 90, JSON.stringify(r));
 			ok('...every box lists two to six rows and no pipe (Net3 has no zero-length pipe)', r.shortBoxes === 0 && r.maxRows <= 6 && r.pipeRows === 0, JSON.stringify(r));
-			ok('...and every click without a box selects the node it is on' + (label === '20 notches out' ? ' (but for a one-pixel disc lying within a pixel of a tank\'s edge: measured 3 of 97)' : ''), r.quietWrong <= (label === '20 notches out' ? 4 : 0), JSON.stringify(r));
+			ok('...and every click without a box selects the node it is on', r.quietWrong === 0, JSON.stringify(r));
 			if (notches === 0) { ok('...at the opening view only the places where two symbols are drawn touching open one (measured 7 of 97: three tank or pump over junction; at most 8)', r.boxes <= 8, JSON.stringify(r)); }
 		}
 		await D.page.close();
@@ -252,10 +265,7 @@ async function main() {
 		console.log('  NUMBERS phone 8 notches out: ' + JSON.stringify(r));
 		ok('8 notches out (network ' + r.width + ' px wide): ' + r.n + ' node-centre taps open ' + r.boxes + ' boxes', r.n >= 50, JSON.stringify(r));
 		ok('...every box lists two to six rows and no pipe (Net3 has no zero-length pipe)', r.shortBoxes === 0 && r.maxRows <= 6 && r.pipeRows === 0, JSON.stringify(r));
-		// Round 6: with the box strictly for overlaps, a finger's tap on a dot in a crowd of dots a few pixels apart
-		// is the plain tap, which the page's finger rule (a node within 24 px, Tom 2026-09-01) may give to a neighbour.
-		// That is printed, not asserted: it is the cost of "if you see a Properties box, you picked an unambiguous symbol".
-		console.log('  NOTE phone taps without a box that selected a different node than the one tapped: ' + r.quietWrong + ' of ' + (r.n - r.boxes));
+		ok('...and every tap without a box selects the node it is on', r.quietWrong === 0, JSON.stringify(r));
 		await T.page.close();
 
 		console.log('\nB2. Phone, the opening view: the Lake is off the left edge until panned; a real tap on the Lake over Pump 10 opens the box');
@@ -273,7 +283,19 @@ async function main() {
 		await pcdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
 		await P.settle(600);
 		const lk = await lakeBox();
-		const at = { x: (Math.max(lk.a[0], lk.b[0]) + Math.min(lk.a[2], lk.b[2])) / 2, y: (Math.max(lk.a[1], lk.b[1]) + Math.min(lk.a[3], lk.b[3])) / 2 };
+		const at = await P.page.evaluate(() => {
+			const r = document.querySelector('#lpn_canvas path.lpn-node-hit[data-node="Lake"]'), g = document.querySelector('#lpn_canvas path.lpn-link-symbol-hit[data-link="10"]');
+			const rb = r.getBoundingClientRect(), gb = g.getBoundingClientRect(), svg = r.ownerSVGElement, Pt = svg.createSVGPoint(), rm = r.getScreenCTM().inverse(), gm = g.getScreenCTM().inverse();
+			const has = (e, m, x, y, o) => { Pt.x = x + o[0]; Pt.y = y + o[1]; return e.isPointInFill(Pt.matrixTransform(m)); };
+			const offs = [[0, 0], [1.2, 0], [-1.2, 0], [0, 1.2], [0, -1.2]];
+			let best = { x: -1, y: -1 };
+			for (let x = Math.max(rb.left, gb.left); x <= Math.min(rb.right, gb.right); x += 0.5) {
+				for (let y = Math.max(rb.top, gb.top); y <= Math.min(rb.bottom, gb.bottom); y += 0.5) {
+					if (offs.every((o) => has(r, rm, x, y, o) && has(g, gm, x, y, o))) { best = { x, y }; }
+				}
+			}
+			return best;
+		});
 		ok('...panned by a finger, the Lake is on screen', at.x > 0 && at.x < 390, JSON.stringify(at));
 		await P.page.touchscreen.tap(at.x, at.y);
 		await P.settle(700);

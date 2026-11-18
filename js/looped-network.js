@@ -61227,9 +61227,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var sz, ink, k;
 		if (n.type === 'reservoir' || n.type === 'tank') {
 			sz = nodeSymbolSize(n); ink = SYMBOL_INK[n.type];
-			return { kind: 'node', id: n.id, type: n.type, rank: PICK_KIND_RANK.node, rect: {
+			k = { kind: 'node', id: n.id, type: n.type, rank: PICK_KIND_RANK.node, rect: {
 				l: px - sz.w * s / 2 + sz.w * s * ink.x0 / SYMBOL_VIEWBOX, r: px - sz.w * s / 2 + sz.w * s * ink.x1 / SYMBOL_VIEWBOX,
 				t: py - sz.h * s / 2 + sz.h * s * ink.y0 / SYMBOL_VIEWBOX, b: py - sz.h * s / 2 + sz.h * s * ink.y1 / SYMBOL_VIEWBOX } };
+			// A reservoir is drawn as a downward triangle (SYMBOL_SILHOUETTE.reservoir, M3.5 5.5H20.5L12 20Z): the empty corners of its box are not ink.
+			if (n.type === 'reservoir') {
+				k.parts = [{ poly: [[3.5, 5.5], [20.5, 5.5], [12, 20]].map(function (c) { return { x: px - sz.w * s / 2 + sz.w * s * c[0] / SYMBOL_VIEWBOX, y: py - sz.h * s / 2 + sz.h * s * c[1] / SYMBOL_VIEWBOX }; }) }];
+			}
+			return k;
 		}
 		k = nodeRadius(n) * s;
 		return { kind: 'node', id: n.id, type: n.type, rank: PICK_KIND_RANK.node, circle: { x: px, y: py, r: k } };
@@ -61256,7 +61261,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A node's distance in client px from a press to its drawn extent (0 on the ink).
 	function nodeInkDistPx(n, cx, cy, rect) {
 		var r = rect || svg.getBoundingClientRect(), s = state.s || 1;
-		return Geom.pickExtentDistance(pickNodeItem(n, s, r.left + state.tx + nodeDrawX(n) * s, r.top + state.ty + nodeDrawY(n) * s), cx, cy);
+		return Geom.pickExtentDistance(pickNodeItem(n, s, r.left + svg.clientLeft + state.tx + nodeDrawX(n) * s, r.top + svg.clientTop + state.ty + nodeDrawY(n) * s), cx, cy);
 	}
 	// Every SYMBOL the page drew near a press, as a client-px extent for Geom.pickSymbols(): a
 	// junction's disc, a reservoir's or tank's silhouette, a pump's or valve's turned glyph, a Text's
@@ -61270,8 +61275,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var items = [], at = {}, r = svg.getBoundingClientRect(), s = state.s || 1, i, n, l, le, lb, shp, px, py, b, pl, pts, fa, fb, len, qx, qy,
 			big = Math.max(pumpSymbolSize('pump'), nodeSymbolSize({ type: 'tank' }).w, nodeSymbolSize({ type: 'reservoir' }).w, 2 * JUNCTION_R * symbolFactor()) * s,
 			near = reach + big, textNear = reach + 600;
-		function sx(wx) { return r.left + state.tx + wx * s; }
-		function sy(wy) { return r.top + state.ty + wy * s; }
+		// The drawing starts inside the svg's border: the origin is the client box, as the drawn ink is.
+		function sx(wx) { return r.left + svg.clientLeft + state.tx + wx * s; }
+		function sy(wy) { return r.top + svg.clientTop + state.ty + wy * s; }
 		function rectOf(box) { return box.width > 0 || box.height > 0 ? { l: box.left, t: box.top, r: box.right, b: box.bottom } : null; }
 		function inNear(x, y, w) { return Math.abs(x - cx) <= w && Math.abs(y - cy) <= w; }
 		// One pass over the nodes holds every drawn position, so the links never ask for one again.
@@ -61279,7 +61285,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			n = doc.nodes[i];
 			px = nodeDrawX(n); py = nodeDrawY(n);
 			at[n.id] = { x: px, y: py, r: nodeRadius(n) };
-			if (nodeEls[n.id] && inNear(sx(px), sy(py), near)) { items.push(pickNodeItem(n, s, sx(px), sy(py))); }
+			if (nodeEls[n.id] && inNear(sx(px), sy(py), near) && hitIsVisible(nodeEls[n.id].circle)) { items.push(pickNodeItem(n, s, sx(px), sy(py))); }
 		}
 		for (i = 0; i < doc.links.length; i++) {
 			l = doc.links[i]; le = linkEls[l.id]; fa = at[l.from]; fb = at[l.to];
@@ -61288,7 +61294,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// With no bend the symbol is at the chord's middle: a link whose middle is far off is not looked at further.
 				if (!(l.verts && l.verts.length) && !inNear(sx((fa.x + fb.x) / 2), sy((fa.y + fb.y) / 2), near)) { continue; }
 				pl = linkSymbolPlace(l);
-				if (pl && inNear(sx(pl.x), sy(pl.y), near)) { items.push(pickGlyphItem(l, pl, s, sx(pl.x), sy(pl.y))); }
+				if (pl && inNear(sx(pl.x), sy(pl.y), near) && hitIsVisible(le.symbolHit)) { items.push(pickGlyphItem(l, pl, s, sx(pl.x), sy(pl.y))); }
 				continue;
 			}
 			// A visible line is never a row. A pipe is a point only when its two ends are at one point

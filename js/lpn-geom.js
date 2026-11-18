@@ -992,7 +992,7 @@ EngCalcs.lpnGeom = (function () {
 			c = (b.x - a.x) * (py - a.y) - (b.y - a.y) * (px - a.x);
 			if (c !== 0) { if (sign && (c > 0) !== (sign > 0)) { return false; } sign = c; }
 		}
-		return true;
+		return sign !== 0;   // a polygon collapsed to a line or a point holds nothing
 	}
 	function pickPolyEdgeDist(poly, px, py) { return pointToPolylineDistance(poly.concat([poly[0]]), px, py); }
 	function pickPartDist(p, px, py) {
@@ -1033,33 +1033,38 @@ EngCalcs.lpnGeom = (function () {
 		if (m.outline) { return pointToPolylineDistance(pickOutlinePts(m.outline), x, y) <= PICK_SHAPE_INK; }
 		return pickPartHas(pickPartsOf(m), x, y);
 	}
-	// Is every point of the item's ink in the ink of some node or glyph painted over it? `seen` is whether any of those
-	// covering points is in the ink of an item of `inkSet`.
 	// Paint order, bottom to top (the page's own layers): Shapes, pump and valve symbols, nodes, Texts; within a
 	// layer the later item in the list is on top (the caller hands nodes and links in the order it drew them).
 	var PICK_LAYER = { shape: 0, link: 1, node: 2, label: 3 };
-	function pickZ(m, items) { return (PICK_LAYER[m.kind] || 0) * 1e6 + items.indexOf(m); }
-	function pickHiddenUnder(h, items, inkSet) {
-		var hz = pickZ(h, items), parts = pickPartsOf(h), box = pickPartsBox(parts), step = Math.max(0.5, Math.sqrt((box.r - box.l) * (box.b - box.t) / 1600)),
-			x, y, hiders = items.filter(function (m) { return m !== h && pickZ(m, items) > hz && !m.soft && !m.outline && m.kind !== 'label' && pickBoxesMeet(box, pickPartsBox(pickPartsOf(m))); }),
-			seen = false, any = false, i, cover;
-		if (!hiders.length) { return false; }
+	function pickBoxesMeet(a, b) { return a.l <= b.r && b.l <= a.r && a.t <= b.b && b.t <= a.b; }
+	// One pass per press: each item's ink pieces, their box and its paint order, so nothing is rebuilt in the sampling loops.
+	function pickInfos(items) {
+		return items.map(function (m, i) {
+			var parts = (m.outline || m.kind === 'label') ? null : pickPartsOf(m);
+			return { m: m, parts: parts, box: parts ? pickPartsBox(parts) : null, z: (PICK_LAYER[m.kind] || 0) * 1e6 + i };
+		});
+	}
+	// Is every point of the item's ink in the ink of some node or glyph painted over it, and is one of those in the
+	// ink set (so the press is on a symbol hiding it)?
+	function pickHiddenUnder(h, infos, inkSet) {
+		var box = h.box, step = Math.max(0.5, Math.sqrt((box.r - box.l) * (box.b - box.t) / 1600)), x, y, i, cover, seen = false, any = false,
+			hiders = infos.filter(function (o) { return o !== h && o.z > h.z && o.parts && !o.m.soft && pickBoxesMeet(box, o.box); });
+		if (!hiders.some(function (o) { return inkSet.indexOf(o.m) >= 0; })) { return false; }
 		for (x = box.l + step / 2; x < box.r; x += step) {
 			for (y = box.t + step / 2; y < box.b; y += step) {
-				if (!pickPartHas(parts, x, y)) { continue; }
+				if (!pickPartHas(h.parts, x, y)) { continue; }
 				any = true; cover = false;
 				for (i = 0; i < hiders.length; i++) {
-					if (pickPartHas(pickPartsOf(hiders[i]), x, y)) { cover = true; if (inkSet.indexOf(hiders[i]) >= 0) { seen = true; } }
+					if (pickPartHas(hiders[i].parts, x, y)) { cover = true; if (inkSet.indexOf(hiders[i].m) >= 0) { seen = true; } }
 				}
 				if (!cover) { return false; }
 			}
 		}
 		return any && seen;
 	}
-	function pickBoxesMeet(a, b) { return a.l <= b.r && b.l <= a.r && a.t <= b.b && b.t <= a.b; }
 	function pickSymbols(items, x, y, opts) {
 		var o = opts || {}, cap = o.cap === undefined ? 6 : o.cap, coin = o.coincident === undefined ? 1 : o.coincident,
-			inkSet = [], hidden = [], list, primary, pa, i, it;
+			inkSet = [], hidden = [], list, primary, pa, i, it, infos;
 		function natural(a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); }
 		function order(a, b) {
 			return (b.coin - a.coin) || (a.d - b.d) || ((a.m.rank || 0) - (b.m.rank || 0)) || natural(a.m.id, b.m.id);
@@ -1069,12 +1074,13 @@ EngCalcs.lpnGeom = (function () {
 		items = items.filter(function (m) { return !(m.outline && m.outline.pts.length > 1 && !m.outline.closed); });
 		items.forEach(function (m) { if (!m.soft && pickInInk(m, x, y)) { inkSet.push(m); } });
 		if (!inkSet.length) { return []; }
+		infos = pickInfos(items);
 		primary = inkSet.filter(function (m) { return o.first && m.kind === o.first.kind && m.id === o.first.id; })[0] || inkSet.map(entry).sort(order)[0].m;
 		pa = pickAnchor(primary);
 		for (i = 0; i < items.length; i++) {
 			it = items[i];
 			if (inkSet.indexOf(it) >= 0 || it.outline || it.kind === 'label') { continue; }
-			if (it.soft ? inkSet.some(function (m) { return !m.outline && m.kind !== 'label' && pickPartHas(pickPartsOf(m), it.circle.x, it.circle.y); }) : pickHiddenUnder(it, items, inkSet)) { hidden.push(it); }
+			if (it.soft ? inkSet.some(function (m) { return !m.outline && m.kind !== 'label' && pickPartHas(pickPartsOf(m), it.circle.x, it.circle.y); }) : pickHiddenUnder(infos[i], infos, inkSet)) { hidden.push(it); }
 		}
 		if (inkSet.length + hidden.filter(function (m) { return !m.soft; }).length < 2) { return []; }
 		list = inkSet.filter(function (m) { return m !== primary; }).map(entry).sort(order);
