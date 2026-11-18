@@ -30783,13 +30783,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// either: inches or millimetres would put a 15 m tank on screen as 15000. The
 					// popup says the same thing in its tip.
 					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter', plainFor: paneOwnedFor('tankDiameter'),
-						get: function (n) { return effective(n, 'tankDiameter'); },
+						get: function (n) { return pressureTankOwner(n) ? undefined : effective(n, 'tankDiameter'); },
 						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
 					// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** (audit 2026-11). The volume is in the
 					// Length unit cubed, so its heading names that, as the Available volume column does.
 					(function () {
 						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume', plainFor: paneOwnedFor('minVolume'),
-							get: function (n) { return effective(n, 'minVolume'); },
+							get: function (n) { return pressureTankOwner(n) ? undefined : effective(n, 'minVolume'); },
 							set: function (n, v) { setProp(n, 'minVolume', v); updateNode(n.id, true); } };
 						c.unitText = tankVolumeUnitText;
 						return c;
@@ -30799,7 +30799,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 							var pc = EngCalcs.pageConfig || {};
 							return [['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']];
 						},
-						get: function (n) { return tankOverflowWord(n); },
+						get: function (n) { return pressureTankOwner(n) ? '' : tankOverflowWord(n); },
 						set: function (n, v) { tankOverflowWrite(n, v); updateNode(n.id, true); } },
 					// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), the twin of the pipe pair:
 					// water sits in a tank far longer than it sits in any main, so this is where a
@@ -41798,7 +41798,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		unitNumberFieldBlank(fields, pc.lpn_field_well_pt_empty || 'Empty pressure', 'lpn_u_pressure', function () { return p.pre; },
 			function (v) { if (v === undefined || !isFinite(v)) { delete p.pre; } else { p.pre = v; } apply(); },
 			typeof p.on === 'number' ? toDisplay(toSI(p.on, 'lpn_u_pressure') - ptGapM(), 'lpn_u_pressure') : undefined, pc.lpn_field_well_pt_empty_tip);
-		numberFieldPlain(fields, (pc.lpn_curve_kind_volume || 'Tank volume') + ' (' + elevVolumeUnitText() + ')', p.vol, function (v) { p.vol = v; apply(); }, pc.lpn_field_well_pt_volume_tip);
+		numberFieldPlain(fields, (pc.lpn_field_well_pt_volume || 'Total tank volume') + ' (' + elevVolumeUnitText() + ')', p.vol, function (v) { p.vol = v; apply(); }, pc.lpn_field_well_pt_volume_tip);
 		if (s) {
 			readonlyUnitField(fields, pc.lpn_field_well_pt_on_head || 'Pump on pressure head', 'lpn_u_elevhead', s.on, pc.lpn_field_well_pt_head_tip);
 			readonlyUnitField(fields, pc.lpn_field_well_pt_off_head || 'Pump off pressure head', 'lpn_u_elevhead', s.off, pc.lpn_field_well_pt_head_tip);
@@ -75033,7 +75033,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		reservoir: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', '#coords', 'lpn_field_head', 'lpn_field_head_pattern',
 			'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|', '#qresult', '#notes'],
 		tank: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', 'lpn_field_tank_base_elev', 'lpn_field_tank_diameter',
-			'lpn_field_tank_minvol', 'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', 'lpn_field_tank_overflow', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
+			'lpn_field_tank_minvol', '#owned', 'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', 'lpn_field_tank_overflow', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
 			'lpn_mixing_model', 'lpn_mixing_fraction', 'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|',
 			'lpn_field_head', 'lpn_result_pressure', 'lpn_result_depth', 'lpn_result_tank_volume', '#qresult', '#notes'],
 		pipe: ['lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_pipetype', 'lpn_field_diameter',
@@ -77418,15 +77418,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, owner = pressureTankOwner(n), eu = ' (' + unitLabel('lpn_u_elevhead') + ')';
 		// A pressure tank's initial depth, limits and volume curve are the Well's, shown as it set them (syncPressureTank()), with whose they are.
 		if (owner) {
+			// The sentence first, across the whole box and wrapping, then the rows it is about. Tank diameter, minimum volume and can overflow mean nothing to a
+			// pressure tank (its volume curve sets volume against depth in both engines), so they have no row; the group still writes them.
+			var note = document.createElement('span');
+			note.className = 'lpn-owned-note';
+			note.textContent = ownedSentence(owner, pc.lpn_library_control_owned);
+			note.__prow = '#owned';   // propsReorder() sets it directly above the first locked row (Minimum depth)
+			fields.appendChild(note);
 			readonlyField(fields, (pc.lpn_field_tank_level_short || 'Initial depth') + eu, effective(n, 'level'), pc.lpn_field_tank_level_short_tip, 4);
 			readonlyField(fields, (pc.lpn_field_tank_minlevel_short || 'Minimum depth') + eu, effective(n, 'minLevel'), pc.lpn_field_tank_minlevel_short_tip, 4);
 			readonlyField(fields, (pc.lpn_field_tank_maxlevel_short || 'Maximum depth') + eu, effective(n, 'maxLevel'), pc.lpn_field_tank_maxlevel_short_tip, 4);
 			readonlyField(fields, pc.lpn_curve_kind_volume || 'Tank volume', effective(n, 'volCurve') || '');
-			// The rest of the vessel, shown and not typed (the group owns it: PT_OWNED), then the one sentence that says whose it is.
-			readonlyField(fields, (pc.lpn_field_tank_diameter || 'Tank diameter') + ' (' + unitLabel('lpn_u_length') + ')', effective(n, 'tankDiameter'), pc.lpn_field_tank_diameter_tip, 4);
-			readonlyField(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')', effective(n, 'minVolume') === undefined || effective(n, 'minVolume') === null ? '' : effective(n, 'minVolume'), pc.lpn_field_tank_minvol_tip, 4);
-			readonlyField(fields, pc.lpn_field_tank_overflow || 'Can overflow', tankOverflowWord(n) === 'YES' ? (pc.lpn_settings_table_yes || 'Yes') : (pc.lpn_settings_table_no || 'No'), pc.lpn_field_tank_overflow_tip);
-			readonlyField(fields, ownedSentence(owner, pc.lpn_library_control_owned), '');
 			return;
 		}
 		unitNumberField(fields, pc.lpn_field_tank_level_short || 'Initial depth', 'lpn_u_elevhead',

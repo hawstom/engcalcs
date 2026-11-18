@@ -380,11 +380,12 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 ### Round 12: a member whose inputs the group owns is locked (Tom, round 11 pass: "the tank properties can be edited"; `well-tank-three-point-harness.js`, `well-pressure-tank-lock-browser-harness.js`)
 
 - **The rule:** one fact gets one door, the Well's Properties box. `PT_OWNED` lists what a pressure tank takes from its Well: initial, minimum and maximum depth, volume
-  curve, tank diameter, minimum volume and can overflow. `ownerOfProp(el, prop)` is the one question every door asks. The tank's Properties shows those rows read-only
-  (ID, results and the other rows stay), then one sentence: "Written by well W1. Change it in the Properties box of the well." (`lpn_library_control_owned`, the Controls
+  curve, tank diameter, minimum volume and can overflow. The last three mean nothing to it (its volume curve sets volume against depth; diameter 15 and 3 solve identically in both engines, `well-tank-three-point-harness.js`), so they have no row in its box or cell in Tables; the group still writes them. `ownerOfProp(el, prop)` is the one question every door asks. The tank's Properties shows the four that matter read-only, under the sentence (full box width, wrapping, directly above Minimum depth),
+  (ID, results and the other rows stay), the sentence being "Written by well W1. Change it in the Properties box of the well." (`lpn_library_control_owned`, the Controls
   editor's sentence). Tables draws those six cells as plain text (`plainFor`; no tip on a cell, so the sentence is in the Properties box). `setProp()` refuses them with the sentence, so a scenario
   cannot override them and Find and replace, the Settings push and paste cannot write them; Find and replace offers the property, leaves the tank out, and says the sentence
   instead of "Nothing would change." Explode removes the lock (no group, no owner).
+- **The Well's own row** for the vessel is "Total tank volume" (`lpn_field_well_pt_volume`, Tom's 2026-10-25 words), so it is not confused with the tank's "Tank volume" curve row (`lpn_curve_kind_volume`, still used by the Library and Find).
 - **Not locked, the tank's own:** Elevation, Base elevation, position, Description, Tag, reaction, mixing, initial quality. The open-air Well with tank's tank, the tee and the two
   branch pipes keep every input: Round 7 puts their values in their own boxes, and the Well's box asks only the pump's two levels.
 - **No Select-the-well button:** no such door exists yet (the Controls editor's sentence is text).

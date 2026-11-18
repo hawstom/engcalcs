@@ -19,7 +19,7 @@
 // Licensed under GNU GPL v3.0 or later
 'use strict';
 
-const { ROOT, byId, loadLoopedNetwork, setUnitSet, setHitTarget } = require('./lpn-dom-stub.js');
+const { ROOT, byId, loadLoopedNetwork, setUnitSet, setHitTarget, NODE_ENGINE_URL } = require('./lpn-dom-stub.js');
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-epanet.js');
@@ -403,7 +403,7 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	L.setMode('select'); L.openPopup('W1', 10, 10);
 	const labels = boxLabels();
 	console.log('        box: ' + labels.join(' | '));
-	ok('the box asks pump on, pump off, empty pressure and tank volume once, on the well, and shows the two heads', ['Pump on below', 'Pump off above', 'Empty pressure', 'Tank volume', 'Pump on pressure head', 'Pump off pressure head'].every((w) => labels.filter((x) => x.indexOf(w) === 0).length === 1), '');
+	ok('the box asks pump on, pump off, empty pressure and tank volume once, on the well, and shows the two heads', ['Pump on below', 'Pump off above', 'Empty pressure', 'Total tank volume', 'Pump on pressure head', 'Pump off pressure head'].every((w) => labels.filter((x) => x.indexOf(w) === 0).length === 1), '');
 	a.pt.on = 30; a.pt.pre = 25; L.syncPressureTank(a);
 	ok('an edit writes the curve, the limits and the controls again', Math.abs(L.curveById('W1TV').points[1][0] - 25) < 1e-3 && a.pumpOn === 30 && doc.controls.filter((x) => x.asm === 'W1').length === 2, JSON.stringify([a.pumpOn, L.curveById('W1TV').points[1]]));
 	a.pt.on = 50; a.pt.off = 40; L.syncPressureTank(a);
@@ -544,10 +544,22 @@ console.log('\n--- 10. round 11 review fixes ---');
 	L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
 	const a = doc.assemblies[0];
 	const tk = L.nodeById(a.tank);
+	{
+		// The diameter means nothing to a pressure tank: its volume curve sets volume against depth, in both engines (so the box does not show it).
+		curves(doc, a);
+		L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'demand', 10);
+		const solveBoth = async (d) => { tk.tankDiameter = d; const m = L.currentModel(); return [EC.lpnSolve(m), await EC.lpnSolveEpanet(L.currentModel(), { moduleUrl: NODE_ENGINE_URL })]; };
+		const big = await solveBoth(15), small = await solveBoth(3);
+		['built-in', 'EPANET'].forEach((nm, i) => {
+			const diffs = Object.keys(big[i].heads).map((k) => Math.abs(big[i].heads[k] - small[i].heads[k]));
+			ok(nm + ': a pressure tank solves the same with diameter 15 and 3', big[i].ok && small[i].ok && Math.max.apply(null, diffs) < 1e-9, 'max head difference ' + Math.max.apply(null, diffs).toExponential(2));
+		});
+		tk.tankDiameter = 15;
+	}
 	L.setMode('select'); L.openPopup(a.tank, 10, 10);
 	const labels = boxLabels();
 	console.log('        tank box: ' + labels.join(' | '));
-	ok('the pressure tank\'s box shows its depths and curve as the Well set them, with whose they are', labels.some((x) => /^Written by well W1/.test(x)) && labels.filter((x) => /^(Initial|Minimum|Maximum) depth/.test(x)).length === 3 && !(function () { let inputs = 0; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL' && /^(Initial|Minimum|Maximum) depth/.test((e.textContent || '').trim())) { (e.children || e.childNodes || []).forEach((c) => { if (c.tagName === 'INPUT') { inputs++; } }); } }); return inputs; }()));
+	ok('the pressure tank\'s box shows its depths and curve as the Well set them, with whose they are', (function () { let f = 0; walk(byId.lpn_popup_fields, (e) => { if (e.className === 'lpn-owned-note' && /^Written by well W1/.test(e.textContent || '')) { f++; } }); return f === 1; }()) && labels.filter((x) => /^(Initial|Minimum|Maximum) depth/.test(x)).length === 3 && !(function () { let inputs = 0; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL' && /^(Initial|Minimum|Maximum) depth/.test((e.textContent || '').trim())) { (e.children || e.childNodes || []).forEach((c) => { if (c.tagName === 'INPUT') { inputs++; } }); } }); return inputs; }()));
 	if (process.argv.includes('--write-fixture')) {
 		require('fs').writeFileSync(ROOT + 'dev/lpn-spike/well-pressure-tank-fixture.lwn', JSON.stringify(JSON.parse(JSON.stringify(L.serializeProject()))));
 		console.log('wrote the fixture');
@@ -562,13 +574,14 @@ console.log('\n--- 10. round 11 review fixes ---');
 	L.setProp(tk, 'bottomElev', 1.5);
 	ok('the tank\'s Base elevation stays its own', L.effective(tk, 'bottomElev') === 1.5);
 	// Properties: every owned input is a read-only row (no input element), the sentence shows once, and the identity rows stay typeable.
-	const owned = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank volume', 'Tank diameter', 'Minimum volume', 'Can overflow'];
+	const owned = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank volume'];
 	const inputsOf = (lab) => { let n = 0; walk(lab, (e) => { if (e.tagName === 'INPUT' || e.tagName === 'SELECT') { n++; } }); return n; };
 	const labelEls = []; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL') { labelEls.push(e); } });
 	const txt = (e) => (e.textContent || '').replace(/\s+/g, ' ').trim();
 	const ownedEls = labelEls.filter((e) => owned.some((o) => txt(e).indexOf(o) === 0));
-	ok('all seven owned inputs are listed in the tank\'s box, none of them typeable', ownedEls.length === 7 && ownedEls.every((e) => inputsOf(e) === 0), ownedEls.map(txt).join(' | '));
-	ok('the sentence shows exactly once, naming the well', labelEls.filter((e) => /^Written by well W1\. Change it in the Properties box of the well\.$/.test(txt(e))).length === 1);
+	ok('the four owned rows that mean something to a pressure tank are listed, none typeable, and diameter, minimum volume and overflow have no row', ownedEls.length === 4 && ownedEls.every((e) => inputsOf(e) === 0) && !labelEls.some((e) => /^(Tank diameter|Minimum volume|Can overflow)/.test(txt(e))), ownedEls.map(txt).join(' | '));
+	const notes = []; walk(byId.lpn_popup_fields, (e) => { if (e.className === 'lpn-owned-note') { notes.push(e); } });
+	ok('the sentence shows exactly once, naming the well', notes.length === 1 && /^Written by well W1\. Change it in the Properties box of the well\.$/.test(txt(notes[0])));
 	ok('the tank\'s Elevation and Base elevation are still typeable', ['Elevation', 'Base elevation'].every((o) => labelEls.some((e) => txt(e).indexOf(o) === 0 && inputsOf(e) > 0)));
 	// Tables: the six columns are plain cells for this tank, and typeable for an ordinary tank.
 	const spec = L.paneTables().filter((t) => t.cols.some((c) => c.key === 'tankDiameter'))[0];

@@ -54,7 +54,8 @@ async function main() {
 	if (!executablePath) { console.error(NAME + ': no Chromium found. SKIPPING.'); env.stopServer(); process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
 	const fixture = require('fs').readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'well-pressure-tank-fixture.lwn'), 'utf8');
-	const OWNED = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank volume', 'Tank diameter', 'Minimum volume', 'Can overflow'];
+	const OWNED = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank volume'];
+	const ABSENT = ['Tank diameter', 'Minimum volume', 'Can overflow'];
 	const SENTENCE = 'Written by well W1. Change it in the Properties box of the well.';
 	try {
 		const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 1000 }, serviceWorkers: 'block' });
@@ -82,9 +83,21 @@ async function main() {
 		await a.settle(900);
 		let rs = await rows();
 		const find = (name) => rs.filter((r) => r.t.indexOf(name) === 0)[0];
-		ok('the box is the tank\'s own (Tank diameter row present)', !!find('Tank diameter'), rs.map((r) => r.t).join(' | '));
-		ok('the seven owned rows are listed and none holds a control', OWNED.every((o) => find(o) && find(o).controls === 0), OWNED.map((o) => o + ':' + (find(o) ? find(o).controls : 'missing')).join(' '));
-		ok('the sentence shows once', rs.filter((r) => r.t === SENTENCE).length === 1);
+		ok('the box is the tank\'s own (Base elevation row present)', !!find('Base elevation'), rs.map((r) => r.t).join(' | '));
+		ok('diameter, minimum volume and overflow have no row on a pressure tank', ABSENT.every((o) => !find(o)), rs.map((r) => r.t).join(' | '));
+		ok('the four owned rows are listed and none holds a control', OWNED.every((o) => find(o) && find(o).controls === 0), OWNED.map((o) => o + ':' + (find(o) ? find(o).controls : 'missing')).join(' '));
+		const geo = await P.evaluate(() => {
+			const n = document.querySelector('#lpn_popup_fields .lpn-owned-note'), f = document.getElementById('lpn_popup_fields');
+			if (!n) { return null; }
+			const r = n.getBoundingClientRect(), fr = f.getBoundingClientRect(), first = Array.from(f.querySelectorAll('label')).filter((l) => /^Minimum depth/.test(l.textContent.trim()))[0];
+			const rng = document.createRange(); rng.selectNodeContents(n); const tr = rng.getBoundingClientRect();
+			return { text: n.textContent.trim(), right: tr.right, boxRight: fr.right, left: tr.left, boxLeft: fr.left, above: first ? r.bottom <= first.getBoundingClientRect().top + 1 : false, gap: first ? first.getBoundingClientRect().top - r.bottom : 999, sw: n.scrollWidth, cw: n.clientWidth };
+		});
+		ok('the sentence shows once, whole, with its right edge inside the box', !!geo && geo.text === SENTENCE && geo.right <= geo.boxRight + 1 && geo.sw <= geo.cw + 1, JSON.stringify(geo));
+		ok('and stands directly above the first locked row', !!geo && geo.above && geo.gap < 40, JSON.stringify(geo));
+		const wellRows = await (async () => { await P.keyboard.press('Escape'); const w0 = await centreOf('W1'); await P.mouse.click(w0.x, w0.y); await a.settle(900); const r0 = await rows(); await P.keyboard.press('Escape'); return r0; })();
+		ok('the Well\'s own volume row is "Total tank volume" (m^3 or ft^3), and the Well has no plain "Tank volume" row', wellRows.some((r) => /^Total tank volume/.test(r.t)) && !wellRows.some((r) => /^Tank volume/.test(r.t)), wellRows.map((r) => r.t).join(' | '));
+		const c1 = await centreOf('T1'); await P.mouse.click(c1.x, c1.y); await a.settle(900); rs = await rows();
 		ok('Elevation and Base elevation are still typeable', find('Elevation').controls > 0 && find('Base elevation').controls > 0);
 		const before = rs.map((r) => r.t).join('|');
 		for (const o of OWNED) {
@@ -108,7 +121,7 @@ async function main() {
 		await P.mouse.click(c2.x, c2.y);
 		await a.settle(900);
 		rs = await rows();
-		ok('after Explode the six inputs are typeable (an ordinary tank has no volume-curve row) and the sentence is gone', OWNED.filter((o) => o !== 'Tank volume').every((o) => find(o) && find(o).controls > 0) && !rs.some((r) => r.t === SENTENCE), OWNED.map((o) => o + ':' + (find(o) ? find(o).controls : 'missing')).join(' '));
+		ok('after Explode the inputs are typeable (diameter, minimum volume and overflow are back; an ordinary tank has no volume-curve row) and the sentence is gone', OWNED.filter((o) => o !== 'Tank volume').concat(ABSENT).every((o) => find(o) && find(o).controls > 0) && !(await P.evaluate(() => !!document.querySelector('#lpn_popup_fields .lpn-owned-note'))), OWNED.map((o) => o + ':' + (find(o) ? find(o).controls : 'missing')).join(' '));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {
