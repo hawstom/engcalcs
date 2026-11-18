@@ -387,6 +387,16 @@ head('4b3. controls: a comment is a row of its own, and Net3 reads, moves and wr
 			';Heading/0 ; ;Fill it/1 ; LINK P1 OPEN AT TIME 1//0 ; ;end/0 ; LINK P2 OPEN AT TIME 2 ;trail/trail/0',
 			up.map((c) => c.comment ? c.lines.join('|') + '/' + (c.gap || 0) : c.raw + '/' + (c.note || '') + '/' + (c.gap || 0)).join(' ; '));
 		ok('...and upgrading again changes nothing', same(EngCalcs.lpnControlsUpgrade(up), up));
+		// a `tail` with no description above it is kept: as the trailing note when the control has none, as a comment row after it when it has one
+		const oldT = [
+			{ link: 'P1', raw: 'LINK P1 OPEN AT TIME 1', action: {}, condition: {}, tail: 'only tail' },
+			{ link: 'P2', raw: 'LINK P2 OPEN AT TIME 2 ;own', action: {}, condition: {}, note: 'own', noteAt: 'end', tail: 'second tail' }
+		];
+		const upT = EngCalcs.lpnControlsUpgrade(oldT);
+		const text = (c) => c.comment ? c.lines.join('|') : c.raw + '/' + (c.note || '');
+		ok('an older project: a tail with no description above it is kept, as the trailing note or as a comment row after the control that has its own',
+			upT.map(text).join(' ; ') === 'LINK P1 OPEN AT TIME 1/only tail ; LINK P2 OPEN AT TIME 2 ;own/own ; ;second tail' && upT.every((c) => !c.tail), upT.map(text).join(' ; '));
+		ok('...and upgrading that again changes nothing', same(EngCalcs.lpnControlsUpgrade(upT), upT));
 	}
 }
 

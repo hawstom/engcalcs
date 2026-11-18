@@ -787,5 +787,17 @@ head('14. a comment row imported after the last comment row of the open project 
 	check(c.length === 4 && c[1].comment && c[2].comment && c[2].gap === 1, 'Controls: ;ours then ;theirs, the second with one blank line: ' + JSON.stringify(c.map((x) => x.comment ? x.lines[0] + '/' + (x.gap | 0) : x.raw)));
 }());
 
+head('15. comment rows left behind by an import are said in the receipt, never dropped in silence');
+(function () {
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 }, controls: [{ link: '9', raw: 'LINK 9 OPEN AT TIME 1', action: {}, condition: null, text: {} }], rules: [] });
+	clearReport();
+	L.libImportRun({ v: 6, units: {}, controls: [
+		{ comment: true, lines: [';above the clash'] },
+		{ link: '9', raw: 'LINK 9 OPEN AT TIME 1', action: {}, condition: null, text: {} },
+		{ comment: true, lines: [';closing note'], gap: 1 }
+	], rules: [] }, 'from.lwn', ['controls']);
+	check(said('lpn_library_import_comments_left') && reportLines().some((t) => /: 2$/.test(t) && /not copied in/.test(t)), 'the receipt counts the comment above the clash and the closing note: ' + JSON.stringify(reportLines()));
+}());
+
 console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All library-import checks passed.'));
 process.exit(failures ? 1 : 0);

@@ -2765,6 +2765,7 @@ EngCalcs.pageConfig = {
 	lpn_library_import_heading: <?=json_encode($ec_lang['lpn_library_import_heading'])?>,
 	lpn_library_import_added: <?=json_encode($ec_lang['lpn_library_import_added'])?>,
 	lpn_library_import_comments: <?=json_encode($ec_lang['lpn_library_import_comments'])?>,
+	lpn_library_import_comments_left: <?=json_encode($ec_lang['lpn_library_import_comments_left'])?>,
 	lpn_library_import_conflict: <?=json_encode($ec_lang['lpn_library_import_conflict'])?>,
 	lpn_library_import_none: <?=json_encode($ec_lang['lpn_library_import_none'])?>,
 	lpn_library_import_curve_shape: <?=json_encode($ec_lang['lpn_library_import_curve_shape'])?>,

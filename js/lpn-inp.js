@@ -2482,8 +2482,13 @@
 			return sc.gap;
 		}
 		list.forEach(function (c) {
-			var lines = [], note, above, src, k;
-			if (!c || c.comment) { out.push(c); return; }
+			var lines = [], note, above, src, k, tailRows = null;
+			if (!c || c.comment) {
+				// Blank lines a foot left over belong to the comment row that follows it.
+				if (c && carry) { c = Object.assign({}, c, { gap: Math.max(c.gap | 0, carry) }); carry = 0; }
+				out.push(c);
+				return;
+			}
 			for (k = 0; k < carry; k++) { lines.push(''); }
 			carry = 0;
 			lines = lines.concat(Array.isArray(c.head) ? c.head : []);
@@ -2502,12 +2507,16 @@
 				if (c.tok) { delete c.tok.note; }
 				if (c.tail) { c.note = c.tail; c.noteAt = 'end'; if (c.tok && c.tok.tail !== undefined) { c.tok.note = c.tok.tail; } }
 			}
+			// A `tail` that has no place as the trailing note (the control already has one) is kept as a comment row after the control, never dropped.
+			if (c.tail && !(above || !c.note)) { tailRows = [';' + EngCalcs.lpnDescInline(EngCalcs.lpnDescText(c.tail))]; }
+			else if (c.tail && !above) { c.note = EngCalcs.lpnDescText(c.tail); c.noteAt = 'end'; if (c.tok && c.tok.tail !== undefined) { c.tok.note = c.tok.tail; } }
 			delete c.tail;
 			if (c.tok) { delete c.tok.tail; if (!Object.keys(c.tok).length) { delete c.tok; } }
 			k = rows(lines);
 			if (k) { c.gap = k; }
 			out.push(c);
-			if (Array.isArray(c.foot)) { carry = rows(c.foot); }
+			if (tailRows) { carry = rows(tailRows.concat(Array.isArray(c.foot) && c.foot.length ? [''].concat(c.foot) : [])); }
+			else if (Array.isArray(c.foot)) { carry = rows(c.foot); }
 			delete c.foot;
 		});
 		if (out.length) { delete out[0].gap; }

@@ -70207,7 +70207,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var spec = LIB_IMPORTABLE[kind];
 			if (!spec) { return; }
 			var source = libImportSourceOf(spec, saved),
-				taken = {}, clones = [], added = [], clashed = [], pendingComments = [], nComments = 0;
+				taken = {}, clones = [], added = [], clashed = [], pendingComments = [], nComments = 0, nLeft = 0;
 			spec.read().forEach(function (rec) {
 				if (libImportIsUsable(spec, rec)) { taken[String(libImportKeyOf(spec, rec))] = true; }
 			});
@@ -70217,16 +70217,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (rec && rec.comment) { pendingComments.push(rec); return; }
 				var held = pendingComments;
 				pendingComments = [];
-				if (!libImportIsUsable(spec, rec)) { return; }
+				// A comment row left behind is counted and said in the receipt, never dropped in silence.
+				if (!libImportIsUsable(spec, rec)) { nLeft += held.length; return; }
 				var id = String(libImportKeyOf(spec, rec)), clone;
-				if (taken[id]) { clashed.push(id); return; }
-				try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { return; }
+				if (taken[id]) { clashed.push(id); nLeft += held.length; return; }
+				try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { nLeft += held.length; return; }
 				taken[id] = true;
 				held.forEach(function (c) { try { clones.push(JSON.parse(JSON.stringify(c))); nComments++; } catch (err) { /* skipped */ } });
 				clones.push(clone);
 				added.push(id);
 			});
-			plan.push({ kind: kind, spec: spec, clones: clones, added: added, clashed: clashed, comments: nComments });
+			plan.push({ kind: kind, spec: spec, clones: clones, added: added, clashed: clashed, comments: nComments, left: nLeft + pendingComments.length });
 		});
 		if (plan.some(function (p) { return p.clones.length > 0; })) {
 			// ONE snapshot for the whole wizard: the user pressed one button, so one Undo puts the
@@ -70265,6 +70266,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			if (p.comments) {
 				lines.push((pc.lpn_library_import_comments || 'Comment rows copied in with them: {n}').replace('{n}', String(p.comments)));
+			}
+			if (p.left) {
+				lines.push((pc.lpn_library_import_comments_left || 'Comment rows not copied in, because no item they stand above was copied: {n}').replace('{n}', String(p.left)));
 			}
 			if (p.clashed.length) {
 				lines.push((pc.lpn_library_import_conflict || 'Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.')
