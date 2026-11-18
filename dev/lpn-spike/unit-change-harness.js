@@ -35,7 +35,7 @@ const L = loadLoopedNetwork(
 	"\t\tonUnitChange: onUnitChange, remember: rememberUnitSelections,\n" +
 	"\t\tapplyUnitSelections: applyUnitSelections, readUnitSelections: readUnitSelections,\n" +
 	"\t\tunitKey: unitKey, undo: undo, undoDepth: function () { return undoStack.length; },\n" +
-	"\t\tINPUTS: LPN_UNIT_SELECTS,\n" +
+	"\t\tINPUTS: LPN_UNIT_SELECTS, getSettings: function () { return settings; },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +
@@ -273,7 +273,7 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	pickUnit('lpn_u_length', 'm');
 	setDecimals(0);
 	press('Convert');
-	ok('Length: Decimals 0 rounds to whole meters (216)', L.getDoc().links[0]._length === 216, String(L.getDoc().links[0]._length));
+	ok('Length: Decimals 0 never leaves fewer than 4 significant figures (216.4)', L.getDoc().links[0]._length === 216.4, String(L.getDoc().links[0]._length));
 	L.undo();
 	pickUnit('lpn_u_length', 'm');
 	setDecimals(4);
@@ -338,7 +338,86 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	pickUnit('lpn_u_volume', 'gal');
 	setDecimals(0);
 	press('Convert');
-	ok('a nonzero number the rounding would zero is kept at six significant figures', T().minVolume > 0, String(T().minVolume));
+	ok('a nonzero number the rounding would zero is kept to 4 significant figures', T().minVolume > 0, String(T().minVolume));
+}
+
+// ---- 7. Rounding never costs accuracy (code review: 150 mm as 6 in is 1.6% off) ----------------------
+{
+	console.log('\n--- accuracy under the default Decimals ---');
+	function one(name, to, mk, read, want) {
+		L.reset(); L.setCanvas(800, 600);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'mm', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'lps', lpn_u_roughness: 'mm', lpn_u_volume: 'ft3' });
+		L.remember();
+		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0), t = L.addNode('tank', 200, 0);
+		const pipe = L.addLink('pipe', r.id, j.id);
+		mk(j, pipe, t); L.buildDom();
+		pickUnit(name, to);
+		press('Convert');
+		const got = read(L.getDoc());
+		ok(name + ' -> ' + to + ' within 0.05% of the exact value', Math.abs(got - want) <= 5e-4 * Math.abs(want), got + ' against ' + want);
+	}
+	one('lpn_u_diameter', 'in', (j, p) => { p.diameter = undefined; L.setProp(p, 'diameter', 150); }, (d) => d.links[0]._diameter, 150 / 25.4);
+	one('lpn_u_flow', 'gpm', (j) => { L.setProp(j, 'demand', 0.02); }, (d) => d.nodes[1]._demand, 0.02 / 0.0630901964);
+	one('lpn_u_volume', 'acft', (j, p, t) => { L.setProp(t, 'minVolume', 1000); }, (d) => d.nodes[2].minVolume, 1000 / 43560);
+	// Darcy-Weisbach roughness, 2 mm in millimeters to feet (0.0066 ft, not 0.01).
+	{
+		L.reset(); L.setCanvas(800, 600);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_roughness: 'mm' });
+		L.remember();
+		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0), p = L.addLink('pipe', r.id, j.id);
+		L.getSettings().method = 'dw';
+		L.setProp(p, 'roughness', 2); L.buildDom();
+		pickUnit('lpn_u_roughness', 'ft');
+		press('Convert');
+		const got = L.getDoc().links[0]._roughness;
+		ok('Darcy-Weisbach roughness 2 mm -> ft within 0.05%', Math.abs(got - 2 / 304.8) <= 5e-4 * 2 / 304.8, String(got));
+	}
+}
+
+// ---- 8. Enter after a keyboard unit change keeps (code review: Convert was the focused button) ------
+{
+	console.log('\n--- the focused answer is Keep ---');
+	buildNetwork();
+	pickUnit('lpn_u_length', 'm');
+	const btns = byId.lpn_dialog_buttons.children;
+	ok('the visual order is still Convert, Keep, Cancel', JSON.stringify(btns.map(b => b.textContent)) === JSON.stringify([PC.lpn_convas_ok, PC.lpn_units_keep, PC.lpn_cancel]));
+	ok('Keep holds the focus', global.document.activeElement === btns[1], global.document.activeElement && global.document.activeElement.textContent);
+	press('Keep');
+}
+
+// ---- 9. Settings > New assets numbers, the legacy Volume fallback, the stale token -------------------
+{
+	console.log('\n--- the other numbers a Convert owes ---');
+	buildNetwork();
+	const d0 = L.getSettings().defaults.diameter;
+	pickUnit('lpn_u_diameter', 'mm');
+	press('Convert');
+	const d1 = L.getSettings().defaults.diameter;
+	ok('Convert moves the New assets diameter too (' + d0 + ' in -> ' + d1 + ' mm)', Math.abs(d1 - d0 * 25.4) <= 5e-4 * d0 * 25.4, String(d1));
+	buildNetwork();
+	const d2 = L.getSettings().defaults.diameter;
+	pickUnit('lpn_u_diameter', 'mm');
+	press('Keep');
+	ok('Keep leaves the New assets diameter alone', L.getSettings().defaults.diameter === d2);
+	// A project saved before the Volume selector: its volume unit comes from its own length unit.
+	['ft', 'm', 'in'].forEach((k) => {
+		const units = { lpn_u_length: k }, copy = JSON.stringify(units);
+		L.applyUnitSelections(units);
+		const want = k === 'm' ? 'm3' : 'ft3';
+		ok('a legacy project in ' + k + ' opens on ' + want + ' whatever the last project left', L.unitKey('lpn_u_volume') === want, L.unitKey('lpn_u_volume'));
+		ok('...and the caller\'s units object is not written to', JSON.stringify(units) === copy);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_volume: 'l' });
+	});
+	// The converted Minimum volume sheds the file's text for the old number.
+	L.reset(); L.setCanvas(800, 600);
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_volume: 'ft3' });
+	L.remember();
+	const t = L.addNode('tank', 0, 0);
+	L.setProp(t, 'minVolume', 20000); L.getDoc().nodes[0].tok = { minVolume: '20000.0' };
+	L.buildDom();
+	pickUnit('lpn_u_volume', 'gal');
+	press('Convert');
+	ok('the converted Minimum volume keeps no stale .inp text', !(L.getDoc().nodes[0].tok && L.getDoc().nodes[0].tok.minVolume), JSON.stringify(L.getDoc().nodes[0].tok));
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

@@ -691,8 +691,8 @@
 	 * file's own units, and the document keeps them as the file wrote them: js/looped-network.js
 	 * converts the abscissa of a FLOW-bearing curve on import and deliberately leaves this kind
 	 * alone. The level is a vertical distance on the same staff as every other one on a tank, so it
-	 * is the Elevation/Head unit. The Volume selector governs only a tank's Available volume
-	 * result and never a curve's numbers: the ordinate is in the file's volume, which EPANET pairs
+	 * is the Elevation/Head unit. The Volume selector governs a tank's typed Minimum volume
+	 * and its volume results, and never a curve's numbers: the ordinate is in the file's volume, which EPANET pairs
 	 * with the length (cubic feet under US flow units, cubic metres under SI). So the ordinate's
 	 * factor is the abscissa's CUBED, taken from the one converter this file is handed rather than
 	 * from a second table, and the two axes therefore always reinterpret together, which is the only

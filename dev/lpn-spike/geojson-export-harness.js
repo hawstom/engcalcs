@@ -272,6 +272,15 @@ console.log('\n7. Pattern and curve fields carry the numbers; *_name carries the
 		JSON.parse('[' + pmp.pump_curve.replace(/\(/g, '[').replace(/\)/g, ']') + ']').every((q, i, a) => i === 0 || q[0] > a[i - 1][0]));
 	const tk = feat(true, '1').properties;
 	ok('a tank carries min_vol, 0', tk.min_vol === 0 && 'min_vol' in tk && !('min_vol' in feat(true, '10').properties));
+	{
+		const w2 = WORLD();
+		const t2 = w2.nodes.find((n) => n.type === 'tank');
+		t2.minVolume = 1234.5;
+		w2.units = Object.assign({}, w2.units, { lpn_u_volume: 'gal' });
+		const g2 = JSON.parse(EngCalcs.lpnExportGeoJson(w2, {}).text);
+		const p2 = g2.features.find((f) => f.properties.node_type && f.properties.name === String(t2.id)).properties;
+		ok('a tank with a typed Minimum volume writes it as typed, with the Volume unit named', p2.min_vol === 1234.5 && p2.units && p2.units.min_vol === 'gal', JSON.stringify([p2.min_vol, p2.units && p2.units.min_vol]));
+	}
 	const lvl = JSON.stringify(g).indexOf('"demand_pattern":"3"');
 	ok('no pattern or curve FIELD holds a bare name (Gusnet would read "3" as a one-multiplier pattern)', lvl < 0);
 }

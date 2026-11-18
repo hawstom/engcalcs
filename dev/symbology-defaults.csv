@@ -14,7 +14,7 @@ Pressure	1	P=			2	3	11	28	node:pressure
 Concentration	0		 mg/L	 mg/L	1	1	12	22	node:quality:chemical
 Source share	0		%	%	0	0	13	20	node:quality:trace
 Water age	0		 hr	 hr	1	1	14	18	node:quality:age
-Initial volume	0	Vi=			0	1	15	30	node:initVolume
+Initial volume	0	Vi=			0	1	15	11	node:initVolume
 									
 ## Link									
 ID	1						1	2	link:id

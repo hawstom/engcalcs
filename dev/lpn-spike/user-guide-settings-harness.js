@@ -7,7 +7,7 @@
 //   3. The sections and sub-headings the chapter lists are the box's own, in order, with the saved
 //      marks it states, and the Settings tab in Tables has the columns it names.
 //   4. The searches the chapter gives return what it says, a word in a tip included.
-//   5. The units example is performed on Net1: the question, Convert (13 values, 457 mm, one
+//   5. The units example is performed on Net1: the question, Convert (13 values, 457.2 mm, one
 //      Undo), Keep (13 values untouched, 18 mm).
 //   6. Restore defaults and Start fresh ask the questions the chapter describes, Undo does not
 //      reverse Restore defaults, and in a scenario Restore defaults is dimmed, the units note shows,
@@ -50,7 +50,7 @@ const STRUCTURE = [
 // The numbers the units example states, read out of the chapter so a changed example is re-measured.
 function unitsExample() {
 	const t = plain(enString('lpn_guide_set_units_def'));
-	const d = t.match(/Convert rewrites (\d+) values, and Pipe 10 reads ([\d.]+) mm with Decimals 0\./);
+	const d = t.match(/Convert rewrites (\d+) values, and Pipe 10 reads ([\d.]+) mm\./);
 	const n = t.match(/Keep leaves the (\d+) values alone, and Pipe 10 reads ([\d.]+) mm\./);
 	return { d: d && d.slice(1), n: n && n.slice(1) };
 }

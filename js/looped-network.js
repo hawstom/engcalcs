@@ -9223,7 +9223,7 @@ var EngCalcs = EngCalcs || {};
 			initQuality: { on: false, before: 'Init. ', show: 6, drop: 16, dec: 2, units: true },
 			demandActual: { on: false, before: 'Q=', show: 7, drop: 26, dec: 'u' },
 			level: { on: false, before: 'Y=', show: 9, drop: 12, dec: 'u' },
-			initVolume: { on: false, before: 'Vi=', show: 15, drop: 30, dec: 'u' },
+			initVolume: { on: false, before: 'Vi=', show: 15, drop: 11, dec: 'u' },
 			head: { on: false, before: 'H=', show: 10, drop: 14, dec: 'u' },
 			pressure: { on: true, before: 'P=', show: 11, drop: 28, dec: 'u' },
 			quality: { on: false, before: '', dec: 1, decTrace: 0, units: true,
@@ -51086,9 +51086,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// Nearest `step`, then written with no more decimals than the step has, so 0.1 gives 12.3 and
 	// not 12.299999999999999.
+	// **THE ONE ROUNDING OF A CONVERTED NUMBER** (the strip's Decimals and Convert as's steps both come
+	// here, so the two doors give the same document). A step that would leave fewer than four
+	// significant figures (150 mm as 6 in is 1.6% off) is overruled: the value is kept to four.
 	function roundToStep(v, step) {
-		var d = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
-		return +(Math.round(v / step) * step).toFixed(d);
+		var d = Math.max(0, -Math.floor(Math.log10(step) + 1e-9)), r = +(Math.round(v / step) * step).toFixed(d);
+		if (v !== 0 && isFinite(v) && Math.abs(r - v) > Math.abs(v) * 5e-4) { return +v.toPrecision(4); }
+		return r;
 	}
 	// **ONLY WHAT THIS CONVERSION REWROTE.** A number whose unit did not change is the user's as
 	// typed, and rounding it would be a second edit nobody asked for.
@@ -61798,7 +61802,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return units;
 	}
+	// The cubic unit of a Length unit: the volume option (ft3, m3) whose factor is nearest the length's
+	// factor cubed, for every length key, so a project saved before the Volume selector existed never
+	// borrows whatever the last project left showing. undefined when no volume option is offered.
+	function cubedVolumeUnit(lengthKey) {
+		var f = EngCalcs.unitFactors && EngCalcs.unitFactors[lengthKey], sel = unitEl('lpn_u_volume'), best, bd = Infinity, i, k, g, d;
+		if (!(f > 0) || !sel || !sel.options) { return undefined; }
+		for (i = 0; i < sel.options.length; i++) {
+			k = sel.options[i].value; g = EngCalcs.unitFactors[k];
+			if (!/3$/.test(k) || !(g > 0)) { continue; }
+			d = Math.abs(Math.log(g / (f * f * f)));
+			if (d < bd) { bd = d; best = k; }
+		}
+		return best;
+	}
 	function applyUnitSelections(units) {
+		// A copy: the caller's object (a saved record, a parsed file) is never written to here.
+		units = units ? Object.assign({}, units) : units;
 		reconcileLegacyUnits(units);
 		// Cleared unconditionally, INCLUDING on the early return: this function is the one place a
 		// document's units are installed, so it owns the whole of that state. Clearing only in the
@@ -61808,10 +61828,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A project saved before the Volume selector existed typed its Minimum volume in the Length unit
 		// cubed: take that (feet: cubic feet; metres: cubic metres), as an .inp import does, so no
 		// number changes meaning and never whatever the last project left showing.
-		if (!units.lpn_u_volume && units.lpn_u_length) {
-			units.lpn_u_volume = units.lpn_u_length === 'm' ? 'm3' : (/ft/.test(units.lpn_u_length) ? 'ft3' : undefined);
-			if (!units.lpn_u_volume) { delete units.lpn_u_volume; }
-		}
+		if (!units.lpn_u_volume && units.lpn_u_length) { units.lpn_u_volume = cubedVolumeUnit(units.lpn_u_length); }
+		if (!units.lpn_u_volume) { delete units.lpn_u_volume; }
 		var changed = false;
 		LPN_UNIT_SELECTS.forEach(function (name) {
 			var want = units[name], sel = unitEl(name), i;
@@ -61914,14 +61932,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function convertUnitValues(name, k, dec) {
 		var n = 0;
 		// `dec`, when given, is the Decimals the visitor chose in the unit question: every converted
-		// input is rounded to that many places. A nonzero number the rounding would turn into zero
-		// is kept at six significant figures instead, so a small limit never silently becomes 0.
-		function rnd(v) {
-			var r;
-			if (typeof dec !== 'number') { return v; }
-			r = +v.toFixed(dec);
-			return (r === 0 && v !== 0) ? +v.toPrecision(6) : r;
-		}
+		// input is rounded to that many places by roundToStep(), the one rounding of this page, which
+		// never leaves a number under four significant figures.
+		function rnd(v) { return typeof dec === 'number' ? roundToStep(v, Math.pow(10, -dec)) : v; }
 		function conv(obj, prop) {
 			if (!obj || typeof obj[prop] !== 'number') { return; }
 			obj[prop] = rnd(obj[prop] * k);
@@ -61975,9 +61988,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Length change leaves it alone, as an Elevation/Head change leaves a tank diameter alone.
 			// A stated zero is EPANET's "no separate minimum volume" and means the same in any unit, so
 			// it is neither counted (it would ask the question over nothing) nor rewritten.
-			doc.nodes.forEach(function (nd) { if (nd.minVolume) { conv(nd, 'minVolume'); } });
+			// The file's own text for the old number goes too (CLAUDE.md's token rule: the text must still
+			// SAY the value), and a converted tank is redrawn, so nothing keeps the old volume.
+			function convVol(o) {
+				if (!o || !o.minVolume) { return false; }
+				conv(o, 'minVolume');
+				if (k !== 1 && o.tok) { delete o.tok.minVolume; }   // base-write: a unit change rewrites Base and every scenario together
+				return true;
+			}
+			doc.nodes.forEach(function (nd) { if (convVol(nd) && k !== 1 && nodeEls[nd.id]) { updateNode(nd.id, true); } });
 			eachOverrideMap(function (map) {
-				Object.keys(map).forEach(function (key) { if (map[key] && map[key].minVolume) { conv(map[key], 'minVolume'); } });
+				Object.keys(map).forEach(function (key) { convVol(map[key]); });
 			});
 		} else if (name === 'lpn_u_diameter') {
 			doc.links.forEach(function (l) { conv(l, '_diameter'); });
@@ -62151,14 +62172,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				saveUndoSnapshot();
 				applyOneUnit(name, to);
 				n = (fOld && fNew) ? convertUnitValues(name, fNew / fOld, dec) : 0;
+				// Settings > New assets numbers go with the network's, as Convert as does it.
+				if (fOld && fNew) { convertDefaultInputs(name, fNew / fOld); }
 				rememberUnitSelections();
 				afterUnitChange(unitFromMap(name, from));
 				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
-			// **KEEP IS THE SUITE'S STANDING BEHAVIOUR**: changing a unit reinterprets the typed
-			// number and does not convert it (CLAUDE.md, absolute).
-			{ label: pc.lpn_units_keep || 'Keep', fn: function () {
+			// **KEEP IS THE SUITE'S STANDING BEHAVIOUR, AND THE QUIET PATH**: changing a unit
+			// reinterprets the typed number and does not convert it (CLAUDE.md, absolute). It is the
+			// answer the dialog focuses (isDefault), so an Enter after a keyboard unit change keeps
+			// the numbers; Convert, the first button, is reached only by choosing it.
+			{ label: pc.lpn_units_keep || 'Keep', isDefault: true, fn: function () {
 				var n = countUnitValues(name);
 				applyOneUnit(name, to);
 				rememberUnitSelections();
@@ -62278,13 +62303,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				changes.forEach(function (c) {
 					var fOld = EngCalcs.unitFactors[c.from], fNew = EngCalcs.unitFactors[c.to];
 					applyOneUnit(c.name, c.to);
-					if (fOld && fNew) { n += convertUnitValues(c.name, fNew / fOld, unitDecimalsOf(fields, c.name)); }
+					if (fOld && fNew) {
+						n += convertUnitValues(c.name, fNew / fOld, unitDecimalsOf(fields, c.name));
+						convertDefaultInputs(c.name, fNew / fOld);
+					}
 				});
 				finish();
 				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
 					.replace('{n}', String(n)).replace('{unit}', names()));
 			} },
-			{ label: pc.lpn_units_keep || 'Keep', fn: function () {
+			{ label: pc.lpn_units_keep || 'Keep', isDefault: true, fn: function () {
 				var n = 0;
 				asked.forEach(function (c) { n += countUnitValues(c.name); });
 				applyAll();
@@ -72495,6 +72523,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// The file's own lines and tokens state numbers the document no longer holds.
 			delete c.src; delete c.tok;
 			libCommit();
+			// A tank's Initial volume label reads this curve, so the labels owe a pass.
+			if (c.kind === 'volume') { requestLabelRefresh(); }
 			refreshPopupIfOpen();
 			return true;
 		}
