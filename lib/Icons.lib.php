@@ -56,20 +56,21 @@ define('EC_WELL_CY', 14);          // the circle's centre, from the top
 define('EC_WELL_ARROW_TOP', 3);    // the arrow's tip
 define('EC_WELL_ARROW_BOTTOM', 21.5);   // where the shaft ends, below the circle
 define('EC_WELL_JOIN_X', 13.5);    // where a vessel begins
-function ecWellMark($cx, $vessel, $join) {
+function ecWellMark($cx, $vessel, $join, $vy = 0) {
 	$r = EC_WELL_R; $cy = EC_WELL_CY; $t = EC_WELL_ARROW_TOP; $e = EC_WELL_ARROW_BOTTOM; $w = 3; $h = 3.2;
 	$circle = 'M' . ($cx - $r) . ' ' . $cy . 'a' . $r . ' ' . $r . ' 0 1 0 ' . (2 * $r) . ' 0a' . $r . ' ' . $r . ' 0 1 0 ' . (-2 * $r) . ' 0Z';
 	$x1 = $vessel === '' ? $cx + $r : 22.5;
-	return '<path data-ax="' . $cx . '" data-ay="' . $cy . '" data-x0="' . ($cx - $r) . '" data-y0="' . $t . '" data-x1="' . $x1 . '" data-y1="' . $e . '" d="' . $circle . $vessel . '"/>'
+	$vc = $vessel === '' ? '' : ' data-vx="' . ((EC_WELL_JOIN_X + 22.5) / 2) . '" data-vy="' . $vy . '"';
+	return '<path data-ax="' . $cx . '" data-ay="' . $cy . '"' . $vc . ' data-x0="' . ($cx - $r) . '" data-y0="' . $t . '" data-x1="' . $x1 . '" data-y1="' . $e . '" d="' . $circle . $vessel . '"/>'
 		. '<path d="M' . $cx . ' ' . $e . 'V' . $t . 'M' . ($cx - $w) . ' ' . ($t + $h) . 'L' . $cx . ' ' . $t . 'L' . ($cx + $w) . ' ' . ($t + $h) . '"/>'
 		. ($join ? '<path d="M' . ($cx + $r) . ' ' . $cy . 'H' . EC_WELL_JOIN_X . '"/>' : '');
 }
 // A Well on its own stands at the middle of the frame; with a tank the circle moves left to make room for the vessel.
 function ecWellIcon() { return ecWellMark(12, '', false); }
 // An open-air tank, a rectangle (N2 of the proofs).
-function ecWellTankIcon() { return ecWellMark(7, 'M' . EC_WELL_JOIN_X . ' 9h9v10h-9Z', true); }
+function ecWellTankIcon() { return ecWellMark(7, 'M' . EC_WELL_JOIN_X . ' 9h9v10h-9Z', true, 14); }
 // A pressure tank, an upright capsule (N3).
-function ecWellPressureTankIcon() { return ecWellMark(7, 'M' . EC_WELL_JOIN_X . ' 10a4.5 4.5 0 0 1 9 0v7a4.5 4.5 0 0 1-9 0Z', true); }
+function ecWellPressureTankIcon() { return ecWellMark(7, 'M' . EC_WELL_JOIN_X . ' 10a4.5 4.5 0 0 1 9 0v7a4.5 4.5 0 0 1-9 0Z', true, 13.5); }
 
 $ec_icons = array(
 

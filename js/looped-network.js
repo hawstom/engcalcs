@@ -12028,7 +12028,7 @@ var EngCalcs = EngCalcs || {};
 	// capsule (Well with pressure tank). The icon's FIRST path is the silhouette, the circle and the vessel, and carries the circle's centre (`data-ax`, `data-ay`, the point that
 	// stands on the node) and the drawing's bounds (`data-x0 .. data-y1`), all in the 24-unit frame, so no number is written twice. The silhouette is the backdrop and the grab
 	// shape. The literal is for a page with no icons.
-	var WELL_GEOMETRY_FALLBACK = { d: 'M7.7 14a4.3 4.3 0 1 0 8.6 0a4.3 4.3 0 1 0 -8.6 0Z', ax: 12, ay: 14, x0: 7.7, y0: 3, x1: 16.3, y1: 21.5 };
+	var WELL_GEOMETRY_FALLBACK = { d: 'M7.7 14a4.3 4.3 0 1 0 8.6 0a4.3 4.3 0 1 0 -8.6 0Z', ax: 12, ay: 14, x0: 7.7, y0: 3, x1: 16.3, y1: 21.5, vx: 18, vy: 14 };
 	var wellGeometryCache = {};
 	function wellGeometry(kind) {
 		var svgEl, p, g;
@@ -12037,7 +12037,7 @@ var EngCalcs = EngCalcs || {};
 		p = svgEl && svgEl.querySelector ? svgEl.querySelector('path') : null;
 		if (!p) { return WELL_GEOMETRY_FALLBACK; }
 		g = { d: p.getAttribute('d') };
-		['ax', 'ay', 'x0', 'y0', 'x1', 'y1'].forEach(function (k) {
+		['ax', 'ay', 'x0', 'y0', 'x1', 'y1', 'vx', 'vy'].forEach(function (k) {
 			var v = p.getAttribute('data-' + k);
 			g[k] = v === null || v === undefined || v === '' ? WELL_GEOMETRY_FALLBACK[k] : +v;
 		});
@@ -12045,7 +12045,14 @@ var EngCalcs = EngCalcs || {};
 		return g;
 	}
 	// Which of the three drawings a Well is: alone, with an open-air tank, with a pressure tank.
-	function wellKindOf(a) { return a && a.tank ? (a.pt ? 'welltankp' : 'welltank') : 'well'; }
+	// **A WELL AND ITS TANK ARE DRAWN AS ONE JOINED SYMBOL ONLY WHEN THE TANK AND THE TEE JOIN NOTHING BUT THE ASSEMBLY** (round 13): the tank, the tee and the two short pipes are then
+	// not drawn at their own points. A pipe that joins the tee or the tank means the network goes on from them, so everything is drawn as itself and the Well as the Well alone.
+	function wellJoined(a) {
+		var br = a && a.kind === 'well' && wellHasTank(a) ? a.branch : null;
+		function only(id) { return (incidentLinks[id] || []).every(function (l) { return br.indexOf(l) >= 0; }); }
+		return !!(br && br.length >= 2 && a.tee && nodeById(a.tee) && only(a.tank) && only(a.tee));
+	}
+	function wellKindOf(a) { return wellJoined(a) ? (a.pt ? 'welltankp' : 'welltank') : 'well'; }
 	function wellSymbolKind(n) { var a = n ? assemblyOfNode(n.id) : null; return a && a.kind === 'well' ? wellKindOf(a) : 'well'; }
 	function wellSilhouette(kind) { return wellGeometry(kind || 'well').d; }
 	// A joined symbol's two grab shapes: the circle (the Well's) and the vessel (the tank's). The silhouette is the circle's subpath, then the vessel's.
@@ -12059,7 +12066,7 @@ var EngCalcs = EngCalcs || {};
 	// The Well whose joined symbol draws this tank, else null: the tank is drawn with the Well, at its outlet.
 	function hostWellOfTank(n) {
 		var a = wellTankOwner(n);
-		return a && nodeById(a.nodes[2]) && nodeEls[a.nodes[2]] ? a : null;
+		return a && wellJoined(a) && nodeById(a.nodes[2]) && nodeEls[a.nodes[2]] ? a : null;
 	}
 	// How far the Well's drawing reaches from the node, in the symbol's own 24-unit frame: the farthest corner of its bounds from the circle's centre.
 	function wellReach(kind) {
@@ -12114,12 +12121,12 @@ var EngCalcs = EngCalcs || {};
 	function syncNodeHit(n, hitEl) {
 		var ne = nodeEls[n.id],
 			hit = hitEl || (ne && ne.hit),
-			s = state.s || 1, box, kx, ky, an, hw, tn;
+			s = state.s || 1, box, kx, ky, an, hw, tk;
 		if (!hit) { return; }
 		if (String(hit.tagName || '').toLowerCase() === 'path') {
 			// A tank drawn with its Well has its grab shape on the joined symbol's vessel, so it is placed as the Well's symbol is.
 			hw = hostWellOfTank(n);
-			if (hw) { tn = n; n = nodeById(hw.nodes[2]); }
+			if (hw) { n = nodeById(hw.nodes[2]); }
 			box = nodeSymbolSize(n);
 			kx = box.w / 24; ky = box.h / 24;
 			an = symbolAnchor(n);
@@ -12127,6 +12134,8 @@ var EngCalcs = EngCalcs || {};
 				'translate(' + (nodeDrawX(n) - (an ? an.ax * kx : box.w / 2)) + ',' + (nodeDrawY(n) - (an ? an.ay * ky : box.h / 2)) + ') scale(' + kx + ',' + ky + ')');
 			// Local units: the path lives inside that scale, so a screen pixel is 1 / (s * kx) of one.
 			hit.style.setProperty('--lpn-nhit', LPN_NODE_HIT_PX / (s * kx));
+			// A Well that moves takes the grab shape and the selection mark of the tank drawn with it along.
+			if (!hw && wellRoleOf(n.id) === 'T') { tk = assemblyOfNode(n.id); tk = tk && tk.tank ? nodeById(tk.tank) : null; if (tk && hostWellOfTank(tk) && nodeEls[tk.id] && nodeEls[tk.id].hit) { syncNodeHit(tk, nodeEls[tk.id].hit); vesselMarkSync(tk, nodeEls[tk.id].hit.getAttribute('d')); } }
 			return;
 		}
 		hit.setAttribute('cx', nodeDrawX(n)); hit.setAttribute('cy', nodeDrawY(n));
@@ -23151,7 +23160,7 @@ var EngCalcs = EngCalcs || {};
 	// override mark does.
 	function selectionMarkEl(sel) {
 		if (!sel) { return null; }
-		if (sel.kind === 'node') { return nodeEls[sel.id] && nodeEls[sel.id].circle; }
+		if (sel.kind === 'node') { return nodeEls[sel.id] && (nodeEls[sel.id].vesselMark || nodeEls[sel.id].circle); }
 		if (sel.kind === 'link') { return linkEls[sel.id] && (linkEls[sel.id].halo || linkEls[sel.id].line); }
 		// A meter wears the mark on its BOX, which is the whole symbol -- there is no halo under it
 		// and the connector is not pickable, so the box is what a reader sees and grabs.
@@ -24086,10 +24095,14 @@ var EngCalcs = EngCalcs || {};
 		var out = [];
 		if (!ring || ring.length < 3) { return out; }
 		doc.nodes.forEach(function (n) {
-			if (inArea(ring, nodeDrawX(n), nodeDrawY(n))) { out.push({ kind: 'node', id: n.id }); }
+			// A tank drawn with its Well is where its vessel is, and its hidden tee stays where it is not drawn: neither is caught at an empty place.
+			var jp = joinedHidden.nodes[n.id] ? joinedTankPoint(n) : null;
+			if (joinedHidden.nodes[n.id] && !jp) { return; }
+			if (inArea(ring, jp ? jp.x : nodeDrawX(n), jp ? jp.y : nodeDrawY(n))) { out.push({ kind: 'node', id: n.id }); }
 		});
 		doc.links.forEach(function (l) {
 			var a = nodeAt(nodeById(l.from)), b = nodeAt(nodeById(l.to));
+			if (joinedHidden.links[l.id]) { return; }
 			// BOTH ends, and a link missing one of them is not caught at all: a dangling link is a
 			// defect of the document and a marquee is not the place to make a decision about it.
 			if (a && b && inArea(ring, a.x, a.y) && inArea(ring, b.x, b.y)) {
@@ -27489,7 +27502,8 @@ var EngCalcs = EngCalcs || {};
 		var spec = replaceSpec(replaceState.prop), out = [];
 		if (!spec) { return out; }
 		replaceFoundSet().forEach(function (c) {
-			if (!replaceSpecGroupOk(spec, c.group) || !spec.applies(c.el)) { return; }
+			// A Well's tank is left out of the typed push but not of the DEM fill: the program's own reading, which passes the lock (ownerOfProp()).
+			if (!replaceSpecGroupOk(spec, c.group) || !(spec.applies(c.el) || (spec.prop === 'elev' && wellTankOwner(c.el)))) { return; }
 			out.push({ group: c.group, id: c.el.id });
 		});
 		return out;
@@ -33220,6 +33234,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A pressure tank has no use for its diameter, minimum volume or overflow (its volume curve sets volume against depth), so those cells say "Not used", as Properties draws no row.
 	function paneOnPressureTank(el) { return !!pressureTankOwner(el); }
 	function paneOwnedFor(prop) { return function (el) { return !!ownerOfProp(el, prop); }; }
+	// Whether this cell shows its plain word ("Not used", "Attached") rather than a value: plain for this row, and the column says the word applies to it.
+	function paneCellPlainWordOn(c, el) { return !!(c.plainWord && c.plainFor && c.plainFor(el) && (!c.plainWordIf || c.plainWordIf(el))); }
 	function paneCellIsPlain(c, el) {
 		return !!(c.result || !c.set || (c.plainFor && c.plainFor(el)) || (c.roFor && c.roFor(el)));
 	}
@@ -33266,7 +33282,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **THE PER-ROW PLAIN WORD COMES FIRST**, because a column that is plain for THIS row is a
 		// column whose stored value is not the answer: see paneTextAttachedWord(). One function
 		// decides what a cell says, so the screen, the refill and the printed sheet all say it.
-		if (c.plainWord && c.plainFor && c.plainFor(el) && (!c.plainWordIf || c.plainWordIf(el))) { return c.plainWord(); }
+		if (paneCellPlainWordOn(c, el)) { return c.plainWord(); }
 		var v = c.get(el), d;
 		// **A COLUMN MAY BE A YES/NO, A CHOICE OR A LINE OF TEXT** (Tom, 2026-09-08: the Text table
 		// and the Active column). A yes/no reads as 1 or 0 -- what a pasted sheet can carry and
@@ -33302,7 +33318,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// printing a blank as blank. A per-row plain word still comes first.
 	function paneCellDisplayText(c, el, blankLabel) {
 		var v, choices, i, key;
-		if (!c.choices || c.bool || (c.plainWord && c.plainFor && c.plainFor(el) && (!c.plainWordIf || c.plainWordIf(el)))) { return paneCellText(c, el); }
+		if (!c.choices || c.bool || (paneCellPlainWordOn(c, el))) { return paneCellText(c, el); }
 		v = c.get(el);
 		if (!panePresent(v) && !blankLabel) { return ''; }
 		key = panePresent(v) ? v : '';
@@ -34172,7 +34188,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// the same sentence the property popup gives, so there is one explanation and not
 				// two. `ec-help` is what js/Calculators.lib.js wires the tap tooltip on, and
 				// initTipsIn() at the foot of renderPaneTable() picks it up.
-				if (c.plainWord && c.plainFor && c.plainFor(el) && (!c.plainWordIf || c.plainWordIf(el))) {
+				if (paneCellPlainWordOn(c, el)) {
 					td.className += ' lpn-pane-stated';
 					if (c.plainTip) { td.title = c.plainTip(); td.className += ' ec-help'; }
 				}
@@ -35007,7 +35023,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A cell that is plain FOR THIS ROW shows its plain word, and a paste that lands on it
 		// carrying that exact word back is the round trip a copy of this very cell produces -- not a
 		// stray write to refuse, a no-op to accept. See paneParseCellText()'s own comment.
-		if (c.plainWord && c.plainFor && c.plainFor(el) && (!c.plainWordIf || c.plainWordIf(el)) &&
+		if (paneCellPlainWordOn(c, el) &&
 			String(text === null || text === undefined ? '' : text).trim() === String(c.plainWord()).trim()) { return true; }
 		if (paneCellIsPlain(c, el) || !c.set) { return false; }
 		p = paneParseCellText(c, text, el);
@@ -40959,6 +40975,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		doc.links.push(l);
 		incidentLinks[fromId].push(id); incidentLinks[toId].push(id);
 		buildLinkEls(l);
+		joinedChanged();
 		scheduleSolve();
 		return l;
 	}
@@ -41245,26 +41262,36 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **A WELL WITH A TANK IS ONE POINT ON THE MAP** (Tom, round 13, option a): the joined symbol draws the tank, so the tank node's own symbol and label are not drawn, nor
 	// are its short pipes and the tee when nothing else joins the tee. Picking: the circle is the Well's and the vessel is the tank's (the tank's grab shape moves to it).
 	// Explode, or a lost member, draws every element as itself again. The tank's results are in the Well's box and its block.
+	var joinedHidden = { nodes: {}, links: {} }, joinedSeen = {};
 	function hideJoinedTanks() {
 		var nodes = {}, links = {};
 		assemblyList().forEach(function (a) {
-			var tee = a.tee && incidentLinks[a.tee];
-			if (a.kind !== 'well' || !wellHasTank(a) || !nodeEls[a.nodes[2]]) { return; }
-			nodes[a.tank] = 1;
-			(a.branch || []).forEach(function (id) { links[id] = 1; });
-			if (a.tee && nodeById(a.tee) && tee && tee.every(function (id) { return (a.branch || []).indexOf(id) >= 0; })) { nodes[a.tee] = 1; }
+			if (a.kind !== 'well') { return; }
+			joinedSeen[a.id] = wellJoined(a);
+			if (!joinedSeen[a.id] || !nodeEls[a.nodes[2]]) { return; }
+			nodes[a.tank] = 1; nodes[a.tee] = 1;
+			a.branch.forEach(function (id) { links[id] = 1; });
 		});
+		joinedHidden = { nodes: nodes, links: links };
 		function hid(e, on) { if (!e) { return; } if (e.length !== undefined && !e.classList) { Array.prototype.forEach.call(e, function (x) { hid(x, on); }); return; } if (e.classList) { e.classList.toggle('lpn-asm-hid', on); } }
 		doc.nodes.forEach(function (n) {
-			var ne = nodeEls[n.id], on = !!nodes[n.id], a = on ? wellTankOwner(n) : null;
+			var ne = nodeEls[n.id], on = !!nodes[n.id], host = on ? hostWellOfTank(n) : null, d;
 			if (!ne) { return; }
 			if (on || ne.joinedHid) {
 				[ne.circle, ne.symbolG, ne.symbol, ne.text, ne.leader, ne.lblHit].forEach(function (e) { hid(e, on); });
 				ne.joinedHid = on;
-				if (!a && ne.hit && on) { hid(ne.hit, true); }
-				if (!on && ne.hit) { hid(ne.hit, false); }
+				if (ne.hit && !host) { hid(ne.hit, on); }
 			}
-			if (hostWellOfTank(n) && ne.hit) { ne.hit.setAttribute('d', nodeHitSilhouette(n)); syncNodeHit(n, ne.hit); if (ne.hit.parentNode === nodesLayer) { nodesLayer.appendChild(ne.hit); } }
+			// The tank drawn with its Well keeps a grab shape on the vessel, and wears its selection there; both follow the Well.
+			if (host && ne.hit) {
+				d = nodeHitSilhouette(n);
+				if (ne.hit.getAttribute('d') !== d) { ne.hit.setAttribute('d', d); if (ne.hit.parentNode === nodesLayer) { nodesLayer.appendChild(ne.hit); } }
+				syncNodeHit(n, ne.hit);
+				vesselMarkSync(n, d);
+			} else if (ne.vesselMark) {
+				ne.vesselMark.remove(); ne.vesselMark = null;
+				if (ne.hit && n.type === 'tank') { ne.hit.setAttribute('d', nodeHitSilhouette(n)); syncNodeHit(n, ne.hit); }
+			}
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id], on = !!links[l.id];
@@ -41272,6 +41299,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			[le.line, le.halo, le.hit, le.handles, le.arrows, le.text, le.leader, le.lblHit, le.symbolG].forEach(function (e) { hid(e, on); });
 			le.joinedHid = on;
 		});
+	}
+	// The mark a selected tank wears when its own circle is not drawn: the vessel's outline, placed as the grab shape is.
+	function vesselMarkSync(n, d) {
+		var ne = nodeEls[n.id], hw = hostWellOfTank(n), host = hw && nodeById(hw.nodes[2]), box, kx, an;
+		if (!ne || !host) { return; }
+		if (!ne.vesselMark) {
+			ne.vesselMark = el('path', { 'class': 'lpn-vessel-mark' }, nodesLayer);
+			if (isSelected('node', n.id)) { ne.vesselMark.classList.add('lpn-selected'); }
+		}
+		box = nodeSymbolSize(host); kx = box.w / 24; an = symbolAnchor(host);
+		ne.vesselMark.setAttribute('d', d);
+		ne.vesselMark.setAttribute('transform', 'translate(' + (nodeDrawX(host) - an.ax * kx) + ',' + (nodeDrawY(host) - an.ay * kx) + ') scale(' + kx + ',' + (box.h / 24) + ')');
+	}
+	// Where a joined tank is on the map: the vessel's centre, the point a box-select must test.
+	function joinedTankPoint(n) {
+		var hw = hostWellOfTank(n), host = hw && nodeById(hw.nodes[2]), g, box;
+		if (!host) { return null; }
+		g = wellGeometry(wellKindOf(hw)); box = nodeSymbolSize(host);
+		return { x: nodeDrawX(host) + (g.vx - g.ax) * box.w / 24, y: nodeDrawY(host) + (g.vy - g.ay) * box.h / 24 };
+	}
+	// A change in what joins a tank or a tee can end (or begin) the joined drawing: redraw only then.
+	function joinedChanged() {
+		var changed = false;
+		assemblyList().forEach(function (a) { if (a.kind === 'well' && wellHasTank(a) && !!joinedSeen[a.id] !== wellJoined(a)) { changed = true; } });
+		if (changed) { syncAssemblyGlyphs(); }
 	}
 	// A node a split has just made takes the group's ID, and the counter its own prefix advanced for it is given back.
 	function renameFresh(node, newId) {
@@ -42071,6 +42123,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		l[end] = newId;   // base-write: identity -- a link's ends are not overridable, like its ID
 		incidentLinks[old] = (incidentLinks[old] || []).filter(function (x) { return x !== l.id; });
 		(incidentLinks[newId] = incidentLinks[newId] || []).push(l.id);
+		joinedChanged();
 		touched = [old, newId];
 		beginMapBoxHold();
 		beginLinkGeomHold();
@@ -43965,6 +44018,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
 		incidentLinks[l.to] = incidentLinks[l.to].filter(function (x) { return x !== id; });
 		doc.links = doc.links.filter(function (x) { return x.id !== id; });
+		joinedChanged();
 		purgeOverrides(ovKeyFor('link', id));   // see deleteNode()
 		if (currentPopup && currentPopup.kind === 'link' && currentPopup.id === id) { closePopup(); }
 		scheduleSolve();
@@ -77520,9 +77574,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		note.textContent = ownedSentence(a);
 		fields.appendChild(note);
 	}
-	// A tank's two elevations: the ground it stands on (read from the terrain like a junction's) and where its base sits (blank is the ground). `ownRow` is true in a tank's
-	// own box, where they are typed and the DEM row stands under the first; false there when a Well owns the tank, where they are read-only; undefined in the Well's box,
-	// where the Well types them (`door`: a write through the owner's door).
+	// A tank's two elevations: the ground it stands on (read from the terrain like a junction's) and where its base sits (blank is the ground). `own` is true for a tank nobody owns:
+	// typeable, with the DEM row. For a tank a Well owns it is false: read-only in the tank's own box, and typeable with the DEM row when `door` is true (the Well's box), written through the owner's door.
 	function tankElevationRows(fields, n, nodeId, own, door) {
 		var pc = EngCalcs.pageConfig || {}, eu = ' (' + unitLabel('lpn_u_elevhead') + ')', W = door ? viaOwnerDoor : function (f) { return f(); }, base;
 		if (own === false && !door) {
@@ -77535,7 +77588,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function () { return effective(n, 'elev'); },
 			function (v) { W(function () { setProp(n, 'elev', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_tank_ground_elev_tip, { el: n, prop: 'elev' });
-		if (own) { elevationDemRow(fields, n, nodeId, function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); }); }
+		if (own || door) { elevationDemRow(fields, n, nodeId, function (v) { W(function () { setProp(n, 'elev', v); }); updateNode(nodeId, true); }); }
 		unitNumberFieldBlank(fields, pc.lpn_field_tank_base_elev || 'Base elevation', 'lpn_u_elevhead',
 			function () { return effective(n, 'bottomElev'); },
 			function (v) { W(function () { setTankBottom(n, v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
@@ -77552,9 +77605,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (owner && !door) {
 			// Read-only, as the Well set them (syncPressureTank() or the Well's box). The rows keep the places an ordinary tank's have (PROP_ORDER).
 			popRows(fields, owner.pt ? '#owned' : '', function () {
-				readonlyField(fields, (pc.lpn_field_tank_level_short || 'Initial depth') + eu, effective(n, 'level'), pc.lpn_field_tank_level_short_tip, 4);
-				readonlyField(fields, (pc.lpn_field_tank_minlevel_short || 'Minimum depth') + eu, effective(n, 'minLevel'), pc.lpn_field_tank_minlevel_short_tip, 4);
-				readonlyField(fields, (pc.lpn_field_tank_maxlevel_short || 'Maximum depth') + eu, effective(n, 'maxLevel'), pc.lpn_field_tank_maxlevel_short_tip, 4);
+				readonlyField(fields, (pc.lpn_field_tank_level_short || 'Initial depth') + eu, lockedNumber(effective(n, 'level')), pc.lpn_field_tank_level_short_tip);
+				readonlyField(fields, (pc.lpn_field_tank_minlevel_short || 'Minimum depth') + eu, lockedNumber(effective(n, 'minLevel')), pc.lpn_field_tank_minlevel_short_tip);
+				readonlyField(fields, (pc.lpn_field_tank_maxlevel_short || 'Maximum depth') + eu, lockedNumber(effective(n, 'maxLevel')), pc.lpn_field_tank_maxlevel_short_tip);
 				if (owner.pt) { readonlyField(fields, pc.lpn_curve_kind_volume || 'Tank volume', effective(n, 'volCurve') || ''); }
 			});
 			if (!owner.pt) {
@@ -77646,7 +77699,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		idField(n.id, function (newId) { renameNode(nodeId, newId); }, 'node');
 		clearFields(fields);
 		// A tank a Well owns says so first, above every row (Tom, round 12 pass: "at the top of the box").
-		if (wellTankOwner(n)) { ownedTankNote(fields, wellTankOwner(n)); }
+		var tankOwner = wellTankOwner(n);
+		if (tankOwner) { ownedTankNote(fields, tankOwner); }
 		// **POSITION SITS IMMEDIATELY AFTER THE ID, ON TOM'S RULING OF 2026-09-15** -- `idField()`
 		// above writes the popup's header, so first in `fields` IS slot 2. His reason for one order
 		// across the popup AND the tables rather than two: *"one rule, no special case to
@@ -77696,12 +77750,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Elevation (depth and volume tank base)."*). Elevation is the ground, read and filled
 			// from the terrain exactly as a junction's is; the base is blank-means-the-ground, so its
 			// placeholder is the ground.
-			if (wellTankOwner(n)) {
-				// A Well's tank: its two elevations are the Well's, typed in the tank's section of the Well's box (wellTankOwnedRows()).
-				tankElevationRows(fields, n, nodeId, false);
-			} else {
-				tankElevationRows(fields, n, nodeId, true);
-			}
+			// A Well's tank: its two elevations are the Well's, typed in the tank's section of the Well's box (wellTankOwnedRows()).
+			tankElevationRows(fields, n, nodeId, !wellTankOwner(n));
 			tankDepthFields(fields, n, nodeId);
 			// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), shown on the same terms as the
 			// pipe pair: only while a chemical is being tracked, blank-capable because blank means

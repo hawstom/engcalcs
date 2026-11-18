@@ -28,7 +28,7 @@ require(ROOT + 'js/lpn-native-run.js');
 
 const L = loadLoopedNetwork(
 	"\t\townerOfProp: ownerOfProp, pushSpecList: pushSpecList, replaceOwnedNote: replaceOwnedNote, paneTables: paneTables, paneCellIsPlain: paneCellIsPlain,\n" +
-	"\t\tviaOwnerDoor: viaOwnerDoor, paneCellText: paneCellText,\n" +
+	"\t\tviaOwnerDoor: viaOwnerDoor, paneCellText: paneCellText, wellJoined: wellJoined, wellKindOf: wellKindOf, elementsInRing: elementsInRing, joinedTankPoint: joinedTankPoint, joinedHiddenNow: function () { return joinedHidden; }, terrainFillElevations: terrainFillElevations,\n" +
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode, getMode: function () { return mode; },\n" +
@@ -370,7 +370,7 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	const circle = (svg) => /d="M[\d.]+ 14a4\.3 4\.3 0 1 0 8\.6 0a4\.3 4\.3 0 1 0 -8\.6 0Z/.test(svg), arrow = (svg) => /V3M[\d.]+ 6\.2L[\d.]+ 3L[\d.]+ 6\.2/.test(svg);
 	ok('Well, Well with tank and Well with pressure tank draw one circle and one arrow, the same size in all three (the head 3.5 units clear of the circle)', [w0, w1, w2].every((x) => circle(x) && arrow(x)) && 14 - 4.3 - 6.2 > 3);
 	ok('the Well with tank joins that mark to a rectangle by a short run, the Well with pressure tank to a capsule', /M13\.5 9h9v10h-9Z/.test(w1) && /M11\.3 14H13\.5/.test(w1) && /a4\.5 4\.5 0 0 1 9 0v7a4\.5 4\.5 0 0 1-9 0Z/.test(w2) && /M11\.3 14H13\.5/.test(w2) && !/a4\.5 4\.5/.test(w1));
-	ok('the first path of each is the silhouette (circle and vessel) with the circle\'s centre and the drawing\'s bounds on it, for the map', /^<path data-ax="12" data-ay="14"/.test(w0) && /^<path data-ax="7" data-ay="14" data-x0="2\.7" data-y0="3" data-x1="22\.5" data-y1="21\.5" d="M2\.7 14/.test(w1) && /^<path data-ax="7" data-ay="14"/.test(w2));
+	ok('the first path of each is the silhouette (circle and vessel) with the circle\'s centre and the drawing\'s bounds on it, for the map', /^<path data-ax="12" data-ay="14"/.test(w0) && /^<path data-ax="7" data-ay="14" data-vx="18" data-vy="14" data-x0="2\.7" data-y0="3" data-x1="22\.5" data-y1="21\.5" d="M2\.7 14/.test(w1) && /^<path data-ax="7" data-ay="14"/.test(w2));
 	ok('the old cylinders and their constants are gone from the icon file', !/EC_WELL_UPPER_HALF|EC_WELL_STEP|ecWellDrawing|ec-water/.test(require('fs').readFileSync(ROOT + 'lib/Icons.lib.php', 'utf8')));
 	ok('and the pressure tank has an icon of its own', /'welltankp'\s*=>\s*ecWellPressureTankIcon\(\)/.test(require('fs').readFileSync(ROOT + 'lib/Icons.lib.php', 'utf8')));
 	const NATIVE = L.toSI(1, 'lpn_u_pressure');
@@ -721,6 +721,37 @@ for (const form of ['open-air', 'pressure', 'pressure in US units']) {
 	ok(form + ': the exploded tank\'s Minimum volume row is blank', mv === '' || mv === undefined || mv === null, JSON.stringify(mv));
 }
 setUnitSet('si');
+
+console.log('\n--- 12. round 13 review: joined only when nothing else joins, box-select, the DEM fill ---');
+{
+	const sq = (x, y, r) => [{ x: x - r, y: y - r }, { x: x + r, y: y - r }, { x: x + r, y: y + r }, { x: x - r, y: y + r }];
+	const caught = (x, y, r) => L.elementsInRing(sq(x, y, r)).map((e) => e.id);
+	let doc = fresh();
+	let a = place3(200, 150, 500, 150, 500, 400);
+	const tk = L.nodeById(a.tank);
+	ok('a Well whose tank and tee join nothing but the assembly is drawn joined: the tank, the tee and both branch pipes are the hidden set', L.wellJoined(a) && L.wellKindOf(a) === 'welltank' && L.joinedHiddenNow().nodes[a.tank] && L.joinedHiddenNow().nodes[a.tee] && a.branch.every((id) => L.joinedHiddenNow().links[id]));
+	const vp = L.joinedTankPoint(tk);
+	ok('the tank\'s place on the map is the vessel\'s, beside the Well and not at the tank\'s own point', Math.abs(vp.y - 150) < 40 && vp.x > 200 && Math.hypot(vp.x - 500, vp.y - 400) > 100, JSON.stringify(vp));
+	ok('a box round the empty place the tank really is catches nothing, and a box round the vessel catches the tank', !caught(500, 400, 30).includes(a.tank) && caught(vp.x, vp.y, 6).includes(a.tank), JSON.stringify([caught(500, 400, 30), caught(vp.x, vp.y, 6)]));
+	ok('and the hidden tee and branch pipes are not caught at their places', !caught(500, 150, 30).includes(a.tee) && a.branch.every((id) => !L.elementsInRing(sq(350, 270, 400)).some((e) => e.id === id)));
+	const j = L.addNode('junction', 700, 100);
+	L.addLink('pipe', a.tee, j.id, []);
+	ok('a pipe on the tee ends the joined drawing: the Well alone, and the tank, tee and both pipes are drawn as themselves', !L.wellJoined(a) && L.wellKindOf(a) === 'well' && Object.keys(L.joinedHiddenNow().nodes).length === 0 && Object.keys(L.joinedHiddenNow().links).length === 0);
+	ok('and a box round the tank\'s own point catches it again', caught(500, 400, 30).includes(a.tank) && caught(500, 150, 30).includes(a.tee));
+	doc = fresh(); a = place3(200, 150, 500, 150, 500, 400);
+	const j2 = L.addNode('junction', 800, 450);
+	L.addLink('pipe', a.tank, j2.id, []);
+	ok('a pipe on the tank alone ends it too', !L.wellJoined(a) && L.wellKindOf(a) === 'well');
+	// the DEM fill is the program\'s own write and passes the lock
+	doc = fresh(); a = place3(200, 150, 500, 150, 500, 400);
+	const t2 = L.nodeById(a.tank);
+	L.setProp(t2, 'elev', 40);
+	ok('a typed elevation on a Well\'s tank is still refused', L.effective(t2, 'elev') !== 40);
+	L.terrainFillElevations([{ id: a.tank, meters: 12.5 }], true);
+	ok('but the DEM fill writes it', L.effective(t2, 'elev') === 12.5, String(L.effective(t2, 'elev')));
+	L.setProp(L.nodeById('W1'), 'elev', 99);
+	ok('and the Well\'s ground elevation still moves a tank that follows it', a.tankFollow ? L.effective(t2, 'elev') === 99 : true);
+}
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));
 process.exit(fails ? 1 : 0);

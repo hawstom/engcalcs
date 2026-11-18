@@ -162,6 +162,23 @@ async function main() {
 			const tsel = await P.evaluate(() => ({ explode: !!document.querySelector('[data-assembly-explode]'), note: !!document.querySelector('#lpn_popup_fields .lpn-owned-note') }));
 			ok(label + ': a press on the vessel selects the tank (its box, with the sentence naming the Well)', !tsel.explode && tsel.note, JSON.stringify(tsel));
 			await P.keyboard.press('Escape'); await a.settle(300);
+			// a tank selected by its vessel wears the selection on the vessel (its own circle is not drawn)
+			await P.mouse.click(m.l + m.w * 0.85, m.t + m.h * 0.5); await a.settle(500);
+			const mark = await P.evaluate(() => { const e = document.querySelector('#lpn_canvas .lpn-vessel-mark.lpn-selected'); if (!e) { return null; } const r = e.getBoundingClientRect(); return { w: r.width, stroke: getComputedStyle(e).stroke }; });
+			ok(label + ': a tank selected by its vessel shows the selection on the vessel', !!mark && mark.w > 5 && mark.stroke !== 'none', JSON.stringify(mark));
+			await P.keyboard.press('Escape'); await a.settle(300);
+			if (kind === 'welltank') {
+				// dragging the Well takes the vessel's grab shape along: a press at the vessel's new place selects the tank
+				await P.mouse.move(pts[0].x, pts[0].y); await P.mouse.down(); await P.mouse.move(pts[0].x, pts[0].y + 30, { steps: 4 }); await P.mouse.move(pts[0].x, pts[0].y + 60, { steps: 4 }); await P.mouse.up(); await a.settle(800);
+				await P.keyboard.press('Escape'); await a.settle(300);
+				await P.mouse.click(m.l + m.w * 0.85, m.t + m.h * 0.5 + 60); await a.settle(700);
+				const moved = await P.evaluate(() => ({ explode: !!document.querySelector('[data-assembly-explode]'), note: !!document.querySelector('#lpn_popup_fields .lpn-owned-note') }));
+				ok(label + ': after the Well is dragged, a press on the vessel at its new place selects the tank, and the old place selects nothing', !moved.explode && moved.note, JSON.stringify(moved));
+				await P.keyboard.press('Escape'); await a.settle(300);
+				await P.mouse.click(m.l + m.w * 0.85, m.t + m.h * 0.5); await a.settle(500);
+				ok(label + ': and the old place of the vessel selects nothing', !(await P.evaluate(() => !!document.querySelector('#lpn_popup_fields .lpn-owned-note'))));
+				await P.keyboard.press('Escape'); await a.settle(300);
+			}
 			if (kind === 'welltankp') {
 				await P.mouse.click(pts[0].x, pts[0].y); await a.settle(700);
 				await P.evaluate(() => { const b = document.querySelector('[data-assembly-explode]'); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });

@@ -1439,6 +1439,8 @@ html[lang="zh"] .ec-welcome {
 .lpn-link-halo.lpn-override-inh { stroke: #9e9e9e; stroke-width: calc(2.857 * var(--lpn-lw, 0)); stroke-dasharray: calc(4 * var(--lpn-lw, 0)) calc(3 * var(--lpn-lw, 0)); }
 .lpn-node.lpn-override-inh { stroke: #9e9e9e; stroke-width: calc(0.3 * var(--lpn-sym, 0)); stroke-dasharray: calc(0.9 * var(--lpn-sym, 0)) calc(0.6 * var(--lpn-sym, 0)); }
 .lpn-link-halo.lpn-selected { stroke: var(--ec-map-select); stroke-width: calc(2.857 * var(--lpn-lw, 0)); }
+.lpn-vessel-mark { fill: none; stroke: none; pointer-events: none; }
+.lpn-vessel-mark.lpn-selected { stroke: var(--ec-map-select); stroke-width: 3px; vector-effect: non-scaling-stroke; }
 .lpn-node.lpn-selected { stroke: var(--ec-map-select); stroke-width: calc(0.5 * var(--lpn-symf, 0)); }
 .lpn-lbl.lpn-selected { fill: var(--ec-map-select); }
 :root { --lpn-hover-color: var(--ec-map-hover); }

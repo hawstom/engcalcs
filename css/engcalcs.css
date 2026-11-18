@@ -2378,6 +2378,8 @@ html[lang="zh"] .ec-welcome {
    BEFORE .lpn-node-pending (mid-pipe-draw is about what your next click does, which is more
    urgent still). */
 .lpn-link-halo.lpn-selected { stroke: var(--ec-map-select); stroke-width: calc(2.857 * var(--lpn-lw, 0)); }
+.lpn-vessel-mark { fill: none; stroke: none; pointer-events: none; }
+.lpn-vessel-mark.lpn-selected { stroke: var(--ec-map-select); stroke-width: 3px; vector-effect: non-scaling-stroke; }
 .lpn-node.lpn-selected { stroke: var(--ec-map-select); stroke-width: calc(0.5 * var(--lpn-symf, 0)); }
 .lpn-lbl.lpn-selected { fill: var(--ec-map-select); }
 /* HOVER PREVIEW, Select mode only (Ida's wishlist item 1): additive to the Task 618 cursor, which
