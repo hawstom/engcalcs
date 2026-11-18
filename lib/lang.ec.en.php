@@ -4546,7 +4546,7 @@ $ec_lang['lpn_library_import_no_libraries']='That project file has no libraries 
 $ec_lang['lpn_library_import_heading']='Imported from {file}';
 $ec_lang['lpn_library_import_added']='Copied in: {names}';
 $ec_lang['lpn_library_import_comments']='Comment rows copied in with them: {n}';
-$ec_lang['lpn_library_import_comments_left']='Comment rows not copied in, because no item they stand above was copied: {n}';
+$ec_lang['lpn_library_import_comments_left']='Comment rows not copied in, because the item below each was not copied, or none follows: {n}';
 $ec_lang['lpn_library_import_conflict']='Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.';
 // Said under ONE library's heading in the receipt, where 'these' is that library. The whole-file
 // case is lpn_library_import_no_libraries above, which has no heading over it to lean on.

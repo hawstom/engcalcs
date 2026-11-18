@@ -69952,7 +69952,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		controls: { from: 'controls', label: 'lpn_library_controls',
 			read: libControlsRead, write: libControls, units: [],
 			source: function (saved) { return EngCalcs.lpnControlsUpgrade(saved.controls); },
-			keyOf: libImportControlKey, usable: libImportControlUsable },
+			keyOf: libImportControlKey, usable: libImportControlUsable,
+			// Two comment rows the import brings together stay two rows (the rules do this in their own write()).
+			after: function (dest) { EngCalcs.lpnControlsSeparate(dest); } },
 		rules: { label: 'lpn_library_rules', units: [],
 			source: libImportRulesSource, read: libImportRulesExisting, write: libImportRulesWrite }
 	};
@@ -70223,7 +70225,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (taken[id]) { clashed.push(id); nLeft += held.length; return; }
 				try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { nLeft += held.length; return; }
 				taken[id] = true;
-				held.forEach(function (c) { try { clones.push(JSON.parse(JSON.stringify(c))); nComments++; } catch (err) { /* skipped */ } });
+				held.forEach(function (c) { try { clones.push(JSON.parse(JSON.stringify(c))); nComments++; } catch (err) { nLeft++; } });
 				clones.push(clone);
 				added.push(id);
 			});
@@ -70237,7 +70239,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (!p.clones.length) { return; }
 				var dest = p.spec.write();
 				p.clones.forEach(function (clone) { dest.push(clone); });
-				if (p.kind === 'controls') { EngCalcs.lpnControlsSeparate(dest); }
+				if (p.spec.after) { p.spec.after(dest); }
 			});
 			libCommit();
 			rebuildLibraryBox();
@@ -70268,7 +70270,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				lines.push((pc.lpn_library_import_comments || 'Comment rows copied in with them: {n}').replace('{n}', String(p.comments)));
 			}
 			if (p.left) {
-				lines.push((pc.lpn_library_import_comments_left || 'Comment rows not copied in, because no item they stand above was copied: {n}').replace('{n}', String(p.left)));
+				lines.push((pc.lpn_library_import_comments_left || 'Comment rows not copied in, because the item below each was not copied, or none follows: {n}').replace('{n}', String(p.left)));
 			}
 			if (p.clashed.length) {
 				lines.push((pc.lpn_library_import_conflict || 'Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.')

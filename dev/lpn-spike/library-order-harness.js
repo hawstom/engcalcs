@@ -397,6 +397,13 @@ head('4b3. controls: a comment is a row of its own, and Net3 reads, moves and wr
 		ok('an older project: a tail with no description above it is kept, as the trailing note or as a comment row after the control that has its own',
 			upT.map(text).join(' ; ') === 'LINK P1 OPEN AT TIME 1/only tail ; LINK P2 OPEN AT TIME 2 ;own/own ; ;second tail' && upT.every((c) => !c.tail), upT.map(text).join(' ; '));
 		ok('...and upgrading that again changes nothing', same(EngCalcs.lpnControlsUpgrade(upT), upT));
+		// a tail and a foot together, and a comment row after a foot: no words lost, and no two comment rows without a blank line between
+		const upF = EngCalcs.lpnControlsUpgrade([
+			{ link: 'P1', raw: 'LINK P1 OPEN AT TIME 1 ;own', action: {}, condition: {}, note: 'own', noteAt: 'end', tail: 'tl', foot: [';ft'] },
+			{ comment: true, lines: [';next'] }
+		]);
+		ok('an older project: tail, foot and a following comment row all stay, as three rows each set off by a blank line',
+			upF.map((c) => c.comment ? c.lines.join('|') + '/' + (c.gap | 0) : c.raw).join(' ; ') === 'LINK P1 OPEN AT TIME 1 ;own ; ;tl/0 ; ;ft/1 ; ;next/1', upF.map((c) => c.comment ? c.lines.join('|') + '/' + (c.gap | 0) : c.raw).join(' ; '));
 	}
 }
 

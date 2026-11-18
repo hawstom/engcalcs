@@ -2482,10 +2482,11 @@
 			return sc.gap;
 		}
 		list.forEach(function (c) {
-			var lines = [], note, above, src, k, tailRows = null;
+			var lines = [], note, above, src, k, tailRows = null, tailText;
 			if (!c || c.comment) {
 				// Blank lines a foot left over belong to the comment row that follows it.
-				if (c && carry) { c = Object.assign({}, c, { gap: Math.max(c.gap | 0, carry) }); carry = 0; }
+				c = c && Object.assign({}, c);
+				if (c && carry) { c.gap = Math.max(c.gap | 0, carry); carry = 0; }
 				out.push(c);
 				return;
 			}
@@ -2505,22 +2506,22 @@
 			if (above) {
 				delete c.note;
 				if (c.tok) { delete c.tok.note; }
-				if (c.tail) { c.note = c.tail; c.noteAt = 'end'; if (c.tok && c.tok.tail !== undefined) { c.tok.note = c.tok.tail; } }
 			}
-			// A `tail` that has no place as the trailing note (the control already has one) is kept as a comment row after the control, never dropped.
-			if (c.tail && !(above || !c.note)) { tailRows = [';' + EngCalcs.lpnDescInline(EngCalcs.lpnDescText(c.tail))]; }
-			else if (c.tail && !above) { c.note = EngCalcs.lpnDescText(c.tail); c.noteAt = 'end'; if (c.tok && c.tok.tail !== undefined) { c.tok.note = c.tok.tail; } }
+			// The `tail` becomes the trailing note; when the control already has one it is kept as a comment row after the control. Never dropped.
+			tailText = EngCalcs.lpnDescText(c.tail);
+			if (tailText && !c.note) { c.note = tailText; c.noteAt = 'end'; if (c.tok && c.tok.tail !== undefined) { c.tok.note = c.tok.tail; } }
+			else if (tailText) { tailRows = [';' + EngCalcs.lpnDescInline(tailText)]; }
 			delete c.tail;
 			if (c.tok) { delete c.tok.tail; if (!Object.keys(c.tok).length) { delete c.tok; } }
 			k = rows(lines);
 			if (k) { c.gap = k; }
 			out.push(c);
-			if (tailRows) { carry = rows(tailRows.concat(Array.isArray(c.foot) && c.foot.length ? [''].concat(c.foot) : [])); }
-			else if (Array.isArray(c.foot)) { carry = rows(c.foot); }
+			if (tailRows) { rows(tailRows); }
+			if (Array.isArray(c.foot)) { carry = rows(c.foot); }
 			delete c.foot;
 		});
 		if (out.length) { delete out[0].gap; }
-		return out;
+		return EngCalcs.lpnControlsSeparate(out);
 	};
 	EngCalcs.lpnInpHasComment = function (lines) {
 		return (lines || []).some(function (l) { return /^\s*;/.test(String(l)); });

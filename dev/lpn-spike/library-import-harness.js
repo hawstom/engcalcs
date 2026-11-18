@@ -797,6 +797,11 @@ head('15. comment rows left behind by an import are said in the receipt, never d
 		{ comment: true, lines: [';closing note'], gap: 1 }
 	], rules: [] }, 'from.lwn', ['controls']);
 	check(said('lpn_library_import_comments_left') && reportLines().some((t) => /: 2$/.test(t) && /not copied in/.test(t)), 'the receipt counts the comment above the clash and the closing note: ' + JSON.stringify(reportLines()));
+	// the same for Rules: a clash leaves its comment behind, and the receipt counts it
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 }, controls: [], rules: ['RULE R1', 'IF SYSTEM CLOCKTIME >= 5 AM', 'THEN LINK 9 STATUS IS OPEN'] });
+	clearReport();
+	L.libImportRun({ v: 6, units: {}, controls: [], rules: [';above the clash', 'RULE R1', 'IF SYSTEM CLOCKTIME >= 6 AM', 'THEN LINK 9 STATUS IS CLOSED'] }, 'from.lwn', ['rules']);
+	check(reportLines().some((t) => /not copied in/.test(t) && /: 1$/.test(t)), 'Rules: the comment above the clashing rule is counted in the receipt: ' + JSON.stringify(reportLines()));
 }());
 
 console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All library-import checks passed.'));
