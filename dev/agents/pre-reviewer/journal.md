@@ -5067,3 +5067,10 @@ OBSERVED (re-verify; real Chromium via the branch's env.js server, Net1 well-tes
 - OBSERVED: the tank's locked rows show Tank diameter 15, Minimum volume, Can overflow, with the sentence, but the Well's own Properties has no diameter, minimum volume or overflow row: three locked inputs with no door. The sentence is clipped at the panel width ("...Properties box of the") and sits below X, Y, Mixing model, away from the locked rows. The tank's "Tank volume" row is the curve ID while the Well's "Tank volume (m^3)" is the vessel size.
 - SPECULATION: diameter is ignored by the solver when a volume curve is present, so the lock is harmless to results.
 - Not exercised: Tables cell look, scenario typing by hand, Undo of Explode, US units wizard.
+
+## 2026-11-18, feat/assembly round 13 (Task 822), Perry
+
+- OBSERVED (real Chromium, fresh New project, Insert > Well with pressure tank, three clicks, no curves chosen; Total tank volume 1000): the exploded tank's Minimum volume is blank, [TANKS] MinVol is 0 in the .inp before and after, the tank row set and the volume curve are identical before and after. Tom's item 3 not reproduced. Open-air form: Minimum volume 1000 only when typed as the Well's Minimum volume, and then it stays 1000 as such.
+- OBSERVED: the tank's box opens with the Associated-with-Well sentence; the Well's box carries Total tank volume and, in the tank section, Elevation, Base elevation and the open-air inputs, typeable.
+- OBSERVED: N1 arrow head stands clear of the circle on the map and on r13-well-symbol-proofs.png.
+- NOT CHECKED: curves chosen (two-curve path), a hand look at the symbol zoomed in on the map.
