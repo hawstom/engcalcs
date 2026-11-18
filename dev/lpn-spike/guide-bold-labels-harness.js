@@ -10,9 +10,8 @@
 //   1. English: for every label occurrence in every definition (longest label first, the manual's own heading phrases set aside), the bold
 //      and plain counts equal the spec's. A plain occurrence the spec does not list FAILS: a skipped label cannot pass.
 //   2. English: every <strong> span is a label (or a label with a unit, as in "Pressure (psi)"). No stray bold.
-//   3. Every other language: a <strong> span, where one exists, equals the value of one of that definition's label keys in the same file.
-//      Languages not yet bolded have none and pass; dev/guide-bold-translation-list.md is the sprint list. Named exceptions: ar, bg and cs
-//      have a button string that is itself mistranslated ("Add a rule"), so their span keeps the word for "control".
+//   3. Every other language: the definition carries as many <strong> spans as English, and no span holds another tag. The words are not
+//      compared with the label: a translation may bold an inflected or reworded form of it.
 //   4. Every language: every cell dev/scripts/guide_bold_mechanical.php covers is bold (its --check mode), so a later edit cannot drop one.
 // Strings that cannot carry bold (the entry's opening paragraphs, which are the `?` tips, plain text) are not here.
 'use strict';
@@ -21,7 +20,6 @@ const path = require('path');
 const LIB = process.env.EC_LIB_DIR || path.join(__dirname, '..', '..', 'lib');
 const SPECFILE = JSON.parse(fs.readFileSync(path.join(__dirname, 'guide-bold-labels-spec.json'), 'utf8'));
 const SPEC = SPECFILE.entries;
-const EXCEPT = { 'ar:lpn_guide_lib_ctl_def:0': 1, 'bg:lpn_guide_lib_ctl_def:0': 1, 'cs:lpn_guide_lib_ctl_def:0': 1 };
 const REASONS = ['noun', 'xref', 'syntax', 'data', 'key'];
 const MANUAL = /^lpn_(guide_|notes_|hotkeys_).*_def$/;
 const unesc = (s) => s.replace(/\\(['\\])/g, '$1');
@@ -124,14 +122,12 @@ fs.readdirSync(LIB).filter((f) => /^lang\.ec\.[a-z]{2}\.php$/.test(f) && f !== '
 	Object.keys(SPEC).forEach((mk) => {
 		const v = t[mk];
 		if (v === undefined) { return; }
-		const gotB = (v.match(/<strong>.*?<\/strong>/gsu) || []).map((s) => s.replace(/<\/?strong>/g, ''));
-		gotB.forEach((g, i) => {
-			spans++; checks++;
-			const ok = SPEC[mk].some((e) => t[e.key] !== undefined && t[e.key] !== '' && (t[e.key] === g || (e.stripEllipsis && t[e.key].replace(/…$/u, '') === g) ||
-				(e.boldUnit && g.indexOf(t[e.key].replace(/…$/u, '') + ' (') === 0 && /\)$/.test(g))));
-			if (!ok && !EXCEPT[l + ':' + mk + ':' + i]) { fail(l + ' ' + mk + ' span ' + i + ': ' + JSON.stringify(g) + ' is none of its labels'); }
-			if (ok && EXCEPT[l + ':' + mk + ':' + i]) { fail(l + ' ' + mk + ' span ' + i + ' now matches: remove the exception'); }
-		});
+		// A translation may bold an inflected or reworded form of the label, so the words are not compared: the number of
+		// spans must equal English's, and no span may hold another tag.
+		const gotB = v.match(/<strong>.*?<\/strong>/gsu) || [], enB = (en[mk] || '').match(/<strong>.*?<\/strong>/gsu) || [];
+		spans += gotB.length; checks += 2;
+		if (gotB.length !== enB.length) { fail(l + ' ' + mk + ': ' + gotB.length + ' bold spans, English has ' + enB.length); }
+		gotB.forEach((g, i) => { if (/<(?!\/?strong>)[^>]*>/.test(g)) { fail(l + ' ' + mk + ' span ' + i + ': another tag inside the bold'); } });
 	});
 });
 // 4: every cell the mechanical rule covers (dev/scripts/guide_bold_mechanical.php) is bold in every language.
