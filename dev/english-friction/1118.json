@@ -1,0 +1,138 @@
+{
+    "sprint": "1118",
+    "description": "Translator suggestion box, sprint 1118 (26 languages, on feat/library-order).",
+    "entries": [
+        {
+            "key": "lpn_guide_find_notes_def",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "The bold label 'Values' maps to lpn_settings_defaults (new-asset values, rendered 'قيم الإنشاء'), but in the Find definitions 'Values' means the values typed into a query, so the label key does not name that thing.",
+            "readings": [
+                "bold plain 'القيم' (the typed values)",
+                "bold the label string 'قيم الإنشاء' (creation values)"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        },
+        {
+            "key": "lpn_guide_find_notes_def",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Values is bolded as if it were the Settings label Values, but the sentence means the numbers being compared; same for the Values row in lpn_guide_find_query_def.",
+            "readings": [
+                "plain word for the numbers compared, bolded as English shows",
+                "the Settings, Assets, Values label (bn: শুরুর মান)"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        },
+        {
+            "key": "lpn_guide_ct_box_def",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Color nodes by and Node colors share one bn label (নোডের রঙ), so the sentence naming both reads as a repetition.",
+            "readings": [
+                "same label for both, as the label keys have it",
+                "a distinct label for Color nodes by"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        },
+        {
+            "key": "lpn_guide_find_notes_def",
+            "source": "translator",
+            "lang": "he",
+            "complaint": "The manual bolds Values as if it were the Settings label, but in this sentence it is an ordinary noun; the house Hebrew label for Settings Values (ערכי יצירה) does not read as that noun.",
+            "readings": [
+                "bolded the ordinary Hebrew word ערכים",
+                "bolded the label string ערכי יצירה"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        },
+        {
+            "key": "lpn_guide_find_query_def",
+            "source": "translator",
+            "lang": "he",
+            "complaint": "Same: the table row Values is bolded as a label, yet it explains how to type values.",
+            "readings": [
+                "bolded ערכים",
+                "bolded ערכי יצירה"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        },
+        {
+            "key": "lpn_guide_find_notes_def",
+            "source": "translator",
+            "lang": "my",
+            "complaint": "The bold-label spec ties the Find box's bold 'Values' (this key and lpn_guide_find_query_def) to lpn_settings_defaults, whose Burmese label means 'creation-time values' and is wrong for Find.",
+            "readings": [
+                "bolded the plain word for values",
+                "bolded the settings_defaults label"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        },
+        {
+            "key": "lpn_notes_1_def",
+            "source": "translator",
+            "lang": "ps",
+            "complaint": "The old Pashto text said extended period simulation always runs on EPANET, which the new English contradicts; I retranslated it fully, so it was not a bold-only change.",
+            "readings": [
+                "retranslated from the current English",
+                "kept old words and only added bold"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        },
+        {
+            "key": "lpn_guide_ct_box_def",
+            "source": "translator",
+            "lang": "ps",
+            "complaint": "The existing Pashto for ct_box, ct_example and ct_what did not match the current English (missing sentences, garbled), so I retranslated them whole; they were not bold-only.",
+            "readings": [
+                "retranslated from current English",
+                "kept old words"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        },
+        {
+            "key": "lpn_guide_find_replace_def",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "The bold spec ties 'Closed' to lpn_pane_shape_closed (a Shape property, ru 'Замкнута'), but the text means a pipe's Closed status, which is lpn_field_closed (ru 'Закрыта').",
+            "readings": [
+                "bolded Закрыта (the pipe status on screen)",
+                "bolded Замкнута per the spec key"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        },
+        {
+            "key": "lpn_guide_find_query_def",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "'Values' is bound to lpn_settings_defaults (ru 'Значения при создании'), but in the Find table it is a plain heading about typing values, not that Settings label.",
+            "readings": [
+                "bolded the heading Значения",
+                "bolded the Settings label verbatim"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        },
+        {
+            "key": "lpn_guide_find_notes_def",
+            "source": "translator",
+            "lang": "zh",
+            "complaint": "The bold word Values in the Find notes and query tables is mapped in the bold list to the label of 'Values' under New assets (lpn_settings_defaults), but the sentence is about the Find box Value field.",
+            "readings": [
+                "the Find value field (lpn_find_value, 数值)",
+                "the Settings New assets Values label (创建值)"
+            ],
+            "disposition": "open",
+            "resolution": ""
+        }
+    ]
+}
