@@ -5060,3 +5060,10 @@ OBSERVED (re-verify; real Chromium via the branch's env.js server, Net1 well-tes
 - EPS 2 h, 1 min step, 35/55 psi, 2 gpm, 10 gpm class pump: both engines give the same numbers and the pump cycles every ~3 min; drawdown 5.2 gal for 2.7 ft3 at 33/35/55 (Boyle), plausible. Tank label H stays at the initial head (103.85) while P moves; Net1's own tank does the same (H=970 flat), so not this round's.
 - Insert: Pump button takes 5 presses to reach the form, or Project > Insert (2 clicks); 3 map clicks; then the box: 2 curve selects (curves must already exist) and nothing else if the defaults solved. .inp export (;ASSEMBLY PT=, ;VOLUME, controls in head), re-import, Explode (tank box editable, no "Written by"), Undo regroup all hold. Phone 390: box fits, no sideways scroll.
 - NOT DONE: mutation test of the harnesses, project-file Save as and reopen in the browser, Insert menu icon at real size, scenarios, light/dark, other languages.
+
+## 2026-11-17, feat/assembly round 12 (tank lock), Perry
+
+- OBSERVED: `check_all --fast` fails only payload freshness (expected). Both lock harnesses pass (8/8, three-point all passed). Find and replace on Tank diameter leaves T1 at 15 and says "Written by well W1..." under Replace.
+- OBSERVED: the tank's locked rows show Tank diameter 15, Minimum volume, Can overflow, with the sentence, but the Well's own Properties has no diameter, minimum volume or overflow row: three locked inputs with no door. The sentence is clipped at the panel width ("...Properties box of the") and sits below X, Y, Mixing model, away from the locked rows. The tank's "Tank volume" row is the curve ID while the Well's "Tank volume (m^3)" is the vessel size.
+- SPECULATION: diameter is ignored by the solver when a volume curve is present, so the lock is harmless to results.
+- Not exercised: Tables cell look, scenario typing by hand, Undo of Explode, US units wizard.
