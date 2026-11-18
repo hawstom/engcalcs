@@ -116,13 +116,17 @@ async function compare(file, text) {
 	const nat = EC.lpnNativeRun(model);
 	if (!epa.ok || !nat.ok) { ok(file, false, `ok native=${nat.ok} epanet=${epa.ok} ` + JSON.stringify(nat.issues || epa.issues || '')); return; }
 	const same = epa.frames.length === nat.frames.length && epa.frames.every((f, i) => f.t === nat.frames[i].t);
-	let dH = 0, atH = '', dL = 0, atL = '', dQ = 0, atQ = '', qMax = 0, st = 0, sw = 0;
+	let dH = 0, atH = '', dL = 0, atL = '', dQ = 0, atQ = '', qMax = 0, st = 0, sw = 0, dP = 0, dV = 0, dHL = 0, dD = 0;
 	if (same) {
 		epa.frames.forEach((fe, i) => {
 			const fn = nat.frames[i];
 			model.nodes.forEach((n) => {
 				const d = Math.abs(fn.heads[n.id] - fe.heads[n.id]);
 				if (d > dH) { dH = d; atH = n.id + '@' + fe.t / H + 'h'; }
+				// EPS audit 2026-11-18: pressure and demand were never compared, only heads and flows. A reservoir's
+				// pressure (EPANET: head less its base head) is a known difference, so reservoirs are left out of dP.
+				if (n.type !== 'reservoir') { dP = Math.max(dP, Math.abs(fn.pressures[n.id] - fe.pressures[n.id])); }
+				dD = Math.max(dD, Math.abs(fn.demands[n.id] - fe.demands[n.id]));
 				if (n.type === 'tank') {
 					const dl = Math.abs(fn.levels[n.id] - fe.levels[n.id]);
 					if (dl > dL) { dL = dl; atL = n.id + '@' + fe.t / H + 'h'; }
@@ -132,6 +136,8 @@ async function compare(file, text) {
 				qMax = Math.max(qMax, Math.abs(fe.flows[l.id]));
 				const d = Math.abs(fn.flows[l.id] - fe.flows[l.id]);
 				if (d > dQ) { dQ = d; atQ = l.id + '@' + fe.t / H + 'h'; }
+				dV = Math.max(dV, Math.abs(fn.velocities[l.id] - fe.velocities[l.id]));
+				dHL = Math.max(dHL, Math.abs(fn.headlosses[l.id] - fe.headlosses[l.id]));
 				if (fn.statuses[l.id] !== fe.statuses[l.id]) { st++; }
 				if (i && fe.statuses[l.id] !== epa.frames[i - 1].statuses[l.id]) { sw++; }
 			});
@@ -146,9 +152,10 @@ async function compare(file, text) {
 			qSwing = Math.max(qSwing, Math.max(...q) - Math.min(...q));
 		});
 	}
-	ok(`${file}, ${nCtl} controls`, same && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && st === 0 && (text ? qSwing > 1e-3 : sw > 0),
+	ok(`${file}, ${nCtl} controls`, same && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && dP <= HEAD_TOL && dHL <= HEAD_TOL && dD <= qTol && dV <= 1e-5 && st === 0 && (text ? qSwing > 1e-3 : sw > 0),
 		`steps ${nat.frames.length}/${epa.frames.length}${same ? '' : ' DIFFER'}  dH=${dH.toExponential(2)} m @${atH}  ` +
 		`dLevel=${dL.toExponential(2)} m @${atL || '-'}  dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})  ` +
+		`dPressure=${dP.toExponential(1)} m dHeadloss=${dHL.toExponential(1)} m dVelocity=${dV.toExponential(1)} m/s dDemand=${dD.toExponential(1)} m3/s  ` +
 		`[${sw} status changes in EPANET's frames${text ? `; pump flow swing ${(qSwing * 1000).toFixed(1)} L/s` : ''}${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
 }
 
