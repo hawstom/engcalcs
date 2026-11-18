@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='এই নোডে নেটওয়ার্ক �
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='এই একক নির্ধারণ করে আপনার ইনপুট কীভাবে পড়া হবে';
-$ec_lang['lpn_units_warn_lead']='{unit} হলো নিচের বিষয়গুলোতে আপনি যা লেখেন তার একক:';
-$ec_lang['lpn_units_options_head']='আপনি একটি একক পরিবর্তন করলে:';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='অ-ধ্বংসাত্মক';
-$ec_lang['lpn_units_nondestructive_desc']='অ-ধ্বংসাত্মক: প্রতিটি ইনপুট ঠিক যেমন আছে তেমনই রাখে এবং নতুন এককে তার অর্থ নতুন করে বোঝে।';
-$ec_lang['lpn_units_destructive']='ধ্বংসাত্মক';
-$ec_lang['lpn_units_destructive_desc']='ধ্বংসাত্মক: গাণিতিক রূপান্তর দিয়ে প্রতিটি ইনপুট নতুন করে লেখে, যাতে নেটওয়ার্কটি রূপান্তরের সহনশীলতার মধ্যে প্রায় একই ভৌত অবস্থায় থাকে। এটি মূল ইনপুটগুলো হারিয়ে ফেলে। পূর্বাবস্থায় ফেরালে সেগুলো ফিরে আসে।';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='যে মান এখন {unit} বোঝায় ({n})। কিছুই নতুন করে লেখা হয়নি।';
 $ec_lang['lpn_status_converted']='যে মান {unit}-এ নতুন করে লেখা হয়েছে ({n})।';

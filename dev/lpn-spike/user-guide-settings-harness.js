@@ -7,8 +7,8 @@
 //   3. The sections and sub-headings the chapter lists are the box's own, in order, with the saved
 //      marks it states, and the Settings tab in Tables has the columns it names.
 //   4. The searches the chapter gives return what it says, a word in a tip included.
-//   5. The units example is performed on Net1: the question, Destructive (13 values, 457.2 mm, one
-//      Undo), Non-destructive (13 values untouched, 18 mm).
+//   5. The units example is performed on Net1: the question, Convert (13 values, 457 mm, one
+//      Undo), Keep (13 values untouched, 18 mm).
 //   6. Restore defaults and Start fresh ask the questions the chapter describes, Undo does not
 //      reverse Restore defaults, and in a scenario Restore defaults is dimmed, the units note shows,
 //      and applying new-asset values is refused.
@@ -32,7 +32,7 @@ const QUOTES = {
 		'lpn_settings_runbox', 'lpn_tool_settings', 'lpn_settings_table_category', 'lpn_find_value'],
 	lpn_guide_set_search_def: ['lpn_settings_search', 'lpn_settings_symbol_opacity', 'lpn_settings_backdrop_opacity', 'lpn_settings_emitter_exponent'],
 	lpn_guide_set_scn_def: ['calc_defaults', 'lpn_settings_push_btn'],
-	lpn_guide_set_units_def: ['lpn_units_nondestructive', 'lpn_units_destructive', 'lpn_cancel', 'lpn_field_diameter', 'lpn_view_units'],
+	lpn_guide_set_units_def: ['lpn_convas_ok', 'lpn_units_keep', 'lpn_cancel', 'lpn_field_diameter', 'lpn_view_units'],
 	lpn_guide_set_assets_def: ['lpn_settings_apply_to_all', 'lpn_settings_push_btn', 'lpn_settings_id_prefixes', 'lpn_settings_defaults'],
 	lpn_guide_set_reset_def: ['calc_defaults', 'lpn_settings_wipe_btn']
 };
@@ -50,8 +50,8 @@ const STRUCTURE = [
 // The numbers the units example states, read out of the chapter so a changed example is re-measured.
 function unitsExample() {
 	const t = plain(enString('lpn_guide_set_units_def'));
-	const d = t.match(/Destructive rewrites (\d+) values, and Pipe 10 reads ([\d.]+) mm\./);
-	const n = t.match(/Non-destructive leaves the (\d+) values alone, and Pipe 10 reads ([\d.]+) mm\./);
+	const d = t.match(/Convert rewrites (\d+) values, and Pipe 10 reads ([\d.]+) mm with Decimals 0\./);
+	const n = t.match(/Keep leaves the (\d+) values alone, and Pipe 10 reads ([\d.]+) mm\./);
 	return { d: d && d.slice(1), n: n && n.slice(1) };
 }
 
@@ -186,32 +186,32 @@ async function main() {
 			return a.dialog();
 		};
 		let dlg = await changeUnit('mm');
-		const head = await T('lpn_units_warn_title');
+		const head = (await T('lpn_units_convert_q')).split('{old}')[0];
 		ok('choosing mm asks the question: its title, the quantity Diameter, and the three buttons', !!dlg && dlg.text.indexOf(head) === 0 && dlg.text.indexOf(await T('lpn_field_diameter')) > 0
-			&& JSON.stringify(dlg.buttons) === JSON.stringify([await T('lpn_units_nondestructive'), await T('lpn_units_destructive'), await T('lpn_cancel')]), JSON.stringify(dlg));
+			&& JSON.stringify(dlg.buttons) === JSON.stringify([await T('lpn_convas_ok'), await T('lpn_units_keep'), await T('lpn_cancel')]), JSON.stringify(dlg));
 		await a.dialogClick(await T('lpn_cancel'));
 		await settle(500);
 		ok('Cancel changes nothing: the unit is still in', (await P.evaluate(() => document.getElementById('lpn_u_diameter').value)) === 'in' && (await diameter()).value === '18');
 		dlg = await changeUnit('mm');
-		await a.dialogClick(await T('lpn_units_destructive'));
+		await a.dialogClick(await T('lpn_convas_ok'));
 		await settle(900);
 		const wantD = (await T('lpn_status_converted')).replace('{n}', ux.d[0]).replace('{unit}', 'mm');
-		ok('Destructive: the notice reads "' + wantD + '"', (await a.notice()) === wantD, await a.notice());
+		ok('Convert: the notice reads "' + wantD + '"', (await a.notice()) === wantD, await a.notice());
 		let dia = await diameter();
 		ok('...and Pipe 10 reads ' + ux.d[1] + ' mm', dia.value === ux.d[1] && dia.label === 'Diameter (mm)', JSON.stringify(dia));
 		await undo();
 		dia = await diameter();
 		ok('one Undo restores the numbers and the unit: Pipe 10 is 18 in again', dia.value === '18' && dia.label === 'Diameter (in)', JSON.stringify(dia));
 		dlg = await changeUnit('mm');
-		await a.dialogClick(await T('lpn_units_nondestructive'));
+		await a.dialogClick(await T('lpn_units_keep'));
 		await settle(900);
 		const wantN = (await T('lpn_status_reinterpreted')).replace('{n}', ux.n[0]).replace('{unit}', 'mm');
-		ok('Non-destructive: the notice reads "' + wantN + '"', (await a.notice()) === wantN, await a.notice());
+		ok('Keep: the notice reads "' + wantN + '"', (await a.notice()) === wantN, await a.notice());
 		dia = await diameter();
 		ok('...and Pipe 10 reads ' + ux.n[1] + ' mm', dia.value === ux.n[1] && dia.label === 'Diameter (mm)', JSON.stringify(dia));
 		await changeUnit('in');
 		const back = await a.dialog();
-		if (back) { await a.dialogClick(await T('lpn_units_nondestructive')); await settle(700); }
+		if (back) { await a.dialogClick(await T('lpn_units_keep')); await settle(700); }
 		ok('the unit is put back to in for what follows', (await diameter()).label === 'Diameter (in)');
 		await closeBox('lpn_setbox_close');
 		await settle(300);

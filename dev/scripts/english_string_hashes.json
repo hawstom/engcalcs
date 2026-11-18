@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-11-01",
-    "count": 3281,
+    "count": 3274,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -9374,18 +9374,11 @@
         "lpn_tsb_quantity": "3b85a69869ded9d3e0f4b571055a8ba22824f502",
         "lpn_tsb_resize": "01f90cde1025cc1c22b40217be2da7150f87f26d",
         "lpn_unit_unknown": "11f7f60db8990ffe8ecf08b9ac137c2ded5a8a24",
-        "lpn_units_destructive": "f58c8364768192a30c9e69789ccc3926aaf93f04",
-        "lpn_units_destructive_desc": "765704f8d854911eb83557979d11f1fe53efc587",
         "lpn_units_elevhead": "d598eb6ae61be7df39ca3031a75a1303d809aa5c",
         "lpn_units_length": "3bade34ecbc5d996b2f301ebd4ba689e81c7c9ea",
         "lpn_units_mapcoords": "7cde82bd0e716b73b131441f5680f24352735af4",
         "lpn_units_mapcoords_deg": "a63788ba696d6741f5302dafe2a279905f77e186",
-        "lpn_units_nondestructive": "b9af42de567deb49606a9c1e44aa6b304eacb323",
-        "lpn_units_nondestructive_desc": "d09cbb2994769f1d175d61d6713bc36eec0b9f5a",
-        "lpn_units_options_head": "82fe01e90beb77b23815204fa483d8d673a4ca2c",
         "lpn_units_usft": "0d8c38e2dbd77ab22d052bdbb6ea9022be4302bc",
-        "lpn_units_warn_lead": "d79c196707ff6d95e7d518747ed7bc455da2ee86",
-        "lpn_units_warn_title": "bf96b1ad91677a0e57fe9937a7e2fe2864b39201",
         "lpn_v2_restore_confirm": "d26631431bd4c562b976bd95365923b33ea08bd0",
         "lpn_v2_restore_never": "f3e5ca94b1f392f437b6fc85bf3f03c306c23e5d",
         "lpn_v2_restore_no": "1f7f368c6d34c41f570dfe461879617ad1c695af",
@@ -21306,14 +21299,6 @@
             "words": 39,
             "ends_sentence": true
         },
-        "lpn_units_destructive": {
-            "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_units_destructive_desc": {
-            "words": 29,
-            "ends_sentence": true
-        },
         "lpn_units_elevhead": {
             "words": 3,
             "ends_sentence": false
@@ -21330,28 +21315,8 @@
             "words": 1,
             "ends_sentence": false
         },
-        "lpn_units_nondestructive": {
-            "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_units_nondestructive_desc": {
-            "words": 14,
-            "ends_sentence": true
-        },
-        "lpn_units_options_head": {
-            "words": 5,
-            "ends_sentence": true
-        },
         "lpn_units_usft": {
             "words": 3,
-            "ends_sentence": false
-        },
-        "lpn_units_warn_lead": {
-            "words": 9,
-            "ends_sentence": true
-        },
-        "lpn_units_warn_title": {
-            "words": 8,
             "ends_sentence": false
         },
         "lpn_v2_restore_confirm": {

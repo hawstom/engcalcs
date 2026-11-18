@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='Durchflüsse, die diesem Knoten aus dem Netz entnomm
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='Diese Einheit legt fest, wie Ihre Eingaben gelesen werden';
-$ec_lang['lpn_units_warn_lead']='{unit} ist die Einheit für das, was Sie eingeben bei:';
-$ec_lang['lpn_units_options_head']='Wenn Sie eine Einheit ändern:';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='Nicht destruktiv';
-$ec_lang['lpn_units_nondestructive_desc']='Nicht destruktiv: Lässt jede Eingabe unverändert und interpretiert sie in der neuen Einheit neu.';
-$ec_lang['lpn_units_destructive']='Destruktiv';
-$ec_lang['lpn_units_destructive_desc']='Destruktiv: Schreibt jede Eingabe mit einer mathematischen Umrechnung neu, sodass das Netz innerhalb der Umrechnungstoleranzen physisch nahezu gleich bleibt. Dabei gehen die ursprünglichen Eingaben verloren. Rückgängig stellt sie wieder her.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='Werte ({n}) bedeuten jetzt {unit}. Es wurde nichts umgeschrieben.';
 $ec_lang['lpn_status_converted']='Werte ({n}) wurden in {unit} umgerechnet.';

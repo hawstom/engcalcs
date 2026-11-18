@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='Протоци који се узимају из м�
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='Ова јединица одређује шта ваши уноси значе';
-$ec_lang['lpn_units_warn_lead']='{unit} је јединица онога што уносите за:';
-$ec_lang['lpn_units_options_head']='Када промените јединицу:';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='Ненаметно';
-$ec_lang['lpn_units_nondestructive_desc']='Ненаметно: оставља сваки унос онаквим какав је и тумачи га у новој јединици.';
-$ec_lang['lpn_units_destructive']='Наметно';
-$ec_lang['lpn_units_destructive_desc']='Наметно: преписује сваки унос математичким претварањем, тако да мрежа остаје физички приближно иста, у оквиру толеранције претварања. Изворни уноси се губе. Опозив их враћа.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='Вредности ({n}) сада значе {unit}. Ништа није преписано.';
 $ec_lang['lpn_status_converted']='Вредности ({n}) преписане су у {unit}.';

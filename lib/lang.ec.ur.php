@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='اس نوڈ پر نیٹ ورک سے نکالا گی�
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='یہ اکائی طے کرتی ہے کہ آپ کے ان پٹس کیسے پڑھے جاتے ہیں';
-$ec_lang['lpn_units_warn_lead']='{unit} اس چیز کی اکائی ہے جو آپ یہاں درج کرتے ہیں:';
-$ec_lang['lpn_units_options_head']='جب آپ کوئی اکائی بدلتے ہیں:';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='غیر تباہ کن';
-$ec_lang['lpn_units_nondestructive_desc']='غیر تباہ کن: ہر اندراج کو ویسا ہی چھوڑتا ہے اور اسے نئی اکائی میں دوبارہ سمجھتا ہے۔';
-$ec_lang['lpn_units_destructive']='تباہ کن';
-$ec_lang['lpn_units_destructive_desc']='تباہ کن: ہر اندراج کو ریاضیاتی تبدیلی کے ذریعے دوبارہ لکھتا ہے، تاکہ نیٹ ورک تبدیلی کی گنجائش کی حد تک طبعی طور پر تقریباً وہی رہے۔ یہ اصل اندراجات کھو دیتا ہے۔ کالعدم کرنے سے وہ واپس آ جاتے ہیں۔';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='قدریں ({n}) اب {unit} کا مطلب رکھتی ہیں۔ کچھ بھی دوبارہ نہیں لکھا گیا۔';
 $ec_lang['lpn_status_converted']='قدریں ({n}) {unit} میں دوبارہ لکھی گئیں۔';

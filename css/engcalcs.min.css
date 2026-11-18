@@ -3361,6 +3361,8 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-lib-manual { border: 0; background: transparent; padding: 0 2px; font: inherit; font-size: 0.9em; color: var(--ec-help-ink); cursor: pointer; }
 .lpn-lib-sec > h3 { margin: 0 0 4px; padding: 0 0 4px; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid var(--ec-border-strong); }
 .lpn-unit-fields { margin: 0.15em 0 0.7em 1.4em; }
+.lpn-unit-decimals { display: block; margin: 0 0 0.9em 1.4em; }
+.lpn-unit-decimals input { width: 4em; margin-left: 0.5em; }
 .engcalcs-print-tools > p { margin-bottom: 0.2em; }
 @media (max-width: 640px) {
 	html:has(#lpn_canvas) #lpn_toolbar > .lpn-toolbar-group:not(#lpn_toolbar_run) { display: none; }

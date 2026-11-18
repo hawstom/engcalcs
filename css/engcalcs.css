@@ -6848,6 +6848,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
    the line above them rather than as more of the sentence. No bullets -- a marker per line would
    add three glyphs and no meaning to a list of five. */
 .lpn-unit-fields { margin: 0.15em 0 0.7em 1.4em; }
+/* The Decimals field of the unit question: a small number box beside its word. */
+.lpn-unit-decimals { display: block; margin: 0 0 0.9em 1.4em; }
+.lpn-unit-decimals input { width: 4em; margin-left: 0.5em; }
 
 /* Print preparation: the Printable version button. */
 .engcalcs-print-tools > p { margin-bottom: 0.2em; }

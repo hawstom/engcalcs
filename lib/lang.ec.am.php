@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='በዚህ ነጥብ ላይ ከመረቡ የሚወጣ
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='ይህ መለኪያ ክፍል ግቤቶችዎ እንዴት እንደሚነበቡ ይወስናል';
-$ec_lang['lpn_units_warn_lead']='{unit} ከዚህ በታች ለሚያስገቡት የመለኪያ ክፍል ነው፦';
-$ec_lang['lpn_units_options_head']='መለኪያ ክፍል ሲቀይሩ፦';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='ጎጂ ያልሆነ';
-$ec_lang['lpn_units_nondestructive_desc']='ጎጂ ያልሆነ፦ እያንዳንዱን ግቤት እንዳለ ይተዋል፣ በአዲሱ መለኪያ ክፍል ብቻ እንደገና ይተረጉመዋል።';
-$ec_lang['lpn_units_destructive']='ጎጂ';
-$ec_lang['lpn_units_destructive_desc']='ጎጂ፦ እያንዳንዱን ግቤት በሒሳብ ልወጣ እንደገና ይጽፋል፣ ስለዚህ መረቡ በአካላዊ ሁኔታ ከልወጣው መቻቻል ውስጥ ተመሳሳይ ሆኖ ይቆያል። የመጀመሪያዎቹን ግቤቶች ያጣል። ቀልብስ መልሶ ያመጣቸዋል።';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='ዋጋዎች ({n}) አሁን {unit} ማለት ናቸው። ምንም ነገር እንደገና አልተጻፈም።';
 $ec_lang['lpn_status_converted']='ዋጋዎች ({n}) ወደ {unit} እንደገና ተጽፈዋል።';

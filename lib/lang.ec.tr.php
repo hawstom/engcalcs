@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='Bu düğümde şebekeden çekilen debiler. Buraya ş
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='Bu birim, girdilerinizin ne anlama geldiğini belirler';
-$ec_lang['lpn_units_warn_lead']='{unit}, şunun için girdiğiniz değerin birimidir:';
-$ec_lang['lpn_units_options_head']='Bir birimi değiştirdiğinizde:';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='Yıkıcı değil';
-$ec_lang['lpn_units_nondestructive_desc']='Yıkıcı değil: her girdiyi olduğu gibi bırakır ve yeni birimde yeniden yorumlar.';
-$ec_lang['lpn_units_destructive']='Yıkıcı';
-$ec_lang['lpn_units_destructive_desc']='Yıkıcı: her girdiyi matematiksel bir dönüşümle yeniden yazar, böylece şebeke dönüşüm toleransları içinde fiziksel olarak neredeyse aynı kalır. Özgün girdileri kaybeder. Geri al, onları geri getirir.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='Değerler ({n}) artık {unit} anlamına geliyor. Hiçbir şey yeniden yazılmadı.';
 $ec_lang['lpn_status_converted']='Değerler ({n}) {unit} birimine yeniden yazıldı.';

@@ -9223,6 +9223,7 @@ var EngCalcs = EngCalcs || {};
 			initQuality: { on: false, before: 'Init. ', show: 6, drop: 16, dec: 2, units: true },
 			demandActual: { on: false, before: 'Q=', show: 7, drop: 26, dec: 'u' },
 			level: { on: false, before: 'Y=', show: 9, drop: 12, dec: 'u' },
+			initVolume: { on: false, before: 'Vi=', show: 15, drop: 30, dec: 'u' },
 			head: { on: false, before: 'H=', show: 10, drop: 14, dec: 'u' },
 			pressure: { on: true, before: 'P=', show: 11, drop: 28, dec: 'u' },
 			quality: { on: false, before: '', dec: 1, decTrace: 0, units: true,
@@ -9266,7 +9267,7 @@ var EngCalcs = EngCalcs || {};
 	// two different units. Head loss is an Elevation/Head quantity (resultUnit('elevhead')).
 	var LPN_LABEL_FIELD_UNIT = {
 		node: { demand: 'lpn_u_flow', demandActual: 'lpn_u_flow', elev: 'lpn_u_elevhead',
-			level: 'lpn_u_elevhead', head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' },
+			level: 'lpn_u_elevhead', initVolume: 'lpn_u_volume', head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' },
 		link: { length: 'lpn_u_length', diameter: 'lpn_u_diameter', flow: 'lpn_u_flow',
 			velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient' },
 		customer: { demand: 'lpn_u_flow', demandActual: 'lpn_u_flow' }
@@ -12939,6 +12940,27 @@ var EngCalcs = EngCalcs || {};
 		if (g.curve) { return tankCurveVolume(g.curve, top) - tankCurveVolume(g.curve, g.minSI); }
 		if (!(g.D > 0) || !isFinite(g.D)) { return undefined; }
 		return Math.PI / 4 * g.D * g.D * (top - g.minSI);
+	}
+	// **A TANK'S INITIAL VOLUME, AS EPANET COMPUTES IT** (Task 857; input3.c tankdata(), input1.c
+	// inittanks()): a usable volume curve read at the initial depth, else the cylinder of the tank
+	// diameter, whose volume at the lowest water depth is the typed Minimum volume when it is above 0
+	// and the diameter's own area times that depth when it is 0, and which grows from there with the
+	// initial depth. SI cubic metres; undefined when there is neither a curve nor a diameter.
+	function tankInitialVolumeSI(n) {
+		var g, lvl, area, vmin;
+		if (!n || n.type !== 'tank') { return undefined; }
+		g = tankGeomLive(n);
+		lvl = toSI(effective(n, 'level') || 0, 'lpn_u_elevhead');
+		if (g.curve) { return tankCurveVolume(g.curve, lvl); }
+		if (!(g.D > 0) || !isFinite(g.D)) { return undefined; }
+		area = Math.PI / 4 * g.D * g.D;
+		vmin = toSI(effective(n, 'minVolume') || 0, 'lpn_u_volume');
+		if (!(vmin > 0)) { vmin = area * g.minSI; }
+		return vmin + area * (lvl - g.minSI);
+	}
+	function tankInitialVolumeDisplay(n) {
+		var v = tankInitialVolumeSI(n);
+		return v === undefined ? undefined : toDisplay(v, resultUnit('volume'));
 	}
 	// Linear between the curve's points, held flat beyond its ends. pts are SI and increasing in x.
 	function tankCurveVolume(pts, x) {
@@ -23240,7 +23262,7 @@ var EngCalcs = EngCalcs || {};
 	// threshold and the shed cascade act on drawn glyphs after the composers have run, and the card
 	// never calls them.
 	var LPN_CARD_FIELDS = {
-		node: ['id', 'desc', 'tag', 'demandActual', 'demand', 'head', 'pressure', 'elev', 'level', 'quality', 'initQuality'],
+		node: ['id', 'desc', 'tag', 'demandActual', 'demand', 'head', 'pressure', 'elev', 'level', 'initVolume', 'quality', 'initQuality'],
 		link: ['id', 'desc', 'tag', 'initStatus', 'diameter', 'length', 'roughness', 'km', 'bulkCoeff', 'wallCoeff',
 			'flow', 'velocity', 'headloss', 'gradient', 'friction', 'status', 'quality', 'rate'],
 		customer: ['id', 'demandActual', 'demand', 'desc', 'tag', 'count']
@@ -51023,7 +51045,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else if (kind === 'unnamed') { p.georef = georefT; }
 		else { delete p.basemap; }
 	}
-	// **THE UNITS, ONCE, INTO THE COPY** (Task 688). The same converter the strip's Destructive
+	// **THE UNITS, ONCE, INTO THE COPY** (Task 688). The same converter the strip's Convert
 	// answer uses, so the two cannot come to disagree about which numbers a unit decides; the
 	// difference is only where it runs, which is a project nobody has typed into yet. Returns the
 	// unit names that actually changed, which is what the rounding reads.
@@ -61889,11 +61911,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// whichever scenario happened to be open. The writes are dynamic (`obj[prop]`), so
 	// scenario_seam_check.php cannot see them either way; this paragraph is the justification the
 	// check would otherwise be asking for.
-	function convertUnitValues(name, k) {
+	function convertUnitValues(name, k, dec) {
 		var n = 0;
+		// `dec`, when given, is the Decimals the visitor chose in the unit question: every converted
+		// input is rounded to that many places. A nonzero number the rounding would turn into zero
+		// is kept at six significant figures instead, so a small limit never silently becomes 0.
+		function rnd(v) {
+			var r;
+			if (typeof dec !== 'number') { return v; }
+			r = +v.toFixed(dec);
+			return (r === 0 && v !== 0) ? +v.toPrecision(6) : r;
+		}
 		function conv(obj, prop) {
 			if (!obj || typeof obj[prop] !== 'number') { return; }
-			obj[prop] = obj[prop] * k;
+			obj[prop] = rnd(obj[prop] * k);
 			n++;
 		}
 		// **ONE AXIS OF EVERY CURVE OF THE NAMED KINDS** (Task 586). A curve is a DOCUMENT object, so
@@ -61906,7 +61937,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		function convSetting(key) {
 			var h = settings.hydraulics;
 			if (!h || typeof h[key] !== 'number') { return; }
-			h[key] = +(h[key] * k).toPrecision(6);
+			h[key] = rnd(+(h[key] * k).toPrecision(6));
 			n++;
 		}
 		function convCurveAxis(axis, kinds, factor) {
@@ -61914,7 +61945,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			docCurvesRead().forEach(function (c) {
 				if (kinds.indexOf(c.kind) < 0) { return; }
 				(c.points || []).forEach(function (pt) {
-					if (pt && typeof pt[axis] === 'number') { pt[axis] = pt[axis] * factor; moved++; }
+					if (pt && typeof pt[axis] === 'number') { pt[axis] = rnd(pt[axis] * factor); moved++; }
 				});
 				// The file's own text no longer states these numbers (CLAUDE.md's token rule: the
 				// text must still SAY the value), so neither the lines nor the tokens may go back out.
@@ -61998,7 +62029,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		} else if (name === 'lpn_u_velocity') {
 			// The velocity warning limit is typed in this unit; a scenario's own is the same number in the same unit.
-			velocityLimitHolders().forEach(function (h) { h.velocityLimit = +(h.velocityLimit * k).toPrecision(6); n++; });
+			velocityLimitHolders().forEach(function (h) { h.velocityLimit = rnd(+(h.velocityLimit * k).toPrecision(6)); n++; });
 			// A scenario's settings are read through a resolved-tree cache: the written numbers must be re-read.
 			if (n) { touchTree('convertUnitValues'); }
 		} else if (name === 'lpn_u_flow') {
@@ -62039,53 +62070,57 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **NO QUESTION WHEN THERE IS NOTHING TO DECIDE** (ROADMAP Task 425). The dialog is for a project
 	// that ALREADY HAS CONTENT. With no stored number in this quantity -- an empty project, or one
-	// whose elements simply carry nothing this unit decides -- Non-destructive and Destructive end at
+	// whose elements simply carry nothing this unit decides -- Convert and Keep end at
 	// the same document, so the question has no answer that matters and a modal in front of the
 	// commonest first action on the page is pure cost. countUnitValues() is the exact test rather
 	// than "is doc.nodes empty": it counts the very numbers a conversion would rewrite, so the two
 	// can never disagree.
 	function unitChangeNeedsDialog(name) { return countUnitValues(name) > 0; }
-	// The question, in Tom's own words (2026-08-18), and NOT paraphrased: the title, the lead line,
-	// the field names ONE PER LINE rather than a comma list, and the two options named by what they
-	// do to the numbers already typed.
-	//
-	// The list is one element per name because a comma list is what he asked it not to be -- a
-	// reader scanning for "is my elevation in this?" reads a column, not a sentence.
-	//
-	// THE LEAD IS `lpn_units_warn_lead`, NOT the `lpn_units_warn_body` it replaces. The old key put the
-	// field names inside the sentence as `{list}`; the column is now built here, so an edit in place
-	// would have left 26 translations carrying a placeholder the page no longer fills -- a literal
-	// "{list}" on the map, which lang_tag_parity_check.php is blocking for exactly that reason. A new
-	// key falls back to English until a sprint reaches it, which is the correct untranslated state.
-	// `more`, from the SI and US buttons: further [sel, name, to] the same click changes, each given
-	// its own lead line and column under the one title.
-	function buildUnitDialogBody(body, sel, name, to, more) {
-		var pc = EngCalcs.pageConfig || {};
-		var h = document.createElement('div'), oh = document.createElement('div');
-		h.style.fontWeight = 'bold';
-		h.textContent = pc.lpn_units_warn_title || 'This unit defines how your inputs are read';
-		body.appendChild(h);
-		[[sel, name, to]].concat(more || []).forEach(function (u) {
-			var lead = document.createElement('div'), list = document.createElement('div');
-			lead.textContent = String(pc.lpn_units_warn_lead || '{unit} is the unit of what you enter for:')
-				.replace('{unit}', unitLabelFor(u[0], u[2]));
-			body.appendChild(lead);
+	// The question, in Tom's own words (2026-11-18): "Convert inputs from {old} to {new}?" with
+	// Convert, Keep and Cancel. The field names the unit decides are listed ONE PER LINE, because a
+	// reader scanning for "is my elevation in this?" reads a column, not a sentence. From the SI and
+	// US buttons there is one block per unit the click changes, under one set of buttons.
+	// `units` is [{sel, name, from, to}], one block each: the question, the fields that unit decides
+	// one per line, and the Decimals field the Convert answer rounds to. Returns each unit's field.
+	function buildUnitDialogBody(body, units) {
+		var pc = EngCalcs.pageConfig || {}, fields = [], note = document.createElement('div');
+		units.forEach(function (u) {
+			var q = document.createElement('div'), list = document.createElement('div'),
+				row = document.createElement('label'), inp = document.createElement('input');
+			q.style.fontWeight = 'bold';
+			q.textContent = String(pc.lpn_units_convert_q || 'Convert inputs from {old} to {new}?')
+				.replace('{old}', unitLabelFor(u.sel, u.from)).replace('{new}', unitLabelFor(u.sel, u.to));
+			body.appendChild(q);
 			list.className = 'lpn-unit-fields';
-			unitServes(u[1]).forEach(function (f) {
-				var row = document.createElement('div');
-				row.textContent = f;
-				list.appendChild(row);
+			unitServes(u.name).forEach(function (f) {
+				var r = document.createElement('div');
+				r.textContent = f;
+				list.appendChild(r);
 			});
 			body.appendChild(list);
+			// The default is the number of places the page itself shows this unit with, which keeps
+			// a converted 149,610 gal whole and 457.2 mm to a whole millimeter.
+			inp.type = 'number'; inp.min = '0'; inp.max = '8'; inp.step = '1';
+			inp.value = String(labelDecimalsForUnit(u.name, u.to));
+			row.className = 'lpn-unit-decimals';
+			inp.setAttribute('data-decimals-for', u.name);
+			row.appendChild(document.createTextNode(pc.lpn_labels_col_decimals || 'Decimals'));
+			row.appendChild(inp);
+			body.appendChild(row);
+			fields.push({ name: u.name, input: inp, dflt: labelDecimalsForUnit(u.name, u.to) });
 		});
-		oh.style.fontWeight = 'bold';
-		oh.textContent = pc.lpn_units_options_head || 'When you change a unit:';
-		body.appendChild(oh);
-		[pc.lpn_units_nondestructive_desc, pc.lpn_units_destructive_desc].forEach(function (t) {
-			var d = document.createElement('div');
-			d.textContent = t || '';
-			body.appendChild(d);
-		});
+		note.textContent = pc.lpn_units_convert_note;
+		body.appendChild(note);
+		return fields;
+	}
+	function unitDecimalsOf(fields, name) {
+		var i, v;
+		for (i = 0; i < fields.length; i++) {
+			if (fields[i].name !== name) { continue; }
+			v = parseInt(fields[i].input.value, 10);
+			return (isFinite(v) && v >= 0) ? Math.min(v, 8) : fields[i].dflt;
+		}
+		return undefined;
 	}
 	function unitFromMap(name, from) { var m = {}; m[name] = from; return m; }
 	function onUnitChange(sel, name) {
@@ -62102,13 +62137,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Put it back until the question is answered. Nothing acts on the new unit before then --
 		// which is also what makes Cancel free: the select never left the unit it was on.
 		applyOneUnit(name, from);
-		openDialog(function (body) { buildUnitDialogBody(body, sel, name, to); }, [
-			// **NON-DESTRUCTIVE IS FIRST, AND IT IS THE SUITE'S STANDING BEHAVIOUR** -- "changing a
-			// unit reinterprets the typed number; it does not convert it", which CLAUDE.md marks
-			// absolute and which this page was once the one place to break. Destructive is the
-			// opt-in and must never become the quiet path: it is reached only by pressing the button
-			// that says what it does.
-			{ label: pc.lpn_units_nondestructive || 'Non-destructive', fn: function () {
+		var fields = [];
+		openDialog(function (body) { fields = buildUnitDialogBody(body, [{ sel: sel, name: name, from: from, to: to }]); }, [
+			// **THE UNDO SNAPSHOT IS THE BACKUP, AND NO SECOND COPY IS OFFERED** (Task 425). Convert is
+			// a user-initiated edit of the document, so it gets one snapshot, taken before anything
+			// moves, and one Undo restores the numbers and the unit (saveUndoSnapshot() records the
+			// unit selections). Switching projects clears the stack, so after that the original
+			// inputs live only in the file on disk, which is untouched until the user saves.
+			// Converting happens only on this button: only the user touches a file's numbers.
+			{ label: pc.lpn_convas_ok || 'Convert', fn: function () {
+				var fOld = EngCalcs.unitFactors[from], fNew = EngCalcs.unitFactors[to], n,
+					dec = unitDecimalsOf(fields, name);
+				saveUndoSnapshot();
+				applyOneUnit(name, to);
+				n = (fOld && fNew) ? convertUnitValues(name, fNew / fOld, dec) : 0;
+				rememberUnitSelections();
+				afterUnitChange(unitFromMap(name, from));
+				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
+					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
+			} },
+			// **KEEP IS THE SUITE'S STANDING BEHAVIOUR**: changing a unit reinterprets the typed
+			// number and does not convert it (CLAUDE.md, absolute).
+			{ label: pc.lpn_units_keep || 'Keep', fn: function () {
 				var n = countUnitValues(name);
 				applyOneUnit(name, to);
 				rememberUnitSelections();
@@ -62116,37 +62166,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				setNotice(String(pc.lpn_status_reinterpreted || 'Values ({n}) now mean {unit}. Nothing was rewritten.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
-			// **THE UNDO SNAPSHOT IS THE BACKUP, AND NO SECOND COPY IS OFFERED** (Task 425's open
-			// question, answered here).
-			//
-			// A Destructive change is a user-initiated edit of the document, so it gets exactly what
-			// every other edit gets: one snapshot, taken before anything moves, on the same 20-deep
-			// stack. A separate backup would be a second document with no home -- this page has one
-			// document and one undo stack (Task 184) -- and offering the choice would put a second
-			// question inside a dialog whose whole job is to ask one, at the moment the user is
-			// already deciding something harder.
-			//
-			// What was genuinely missing was not a backup but HALF AN UNDO: the snapshot carried the
-			// numbers and not the UNITS, so Ctrl+Z gave back the original values with the NEW unit
-			// still on the strip -- silently landing the user in the Non-destructive outcome they
-			// had just declined. saveUndoSnapshot() now records readUnitSelections() and undo()
-			// restores it, so one Ctrl+Z reverts the whole change.
-			//
-			// The one limit, stated because it is the only way to lose these numbers: switching
-			// projects clears the undo stack (clearUndo()), so after a project switch the original
-			// inputs live only in the file on disk -- which is untouched until the user saves.
-			{ label: pc.lpn_units_destructive || 'Destructive', fn: function () {
-				var fOld = EngCalcs.unitFactors[from], fNew = EngCalcs.unitFactors[to], n;
-				saveUndoSnapshot();
-				applyOneUnit(name, to);
-				n = (fOld && fNew) ? convertUnitValues(name, fNew / fOld) : 0;
-				rememberUnitSelections();
-				afterUnitChange(unitFromMap(name, from));
-				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
-					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
-			} },
-			// Cancel does nothing on purpose, and there is nothing for it to do: the select was put
-			// back before the dialog opened, no snapshot was taken, and no number was read.
+			// Cancel does nothing on purpose: the select was put back before the dialog opened, no
+			// snapshot was taken, and no number was read.
 			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
 		]);
 	}
@@ -62168,8 +62189,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **NOT refreshAllFromDocument() -- THAT IS THE PROJECT-ARRIVAL PATH** (ROADMAP Task 653, LEFT
 	// half). A unit change is not a different network arriving: nothing moves. CLAUDE.md's Unit
 	// Sets rule is "changing a unit reinterprets the typed number; it never converts it" -- so the
-	// STORED numbers are untouched (Non-destructive) or rewritten in place by convertUnitValues()
-	// (Destructive) before this runs either way, and no unit here ever decides a coordinate (see
+	// STORED numbers are untouched (Keep) or rewritten in place by convertUnitValues()
+	// (Convert) before this runs either way, and no unit here ever decides a coordinate (see
 	// unitServes() and LPN_UNIT_SELECTS -- length, diameter, roughness, elevation/head, pressure,
 	// flow, velocity, gradient, age; x/y and lon/lat are never among them). So buildDom() has
 	// nothing to rebuild: every element keeps its shape and its place, and rebuilding the whole SVG
@@ -62247,28 +62268,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		function finish() { rememberUnitSelections(); afterUnitChange(fromMap); }
 		function names() { return asked.map(function (c) { return unitLabel(c.name); }).join(', '); }
 		if (!asked.length) { applyAll(); finish(); return; }
+		var fields = [];
 		openDialog(function (body) {
-			buildUnitDialogBody(body, asked[0].sel, asked[0].name, asked[0].to,
-				asked.slice(1).map(function (c) { return [c.sel, c.name, c.to]; }));
+			fields = buildUnitDialogBody(body, asked.map(function (c) { return { sel: c.sel, name: c.name, from: c.from, to: c.to }; }));
 		}, [
-			{ label: pc.lpn_units_nondestructive || 'Non-destructive', fn: function () {
-				var n = 0;
-				asked.forEach(function (c) { n += countUnitValues(c.name); });
-				applyAll();
-				finish();
-				setNotice(String(pc.lpn_status_reinterpreted || 'Values ({n}) now mean {unit}. Nothing was rewritten.')
-					.replace('{n}', String(n)).replace('{unit}', names()));
-			} },
-			{ label: pc.lpn_units_destructive || 'Destructive', fn: function () {
+			{ label: pc.lpn_convas_ok || 'Convert', fn: function () {
 				var n = 0;
 				saveUndoSnapshot();
 				changes.forEach(function (c) {
 					var fOld = EngCalcs.unitFactors[c.from], fNew = EngCalcs.unitFactors[c.to];
 					applyOneUnit(c.name, c.to);
-					if (fOld && fNew) { n += convertUnitValues(c.name, fNew / fOld); }
+					if (fOld && fNew) { n += convertUnitValues(c.name, fNew / fOld, unitDecimalsOf(fields, c.name)); }
 				});
 				finish();
 				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
+					.replace('{n}', String(n)).replace('{unit}', names()));
+			} },
+			{ label: pc.lpn_units_keep || 'Keep', fn: function () {
+				var n = 0;
+				asked.forEach(function (c) { n += countUnitValues(c.name); });
+				applyAll();
+				finish();
+				setNotice(String(pc.lpn_status_reinterpreted || 'Values ({n}) now mean {unit}. Nothing was rewritten.')
 					.replace('{n}', String(n)).replace('{unit}', names()));
 			} },
 			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
@@ -63001,6 +63022,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **TANK WATER DEPTH** (Task 696). A tank is the one node type that has it, and the node
 			// loop prints it only where one is typed.
 			['level', pc.lpn_field_tank_level || 'Water depth'],
+			// **A TANK'S INITIAL VOLUME** (Task 857, Tom 2026-11-18), in the Volume unit; blank for any other node.
+			['initVolume', pc.lpn_field_tank_initvol || 'Initial volume'],
 			['head', pc.lpn_field_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
 			// Off by default. No network has it until a run has been made with the analysis switched
 			// on, and its heading follows that switch -- the name comes from qualityLabel(), never a
@@ -81817,6 +81840,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// field on this list keeps.
 			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
 			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, ex.level, nd.level))); }
+			// Tank only, and only when its volume can be worked out (a diameter or a curve); typed inputs, so in the display unit already.
+			var initVolVal = n.type === 'tank' ? tankInitialVolumeDisplay(n) : undefined;
+			if (ls.node.initVolume && typeof initVolVal === 'number') { lines.push(affix('node', 'initVolume', rawLine(initVolVal, ex.initVolume, nd.initVolume))); }
 			// **LAST, AND ONLY WHERE THERE IS ONE.** A network with the analysis off, or one that has
 			// not been run since it was switched on, prints nothing here rather than a zero -- the
 			// same rule an unsolved pressure and an unstated elevation already follow.
@@ -81927,6 +81953,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// is a typed number already in the Elevation/Head display unit, the same treatment elev
 			// gets above.
 			level: nodeValueMap(function (n) { return n.type === 'tank' ? plainRound(effective(n, 'level'), nd.level) : undefined; }),
+			initVolume: nodeValueMap(function (n) { return n.type === 'tank' ? plainRound(tankInitialVolumeDisplay(n), nd.initVolume) : undefined; }),
 			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(baseDemandTotal(n), nd.demand) : undefined; }),
 			// plainRound(), not displayRound(): a resolved demand is a typed number times a
 			// dimensionless multiplier, so it is already in the displayed unit and never crossed SI.
@@ -81976,6 +82003,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var extrema = {
 			elev: fieldExtrema(nodeVal.elev.list),
 			level: fieldExtrema(nodeVal.level.list),
+			initVolume: fieldExtrema(nodeVal.initVolume.list),
 			demand: fieldExtrema(nodeVal.demand.list),
 			demandActual: fieldExtrema(nodeVal.demandActual.list),
 			head: fieldExtrema(nodeVal.head.list),

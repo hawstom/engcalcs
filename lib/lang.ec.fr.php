@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='Débits prélevés du réseau à ce nœud. Saisissez
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='Cette unité détermine le sens de vos saisies';
-$ec_lang['lpn_units_warn_lead']='{unit} est l\'unité de ce que vous saisissez pour :';
-$ec_lang['lpn_units_options_head']='Quand vous changez une unité :';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='Non destructif';
-$ec_lang['lpn_units_nondestructive_desc']='Non destructif : laisse chaque saisie telle quelle et la réinterprète dans la nouvelle unité.';
-$ec_lang['lpn_units_destructive']='Destructif';
-$ec_lang['lpn_units_destructive_desc']='Destructif : réécrit chaque saisie par une conversion mathématique, afin que le réseau reste physiquement à peu près le même, aux tolérances de conversion près. Les valeurs saisies à l\'origine sont perdues. Annuler les rétablit.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='Valeurs ({n}) qui signifient désormais {unit}. Rien n\'a été réécrit.';
 $ec_lang['lpn_status_converted']='Valeurs ({n}) réécrites en {unit}.';

@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='ဤအမှတ်တွင် ကွန်ရက်
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='ဤယူနစ်သည် သင့်ထည့်သွင်းချက်များကို မည်သို့ဖတ်သည်ကို သတ်မှတ်သည်';
-$ec_lang['lpn_units_warn_lead']='{unit} သည် အောက်ပါအတွက် သင်ရိုက်ထည့်သည့် ယူနစ်ဖြစ်သည် -';
-$ec_lang['lpn_units_options_head']='ယူနစ်တစ်ခု ပြောင်းလိုက်သောအခါ -';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='ဖျက်ဆီးခြင်း မရှိ';
-$ec_lang['lpn_units_nondestructive_desc']='ဖျက်ဆီးခြင်း မရှိ - အကွက်တိုင်းကို ရှိသည့်အတိုင်း ထားပြီး ယူနစ်အသစ်ဖြင့်သာ ပြန်အနက်ဖွင့်သည်။';
-$ec_lang['lpn_units_destructive']='ဖျက်ဆီးသည်';
-$ec_lang['lpn_units_destructive_desc']='ဖျက်ဆီးသည် - အကွက်တိုင်းကို သင်္ချာနည်းဖြင့် ပြောင်းလဲရေးသားသဖြင့်၊ ကွန်ရက်သည် ပြောင်းလဲမှု သည်းခံချက်အတွင်း ရုပ်ပိုင်းဆိုင်ရာ အတူတူနီးပါး ကျန်ရှိနေသည်။ မူလ ရိုက်ထည့်ချက်များ ပျောက်သွားသည်။ Undo ဖြင့် ၎င်းတို့ ပြန်ရောက်နိုင်သည်။';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='ယခု {unit} ဟု အဓိပ္ပာယ်ရှိလာသော တန်ဖိုးများ ({n})။ မည်သည့်အရာမျှ ပြန်ရေးထားခြင်း မရှိပါ။';
 $ec_lang['lpn_status_converted']='ပြန်ရေးလိုက်သော တန်ဖိုးများ ({n}) ကို {unit} အဖြစ် ပြောင်းထားသည်။';

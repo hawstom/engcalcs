@@ -897,6 +897,7 @@ $ec_lang['lpn_field_tank_base_elev']='Base elevation';
 $ec_lang['lpn_field_tank_base_elev_tip']='Elevation of the tank bottom, from which water depth and volume are measured. Left blank, the bottom is at the ground elevation.';
 $ec_lang['lpn_tank_ground_elev_tip']='Ground elevation at the tank. Pressure at the tank is measured from here, as at a junction.';
 $ec_lang['lpn_field_tank_level']='Water depth';
+$ec_lang['lpn_field_tank_initvol']='Initial volume';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='Depth of water in the tank, measured up from the tank bottom.';
 $ec_lang['lpn_field_tank_minlevel']='Lowest water depth';
@@ -910,7 +911,7 @@ $ec_lang['lpn_field_tank_diameter']='Tank diameter';
 $ec_lang['lpn_field_tank_diameter_tip']='For a vertical cylinder. Same units as elevation, not pipe diameter. It sets how much water a given depth holds.';
 // EPANET's Minimum Volume and Can Overflow ([TANKS] columns 7 and 9). The volume is in the Volume unit.
 $ec_lang['lpn_field_tank_minvol']='Minimum volume';
-$ec_lang['lpn_field_tank_minvol_tip']='The volume of water in the tank at its minimum depth, in the Volume unit, for a tank with a sloped or curved bottom; 0 uses the tank diameter, and a volume curve overrides it.';
+$ec_lang['lpn_field_tank_minvol_tip']='The volume of water in the tank at its minimum depth, in the Volume unit, for a tank with a sloped or curved bottom; 0 uses the tank diameter and minimum depth, and a volume curve overrides it.';
 $ec_lang['lpn_field_tank_overflow']='Can overflow';
 $ec_lang['lpn_field_tank_overflow_tip']='Yes lets a full tank spill what it cannot hold, so the pipe into it stays open; No closes the pipe into a full tank. Only an extended period simulation uses it.';
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
@@ -1098,7 +1099,7 @@ $ec_lang['lpn_guide_set_search_def']='<p>Type one or more words in Search settin
 $ec_lang['lpn_guide_set_scn_term']='Settings in a scenario';
 $ec_lang['lpn_guide_set_scn_def']='<p>In a scenario other than Base, a value typed for a setting that scenarios can override is stored as an override, and the row is marked with a solid dot. A triangle marks a setting that scenarios below the open one override. The Scenario manager entry lists which settings can be overridden. Units are the same in every scenario. Restore defaults is dimmed outside Base, and Apply these new-asset values to every existing asset is refused there, because it changes the drawing itself.</p>';
 $ec_lang['lpn_guide_set_units_term']='Changing a unit';
-$ec_lang['lpn_guide_set_units_def']='<p>Each quantity has its own unit in Units. When values in the project are entered in that unit, changing it asks a question first. Non-destructive keeps every number as typed and reads it in the new unit. Destructive rewrites the numbers by conversion, so the network stays physically the same, and the original numbers are lost unless Undo is used; one Undo restores the numbers and the unit. Cancel leaves everything as it was.</p><p>Example on Net1: choose mm for Diameter in Units. Destructive rewrites 13 values, and Pipe 10 reads 457.2 mm. Non-destructive leaves the 13 values alone, and Pipe 10 reads 18 mm.</p>';
+$ec_lang['lpn_guide_set_units_def']='<p>Each quantity has its own unit in Units. When values in the project are entered in that unit, changing it asks: Convert inputs from the old unit to the new one? Convert rewrites the numbers by conversion, rounded to the Decimals you give, so the network stays physically the same; one Undo restores the numbers and the unit. Keep leaves every number as typed and reads it in the new unit. Cancel leaves everything as it was.</p><p>Example on Net1: choose mm for Diameter in Units. Convert rewrites 13 values, and Pipe 10 reads 457 mm with Decimals 0. Keep leaves the 13 values alone, and Pipe 10 reads 18 mm.</p>';
 $ec_lang['lpn_guide_set_assets_term']='New assets, and applying values to existing ones';
 $ec_lang['lpn_guide_set_assets_def']='<p>ID prefixes and Values are for assets drawn from now on. They do not change assets already drawn. Apply to all, beside an ID prefix, gives every existing asset of that kind an ID that starts with the prefix; each keeps its number, and an ID that does not end in a number is not changed. Apply these new-asset values to every existing asset replaces those properties on every existing asset, after a question, but only for the properties whose labels are showing on the map. Undo reverses it.</p>';
 $ec_lang['lpn_guide_set_reset_term']='Restore defaults and Start fresh';
@@ -1302,22 +1303,12 @@ $ec_lang['lpn_demand_tip']='Flows taken out of the network at this node. Enter a
 // **THE UNITS STRIP IS TWO GROUPS** (Task 422). The first decides what the numbers in the document
 // MEAN, so changing one is a model change and the page asks first; the second is how results are
 // read, and changes with no fanfare. Three quantities appear in both because they serve both sides.
-// The question an INPUT unit change asks, in Tom's own wording (2026-08-18, Task 425) rather than a
-// paraphrase of it: name the quantity, list the fields it decides ONE PER LINE, then name the two
-// answers by what they do to the numbers already typed. {unit} is a unit name; the field names are
-// built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
-// NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
-// 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='This unit defines how your inputs are read';
-$ec_lang['lpn_units_warn_lead']='{unit} is the unit of what you enter for:';
-$ec_lang['lpn_units_options_head']='When you change a unit:';
-// Each option's sentence opens with the word on its own button, so the button and the explanation
-// say the same word. Non-destructive is the suite's standing behaviour and the first button;
-// Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='Non-destructive';
-$ec_lang['lpn_units_nondestructive_desc']='Non-destructive: leaves every input as it is and reinterprets it in the new unit.';
-$ec_lang['lpn_units_destructive']='Destructive';
-$ec_lang['lpn_units_destructive_desc']='Destructive: rewrites every input with a mathematical conversion, so the network stays physically close to the same, within conversion tolerances. It loses the original inputs. Undo puts them back.';
+// The question an INPUT unit change asks, in Tom's own wording (2026-11-18): Convert inputs from {old}
+// to {new}? with Convert, Keep and Cancel, and a Decimals field Convert rounds to. {old} and {new} are
+// unit names; the field names are built by the page, one per line.
+$ec_lang['lpn_units_convert_q']='Convert inputs from {old} to {new}?';
+$ec_lang['lpn_units_keep']='Keep';
+$ec_lang['lpn_units_convert_note']='Convert rewrites each number in the new unit, rounded to the decimals given. Keep leaves each number as typed and reads it in the new unit. Undo puts back a conversion.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='Values ({n}) now mean {unit}. Nothing was rewritten.';
 $ec_lang['lpn_status_converted']='Values ({n}) were rewritten into {unit}.';

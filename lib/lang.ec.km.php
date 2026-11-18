@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='លំហូរដែលទាញយកចេញព�
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='ខ្នាតនេះកំណត់របៀបអានធាតុបញ្ចូលរបស់អ្នក';
-$ec_lang['lpn_units_warn_lead']='{unit} ជាឯកតារបស់អ្វីដែលអ្នកបញ្ចូលសម្រាប់៖';
-$ec_lang['lpn_units_options_head']='នៅពេលអ្នកប្ដូរឯកតា៖';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='មិនកែប្រែលេខ';
-$ec_lang['lpn_units_nondestructive_desc']='មិនកែប្រែលេខ៖ ទុកចំណុចបញ្ចូលនីមួយៗឲ្យនៅដដែល ហើយអានវាឡើងវិញក្នុងឯកតាថ្មី។';
-$ec_lang['lpn_units_destructive']='កែប្រែលេខ';
-$ec_lang['lpn_units_destructive_desc']='កែប្រែលេខ៖ សរសេរចំណុចបញ្ចូលនីមួយៗឡើងវិញដោយការបំលែងគណិតវិទ្យា ដូច្នេះបណ្ដាញនៅតែស្ទើរតែដូចដើមផ្នែករូបវិទ្យា ក្នុងដែនកំណត់នៃការបំលែង។ វាបាត់បង់ចំណុចបញ្ចូលដើម។ ត្រឡប់ក្រោយនាំវាមកវិញ។';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='តម្លៃ ({n}) ឥឡូវនេះមានន័យ {unit}។ គ្មានអ្វីត្រូវបានសរសេរឡើងវិញឡើយ។';
 $ec_lang['lpn_status_converted']='តម្លៃ ({n}) ត្រូវបានសរសេរឡើងវិញទៅជា {unit}។';

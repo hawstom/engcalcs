@@ -49,11 +49,17 @@ async function main() {
 			const a = await Session.open(browser, 'ucf', { viewport: { width: 1500, height: 950 }, extraHTTPHeaders: { 'Accept-Language': 'en-US,en;q=0.9' } });
 			await a.goto('Looped-Network.php?ec_nolog=1');
 			await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-			for (const k of ['lpn_units_nondestructive', 'lpn_units_destructive', 'lpn_cancel', 'lpn_ex_net1_title', 'lpn_ex_net1_si_title', 'lpn_field_tank_minvol', 'lpn_result_tank_volume', 'lpn_pane_toggle']) { L[k] = await a.lang(k); }
+			for (const k of ['lpn_units_keep', 'lpn_convas_ok', 'lpn_units_convert_q', 'lpn_cancel', 'lpn_ex_net1_title', 'lpn_ex_net1_si_title', 'lpn_field_tank_minvol', 'lpn_result_tank_volume', 'lpn_pane_toggle']) { L[k] = await a.lang(k); }
 			await a.openExampleCard(L[key]);
 			await a.settle(800);
 			return a;
 		};
+		// The question's Decimals field(s), set the way a visitor types in them.
+		const setDecimals = (a, n) => a.page.evaluate((n) => {
+			const f = Array.from(document.querySelectorAll('#lpn_dialog_body input[data-decimals-for]'));
+			f.forEach((i) => { i.value = String(n); i.dispatchEvent(new Event('input', { bubbles: true })); i.dispatchEvent(new Event('change', { bubbles: true })); });
+			return f.length;
+		}, n);
 		const press = (a, label) => a.page.evaluate((t) => {
 			const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === t);
 			if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); }
@@ -93,7 +99,7 @@ async function main() {
 		const graphText = (a) => a.page.evaluate(() => { const h = document.getElementById('lpn_pgraph_chart'); return h ? h.textContent : ''; });
 		const dialogOpen = (a) => a.dialog().then((d) => !!d);
 
-		for (const [mode, label] of [['destructive', 'Convert'], ['nondestructive', 'Reinterpret']]) {
+		for (const [mode, label] of [['destructive', 'Convert'], ['nondestructive', 'Keep']]) {
 			console.log('\n--- Net1, Volume changed FIRST, ' + label + ' ---');
 			const a = await fresh('lpn_ex_net1_title');
 			await a.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
@@ -105,7 +111,10 @@ async function main() {
 			await setSel(a, 'lpn_u_volume', 'mgal');
 			await a.settle(500);
 			ok('the question appears', await dialogOpen(a));
-			await press(a, L[mode === 'destructive' ? 'lpn_units_destructive' : 'lpn_units_nondestructive']);
+			ok('the question names ft^3 and MG', await a.page.evaluate(() => document.getElementById('lpn_dialog_body').textContent.indexOf('Convert inputs from ft') === 0));
+			ok('one Decimals field is offered, at 3 for MG', await a.page.evaluate(() => { const f = document.querySelectorAll('#lpn_dialog_body input[data-decimals-for]'); return f.length === 1 && f[0].value === '3'; }));
+			if (mode === 'destructive') { await setDecimals(a, 6); }
+			await press(a, L[mode === 'destructive' ? 'lpn_convas_ok' : 'lpn_units_keep']);
 			await a.settle(900);
 			const mv = await stored(a, '2', 'minVolume');
 			if (mode === 'destructive') {
@@ -162,7 +171,8 @@ async function main() {
 		const l0 = await pipeLen();
 		await setSel(b, 'lpn_u_length', 'ft');
 		await b.settle(500);
-		await press(b, L.lpn_units_destructive);
+		await setDecimals(b, 6);
+		await press(b, L.lpn_convas_ok);
 		await b.settle(900);
 		const l1 = await pipeLen();
 		ok('Length Convert as the first change: ' + l0.v + ' m became ' + (l0.v / 0.3048).toFixed(3) + ' ft', !!l1 && l1.id === l0.id && Math.abs(l1.v - l0.v / 0.3048) < 1e-6 * l0.v, JSON.stringify(l1));

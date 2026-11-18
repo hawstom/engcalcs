@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='Расход, забираемый из сети в 
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='Эта единица определяет, как читаются введённые числа';
-$ec_lang['lpn_units_warn_lead']='{unit} — это единица измерения того, что вы вводите для:';
-$ec_lang['lpn_units_options_head']='При изменении единицы измерения:';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='Без преобразования';
-$ec_lang['lpn_units_nondestructive_desc']='Без преобразования: оставляет все введённые значения без изменений и переосмысливает их в новой единице измерения.';
-$ec_lang['lpn_units_destructive']='С преобразованием';
-$ec_lang['lpn_units_destructive_desc']='С преобразованием: пересчитывает все введённые значения по формуле перевода единиц, поэтому сеть остаётся физически почти такой же, в пределах погрешности пересчёта. Исходные значения при этом теряются. Отмена вернёт их обратно.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='Значения ({n}) теперь означают {unit}. Ничего не было переписано.';
 $ec_lang['lpn_status_converted']='Значения ({n}) были переписаны в {unit}.';

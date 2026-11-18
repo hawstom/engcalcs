@@ -1268,16 +1268,9 @@ $ec_lang['lpn_demand_tip']='التدفق المسحوب من الشبكة عند
 // built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
 // NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='هذه الوحدة تحدد معنى مدخلاتك';
-$ec_lang['lpn_units_warn_lead']='{unit} هي وحدة ما تُدخله في:';
-$ec_lang['lpn_units_options_head']='عند تغيير الوحدة:';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='غير إتلافي';
-$ec_lang['lpn_units_nondestructive_desc']='غير إتلافي: يترك كل مُدخل كما هو ويعيد تفسيره بالوحدة الجديدة.';
-$ec_lang['lpn_units_destructive']='إتلافي';
-$ec_lang['lpn_units_destructive_desc']='إتلافي: يعيد كتابة كل مُدخل بتحويل رياضي، بحيث تبقى الشبكة قريبة فيزيائياً من حالتها، ضمن هوامش التحويل. يفقد هذا الخيار المُدخلات الأصلية. التراجع يعيدها.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='القيم ({n}) تعني الآن {unit}. لم يُعَد كتابة أي شيء.';
 $ec_lang['lpn_status_converted']='القيم ({n}) أُعيدت كتابتها بوحدة {unit}.';
