@@ -5034,3 +5034,10 @@ OBSERVED (re-verify; real Chromium, Net1 EPS 25 frames to 24 h, desktop 1400x900
 - Floating Properties box covers the bottom-pane chart in the middle (line at 15:00 is under it: elementFromPoint gives the box graph's svg). A toast at the right edge covered the line at 24:00. On the phone the box covers the whole pane, so its own graph is the handle.
 - Stray: lpn-time.js has an orphan doc comment ("A press on the graph's time line takes the clock in hand") above lpnTimeStops.
 - NOT DONE: Net3 (examples list matched but result looked like Net1; not distinguished), system-flow chart alone, mutation test, how the line looks in the pane, dark theme.
+
+## 2026-11-17 feat/graph-scrub round 2 (16c0c032d, cda4057ae), Perry
+
+- OBSERVED (Chromium, 1366x768 mouse, Net1 EPS, junction 10, bottom Time series): at 0:00 a solid blue knob and blue line show on the left frame; mouse press-drag on the plot (not on the line) moves the run (to 7:00), the map labels change and the toolbar time selector agrees; Step forward moves the line one step; plain click on plot and on a dot moves nothing, the dot's hover tip still shows; dark theme line is a lighter blue, visible. check_all --fast exit 0.
+- OBSERVED (390 wide, touch): in the Properties box chart a finger on the line or knob seeks; a finger on the plot away from the line seeks nothing and the pane scrolls (scrollTop 14 to 0); tap moves nothing.
+- OBSERVED: at 1366x768 the floating Properties box and the "Reporting time steps" notice cover the middle of the bottom chart; plot drags must start left of x~640.
+- SPECULATION: a shared scratchpad path let a sibling agent overwrite my fast.log; use a unique filename.
