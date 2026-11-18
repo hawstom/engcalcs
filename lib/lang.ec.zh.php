@@ -2643,7 +2643,7 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>方�
 $ec_lang['lpn_notes_color_term']='颜色区间的边界值保持不变';
 $ec_lang['lpn_notes_color_def']='<strong>色带边界值</strong>在选择数据分类方法时设定，此后不会随每个时间步重新设定，因为那样会使颜色在每个时刻代表新的含义，不利于直观了解系统。方案显示“基础”的边界值。EPANET 也采用同样的方式。若要获得新的边界值，请重新选择一种方法，或自行输入边界值。';
 $ec_lang['lpn_notes_engine_term']='本页面运行的 EPANET 版本';
-$ec_lang['lpn_notes_engine_def']='本页面使用的 EPANET 求解器是 OWA-EPANET 2.3.5，发布于 2025 年 2 月 20 日。EPANET 由 Open Water Analytics 社区开发，该社区与美国环境保护局合作，后者于 2019 年 12 月发布了 2.2.0 版。运行报告中显示为 2.3.05，是因为引擎将最后一位数字写成两位。它通过 Luke Butler 基于 MIT 许可证发布的 epanet-js 0.9.0 接入本页面，并在您的浏览器内运行：您的管网从不会被发送到别处求解。';
+$ec_lang['lpn_notes_engine_def']='本页面使用的 EPANET 求解器是 OWA-EPANET 2.3.5，发布于 2025 年 2 月 20 日。EPANET 由 Open Water Analytics 社区开发，该社区与美国环境保护局合作，后者于 2019 年 12 月发布了 2.2.0 版。求解器（运行）报告中显示为 2.3.05，是因为引擎将最后一位数字写成两位。它通过 Luke Butler 基于 MIT 许可证发布的 epanet-js 0.9.0 接入本页面，并在您的浏览器内运行：您的管网从不会被发送到别处求解。';
 // The Notes example (Task 785). Held by dev/lpn-spike/user-guide-notes-harness.js.
 $ec_lang['lpn_guide_nt_example_term']='Net1 上的示例：超出曲线范围的水泵';
 $ec_lang['lpn_guide_nt_example_def']='打开 Net1 示例并选择“<strong>水务</strong>”、“<strong>库</strong>”。曲线 1，即水泵 9 的 Pump Curve，只有一个点，250 ft 处 1500 gpm。零流量水头为 333.3 ft，最大流量为 3000 gpm。在 3500 gpm（已超出曲线末端）时，曲线给出的水头为 −120.4 ft。EPANET 求解器报告同样的水头，即水泵两端损失 120.4 ft，并警告水泵无法提供足够的流量或水头。';
