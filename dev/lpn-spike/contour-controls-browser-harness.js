@@ -10,7 +10,7 @@
 //   5. in a child scenario time steps leave an open pull-down alone (no rebuild); a re-solve that changes the
 //      default interval shows in the box.
 //   6. a 390-wide phone: the box fits.
-//   7. round 5: Show plot has no tip; a standing line "Follows project "Node colors" settings." heads the
+//   7. round 5: Show plot has no tip; a standing line "Uses the project "Node colors" settings." heads the
 //      box with Node colors a link into Settings at Symbology, Node colors; Show plot changes no other control (Fill,
 //      Opacity, Buffer, Lines, Interval, Labels), off draws nothing, on draws them as set; undo, save and reopen, and a
 //      child scenario agree.

@@ -14181,9 +14181,9 @@ var EngCalcs = EngCalcs || {};
 		// their job."). Fill, lines, labels and Ground keep their values and stay editable; off, nothing is drawn.
 		// **THE STANDING LINE** names what the plot follows, always, with Node colors a way into Settings there. With No
 		// color there is no property to plot: a second line says so, and nothing turns colors on (Tom, 2026-10-29).
-		var stand = document.createElement('div'), link = document.createElement('a'), tpl = pc.lpn_contour_follows || 'Follows project "{link}" settings.', at = tpl.indexOf('{link}');
+		var stand = document.createElement('div'), link = document.createElement('a'), tpl = pc.lpn_contour_follows || 'Uses the project "{link}" settings.', at = tpl.indexOf('{link}');
 		// A translation that lost the placeholder falls back to the English sentence, so the link is always there.
-		if (at < 0) { tpl = 'Follows project "{link}" settings.'; at = tpl.indexOf('{link}'); }
+		if (at < 0) { tpl = 'Uses the project "{link}" settings.'; at = tpl.indexOf('{link}'); }
 		stand.className = 'lpn-contour-box-note'; stand.id = 'lpn_contour_follows';
 		link.href = '#'; link.id = 'lpn_contour_follows_link';
 		link.textContent = pc.lpn_settings_sym_node_colors || 'Node colors';
@@ -36347,7 +36347,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A press on a mark is not a press on the cell: it must not move the selection, enter the cell or take focus.
 		box.addEventListener('mousedown', function (e) { e.stopPropagation(); e.preventDefault(); });
 		if (push) {
-			box.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Push override upward', function () {
+			box.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Move this override up', function () {
 				var h = paneOverrideHit(c, row), vals, dest, others, now;
 				if (!h || h.col) { return; }
 				paneInScenario(h.scn, function () {
@@ -37394,7 +37394,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				note.className = 'lpn-gfull';
 				// What All holds and what it leaves out (Task 814, rows 24-26): the file is flat copies, not the tree.
 				var noteText = (pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.') + ' ' +
-					(pc.lpn_export_table_scn_keeps || 'All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.');
+					(pc.lpn_export_table_scn_keeps || 'With All chosen, the file holds one sheet for each scenario. Parent scenarios, alternatives, and inheritance are not in the file.');
 				body.appendChild(note);
 				groups.scenarios.addEventListener('change', function () { note.textContent = picked('scenarios') === 'all' ? noteText : ''; });
 			}
@@ -47387,7 +47387,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{n}', String(coords.ids.length)));
 		}
 		if (semis) {
-			said.push((pc.lpn_inp_export_flat_label_semicolon || 'Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.')
+			said.push((pc.lpn_inp_export_flat_label_semicolon || 'Texts ({n}) in this project contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written in full in the file, and EPANET will read only the part before the semicolon.')
 				.replace('{n}', String(semis.ids.length)));
 		}
 		if (fittings) {
@@ -48282,12 +48282,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// comment lines themselves, which is the only name they have.
 			case 'control-comments': return pc.lpn_inp_drop_control_comments || 'These comments at the end of control lines were not imported, because those controls were not imported. Every control that could be imported was.';
 			case 'comments': return pc.lpn_inp_drop_comments || 'These comment lines in the patterns of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern was imported in full.';
-			case 'duplicate-pattern-id': return pc.lpn_inp_drop_dup_pattern || 'These pattern IDs are defined in more than one place in this file. EPANET adds the later multipliers after the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start.';
-			case 'duplicate-curve-id': return pc.lpn_inp_drop_dup_curve || 'These curve IDs are defined in more than one place in this file. EPANET adds the later points after the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start.';
+			case 'duplicate-pattern-id': return pc.lpn_inp_drop_dup_pattern || 'These pattern IDs are defined in more than one place in this file. EPANET appends the later multipliers to the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start.';
+			case 'duplicate-curve-id': return pc.lpn_inp_drop_dup_curve || 'These curve IDs are defined in more than one place in this file. EPANET appends the later points to the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start.';
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
-			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
+			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.';
 			case 'pressure-unit': return pc.lpn_inp_drop_pressure_unit || 'This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
 			case 'other-options': return pc.lpn_inp_drop_other_options || 'This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
 			// **THE ONE LOSS ON THE `.net` PATH THAT CANNOT BE CARRIED**, so it is told instead. A
@@ -49174,8 +49174,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} }, { label: pc.lpn_cancel || 'Cancel', fn: cancel }];
 		openDialog(function (body) {
 			function p(t, bold) { var e = document.createElement('p'); e.className = bold ? 'lpn-dlg-p lpn-dlg-strong' : 'lpn-dlg-p'; e.textContent = t; body.appendChild(e); return e; }
-			p(pc.lpn_inpalt_lead || 'This file changes values in the categories below. Choose the alternative that receives the values of each.');
-			p(pc.lpn_inpalt_base_note || 'Every scenario inherits the Base alternative, so choosing it changes them all.');
+			p(pc.lpn_inpalt_lead || 'This file changes values in the categories below. For each category, choose the alternative that receives its values.');
+			p(pc.lpn_inpalt_base_note || 'Every scenario inherits the Base alternative, so choosing it changes the values in every scenario.');
 			cats.forEach(function (cat) {
 				var parent = importAltParent(scn, cat), pr = prior && prior[cat], wrap = document.createElement('div'),
 					opts = [['own', importAltOwnLabel(scn, cat)],
@@ -70273,7 +70273,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					.replace('{names}', p.added.join(', ')));
 			}
 			if (p.comments) {
-				lines.push((pc.lpn_library_import_comments || 'Comment rows copied in with them: {n}').replace('{n}', String(p.comments)));
+				lines.push((pc.lpn_library_import_comments || 'Comment rows copied with the imported items: {n}').replace('{n}', String(p.comments)));
 			}
 			if (p.left) {
 				lines.push((pc.lpn_library_import_comments_left || 'Comment rows left out because the item below each was skipped, or nothing follows them: {n}').replace('{n}', String(p.left)));
@@ -70885,8 +70885,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			row, group, tip;
 		if (n < 2 || entries.length !== n) { return; }
 		tip = (pc.lpn_library_move_tip || 'Moves the selected item. Click an item to select it. The order is saved with the project.') + ' ' +
-			(sec === 'controls' ? (pc.lpn_library_move_tip_controls || 'When two controls change the same link at the same time, the control lower in the list takes effect.')
-				: sec === 'rules' ? (pc.lpn_library_move_tip_rules || 'When two rules call for conflicting actions on the same link, the rule with the higher PRIORITY takes effect, and at equal priority the rule higher in the list takes effect.')
+			(sec === 'controls' ? (pc.lpn_library_move_tip_controls || 'When two controls change the same link at the same time, the control nearer the bottom of the list is the one applied.')
+				: sec === 'rules' ? (pc.lpn_library_move_tip_rules || 'When two rules call for conflicting actions on the same link, the rule with the larger PRIORITY number is applied, and at equal PRIORITY the rule nearer the top of the list is applied.')
 				: (pc.lpn_library_move_tip_none || 'The order does not change a run.'));
 		// The shared box style's own row for a box's buttons: sticky, so the four stay in reach down a long list.
 		row = libEl('div', 'lpn-box-tools lpn-lib-toolrow');
@@ -74501,13 +74501,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else { old = null; }
 		return { name: name, old: old };
 	}
-	// Push override upward is always asked, through the page's own dialog, naming where it goes; the
+	// Move this override up is always asked, through the page's own dialog, naming where it goes; the
 	// sentence about other scenarios is added when some change. `go` runs after the undo snapshot is taken.
 	function askPushOverride(dest, n, go) {
 		var pc = EngCalcs.pageConfig || {}, text = dest.old === null
-			? (pc.lpn_ovm_push_ask || 'Push override upward to {target}?').replace('{target}', dest.name)
-			: (pc.lpn_ovm_push_ask_cur || 'Push override upward? Current value in {target}: {old}.').replace('{target}', dest.name).replace('{old}', dest.old);
-		if (n) { text += (pc.lpn_ovm_push_others || ' Scenarios that inherit it change ({n} total).').replace('{n}', String(n)); }
+			? (pc.lpn_ovm_push_ask || 'Move this override up to {target}?').replace('{target}', dest.name)
+			: (pc.lpn_ovm_push_ask_cur || 'Move this override up? Current value in {target}: {old}.').replace('{target}', dest.name).replace('{old}', dest.old);
+		if (n) { text += (pc.lpn_ovm_push_others || ' The {n} scenarios that inherit it will change.').replace('{n}', String(n)); }
 		askDialog({ kind: 'confirm', text: text }, function (yes) {
 			if (!yes) { return; }
 			saveUndoSnapshot();
@@ -74606,7 +74606,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The orange up arrow over the dot (Task 855): move this override into the parent scenario.
 		pushProps = (o.on && !baseHere && pushTarget(o.el, o.props)) ? pushableProps(o.el, o.props) : [];
 		if (pushProps.length) {
-			g.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Push override upward', function () {
+			g.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Move this override up', function () {
 				var now = pushableProps(o.el, o.props), vals = pushValuesOf(o.el, now);
 				askPushOverride(pushDestination(o.el, now, vals, ((/\(([^()]+)\)\s*\??\s*$/.exec(String(start.textContent || '').replace(/\s+/g, ' ')) || [])[1]) || ''), pushOtherScenarios(o.el, o.props).length, function () {
 					pushOverrideUp(o.el, now, vals);
@@ -80585,7 +80585,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (issue.code === 'valve-conflict') { return (pc.lpn_diag_valve_conflict || 'These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'gpv-curve-order') { return (pc.lpn_diag_gpv_curve_order || 'The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:') + ' ' + issue.ids.join(', '); }
 		// A [RULES] block EPANET would refuse to read, named by rule in both engines (Task 733).
-		if (issue.code === 'rules-refused') { return (pc.lpn_diag_rules_refused || 'EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'rules-refused') { return (pc.lpn_diag_rules_refused || 'EPANET does not accept these rules. A clause in each is not valid for the element it refers to, or gives a value that cannot be read. Correct or delete them:') + ' ' + issue.ids.join(', '); }
 		// The rest of what EPANET refuses in a period, named in both engines, and the built-in solver's own stop (Task 733).
 		if (issue.code === 'control-refused') { return (pc.lpn_diag_control_refused || 'EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'rule-step-refused') { return pc.lpn_diag_rule_step_refused || 'Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.'; }
@@ -80597,7 +80597,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (issue.code === 'builtin-stopped') {
 			return typeof issue.t === 'number' && EngCalcs.lpnTimeElapsedText
 				? (pc.lpn_diag_builtin_stopped_at || 'The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.').replace('{time}', EngCalcs.lpnTimeElapsedText(issue.t))
-				: (pc.lpn_diag_builtin_stopped || 'The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.');
+				: (pc.lpn_diag_builtin_stopped || 'The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting in Settings, Calculation, Solver.');
 		}
 		if (issue.code === 'builtin-error') { return (pc.lpn_diag_builtin_error || 'An error occurred in the built-in solver: {message}').replace('{message}', String(issue.message || '')); }
 		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
@@ -90012,12 +90012,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// split/join, not .replace(): a pipe id may hold `$&`, which .replace() takes for a pattern of its own, and
 			// the id goes in LAST so that an id holding the text `{velocity}` is not filled a second time.
 			parts.push((extended && typeof p.t === 'number'
-				? (pc.lpn_velocity_warn || '⚠ Pipe {id} velocity is {velocity} at {time}.').split('{time}').join(dsTimeText(p.t))
+				? (pc.lpn_velocity_warn || '⚠ Pipe {id} velocity is {velocity} at {time}, above the limit.').split('{time}').join(dsTimeText(p.t))
 				: (pc.lpn_velocity_warn_steady || '⚠ Pipe {id} velocity is {velocity}.'))
 				.split('{velocity}').join(ffQty(p.v, 'lpn_u_velocity')).split('{id}').join(p.id));
 			more = peaks.length - 1;
 			if (more > 0) {
-				parts.push((pc.lpn_velocity_warn_more || '⚠ And more pipes ({n}) above {limit}.')
+				parts.push((pc.lpn_velocity_warn_more || '⚠ Other pipes above {limit}: {n}.')
 					.split('{n}').join(String(more)).split('{limit}').join(ffQty(limit, 'lpn_u_velocity')));
 			}
 		}

@@ -4,7 +4,7 @@
 // Tom, 2026-11-06: *"Should we restyle the table override indicator to use the circle and arrow
 // convention?"* A table cell that holds the open scenario's override wears the orange dot (click:
 // clear that cell's override, one undo step) and the orange up arrow over it (click: the Properties
-// question, "Push override upward to {target}?", then the value moves to the parent; one undo step).
+// question, "Move this override up to {target}?", then the value moves to the parent; one undo step).
 //   T1  Base: the Pipes table has no mark. A scenario with two diameter overrides: exactly two
 //       cells wear marks, each a dot and an arrow, inside the cell; no other cell has one.
 //   T2  No column is wider than in Base (heading widths identical), at desktop and at phone width.
@@ -102,7 +102,7 @@ async function main() {
 		await settle(300);
 		const d0 = await dlg();
 		ok('T3 pressing the arrow keeps focus in the cell being typed in, and typing goes on', !!stillFocus && /1$/.test(String(typed)), String(typed));
-		ok('T3 the arrow asked the push question', !!d0 && /^Push override upward(?: to |\? Current value in )/.test(d0.text), d0 && d0.text);
+		ok('T3 the arrow asked the push question', !!d0 && /^Move this override up(?: to |\? Current value in )/.test(d0.text), d0 && d0.text);
 		console.log('       question: ' + (d0 && d0.text) + ' / buttons ' + (d0 && d0.buttons.join('|')));
 		await shot('push-question');
 		// T4 cancel
