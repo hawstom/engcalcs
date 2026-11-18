@@ -61184,15 +61184,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// coincident plain elements: *"a box asking which one (AutoCAD's Ctrl selection cycling noted,
 	// not wanted first)."* So a box, not cycling.
 	//
-	// **THE BOX OPENS ONLY WHERE A PERSON CAN SEE IT COMING** (Tom, 2026-11-16: *"I can't predict when
-	// I will or won't get a chooser"*): the press lands on a symbol whose DRAWN extent overlaps
-	// another symbol's by at least 0.4 of the smaller one's width. Two separate dots that both fall inside a finger's reach, without
-	// overlapping each other, are an ordinary click on the nearer. **NO LINE IS IN THE LIST**: no pipe
+	// **THE BOX IS STRICTLY AN OVERLAP DISAMBIGUATOR** (Tom, 2026-11-16: *"If you see a Properties box,
+	// it's because you picked an unambiguous symbol ... If you see a disambiguator box, you know that you
+	// picked an overlap"*): it opens only when the pressed POINT lies on the drawn ink of two or more
+	// symbols, wherever else they touch. Any other press is a plain click, nearest within the pickbox or
+	// finger's reach. The one exception: a symbol with none of its ink showing (all of it under other
+	// symbols) joins the box when the press lands on any symbol hiding it. **NO LINE IS IN THE LIST**: no pipe
 	// and no Shape that is an open polyline (*"all symbols, shapes, and text, but not pipes"*); a
 	// click with only lines under it is an ordinary click, which may select a pipe. The one pipe that
 	// is a row is a point: its two ends at one point (an exploded
 	// assembly's zero-length pipe); two pipes drawn exactly over each other cannot be reached by a click.
-	// The element the browser itself hit (never a plain pipe) is always one of the rows. The symbols are
+	// The element the browser itself hit (never a plain pipe), when it is a row, is the first (`first`). The symbols are
 	// a node (any kind), a pump or valve glyph, a Text, and a Shape that is a point or closed.
 	// **AT MOST PICK_MAX_ROWS (6) ROWS** (*"a list of more than about 4 to 5 elements is not
 	// helpful"*): the symbol nearest the press and those truly coincident with it first, then the
@@ -61318,9 +61320,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The chooser's rows for a press: [] when the click is ordinary, else two to PICK_MAX_ROWS rows.
 	// The reach is the pickbox's own, unchanged: a finger's 24 px, a mouse's half the node band.
-	function pickCandidatesAt(cx, cy, touch) {
+	function pickCandidatesAt(cx, cy, touch, first) {
 		var reach = touch ? TOUCH_REACH_PX : LPN_NODE_HIT_PX / 2;
-		return Geom.pickSymbols(pickItemsNear(cx, cy, reach), cx, cy, { reach: reach, cap: PICK_MAX_ROWS });
+		return Geom.pickSymbols(pickItemsNear(cx, cy, reach), cx, cy, { cap: PICK_MAX_ROWS, first: first });
 	}
 	// "Junction J1", "Pump 9", "Shape S1", "Text" and its first words. The type word is the one the toolbar uses.
 	function pickRowLabel(c) {
@@ -61330,7 +61332,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			el = labelById(c.id);
 			words = String((el && effective(el, 'text')) || '').replace(/\s+/g, ' ').trim().slice(0, 24);
 			// A Text still saying just "Text" is named by its ID, as the other rows are.
-			return (pc.lpn_tool_add_text || 'Text') + ' ' + ((words && words !== (pc.lpn_tool_add_text || 'Text') && words !== (pc.lpn_new_text || 'Text')) ? words : c.id);
+			return (pc.lpn_tool_add_text || 'Text') + ' ' + ((words && words !== (pc.lpn_tool_add_text || 'Text')) ? words : c.id);
 		}
 		return reportTypeNoun(c.kind, c.type) + ' ' + c.id;
 	}
@@ -61352,28 +61354,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A Text over a pile is one more thing the press could mean, so it may start a chooser too.
 		if (!t || (t !== svg && t.dataset.node === undefined && t.dataset.lbl === undefined && t.dataset.shape === undefined &&
 			!(t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')))) { return null; }
-		list = pickCandidatesAt(e.clientX, e.clientY, e.pointerType === 'touch');
-		// **THE ELEMENT THE BROWSER ACTUALLY HIT IS ALWAYS A ROW, AND THE FIRST** once there is a choice, so
-		// a box never hides what a plain click would have selected. A plain pipe is not offered (a line).
-		if (list.length >= 2) { pickEnsureHit(list, t); }
+		list = pickCandidatesAt(e.clientX, e.clientY, e.pointerType === 'touch', pickHitOf(t));
 		return list.length >= 2 ? { id: e.pointerId, x: e.clientX, y: e.clientY, shift: !!e.shiftKey,
 			touch: e.pointerType === 'touch', list: list } : null;
 	}
-	function pickEnsureHit(list, h) {
-		var d = (h && h.dataset) || {}, kind, id, el, sh, i;
-		if (d.node !== undefined) { kind = 'node'; id = d.node; }
-		else if (d.link !== undefined && h.classList.contains('lpn-link-symbol-hit')) { kind = 'link'; id = d.link; }
-		else if (d.lbl !== undefined) { kind = 'label'; id = d.lbl; }
-		else if (d.shape !== undefined) { sh = shapeById(d.shape); if (sh && (sh.pts.length === 1 || sh.closed)) { kind = 'shape'; id = d.shape; } }
-		if (!kind) { return; }
-		// What a plain click would select comes first; the rest keep their order (by distance).
-		for (i = 0; i < list.length; i++) {
-			if (list[i].kind === kind && list[i].id === id) { list.unshift(list.splice(i, 1)[0]); return; }
-		}
-		el = kind === 'node' ? nodeById(id) : (kind === 'link' ? linkById(id) : (kind === 'shape' ? shapeById(id) : labelById(id)));
-		if (!el) { return; }
-		if (list.length >= PICK_MAX_ROWS) { list.pop(); }
-		list.unshift({ kind: kind, id: id, type: el.type });
+	// What a plain click on the element the browser hit would select, as {kind, id}; the box leads with it
+	// when it is one of the rows. A plain pipe is not offered (a line).
+	function pickHitOf(h) {
+		var d = (h && h.dataset) || {}, sh;
+		if (d.node !== undefined) { return { kind: 'node', id: d.node }; }
+		if (d.link !== undefined && h.classList.contains('lpn-link-symbol-hit')) { return { kind: 'link', id: d.link }; }
+		if (d.lbl !== undefined) { return { kind: 'label', id: d.lbl }; }
+		if (d.shape !== undefined) { sh = shapeById(d.shape); if (sh && (sh.pts.length === 1 || sh.closed)) { return { kind: 'shape', id: d.shape }; } }
+		return null;
 	}
 	// The row's element wears the hover mark through setHoverPreview(), the one write site, so the
 	// page's record of what is marked cannot go stale; viaLabel lights it and opens no hover card.

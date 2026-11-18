@@ -911,48 +911,44 @@ EngCalcs.lpnGeom = (function () {
 	// Pure, in SCREEN pixels: the caller hands in what it DREW, each item's extent as the draw code
 	// sizes it, and nothing here touches the DOM. Returns the ordered candidate list for a press at
 	// (x, y). **AN EMPTY LIST MEANS THE PRESS IS ORDINARY** (the page's own hit test names the
-	// element); **A LIST (always two or more) MEANS THE CLICK LANDED ON A SYMBOL THAT VISIBLY
-	// OVERLAPS ANOTHER (by at least 0.4 of the smaller one's width)**, so a person can see
-	// beforehand that a box will come (Tom, 2026-11-16: "I can't predict when I will or won't get a
-	// chooser").
+	// element, the nearest within the pickbox or the finger's reach); **A LIST (always two or more)
+	// MEANS THE PRESSED POINT ITSELF LIES ON THE DRAWN INK OF TWO OR MORE SYMBOLS**, so the box is
+	// strictly an overlap disambiguator and a person can see it coming (Tom, 2026-11-16: "If you see a
+	// Properties box, it's because you picked an unambiguous symbol even if you were uncertain about
+	// that due to your vision, the resolution, or your fat finger. If you see a disambiguator box, you
+	// know that you picked an overlap"). Where symbols touch or overlap elsewhere does not matter.
 	//
 	// **NO LINE IS EVER AN ITEM**: not a pipe, not a Shape that is an open polyline (Tom, 2026-11-16:
-	// "all symbols, shapes, and text, but not pipes", "I also meant ... 'pipe' line"). The one
-	// exception is the caller's, and it is not a line on the screen: a pipe drawn shorter than its end
-	// symbols is a point, handed in as a circle (an exploded assembly's zero-length pipe).
+	// "all symbols, shapes, and text, but not pipes"). The one exception is the caller's, and it is not
+	// a line on the screen: a pipe drawn shorter than its end symbols is a point, handed in as a circle
+	// with `soft` (an exploded assembly's zero-length pipe).
 	//
 	// An item is {kind, id, type, rank, soft?, and one extent}: circle {x, y, r}; rect {l, t, r, b};
-	// quad {cx, cy, hw, hh, ux, uy} (a rect rotated, u the unit vector of its x axis: a pump glyph); or
-	// outline {pts: [{x, y}], closed} (a Shape: a point or a closed outline; an open one is dropped).
-	// `rank` breaks ties (a symbol over a Text over a Shape).
-	//   1. The PRIMARY is the item nearest the press whose extent is within `reach` of it (0 inside).
-	//      None: ordinary. Two separate dots that both fall within a finger's reach but do not
-	//      overlap each other are therefore ordinary: the nearer one is the primary and has no
-	//      overlapping neighbour.
-	//   2. The OTHERS are the items under the pickbox too (within `reach` of the press, or any at all when the
-	//      press is ON a junction's disc) whose drawn
-	//      extent overlaps the primary's. None: ordinary. So a click on a pump clear of the reservoir
-	//      it overlaps, or on the far end of a long Text, is ordinary; the box is for the overlap.
-	//   3. ORDER: the primary FIRST AND NEVER CUT; then items whose anchor (a circle's, rect's or
-	//      quad's centre) is within `coincident` px of the primary's, then the rest; each by distance
-	//      from the press, then rank, then id in natural order. At most `cap` (6) rows.
-	// opts: reach (6), cap (6), coincident (1), deep (0.4), contact (1 px^2).
+	// quad {cx, cy, hw, hh, ux, uy} (a rect rotated, u the unit vector of its x axis); `parts` (a pump's
+	// or valve's drawn pieces, see below); or outline {pts: [{x, y}], closed} (a Shape: a point or a
+	// closed outline; an open one is dropped). `rank` breaks ties (a symbol over a Text over a Shape).
+	//   1. THE INK SET is every item whose drawn ink holds the press point: a circle's disc and a rect with their
+	//      stroke, each piece of `parts`, a Shape's line within PICK_SHAPE_INK px. None or one:
+	//      ordinary. Two or more: the box.
+	//   2. A HIDDEN SYMBOL JOINS (Tom: "a symbol hidden entirely under other symbols so that the user
+	//      cannot visually find it to pick it ... must appear in a chooser box with the symbol(s) that
+	//      are hiding them"). A node or glyph none of whose ink shows, because every point of it lies
+	//      in the ink of other nodes or glyphs, is in the box whenever one of those hiders is in the ink
+	//      set, even if the press is on that hider alone. A `soft` point (a buried pipe) joins when its
+	//      point lies in an ink-set item, and is never the reason for a box. A Text or a Shape neither
+	//      hides nor is hidden (a Text's box is mostly empty). A hider is painted OVER what it hides (nodes over
+	//      pump and valve symbols, a later node over an earlier one), so a junction on a pump is never hidden by it. Measured on the extents handed in, so it
+	//      follows the view and the zoom.
+	//   3. ORDER: the ink-set item the caller names in `first` (what a plain click would select), else the one
+	//      nearest the press, FIRST AND NEVER CUT, then items whose anchor is
+	//      within `coincident` px of its, then the rest of the ink set, then the hidden ones; each by
+	//      distance from the press, then rank, then id in natural order. At most `cap` (6) rows.
+	// opts: cap (6), coincident (1), first ({kind, id}).
 	//
-	// **A PUMP'S OR VALVE'S SYMBOL IS A SYMBOL** (Tom, 2026-11-16, phone test: "a pump or valve is
-	// overlapping a node. I specifically requested all symbol overlaps to be included"). Its item
-	// carries `parts`, the convex pieces of its drawn silhouette (a pump's casing and tail, a valve's two
-	// triangles). An overlap with a glyph is VISIBLE CONTACT: the two drawn shapes share at least
-	// `contact` px^2 (1, about four pixels of ink), summed over all its pieces. Depth is the wrong
-	// measure there: a disc over a valve's waist meets both triangles lightly and a disc on a pump's
-	// tail tip is shallow, yet both show ink on ink. Touching, or near, is not contact. Where no glyph
-	// is involved the 0.4 depth rule is unchanged. The glyph's LINE is never an item.
-	//
-	// "Overlap" is deep: the depth of one into the other is at least `deep` (0.4, and not 0.5 because
-	// Net3's Lake and pump 10, which Tom named as overlapping, share 0.43 of the reservoir's drawn
-	// height and no more) of the smaller symbol's width, so two dots merely touching or grazing are
-	// not an overlap. Exactly coincident symbols always are. A line (a Shape's outline) has no width:
-	// it overlaps a dot it passes within half a radius of the centre, or a box it crosses once the box
-	// is shrunk by a quarter of its smaller side.
+	// **A PUMP'S OR VALVE'S SYMBOL IS A SYMBOL** (Tom, 2026-11-16). Its item carries `parts`, the convex
+	// pieces of its drawn silhouette (a pump's casing and tail, a valve's two triangles), so the empty
+	// corners of its bounding box are not ink. The glyph's LINE is never an item.
+	var PICK_SHAPE_INK = 3;
 	function pickRectDist(r, px, py) { return Math.hypot(Math.max(r.l - px, 0, px - r.r), Math.max(r.t - py, 0, py - r.b)); }
 	function pickQuadLocal(q, px, py) {
 		var dx = px - q.cx, dy = py - q.cy;
@@ -984,22 +980,6 @@ EngCalcs.lpnGeom = (function () {
 			return { x: q.cx + lx * ax - ly * ay, y: q.cy + lx * ay + ly * ax };
 		});
 	}
-	function pickMinSide(m) {
-		if (m.rect) { return Math.min(m.rect.r - m.rect.l, m.rect.b - m.rect.t); }
-		return 2 * Math.min(m.quad.hw, m.quad.hh);
-	}
-	// Does a segment cross, or lie in, a rect?
-	function pickSegInRect(a, b, r) {
-		var t0 = 0, t1 = 1, dx = b.x - a.x, dy = b.y - a.y, p = [-dx, dx, -dy, dy], q = [a.x - r.l, r.r - a.x, a.y - r.t, r.b - a.y], k, u;
-		for (k = 0; k < 4; k++) {
-			if (p[k] === 0) { if (q[k] < 0) { return false; } continue; }
-			u = q[k] / p[k];
-			if (p[k] < 0) { if (u > t1) { return false; } if (u > t0) { t0 = u; } }
-			else { if (u < t0) { return false; } if (u < t1) { t1 = u; } }
-		}
-		return true;
-	}
-
 	// A GLYPH (a pump's or valve's drawn symbol) carries `parts`: the convex pieces its silhouette is
 	// made of, each {circle: {x, y, r}} or {poly: [{x, y}]} (client px, in order), beside the bounding
 	// `quad` that stands for it wherever a box is enough (its anchor, a Shape's outline). A pump is its
@@ -1024,46 +1004,15 @@ EngCalcs.lpnGeom = (function () {
 		if (m.rect || m.quad) { return pickCorners(m); }
 		return null;
 	}
-	// How deep one convex piece sits in another, in px (0 when apart).
-	function pickPartDepth(a, b) {
-		var c, o, d, pts, depth, i, k, axes = [], len, lo, hi, v, ca, cb;
-		if (a.circle && b.circle) { return Math.max(0, a.circle.r + b.circle.r - Math.hypot(a.circle.x - b.circle.x, a.circle.y - b.circle.y)); }
-		if (a.circle || b.circle) {
-			c = a.circle ? a : b; o = a.circle ? b : a;
-			d = pickPartDist(o, c.circle.x, c.circle.y);
-			if (d > 0) { return Math.max(0, c.circle.r - d); }
-			return c.circle.r + pickPolyEdgeDist(o.poly, c.circle.x, c.circle.y);
-		}
-		ca = a.poly; cb = b.poly;
-		[ca, cb].forEach(function (poly) {
-			for (i = 0; i < poly.length; i++) { axes.push({ x: -(poly[(i + 1) % poly.length].y - poly[i].y), y: poly[(i + 1) % poly.length].x - poly[i].x }); }
-		});
-		depth = Infinity;
-		for (k = 0; k < axes.length; k++) {
-			len = Math.hypot(axes[k].x, axes[k].y) || 1; lo = [Infinity, Infinity]; hi = [-Infinity, -Infinity];
-			[ca, cb].forEach(function (poly, j) {
-				poly.forEach(function (p) {
-					v = (p.x * axes[k].x + p.y * axes[k].y) / len;
-					if (v < lo[j]) { lo[j] = v; } if (v > hi[j]) { hi[j] = v; }
-				});
-			});
-			depth = Math.min(depth, Math.min(hi[0], hi[1]) - Math.max(lo[0], lo[1]));
-			if (depth <= 0) { return 0; }
-		}
-		return depth;
-	}
 	var PICK_STROKE_HALF = 0.6;
 	function pickPartsOf(m) {
 		if (m.parts) { return m.parts; }
 		// A node's disc is drawn with a stroke about 1.2 px wide round its radius: that ink is seen too.
 		if (m.circle) { return [{ circle: { x: m.circle.x, y: m.circle.y, r: m.circle.r + PICK_STROKE_HALF } }]; }
+		// A box's drawn outline has the same stroke: the box is grown by it.
+		if (m.rect) { return [{ poly: pickCorners({ rect: { l: m.rect.l - PICK_STROKE_HALF, t: m.rect.t - PICK_STROKE_HALF, r: m.rect.r + PICK_STROKE_HALF, b: m.rect.b + PICK_STROKE_HALF } }) }]; }
 		return [{ poly: pickPolyOf(m) }];
 	}
-	// Two symbols one of which is a glyph overlap when their drawn shapes SHARE AT LEAST `contact` px^2
-	// (Tom: "all symbol overlaps", seen by eye; Perry: a disc over the notch between a valve's two
-	// triangles touches both and must count the sum). The area is sampled on a 0.5 px grid over the
-	// boxes' common part, a point counting when it is in any piece of both. Depth rules (0.4) judge
-	// two ordinary symbols; a light touch of a thin glyph piece has little depth and plenty of ink.
 	function pickPartHas(parts, x, y) {
 		var i, p;
 		for (i = 0; i < parts.length; i++) {
@@ -1080,83 +1029,57 @@ EngCalcs.lpnGeom = (function () {
 		});
 		return b;
 	}
-	function pickContactArea(a, b, step) {
-		var pa = pickPartsOf(a), pb = pickPartsOf(b), ba = pickPartsBox(pa), bb = pickPartsBox(pb),
-			l = Math.max(ba.l, bb.l), r = Math.min(ba.r, bb.r), t = Math.max(ba.t, bb.t), bt = Math.min(ba.b, bb.b), x, y, n = 0;
-		if (r <= l || bt <= t) { return 0; }
-		for (x = l + step / 2; x < r; x += step) {
-			for (y = t + step / 2; y < bt; y += step) {
-				if (pickPartHas(pa, x, y) && pickPartHas(pb, x, y)) { n++; }
+	function pickInInk(m, x, y) {
+		if (m.outline) { return pointToPolylineDistance(pickOutlinePts(m.outline), x, y) <= PICK_SHAPE_INK; }
+		return pickPartHas(pickPartsOf(m), x, y);
+	}
+	// Is every point of the item's ink in the ink of some node or glyph painted over it? `seen` is whether any of those
+	// covering points is in the ink of an item of `inkSet`.
+	// Paint order, bottom to top (the page's own layers): Shapes, pump and valve symbols, nodes, Texts; within a
+	// layer the later item in the list is on top (the caller hands nodes and links in the order it drew them).
+	var PICK_LAYER = { shape: 0, link: 1, node: 2, label: 3 };
+	function pickZ(m, items) { return (PICK_LAYER[m.kind] || 0) * 1e6 + items.indexOf(m); }
+	function pickHiddenUnder(h, items, inkSet) {
+		var hz = pickZ(h, items), parts = pickPartsOf(h), box = pickPartsBox(parts), step = Math.max(0.5, Math.sqrt((box.r - box.l) * (box.b - box.t) / 1600)),
+			x, y, hiders = items.filter(function (m) { return m !== h && pickZ(m, items) > hz && !m.soft && !m.outline && m.kind !== 'label' && pickBoxesMeet(box, pickPartsBox(pickPartsOf(m))); }),
+			seen = false, any = false, i, cover;
+		if (!hiders.length) { return false; }
+		for (x = box.l + step / 2; x < box.r; x += step) {
+			for (y = box.t + step / 2; y < box.b; y += step) {
+				if (!pickPartHas(parts, x, y)) { continue; }
+				any = true; cover = false;
+				for (i = 0; i < hiders.length; i++) {
+					if (pickPartHas(pickPartsOf(hiders[i]), x, y)) { cover = true; if (inkSet.indexOf(hiders[i]) >= 0) { seen = true; } }
+				}
+				if (!cover) { return false; }
 			}
 		}
-		return n * step * step;
+		return any && seen;
 	}
-	function pickGlyphOverlaps(a, b, contact) { return pickContactArea(a, b, 0.5) >= contact; }
-	function pickOverlaps(a, b, deep, contact) {
-		var s, o2, c, j, pts, rc, loc, shrunk, k, qr;
-		if (a.outline && b.outline) { return false; }   // two Shapes are not a symbol under the click
-		if (a.outline || b.outline) {
-			s = a.outline ? a : b; o2 = a.outline ? b : a;
-			if (o2.circle) { return pointToPolylineDistance(pickOutlinePts(s.outline), o2.circle.x, o2.circle.y) <= o2.circle.r / 2; }
-			pts = s.outline.pts;
-			if (o2.quad) {
-				rc = pickQuadRect(o2.quad);
-				pts = pts.map(function (p) { return pickQuadLocal(o2.quad, p.x, p.y); });
-			} else { rc = o2.rect; }
-			k = Math.min(rc.r - rc.l, rc.b - rc.t) / 4;
-			shrunk = { l: rc.l + k, t: rc.t + k, r: rc.r - k, b: rc.b - k };
-			if (pts.length === 1) { return pts[0].x >= shrunk.l && pts[0].x <= shrunk.r && pts[0].y >= shrunk.t && pts[0].y <= shrunk.b; }
-			pts = s.outline.closed && pts.length > 2 ? pts.concat([pts[0]]) : pts;
-			for (j = 0; j + 1 < pts.length; j++) { if (pickSegInRect(pts[j], pts[j + 1], shrunk)) { return true; } }
-			return false;
-		}
-		if ((a.parts || b.parts)) { return pickGlyphOverlaps(a, b, contact); }
-		if (a.circle && b.circle) {
-			return Math.hypot(a.circle.x - b.circle.x, a.circle.y - b.circle.y) <= a.circle.r + b.circle.r - 2 * deep * Math.min(a.circle.r, b.circle.r);
-		}
-		if (a.circle || b.circle) {
-			c = a.circle ? a : b; o2 = a.circle ? b : a;
-			if (o2.quad) { loc = pickQuadLocal(o2.quad, c.circle.x, c.circle.y); qr = pickQuadRect(o2.quad); return pickRectDist(qr, loc.x, loc.y) <= c.circle.r - deep * Math.min(2 * c.circle.r, pickMinSide(o2)); }
-			return pickRectDist(o2.rect, c.circle.x, c.circle.y) <= c.circle.r - deep * Math.min(2 * c.circle.r, pickMinSide(o2));
-		}
-		if (a.rect && b.rect) {
-			return Math.min(a.rect.r, b.rect.r) - Math.max(a.rect.l, b.rect.l) >= deep * Math.min(a.rect.r - a.rect.l, b.rect.r - b.rect.l) &&
-				Math.min(a.rect.b, b.rect.b) - Math.max(a.rect.t, b.rect.t) >= deep * Math.min(a.rect.b - a.rect.t, b.rect.b - b.rect.t);
-		}
-		return pickPartDepth({ poly: pickCorners(a) }, { poly: pickCorners(b) }) >= deep * Math.min(pickMinSide(a), pickMinSide(b));
-	}
+	function pickBoxesMeet(a, b) { return a.l <= b.r && b.l <= a.r && a.t <= b.b && b.t <= a.b; }
 	function pickSymbols(items, x, y, opts) {
-		var o = opts || {}, reach = o.reach === undefined ? 6 : o.reach, cap = o.cap === undefined ? 6 : o.cap,
-			coin = o.coincident === undefined ? 1 : o.coincident, deep = o.deep === undefined ? 0.4 : o.deep, contact = o.contact === undefined ? 1 : o.contact,
-			primary = null, list = [], i, it, d, pa;
+		var o = opts || {}, cap = o.cap === undefined ? 6 : o.cap, coin = o.coincident === undefined ? 1 : o.coincident,
+			inkSet = [], hidden = [], list, primary, pa, i, it;
 		function natural(a, b) { return String(a).localeCompare(String(b), undefined, { numeric: true }); }
 		function order(a, b) {
 			return (b.coin - a.coin) || (a.d - b.d) || ((a.m.rank || 0) - (b.m.rank || 0)) || natural(a.m.id, b.m.id);
 		}
+		function entry(m) { return { m: m, d: pickExtentDistance(m, x, y), coin: (pa && pickAnchor(m) && Math.hypot(pa.x - pickAnchor(m).x, pa.y - pickAnchor(m).y) <= coin) ? 1 : 0 }; }
 		// A line is never an item, whoever hands it in: an open polyline (a point and a closed outline are not lines).
 		items = items.filter(function (m) { return !(m.outline && m.outline.pts.length > 1 && !m.outline.closed); });
-		for (i = 0; i < items.length; i++) {
-			it = { m: items[i], d: pickExtentDistance(items[i], x, y) };
-			if (it.d > reach) { continue; }
-			if (!primary || order({ m: it.m, d: it.d, coin: 0 }, { m: primary.m, d: primary.d, coin: 0 }) < 0) { primary = it; }
-		}
-		if (!primary) { return []; }
-		pa = pickAnchor(primary.m);
+		items.forEach(function (m) { if (!m.soft && pickInInk(m, x, y)) { inkSet.push(m); } });
+		if (!inkSet.length) { return []; }
+		primary = inkSet.filter(function (m) { return o.first && m.kind === o.first.kind && m.id === o.first.id; })[0] || inkSet.map(entry).sort(order)[0].m;
+		pa = pickAnchor(primary);
 		for (i = 0; i < items.length; i++) {
 			it = items[i];
-			if (it === primary.m || !pickOverlaps(primary.m, it, deep, contact)) { continue; }
-			d = pickExtentDistance(it, x, y);
-			// A junction's disc is under the whole finger: whatever overlaps the disc the press is ON counts,
-			// wherever on the disc the press fell. A big symbol (a reservoir, a Text) keeps the reach: a click
-			// on the reservoir clear of the pump that overlaps its corner is an ordinary click.
-			if (d <= reach || (primary.d === 0 && primary.m.circle)) {
-				list.push({ m: it, d: d, coin: (pa && pickAnchor(it) && Math.hypot(pa.x - pickAnchor(it).x, pa.y - pickAnchor(it).y) <= coin) ? 1 : 0 });
-			}
+			if (inkSet.indexOf(it) >= 0 || it.outline || it.kind === 'label') { continue; }
+			if (it.soft ? inkSet.some(function (m) { return !m.outline && m.kind !== 'label' && pickPartHas(pickPartsOf(m), it.circle.x, it.circle.y); }) : pickHiddenUnder(it, items, inkSet)) { hidden.push(it); }
 		}
-		// An item flagged `soft` (a pipe drawn as a point) is a row but never the reason for a box.
-		if (!list.length || (primary.m.soft ? 0 : 1) + list.filter(function (e) { return !e.m.soft; }).length < 2) { return []; }
-		list.sort(order);
-		list.unshift({ m: primary.m, d: primary.d });
+		if (inkSet.length + hidden.filter(function (m) { return !m.soft; }).length < 2) { return []; }
+		list = inkSet.filter(function (m) { return m !== primary; }).map(entry).sort(order);
+		hidden = hidden.map(entry).sort(order);
+		list = [entry(primary)].concat(list, hidden);
 		return list.slice(0, cap).map(function (e) {
 			return { kind: e.m.kind, id: e.m.id, type: e.m.type, distPx: e.d };
 		});
@@ -1188,7 +1111,6 @@ EngCalcs.lpnGeom = (function () {
 		orientedLabelBox: orientedLabelBox,
 		pickSymbols: pickSymbols,
 		pickExtentDistance: pickExtentDistance,
-		pickOverlaps: pickOverlaps,
 		pointToSegmentDistance: pointToSegmentDistance,
 		pointToPolylineDistance: pointToPolylineDistance,
 		buildSegmentIndex: buildSegmentIndex,

@@ -1,11 +1,9 @@
-// **A PUMP'S OR VALVE'S SYMBOL OVERLAPS A JUNCTION WHERE THE INK TOUCHES** (Tom, 2026-11-16: "I specifically
-// requested all symbol overlaps to be included, but not lines", and he wants to predict it by eye; Perry's
-// review found a disc over the notch between a valve's two triangles with 20 px^2 of contact and no box,
-// and 5 px^2 elsewhere with one). Real Chromium, a mouse. A junction is slid along and across a pump and
-// a valve at four angles; for each position the drawn ink is SAMPLED every 0.5 px (the glyph's silhouette
-// by isPointInFill, the junction's disc by fill and stroke) and the click must open a box exactly when
-// the shared ink is at least FLOOR px^2: a box at FLOOR + 1 or more, none at FLOOR - 0.75 or less (the
-// band between is printed, not asserted: it is a fraction of a pixel of antialiasing).
+// **A PRESS OPENS THE BOX ONLY WHERE ITS POINT IS ON THE INK OF TWO OR MORE SYMBOLS** (Tom, 2026-11-16, round 6:
+// "only clicking on overlaps would trigger the box"). Real Chromium, a mouse. A junction is slid along and
+// across a pump and a valve at four angles. For each position the junction's CENTRE is pressed: the glyph's
+// silhouette is asked by isPointInFill whether the centre is on its ink, and the click must open a box exactly
+// then (a centre within 1.5 px of the silhouette's edge is printed, not asserted: the page's drawn path and the pick model differ by about a pixel there). The same glyph is also
+// pressed on a point of its own ink well clear of the junction: that is never a box.
 //
 //   node dev/lpn-spike/pick-glyph-contact-browser-harness.js   (takes the browser lock itself)
 //
@@ -30,7 +28,6 @@ if (process.env[LOCK_ENV] !== '1') {
 	}
 }
 
-const FLOOR = 1;   // px^2, js/lpn-geom.js `contact`
 let checks = 0, failures = 0;
 function ok(label, cond, detail) {
 	checks++;
@@ -70,24 +67,25 @@ async function main() {
 		d.view = { cx: cols * 12 - 12, cy: 60, s: S };   // the 6 rows centred, clear of the bars at the top
 		return JSON.stringify(d);
 	};
-	// The ink the junction's disc and the glyph's silhouette share, sampled every 0.5 px, in the page.
-	const inkArea = (page, id) => page.evaluate((id) => {
+	// Is the junction's centre on the glyph's silhouette (and is that settled to 1.5 px), and a point of the
+	// glyph's ink well clear of the disc, in the page.
+	const probe = (page, id) => page.evaluate((id) => {
 		const node = document.querySelector('#lpn_canvas circle.lpn-node[data-node="' + id + 'j"]'), glyph = document.querySelector('#lpn_canvas path.lpn-link-symbol-hit[data-link="' + id + '"]');
 		if (!node || !glyph) { return null; }
-		const nb = node.getBoundingClientRect(), gb = glyph.getBoundingClientRect(), svg = document.getElementById('lpn_canvas').closest('svg') || node.ownerSVGElement;
-		const nm = node.getScreenCTM().inverse(), gm = glyph.getScreenCTM().inverse(), P = svg.createSVGPoint();
-		const toLocal = (m, x, y) => { P.x = x; P.y = y; return P.matrixTransform(m); };
-		const l = Math.max(nb.left - 1, gb.left), r = Math.min(nb.right + 1, gb.right), t = Math.max(nb.top - 1, gb.top), b = Math.min(nb.bottom + 1, gb.bottom);
-		let n = 0;
-		for (let x = l + 0.25; x < r; x += 0.5) {
-			for (let y = t + 0.25; y < b; y += 0.5) {
-				const g = toLocal(gm, x, y), c = toLocal(nm, x, y);
-				if (glyph.isPointInFill(g) && (node.isPointInFill(c) || node.isPointInStroke(c))) { n++; }
+		const nb = node.getBoundingClientRect(), gb = glyph.getBoundingClientRect(), svg = node.ownerSVGElement, gm = glyph.getScreenCTM().inverse(), P = svg.createSVGPoint();
+		const inGlyph = (x, y) => { P.x = x; P.y = y; return glyph.isPointInFill(P.matrixTransform(gm)); };
+		const cx = nb.left + nb.width / 2, cy = nb.top + nb.height / 2, r = nb.width / 2;
+		const here = inGlyph(cx, cy), settled = [[1.5, 0], [-1.5, 0], [0, 1.5], [0, -1.5], [1.1, 1.1], [-1.1, 1.1], [1.1, -1.1], [-1.1, -1.1]].every((d) => inGlyph(cx + d[0], cy + d[1]) === here);
+		let free = null;
+		for (let x = gb.left; x <= gb.right; x += 0.5) {
+			for (let y = gb.top; y <= gb.bottom; y += 0.5) {
+				const d = Math.hypot(x - cx, y - cy);
+				if (d > r + 4 && inGlyph(x, y) && (!free || d > free.d)) { free = { x, y, d }; }
 			}
 		}
-		return n * 0.25;
+		return { x: cx, y: cy, here, settled, free };
 	}, id);
-	let tot = { cases: 0, boxes: 0, mustBox: 0, mustNot: 0, band: 0, wrong: [] };
+	let tot = { cases: 0, boxes: 0, mustBox: 0, mustNot: 0, band: 0, free: 0, freeBoxes: 0, wrong: [] };
 	try {
 		for (const type of (process.env.GC_TYPES || 'pump,valve').split(',')) {
 			for (const deg of (process.env.GC_DEGS || '0,40,90,200').split(',').map(Number)) {
@@ -106,27 +104,35 @@ async function main() {
 				let wrong = 0, mustBox = 0, mustNot = 0, band = 0, boxes = 0;
 				for (let i = 0; i < cells.length; i++) {
 					const id = type[0] + i;
-					const area = await inkArea(S1.page, id);
-					const c = await S1.page.evaluate((id) => { const e = document.querySelector('#lpn_canvas circle.lpn-node[data-node="' + id + 'j"]'); if (!e) { return null; } const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }, id);
-					if (area === null || !c || c.x < 0 || c.y < 0 || c.x > 1400 || c.y > 900) { continue; }
-					await S1.page.mouse.move(c.x, c.y); await S1.page.mouse.click(c.x, c.y); await S1.settle(260);
-					const rows = await S1.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => b.textContent.trim()));
-					await S1.page.keyboard.press('Escape'); await S1.settle(120);
-					await S1.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
-					await S1.page.mouse.click(1380, 880); await S1.settle(120);
+					const pr = await probe(S1.page, id);
+					if (!pr || pr.x < 0 || pr.y < 0 || pr.x > 1400 || pr.y > 900) { continue; }
+					const press = async (pt) => {
+						await S1.page.mouse.move(pt.x, pt.y); await S1.page.mouse.click(pt.x, pt.y); await S1.settle(260);
+						const rows = await S1.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => b.textContent.trim()));
+						await S1.page.keyboard.press('Escape'); await S1.settle(120);
+						await S1.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
+						await S1.page.mouse.click(1380, 880); await S1.settle(120);
+						return rows;
+					};
+					const rows = await press(pr);
 					const box = rows.length > 1 && rows.some((r) => new RegExp('^(Pump|Valve) ' + id + '$').test(r)) && rows.some((r) => r === 'Junction ' + id + 'j');
 					tot.cases++; if (box) { boxes++; tot.boxes++; }
-					if (area >= FLOOR + 1) { mustBox++; if (!box) { wrong++; tot.wrong.push([type, deg, cells[i], area, rows]); } }
-					else if (area <= FLOOR - 0.75) { mustNot++; if (box) { wrong++; tot.wrong.push([type, deg, cells[i], area, rows]); } }
-					else { band++; }
+					if (!pr.settled) { band++; }
+					else if (pr.here) { mustBox++; if (!box) { wrong++; tot.wrong.push([type, deg, cells[i], 'centre on ink', rows]); } }
+					else { mustNot++; if (box) { wrong++; tot.wrong.push([type, deg, cells[i], 'centre off ink', rows]); } }
+					if (pr.free) {
+						const fr = await press(pr.free);
+						tot.free++;
+						if (fr.length > 1) { tot.freeBoxes++; wrong++; tot.wrong.push([type, deg, cells[i], 'free ink', fr]); }
+					}
 				}
 				tot.mustBox += mustBox; tot.mustNot += mustNot; tot.band += band;
-				ok(type + ' at ' + deg + ' degrees: a box exactly where the ink overlaps (' + mustBox + ' overlapping, ' + mustNot + ' clear, ' + band + ' within a pixel of the floor, ' + boxes + ' boxes)', wrong === 0 && mustBox > 5 && mustNot > 5, JSON.stringify(tot.wrong.slice(-4)));
+				ok(type + ' at ' + deg + ' degrees: a box exactly where the press is on both inks, none on free ink (' + mustBox + ' centres on the glyph, ' + mustNot + ' off it, ' + band + ' within 1.5 px of its edge, ' + boxes + ' boxes, free ink pressed ' + tot.free + ' times)', wrong === 0 && mustBox >= (type === 'pump' ? 5 : 1) && mustNot > 5, JSON.stringify(tot.wrong.slice(-4)));
 				await S1.page.close();
 			}
 		}
 		tot.wrong.forEach((w) => console.log('  (wrong) ' + JSON.stringify(w)));
-		console.log('  NUMBERS ' + JSON.stringify({ cases: tot.cases, boxes: tot.boxes, mustBox: tot.mustBox, mustNot: tot.mustNot, band: tot.band }));
+		console.log('  NUMBERS ' + JSON.stringify({ cases: tot.cases, boxes: tot.boxes, mustBox: tot.mustBox, mustNot: tot.mustNot, band: tot.band, free: tot.free, freeBoxes: tot.freeBoxes }));
 		ok('no page error', errors.length === 0, errors.join(' | '));
 	} finally {
 		await browser.close();

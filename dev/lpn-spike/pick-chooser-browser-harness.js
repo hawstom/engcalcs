@@ -25,9 +25,11 @@
 //      them give none; an open Shape line crossing a pipe gives none; a junction on a closed Shape's
 //      outline gives the junction and the Shape. A tap on a tank's ink beside a nearer junction centre
 //      selects the tank.
-//   K. Round 4: a pump's or valve's symbol is a symbol. A junction over a pump's middle or tail end, or a
-//      valve's middle or edge, opens a box of the two, with a mouse and a finger; a junction 28 px clear
-//      opens none; the pump's line away from its symbol opens none.
+//   K. Round 6: the box opens only when the pressed POINT is on the ink of two or more symbols. A press on
+//      the overlap of a junction and a pump or valve opens a box of the two; a press on the free part of the
+//      same glyph selects it with no box; a junction with no glyph ink under its centre opens none; the
+//      pump's line away from its symbol opens none; a mouse and a finger.
+//   L. Round 6: a junction wholly under a tank is in the box from a press anywhere on the tank.
 //   M. A 390 px phone, taps at x = 180 near the top, middle and bottom on the pile: the box has no row
 //      under the press and lies wholly on screen.
 //   E. Review fixes: a finger's tap near the right and bottom edges opens the box with no row under the
@@ -147,8 +149,8 @@ async function main() {
 		await closeProps();
 		await click(pile);
 		ok('a click on the assembly opens the box', await chooserOpen());
-		const want = ['Junction J3', 'Junction J1', 'Junction J2', 'Pipe P2', 'Pump PU9'];   // the one a plain click would hit (J3, drawn on top) first
-		ok('...listing the symbols there as their type word and ID, the plain-click element first, then by distance, with the zero-length pipe (a point, not a line) but not the long pipes that end there', J(await rows()) === J(want), J(await rows()));
+		const want = ['Junction J3', 'Junction J1', 'Junction J2', 'Pump PU9', 'Pipe P2'];   // the one a plain click would hit (J3, drawn on top) first; the buried pipe, never the reason for a box, last
+		ok('...listing the symbols there as their type word and ID, the plain-click element first, then by distance, with the zero-length pipe (a point, not a line) last but not the long pipes that end there', J(await rows()) === J(want), J(await rows()));
 		ok('...selecting nothing yet: the selection is as it was (the junction M)', J(await selected()) === J(['node:M']), J(await selected()));
 		const box = await page.evaluate(() => { const b = document.querySelector('.lpn-pick-chooser').getBoundingClientRect(); return { l: b.left, t: b.top, w: b.width, h: b.height }; });
 		ok('...at the pointer, wholly on screen', Math.abs(box.l - pile.x) < 40 && Math.abs(box.t - pile.y) < 40 && box.l + box.w <= 1400 && box.t + box.h <= 900, J(box));
@@ -424,7 +426,7 @@ async function main() {
 		await tap(tpile);
 		if (!(await t.chooserOpen())) { console.log('  (debug) top elements at the pile: ' + J(await T.page.evaluate((p) => document.elementsFromPoint(p.x, p.y).slice(0, 5).map((e) => e.tagName + '.' + String(e.className && e.className.baseVal !== undefined ? e.className.baseVal : e.className).slice(0, 40)), tpile))); }
 		ok('a tap on the assembly opens the box (it stays open: the lift is not a press elsewhere)', await t.chooserOpen());
-		ok('...with the same five rows', J(await t.rows()) === J(['Junction J3', 'Junction J1', 'Junction J2', 'Pipe P2', 'Pump PU9']), J(await t.rows()));
+		ok('...with the same five rows', J(await t.rows()) === J(['Junction J3', 'Junction J1', 'Junction J2', 'Pump PU9', 'Pipe P2']), J(await t.rows()));
 		const heights = await T.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => Math.round(b.getBoundingClientRect().height)));
 		ok('...each row finger-sized (at least 44 px tall)', heights.length === 5 && heights.every((h) => h >= 44), J(heights));
 		const inView = await T.page.evaluate(() => { const b = document.querySelector('.lpn-pick-chooser').getBoundingClientRect(); return b.left >= 0 && b.top >= 0 && b.right <= innerWidth && b.bottom <= innerHeight; });
@@ -453,9 +455,7 @@ async function main() {
 		const nearP6 = { x: tp2.x, y: tp2.y + 15 };
 		await t.closeProps();
 		await tap(nearP6);
-		ok('a finger on pipe P6, 15 px from the pile, gets the two junctions and no pipe', J((await t.rows()).slice().sort()) === J(['Junction J6', 'Junction J7']), J([await t.rows(), nearP6]));
-		await (async () => { const b = await t.rowBtn('Junction J7'); const bb = await b.boundingBox(); await tap({ x: bb.x + bb.width / 2, y: bb.y + bb.height / 2 }); })();
-		ok('...and choosing Junction J7 selects it', J(await t.selected()) === J(['node:J7']) && !(await t.chooserOpen()), J(await t.selected()));
+		ok('a finger on pipe P6, 15 px from the pile (on no symbol), opens no box: the plain tap decides', !(await t.chooserOpen()), J([await t.rows(), nearP6]));
 		await t.closeProps();
 		// E3. a long press that dismisses the box opens no context menu (review item 3).
 		await tap(tpile);
@@ -508,11 +508,29 @@ async function main() {
 		await T.page.close();
 
 
-		// =========================================================== round 4: a pump's or valve's symbol is a symbol
-		console.log('\nK. Round 4 (Tom, 2026-11-16, phone test): a pump or valve SYMBOL over a junction opens the box, a mouse and a finger');
+		// =========================================================== round 6: only the pressed point's ink counts
+		console.log('\nK. Round 6 (Tom, 2026-11-16): the box opens only when the PRESSED POINT is on the ink of two or more symbols, a mouse and a finger');
 		const proj4 = JSON.parse(project); proj4.view = { cx: 135, cy: -57, s: 3.5 };
+		// Each glyph's junction sits over the glyph's ink at its middle or end; the box is for the press ON the overlap.
 		const cases4 = [['PA', 'pump', 'Pump PA', 'Junction PAj', 'a junction at the middle of a pump'], ['PB', 'pump', 'Pump PB', 'Junction PBj', 'a junction over the tail end of a pump'],
-			['VA', 'valve', 'Valve VA', 'Junction VAj', 'a junction at the middle of a valve'], ['VB', 'valve', 'Valve VB', 'Junction VBj', 'a junction over the edge of a valve']];
+			['VA', 'valve', 'Valve VA', 'Junction VAj', 'a junction at the middle of a valve']];
+		// Ink in the page: the glyph's silhouette (isPointInFill) and the junction's disc with its stroke.
+		const inkProbe = (page, lid) => page.evaluate((lid) => {
+			const g = document.querySelector('#lpn_canvas path.lpn-link-symbol-hit[data-link="' + lid + '"]'), n = document.querySelector('#lpn_canvas circle.lpn-node[data-node="' + lid + 'j"]');
+			const gb = g.getBoundingClientRect(), nb = n.getBoundingClientRect(), svg = n.ownerSVGElement, P = svg.createSVGPoint(), gm = g.getScreenCTM().inverse(), nm = n.getScreenCTM().inverse();
+			const L = (m, x, y) => { P.x = x; P.y = y; return P.matrixTransform(m); };
+			const cx = nb.left + nb.width / 2, cy = nb.top + nb.height / 2, r = nb.width / 2;
+			let best = null, over = null;
+			for (let x = gb.left; x <= gb.right; x += 0.5) {
+				for (let y = gb.top; y <= gb.bottom; y += 0.5) {
+					if (!g.isPointInFill(L(gm, x, y))) { continue; }
+					const d = Math.hypot(x - cx, y - cy);
+					if (d > r + 4 && (!best || d > best.d)) { best = { x, y, d }; }   // glyph ink, well clear of the disc
+					if (d < r - 1 && (!over || d < over.d)) { over = { x, y, d }; }   // glyph ink inside the disc
+				}
+			}
+			return { free: best, over: over, centre: { x: cx, y: cy }, centreOnGlyph: g.isPointInFill(L(gm, cx, cy)) };
+		}, lid);
 		for (const touch of [false, true]) {
 			const K = await Session.open(browser, NAME + '-k' + (touch ? 'p' : 'd'), touch ? { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true } : { viewport: { width: 1400, height: 900 } });
 			await open(K, JSON.stringify(proj4));
@@ -525,31 +543,84 @@ async function main() {
 					await K.settle(600);
 				} else { await kt.click(p); }
 			};
+			const away = async () => { await press({ x: touch ? 195 : 700, y: touch ? 800 : 880 }); };
 			const who = touch ? 'a tap' : 'a click';
 			for (const [lid, typ, linkRow, nodeRow, what] of cases4) {
-				const jc = await kt.centre('#lpn_canvas [data-node="' + lid + 'j"]');
-				await press(jc);
-				ok(who + ' on ' + what + ' opens a box of the junction and the ' + typ, J((await kt.rows()).slice().sort()) === J([linkRow, nodeRow].sort()), J(await kt.rows()));
-				ok('...with the junction first (what a plain ' + (touch ? 'tap' : 'click') + ' selects) and nothing selected yet', (await kt.rows())[0] === nodeRow && (await kt.selected()).length === 0, J([await kt.rows(), await kt.selected()]));
+				const ink = await inkProbe(K.page, lid);
+				// On the overlap: a point on the glyph's ink inside the junction's disc.
+				ok('(' + what + ': the glyph has ink under the disc)', !!ink.over, J(ink));
+				await press(ink.over || ink.centre);
+				ok(who + ' on the overlap of ' + what + ' opens a box of the junction and the ' + typ, J((await kt.rows()).slice().sort()) === J([linkRow, nodeRow].sort()), J(await kt.rows()));
+				ok('...nothing is selected yet', (await kt.selected()).length === 0, J(await kt.selected()));
 				const lr = await kt.rowBtn(linkRow), lb = await lr.boundingBox();
 				await press({ x: lb.x + lb.width / 2, y: lb.y + lb.height / 2 });
-				ok('...and choosing the ' + typ + ' selects it, which that ' + (touch ? 'tap' : 'click') + ' could not reach before', J(await kt.selected()) === J(['link:' + lid]), J(await kt.selected()));
+				ok('...and choosing the ' + typ + ' selects it', J(await kt.selected()) === J(['link:' + lid]), J(await kt.selected()));
 				await kt.closeProps();
-				await press({ x: touch ? 195 : 700, y: touch ? 800 : 880 });
+				await away();
+				// Away from the junction: the free part of the same symbol is just the symbol.
+				ok('(' + what + ': the glyph has ink clear of the disc)', !!ink.free, J(ink));
+				await press(ink.free || ink.centre);
+				// A finger within its reach of a junction gets the junction (Tom, 2026-09-01: "nodes need to get precedence
+			// always"), so on a phone the one selected is the pump or that junction; never a box.
+			const sel = await kt.selected();
+			ok(who + ' on the free part of ' + what + ' selects exactly one thing' + (touch ? ' (a finger near a junction gets the junction)' : ', the ' + typ) + ' with no box',
+				!(await kt.chooserOpen()) && sel.length === 1 && (touch ? (sel[0] === 'link:' + lid || sel[0] === 'node:' + lid + 'j') : sel[0] === 'link:' + lid), J([await kt.rows(), sel, ink.free]));
+				await kt.closeProps();
+				await away();
 			}
-			// Not an overlap: a junction 8 map units (28 px) from the symbol is clear of it.
-			for (const [lid, typ] of [['PN', 'pump'], ['VN', 'valve']]) {
+			// A junction the glyph's ink does not reach under: the press on the junction is the junction alone.
+			for (const [lid, typ] of [['VB', 'valve'], ['PN', 'pump'], ['VN', 'valve']]) {
 				const jn = await kt.centre('#lpn_canvas [data-node="' + lid + 'j"]');
 				await press(jn);
-				ok(who + ' on a junction clear of a ' + typ + ' symbol opens no box and selects the junction', !(await kt.chooserOpen()) && J(await kt.selected()) === J(['node:' + lid + 'j']), J([await kt.rows(), await kt.selected()]));
+				ok(who + ' on a junction beside a ' + typ + ' symbol (no ink under the point) opens no box and selects the junction', !(await kt.chooserOpen()) && J(await kt.selected()) === J(['node:' + lid + 'j']), J([await kt.rows(), await kt.selected()]));
 				await kt.closeProps();
-				await press({ x: touch ? 195 : 700, y: touch ? 800 : 880 });
+				await away();
 			}
 			// The link's LINE is not a symbol: the line well clear of the symbol selects the pump, no box.
 			const ga = await K.page.evaluate(() => { const r = document.querySelector('#lpn_canvas path.lpn-link-symbol-hit[data-link="PA"]').getBoundingClientRect(), n = document.querySelector('#lpn_canvas circle.lpn-node[data-node="PAa"]').getBoundingClientRect(); return { x: (r.left + n.right) / 2 - 6, y: r.top + r.height / 2 }; });
 			await press({ x: ga.x - (touch ? 0 : 0), y: ga.y });
 			ok(who + ' on the pump\'s line, away from its symbol, opens no box', !(await kt.chooserOpen()), J([ga, await kt.rows(), await kt.selected()]));
 			await K.page.close();
+		}
+
+		// =========================================================== round 6: a symbol hidden entirely under another
+		console.log('\nL. Round 6: a junction wholly under a tank is in the box from a press anywhere on the tank');
+		for (const touch of [false, true]) {
+			const projH = JSON.parse(project); projH.view = { cx: 175, cy: 20, s: 0.8 };   // zoomed out: a tank keeps its size on the screen, a junction shrinks
+			const H = await Session.open(browser, NAME + '-h' + (touch ? 'p' : 'd'), touch ? { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true } : { viewport: { width: 1400, height: 900 } });
+			await open(H, JSON.stringify(projH));
+			const ht = tools(H), hc = touch ? await H.page.context().newCDPSession(H.page) : null;
+			const press = async (p) => {
+				if (touch) {
+					await hc.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: p.x, y: p.y, id: 1 }] });
+					await sleep(60);
+					await hc.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+					await H.settle(600);
+				} else { await ht.click(p); }
+			};
+			const who = touch ? 'a tap' : 'a click';
+			// The tank's drawn ink, and the junction's disc: is the disc wholly inside the ink?
+			const geo = await H.page.evaluate(() => {
+				const g = document.querySelector('#lpn_canvas path.lpn-node-hit[data-node="HT"]'), n = document.querySelector('#lpn_canvas circle.lpn-node[data-node="HJ"]');
+				const gb = g.getBoundingClientRect(), nb = n.getBoundingClientRect();
+				return { l: gb.left, r: gb.right, t: gb.top, b: gb.bottom, nl: nb.left, nr: nb.right, nt: nb.top, nb: nb.bottom };
+			});
+			// The tank's hit path is its drawn silhouette (SYMBOL_INK): the box of its ink.
+			const ink = { l: geo.l, r: geo.r, t: geo.t, b: geo.b };
+			ok('(the junction\'s disc lies wholly inside the tank\'s ink: nothing of it shows)', geo.nl >= ink.l && geo.nr <= ink.r && geo.nt >= ink.t && geo.nb <= ink.b, J([geo, ink]));
+			// The far corner of the tank's ink from the disc, 1 px inside.
+			const corner = { x: ink.r - 1, y: ink.t + 1 };
+			await press(corner);
+			ok(who + ' on the tank far from the junction hidden under it lists both, the tank first', J(await ht.rows()) === J(['Tank HT', 'Junction HJ']), J([geo, corner, await ht.rows(), await ht.selected()]));
+			await H.page.keyboard.press('Escape'); await H.settle(200);
+			await press({ x: touch ? 195 : 700, y: touch ? 800 : 880 });
+			await press({ x: geo.nl + (geo.nr - geo.nl) / 2, y: geo.nt + (geo.nb - geo.nt) / 2 });
+			ok(who + ' on the disc itself lists both', (await ht.rows()).length === 2, J(await ht.rows()));
+			await H.page.keyboard.press('Escape'); await H.settle(200);
+			await press({ x: touch ? 195 : 700, y: touch ? 800 : 880 });
+			await press({ x: geo.l - 40, y: geo.t - 40 });
+			ok(who + ' on bare map beside the tank opens no box', !(await ht.chooserOpen()), J(await ht.rows()));
+			await H.page.close();
 		}
 
 

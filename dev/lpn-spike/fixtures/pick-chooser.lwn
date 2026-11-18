@@ -653,6 +653,35 @@
 				"y": "-95.00"
 			},
 			"_initQuality": 0
+		},
+		{
+			"id": "HJ",
+			"type": "junction",
+			"x": 175,
+			"y": 21,
+			"elev": 710,
+			"_demand": 0,
+			"tok": {
+				"x": "175.00",
+				"y": "21.00"
+			},
+			"_initQuality": 0.5
+		},
+		{
+			"id": "HT",
+			"type": "tank",
+			"x": 175,
+			"y": 20,
+			"elev": 131.9,
+			"_level": 13.1,
+			"minLevel": 0.1,
+			"maxLevel": 32.1,
+			"tankDiameter": 85,
+			"tok": {
+				"x": "175.00",
+				"y": "20.00"
+			},
+			"minVolume": 0
 		}
 	],
 	"links": [
