@@ -153,6 +153,21 @@ async function main() {
 			ok(tag + ': the time line has a wide, invisible handle over it', !!g && await s.page.evaluate(() => {
 				const h = document.querySelector('#lpn_ts_chart .lpn-ts-now-hit'); return parseFloat(getComputedStyle(h).strokeWidth) >= 20 && getComputedStyle(h).touchAction === 'none';
 			}));
+			// What a visitor sees at 0:00, where the line lies on the chart's left frame (Tom, 2026-11-17: "I don't see a time line").
+			const seen = await s.page.evaluate(() => {
+				const q = (c) => document.querySelector('#lpn_ts_chart ' + c);
+				const line = q('.lpn-ts-now'), knob = q('.lpn-ts-now-knob'), fr = q('.lpn-profile-frame');
+				if (!line || !knob || !fr) { return null; }
+				const kb = knob.getBoundingClientRect(), fb = fr.getBoundingClientRect(), lb = line.getBoundingClientRect(), cs = getComputedStyle(line), fs = getComputedStyle(fr);
+				return { kw: kb.width, kh: kb.height, kBelowTop: kb.bottom <= fb.top + 1, kAbove: kb.top < fb.top, kx: kb.left + kb.width / 2, lx: lb.left, fl: fb.left, fr: fb.right,
+					lw: parseFloat(cs.strokeWidth), fw: parseFloat(fs.strokeWidth), lc: cs.stroke, fc: fs.stroke, lh: lb.height, fh: fb.height, cursor: getComputedStyle(q('.lpn-ts-now-hit')).cursor, now: EngCalcs.lpnTimeNow() };
+			});
+			ok(tag + ': at 0:00 the time line and its knob are drawn', !!seen && seen.now === 0 && seen.lh > 20 && seen.kw >= 10 && seen.kh >= 8, JSON.stringify(seen));
+			ok(tag + ': ...the knob sits above the plot frame, inside the chart, on the line', !!seen && seen.kAbove && seen.kBelowTop && Math.abs(seen.kx - seen.lx) < 1.5);
+			ok(tag + ': ...and the line is not the frame: thicker and another colour, so it shows over the frame at 0:00', !!seen && seen.lw > seen.fw && seen.lc !== seen.fc, seen && (seen.lw + ' ' + seen.lc + ' vs ' + seen.fw + ' ' + seen.fc));
+			ok(tag + ': ...and it shows the resize cursor', !!seen && seen.cursor === 'ew-resize');
+			const mapText = () => s.page.evaluate(() => document.getElementById('lpn_canvas').textContent.replace(/\s+/g, ' '));
+			const mapBefore = await mapText();
 			const frames = await s.page.evaluate(() => EngCalcs.lpnTimeRunFrames().map((f) => f.t));
 			const t0 = g.now;
 			// Aim three quarters of the way across the frame; the step the run lands on is the nearest reporting step.
@@ -174,6 +189,7 @@ async function main() {
 			const after = await geo();
 			const sel = await s.page.evaluate(() => +document.getElementById('lpn_time_step').value);
 			ok(tag + ': dragging the time line moved the run to a later step', after && after.now > t0, t0 + ' -> ' + (after && after.now));
+			ok(tag + ': ...and the map shows different results (its labels changed)', (await mapText()) !== mapBefore);
 			ok(tag + ': ...and it is exactly a reporting step', after && frames.indexOf(after.now) >= 0, String(after && after.now));
 			ok(tag + ': ...and the time selector on the toolbar shows that step', frames[sel] === after.now, 'selector ' + sel + ' = ' + frames[sel]);
 			// Where the pointer ended is where the line is, to within half a reporting step.
@@ -181,6 +197,22 @@ async function main() {
 			ok(tag + ': ...and the line sits under where the pointer was released (within half a step)', Math.abs((await s.page.evaluate(() => {
 				const h = document.querySelector('#lpn_ts_chart .lpn-ts-now-hit').getBoundingClientRect(); return h.left + h.width / 2; })) - aimX) <= step / 2 + 2,
 				'aim ' + Math.round(aimX) + ', step ' + step.toFixed(1) + 'px');
+			// A mouse press anywhere on the plot (not only on the line) takes the line along; without travel it moves nothing.
+			if (!touch) {
+				await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, frames[0]);
+				await s.settle(500);
+				const pg0 = await geo(), py = pg0.y - 20, px = pg0.left + (pg0.right - pg0.left) * 0.3;
+				await s.page.mouse.click(px, py);
+				await s.settle(400);
+				ok(tag + ': a click on the plot away from the line moves nothing', (await geo()).now === frames[0]);
+				await s.page.mouse.move(px, py); await s.page.mouse.down();
+				for (let k = 1; k <= 8; k++) { await s.page.mouse.move(px + k * 12, py); await s.settle(50); }
+				await s.page.mouse.up();
+				await s.settle(500);
+				ok(tag + ': a press and drag on the plot away from the line moves the run', (await geo()).now > frames[0], String((await geo()).now));
+				await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, after.now);
+				await s.settle(500);
+			}
 			// A click on the line (no travel) keeps the step it is on.
 			const before2 = after.now;
 			if (!touch) { await s.page.mouse.click(after.x, after.y); }

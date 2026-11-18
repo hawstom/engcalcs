@@ -39197,30 +39197,42 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Called twice per chart: 'line' under the series, 'hit' last, so the handle is on top of every line,
 	// dot and ring and a press where a series crosses the line still takes the line.
 	function tsNowMark(host, svg, now, X, box, xB, part) {
-		var x, hit;
+		var x, hit, knob, hostId = host.id || host;
 		if (now < xB.min || now > xB.max) { return; }
 		x = X(now);
-		if (part === 'line') {
-			el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-ts-now' }, svg);
-			svg._tsNow = { box: box, xB: xB };
-			return;
-		}
-		hit = el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-ts-now-hit' }, svg);
-		// **`touch-action` IS NOT HONOURED ON AN SVG SHAPE** (measured: a sideways finger drag from the line
-		// took the browser's swipe-back and left the page), so the finger's touchstart is claimed here too.
-		// The pointer events that do the work still fire.
-		hit.addEventListener('touchstart', function (e) { e.preventDefault(); }, { passive: false });
-		hit.addEventListener('pointerdown', function (e) {
+		function press(e) {
 			if (e.button !== undefined && e.button > 0) { return; }
 			e.preventDefault();
 			tsNowEnd(null);
 			if (EngCalcs.lpnTimePause) { EngCalcs.lpnTimePause(); }
-			tsNowDrag = { id: e.pointerId, host: host.id || host, x0: e.clientX, moved: false,
+			tsNowDrag = { id: e.pointerId, host: hostId, x0: e.clientX, moved: false,
 				last: (EngCalcs.lpnTimeStatisticLabel && EngCalcs.lpnTimeStatisticLabel()) ? null : EngCalcs.lpnTimeNow() };
 			document.addEventListener('pointermove', tsNowMove, true);
 			document.addEventListener('pointerup', tsNowEnd, true);
 			document.addEventListener('pointercancel', tsNowEnd, true);
 			window.addEventListener('blur', tsNowEnd);
+		}
+		if (part === 'line') {
+			// **A PRESS ANYWHERE ON THE PLOT, BY MOUSE OR PEN, TAKES THE LINE TOO** (Tom, 2026-11-17: he saw no line
+			// to grab). Drawn UNDER the series, so a dot or a segment keeps its own tip. A finger does not: it
+			// would take the pane's vertical scroll, so a finger grabs the line or its knob only.
+			hit = el('rect', { x: box.left, y: box.top, width: box.width, height: box.height, class: 'lpn-ts-plot-hit' }, svg);
+			hit.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'touch') { press(e); } });
+			el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-ts-now' }, svg);
+			svg._tsNow = { box: box, xB: xB };
+			return;
+		}
+		hit = el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-ts-now-hit' }, svg);
+		// The knob: a triangle in the margin above the frame, apex on the line. At 0:00 the line lies on the
+		// chart's left frame and is the same height as it, so the knob is what a visitor sees there.
+		knob = el('polygon', { points: (x - 7) + ',' + (box.top - 11) + ' ' + (x + 7) + ',' + (box.top - 11) + ' ' + x + ',' + box.top,
+			class: 'lpn-ts-now-knob' }, svg);
+		// **`touch-action` IS NOT HONOURED ON AN SVG SHAPE** (measured: a sideways finger drag from the line
+		// took the browser's swipe-back and left the page), so the finger's touchstart is claimed here too.
+		// The pointer events that do the work still fire.
+		[hit, knob].forEach(function (g) {
+			g.addEventListener('touchstart', function (e) { e.preventDefault(); }, { passive: false });
+			g.addEventListener('pointerdown', press);
 		});
 	}
 	function tsWaitingText(pc) {
