@@ -436,6 +436,50 @@ head('4b4. comment rows never run together on export: after a delete, a move or 
 	ok('an export never changes the rows', JSON.stringify(d.controls) === before);
 }
 
+head('4b5. comment rows in memory agree with the file: a delete or a move that brings two together gives the later one a blank line, and one accessor skips them');
+{
+	const net1 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net1.inp'), 'utf8').replace(/\r\n/g, '\n');
+	const withControls = (body) => net1.replace(/\[CONTROLS\][^\[]*/i, '[CONTROLS]\n' + body + '\n\n');
+	const rowsOf = (d) => d.controls.map((c) => c.comment ? 'C' : 'k').join('');
+	const secLines = (inp) => { const o = []; let on = false; inp.replace(/\r\n/g, '\n').split('\n').forEach((l) => { const m = /^\[(\w+)\]/.exec(l.trim()); if (m) { on = m[1] === 'CONTROLS'; return; } if (on) { o.push(l); } }); while (o.length && !o[o.length - 1].trim()) { o.pop(); } return o; };
+	const T = ';A\nLINK 9 OPEN AT TIME 1\n;B\nLINK 9 CLOSED AT TIME 2\n;C\nLINK 9 OPEN AT TIME 3';
+	// unedited: import then export writes the section as it came
+	let d = importNet('c.inp', withControls(T));
+	ok('an unedited import writes the controls section exactly as it came', secLines(EngCalcs.lpnExportInp(d).inp).join('\n') === T, JSON.stringify(secLines(EngCalcs.lpnExportInp(d).inp)));
+	// move: the control between A and B goes to the bottom, which brings A and B together. The memory already holds the blank line.
+	L.libOrderSelect('controls', 1);
+	L.libOrderMove('controls', 'bottom');
+	ok('move: the two comment rows brought together are both still there, and the later one carries a blank line in memory', rowsOf(d) === 'CCkCkk' && d.controls[1].gap === 1 && d.controls[0].lines[0] === ';A' && d.controls[1].lines[0] === ';B', rowsOf(d) + ' ' + JSON.stringify(d.controls.map((c) => c.gap)));
+	// ...and a save and reopen, then an export, writes the same text as exporting before the save, and it reads back as the same rows
+	const before = EngCalcs.lpnExportInp(d).inp;
+	const saved = JSON.parse(JSON.stringify(L.serialize()));
+	d.controls = []; L.applySaved(saved, 'x');
+	const after = EngCalcs.lpnExportInp(L.getDoc()).inp;
+	ok('...a saved and reopened project exports the identical section, and it reads back as the same rows', secLines(after).join('\n') === secLines(before).join('\n') && rowsOf(importNet('c4.inp', after)) === rowsOf(L.getDoc()), rowsOf(importNet('c4.inp', after)) + ' vs ' + rowsOf(L.getDoc()));
+	// delete: the same through the shared helper the Delete button uses
+	d = importNet('c.inp', withControls(T));
+	L.libItemGapPass(d.controls, 1); d.controls = EngCalcs.lpnControlsSeparate(d.controls.filter((c, k) => k !== 1));
+	ok('delete: the comment row beside a deleted control stays (a comment is a row of its own), the later of the two takes a blank line', rowsOf(d) === 'CCkCk' && d.controls[1].gap === 1 && d.controls[0].lines[0] === ';A' && d.controls[1].lines[0] === ';B', rowsOf(d) + ' ' + JSON.stringify(d.controls.map((c) => c.gap)));
+	// scenario skip with no blank lines at all: A and B meet in the output, so one blank line is written and they read back as two
+	d = importNet('c.inp', withControls(T));
+	d.links.find((l) => l.id === '9')._active = false;
+	let out = EngCalcs.lpnExportInp(d).inp;
+	ok('scenario skip, no blank lines in the file: nothing of the skipped controls is written, and the three comments stay three rows, each set off by one blank line',
+		secLines(out).join('|') === ';A||;B||;C' && rowsOf(importNet('c5.inp', out)) === 'CCC', JSON.stringify(secLines(out)));
+	// the one accessor
+	d = importNet('c.inp', withControls(T));
+	ok('lpnControlsOnly: the three controls, no comment row', EngCalcs.lpnControlsOnly(d.controls).length === 3 && EngCalcs.lpnControlsOnly(d.controls).every((c) => !c.comment) && d.controls.length === 6);
+	const block = EngCalcs.lpnTimeModelBlock(d, undefined);
+	ok('the run reads the three controls and reports nothing for the comment rows', block.controls.length === 3 && !(block.warnings || []).some((w) => w.code === 'control-unreadable'), JSON.stringify(block.warnings));
+	// the rules cut and the controls cut are the one cutter
+	const runs = EngCalcs.lpnInpLineRuns([';a', ';b', '', '', 'x', ';c'], (l) => /^;/.test(l) ? 'comment' : 'text');
+	ok('lpnInpLineRuns: runs of one kind with the blank lines before each', JSON.stringify(runs) === JSON.stringify({ runs: [{ kind: 'comment', lines: [';a', ';b'], gap: 0 }, { kind: 'text', lines: ['x'], gap: 2 }, { kind: 'comment', lines: [';c'], gap: 0 }], gap: 0 }), JSON.stringify(runs));
+	ok('lpnGapBefore: a blank line only where two comment rows meet', EngCalcs.lpnGapBefore(0, true, true) === 1 && EngCalcs.lpnGapBefore(0, true, false) === 0 && EngCalcs.lpnGapBefore(3, true, true) === 3 && EngCalcs.lpnGapBefore(2, false, true) === 2);
+	// the English words of the report say what it reports: the end-of-line comment of a control that was not imported
+	const en = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8').match(/\['lpn_inp_drop_control_comments'\]='([^']*)'/)[1];
+	ok('lpn_inp_drop_control_comments says the comments are those at the end of a control line', /at the end of control lines/.test(en) && !/they belong to/.test(en), en);
+}
+
 head('4c. an item with no ID is selected by position, and a position that has changed is never kept');
 {
 	const d = freshDoc();

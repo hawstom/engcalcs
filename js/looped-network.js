@@ -48280,7 +48280,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Comment lines a pattern or a control cannot keep: between the rows of one pattern, on
 			// the end of a pattern row, or above a control that was itself left out. The ids are the
 			// comment lines themselves, which is the only name they have.
-			case 'control-comments': return pc.lpn_inp_drop_control_comments || 'These comment lines in the controls of this file were not imported, because the control they belong to was not imported. Every control that could be imported was.';
+			case 'control-comments': return pc.lpn_inp_drop_control_comments || 'These comments at the end of control lines were not imported, because those controls were not imported. Every control that could be imported was.';
 			case 'comments': return pc.lpn_inp_drop_comments || 'These comment lines in the patterns of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern was imported in full.';
 			case 'duplicate-pattern-id': return pc.lpn_inp_drop_dup_pattern || 'These pattern IDs are defined in more than one place in this file. EPANET adds the later multipliers after the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start.';
 			case 'duplicate-curve-id': return pc.lpn_inp_drop_dup_curve || 'These curve IDs are defined in more than one place in this file. EPANET adds the later points after the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start.';
@@ -70834,7 +70834,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (to === i) { return false; }
 		saveUndoSnapshot();
 		if (sec === 'rules') { doc.rules = libRulesMoved(libRulesRead(), i, to, info.es); }
-		else { libArrayMove(LIB_ORDER[sec].write(), i, to, LIB_ORDER[sec].slotted); }
+		else {
+			libArrayMove(LIB_ORDER[sec].write(), i, to, LIB_ORDER[sec].slotted);
+			if (sec === 'controls') { EngCalcs.lpnControlsSeparate(doc.controls); }
+		}
 		// Not counted for the rules: two comment rows moved against each other read as one, so the list may now be shorter.
 		libOrderSelect(sec, to, sec === 'rules' ? { n: undefined } : info);
 		libCommit();
@@ -72806,7 +72809,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function libInactiveIds(kind) {
 		var out = [];
 		if (kind === 'control') {
-			libControlsRead().forEach(function (c) {
+			EngCalcs.lpnControlsOnly(libControlsRead()).forEach(function (c) {
 				var l = c && c.link !== '' && c.link !== undefined ? linkById(String(c.link)) : null,
 					cond = c && c.condition, n = cond && cond.kind === 'node' ? nodeById(String(cond.node)) : null;
 				if ((l && !linkLive(l)) || (n && !isActive(n))) { out.push(String(c.link)); }
@@ -72887,7 +72890,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.appendChild(libButton(pc.lpn_library_comment_add || 'Add a comment', function () {
 			saveUndoSnapshot();
 			// After another comment, a blank line keeps it a row of its own: consecutive comment lines are one row.
-			libControls().push(list.length && list[list.length - 1].comment ? { comment: true, lines: [';'], gap: 1 } : { comment: true, lines: [';'] });
+			EngCalcs.lpnControlsSeparate(libControls()); libControls().push({ comment: true, lines: [';'] });
+			EngCalcs.lpnControlsSeparate(libControls());
 			libSelForgetIndexed();
 			libCommit();
 			rebuildLibraryBox();
@@ -72903,7 +72907,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}, function () {
 					var all = libControls();
 					libItemGapPass(all, i);
-					doc.controls = all.filter(function (c, k) { return k !== i; });
+					doc.controls = EngCalcs.lpnControlsSeparate(all.filter(function (c, k) { return k !== i; }));
 				});
 				return;
 			}
@@ -72971,7 +72975,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var all = libControls();
 				saveUndoSnapshot();
 				libItemGapPass(all, i);
-				doc.controls = all.filter(function (c, k) { return k !== i; });
+				doc.controls = EngCalcs.lpnControlsSeparate(all.filter(function (c, k) { return k !== i; }));
 				libSelForgetIndexed();
 				libCommit();
 				rebuildLibraryBox();
@@ -73012,36 +73016,32 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the first RULE line that are neither, which are not a rule and stay where they are). `gap` is the count of blank lines directly
 	// before the item. EPANET has no description for a rule, and a comment above one is its own item, not the rule's.
 	function libRuleItems(lines) {
-		var out = [], at = 0, gap = 0, open = null;
-		function scan(from, to, texty) {
-			var k, l, kind;
-			for (k = from; k < to; k++) {
-				l = String(lines[k]);
-				if (!l.trim()) { gap++; open = null; continue; }
-				kind = /^\s*;/.test(l) ? 'comment' : 'text';
-				if (open && open.kind === kind) { open.lines.push(l); continue; }
-				open = { kind: kind, name: '', lines: [l], gap: gap };
-				out.push(open); gap = 0;
-			}
+		var out = [], at = 0, gap = 0, free = [];
+		// The lines between two rules (a rule's trailing comments and blanks, and any non-rule chunk) are cut into runs by the one cutter
+		// the Controls comment rows use.
+		function flush() {
+			var sc = EngCalcs.lpnInpLineRuns(free, function (l) { return /^\s*;/.test(l) ? 'comment' : 'text'; });
+			sc.runs.forEach(function (r) { out.push({ kind: r.kind, name: '', lines: r.lines, gap: r.gap }); });
+			gap = sc.gap; free = [];
 		}
 		(EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(lines) : []).forEach(function (chunk) {
 			var end = at + chunk.lines.length - (chunk.trailing || 0);
 			if (chunk.name) {
+				flush();
 				out.push({ kind: 'rule', name: chunk.name, lines: lines.slice(at, end).map(String), gap: gap });
-				gap = 0; open = null;
-			} else { scan(at, end); }
-			scan(end, at + chunk.lines.length);
+				gap = 0;
+			} else { free = free.concat(lines.slice(at, end)); }
+			free = free.concat(lines.slice(end, at + chunk.lines.length));
 			at += chunk.lines.length;
 		});
+		flush();
 		if (out.length) { out[0].gap = 0; }
 		return out;
 	}
 	function libRuleItemsText(items) {
 		var out = [];
 		items.forEach(function (it, k) {
-			var g, n = it.gap | 0;
-			// Two comment rows never meet without a blank line: consecutive comment lines read back as one row.
-			if (k && it.kind === 'comment' && items[k - 1].kind === 'comment') { n = Math.max(n, 1); }
+			var g, n = EngCalcs.lpnGapBefore(it.gap, k && items[k - 1].kind === 'comment', it.kind === 'comment');
 			for (g = 0; k && g < n; g++) { out.push(''); }
 			it.lines.forEach(function (l) { out.push(l); });
 		});
@@ -75971,7 +75971,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// Every control that names `oldId` in the given role follows the rename, record and text alike.
 	function renameInControls(role, oldId, newId) {
-		(doc.controls || []).forEach(function (c) {
+		EngCalcs.lpnControlsOnly(doc.controls).forEach(function (c) {
 			if (!c) { return; }
 			if (role === 'link' && c.link === oldId) {
 				c.link = newId;

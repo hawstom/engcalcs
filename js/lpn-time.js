@@ -302,9 +302,8 @@
 				return String((c && c.link) || (c && c.raw) || '').trim() ||
 					String((c && c.text && c.text.raw) || '?');
 			};
-		((doc && doc.controls) || []).forEach(function (c) {
+		EC.lpnControlsOnly(doc && doc.controls).forEach(function (c) {
 			var out, cond = c && c.condition;
-			if (c && c.comment) { return; }   // a comment row (Task 859) is not a control
 			if (!cond) { note('control-unreadable', nameOf(c)); return; }
 			if (liveLinks && !liveLinks[String(c.link)]) { note('control-dangling', nameOf(c)); return; }
 			if (liveNodes && cond.kind === 'node' && !liveNodes[String(cond.node)]) {

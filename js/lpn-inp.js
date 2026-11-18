@@ -790,9 +790,9 @@
 		}
 
 		var patterns = [], patternIndex = {}, times = null, controls = [];
-		// Comment lines in [PATTERNS] and [CONTROLS] that no pattern or control can keep, by
-		// section. Reported at the end as one `comments` difference each.
-		var lostComments = { PATTERNS: [] };
+		// Comment lines in [PATTERNS] that no pattern can keep (the controls' are lostCtlComments below).
+		// Reported at the end as one `comments` difference.
+		var lostPatternComments = [];
 		rows = rawSections.PATTERNS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
@@ -825,13 +825,13 @@
 				if (runStart && pat.multipliers.length === 0 && EngCalcs.lpnInpHasComment(psp.head)) {
 					pat.head = psp.head;
 				} else {
-					lostComments.PATTERNS = lostComments.PATTERNS.concat(psp.head);
+					lostPatternComments = lostPatternComments.concat(psp.head);
 				}
-				if (pnote) { lostComments.PATTERNS = lostComments.PATTERNS.concat(psp.desc); }
+				if (pnote) { lostPatternComments = lostPatternComments.concat(psp.desc); }
 			}
 			// A trailing comment on a pattern row means nothing to EPANET (input2.c replaces it
 			// with the line comment in [PATTERNS]) and has nowhere to go in six-per-line rows.
-			if (EngCalcs.lpnDescText(r.cmt)) { lostComments.PATTERNS.push(';' + r.cmt); }
+			if (EngCalcs.lpnDescText(r.cmt)) { lostPatternComments.push(';' + r.cmt); }
 			for (var pj = 1; pj < r.length; pj++) {
 				var pv = parseFloat(r[pj]);
 				if (!isFinite(pv)) { continue; }
@@ -1490,7 +1490,7 @@
 			else { lostCtlComments = lostCtlComments.concat(sectionFoot.CONTROLS); }
 		}
 		if (ctlItems.length) { delete ctlItems[0].gap; }
-		controls = ctlItems.filter(function (c) { return !c.comment; });
+		controls = EngCalcs.lpnControlsOnly(ctlItems);
 		// **WHAT FOLLOWS THE LAST PATTERN** stays with it as `foot`, written back after it.
 		(function () {
 			var foot = sectionFoot.PATTERNS, last = patterns[patterns.length - 1];
@@ -1498,16 +1498,15 @@
 			while (foot.length && !foot[0].trim()) { foot.shift(); }
 			while (foot.length && !foot[foot.length - 1].trim()) { foot.pop(); }
 			if (last) { last.foot = foot; }
-			else { lostComments.PATTERNS = lostComments.PATTERNS.concat(foot); }
+			else { lostPatternComments = lostPatternComments.concat(foot); }
 		})();
-		['PATTERNS'].forEach(function (sec) {
-			var lost = lostComments[sec].filter(function (l) { return EngCalcs.lpnDescText(String(l).replace(/^\s*;/, '')); });
-			if (lost.length) { drop('comments', lost.map(function (l) { return l.trim(); }), sec); }
-		});
-		(function () {
-			var lost = lostCtlComments.filter(function (l) { return EngCalcs.lpnDescText(String(l).replace(/^\s*;/, '')); });
-			if (lost.length) { drop('control-comments', lost.map(function (l) { return l.trim(); }), 'CONTROLS'); }
-		})();
+		// A comment line this page has no place for is reported, never dropped in silence (blank ones carry no words).
+		function reportLost(list, code, sec) {
+			var lost = list.filter(function (l) { return EngCalcs.lpnDescText(String(l).replace(/^\s*;/, '')); });
+			if (lost.length) { drop(code, lost.map(function (l) { return l.trim(); }), sec); }
+		}
+		reportLost(lostPatternComments, 'comments', 'PATTERNS');
+		reportLost(lostCtlComments, 'control-comments', 'CONTROLS');
 
 		// ---- geometry ----
 		rows = rawSections.COORDINATES || [];
@@ -2423,16 +2422,47 @@
 	 * left after the last comment, for the item that follows. Nothing is added or lost.
 	 */
 	EngCalcs.lpnInpCommentRows = function (lines) {
-		var rows = [], gap = 0, open = null;
+		var sc = EngCalcs.lpnInpLineRuns(lines, function () { return 'comment'; });
+		return { rows: sc.runs.map(function (r) {
+			var row = { comment: true, lines: r.lines };
+			if (r.gap) { row.gap = r.gap; }
+			return row;
+		}), gap: sc.gap };
+	};
+	/**
+	 * THE ONE CUTTER OF A RUN OF LINES INTO ITEMS (comment rows of Controls and Rules, and the non-rule text of Rules). `kindOf(line)` names
+	 * what a non-blank line is; consecutive lines of one kind are one run `{ kind, lines, gap }`, `gap` being the blank lines directly before
+	 * it (0 when none). A blank line ends a run. `gap` of the result is the blank lines after the last run. Nothing is added or lost.
+	 */
+	EngCalcs.lpnInpLineRuns = function (lines, kindOf) {
+		var runs = [], gap = 0, open = null, kind;
 		(lines || []).forEach(function (l) {
 			l = String(l);
 			if (!l.trim()) { gap++; open = null; return; }
-			if (open) { open.lines.push(l); return; }
-			open = { comment: true, lines: [l] };
-			if (gap) { open.gap = gap; }
-			rows.push(open); gap = 0;
+			kind = kindOf(l);
+			if (open && open.kind === kind) { open.lines.push(l); return; }
+			open = { kind: kind, lines: [l], gap: gap };
+			runs.push(open); gap = 0;
 		});
-		return { rows: rows, gap: gap };
+		return { runs: runs, gap: gap };
+	};
+	/**
+	 * The blank lines to write before an item that had `gap` of them: two comment rows never meet without at least one, because consecutive
+	 * comment lines read back as ONE row. The one place that rule is written.
+	 */
+	EngCalcs.lpnGapBefore = function (gap, prevIsComment, isComment) {
+		return (prevIsComment && isComment) ? Math.max(gap | 0, 1) : (gap | 0);
+	};
+	/**
+	 * A list of controls (or of any items with `comment` and `gap`) after an edit has brought two comment rows together: the later one takes a
+	 * blank line, so the memory holds what the `.inp` will say and the two never read back as one. Comment rows stay where they are when the item
+	 * beside them is deleted or moved (a comment is a row of its own, so it is never deleted with a neighbour). Returns the list.
+	 */
+	EngCalcs.lpnControlsSeparate = function (list) {
+		(list || []).forEach(function (c, k) {
+			if (k && c && c.comment && list[k - 1] && list[k - 1].comment) { c.gap = EngCalcs.lpnGapBefore(c.gap, true, true); }
+		});
+		return list;
 	};
 	/**
 	 * A project saved before comments were rows of their own holds a control's description above it
@@ -3532,9 +3562,8 @@
 		// (consecutive comment lines read back as ONE row).
 		var prevWasComment = false, carryGapOut = 0;
 		function gapLines(item) {
-			var g = Math.max(item.gap | 0, carryGapOut);
+			var g = EngCalcs.lpnGapBefore(Math.max(item.gap | 0, carryGapOut), prevWasComment, !!item.comment);
 			carryGapOut = 0;
-			if (item.comment && prevWasComment) { g = Math.max(g, 1); }
 			prevWasComment = !!item.comment;
 			if (!controlRows.length) { return; }
 			for (var k = 0; k < g; k++) { controlRows.push(''); }
@@ -3576,7 +3605,7 @@
 					off = !!blk && (blk.nodes.some(function (id) { return omitted[id]; }) || blk.links.some(function (id) { return offLink[id]; }));
 				}
 				if (off) { offRules.push(c.name || '?'); removed = true; } else { keptRules = keptRules.concat(body); removed = removed && !body.length; }
-				if (tail.length && removed && keptRules.length && isCom(keptRules[keptRules.length - 1]) && isCom(tail[0])) { keptRules.push(''); }
+				if (tail.length && removed && keptRules.length) { for (var bl = EngCalcs.lpnGapBefore(0, isCom(keptRules[keptRules.length - 1]), isCom(tail[0])); bl > 0; bl--) { keptRules.push(''); } }
 				if (tail.length) { removed = false; }
 				keptRules = keptRules.concat(tail);
 			});
