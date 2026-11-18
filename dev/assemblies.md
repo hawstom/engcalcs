@@ -382,7 +382,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **The rule:** one fact gets one door, the Well's Properties box. `PT_OWNED` lists what a pressure tank takes from its Well: initial, minimum and maximum depth, volume
   curve, tank diameter, minimum volume and can overflow. `ownerOfProp(el, prop)` is the one question every door asks. The tank's Properties shows those rows read-only
   (ID, results and the other rows stay), then one sentence: "Written by well W1. Change it in the Properties box of the well." (`lpn_library_control_owned`, the Controls
-  editor's sentence). Tables draws those six cells as plain text with the sentence as the tip (`plainFor`, `ownTip`). `setProp()` refuses them with the sentence, so a scenario
+  editor's sentence). Tables draws those six cells as plain text (`plainFor`; no tip on a cell, so the sentence is in the Properties box). `setProp()` refuses them with the sentence, so a scenario
   cannot override them and Find and replace, the Settings push and paste cannot write them; Find and replace offers the property, leaves the tank out, and says the sentence
   instead of "Nothing would change." Explode removes the lock (no group, no owner).
 - **Not locked, the tank's own:** Elevation, Base elevation, position, Description, Tag, reaction, mixing, initial quality. The open-air Well with tank's tank, the tee and the two

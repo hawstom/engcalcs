@@ -574,8 +574,8 @@ console.log('\n--- 10. round 11 review fixes ---');
 	const spec = L.paneTables().filter((t) => t.cols.some((c) => c.key === 'tankDiameter'))[0];
 	const ordinary = { id: 'T9', type: 'tank', x: 0, y: 0 };
 	const lockedKeys = ['level', 'minLevel', 'maxLevel', 'tankDiameter', 'minVolume', 'overflow'];
-	ok('Tables: those six cells are read-only for the pressure tank, with the sentence, and typeable for another tank',
-		lockedKeys.every((k) => { const c = spec.cols.filter((x) => x.key === k)[0]; return L.paneCellIsPlain(c, tk) && /^Written by well W1\./.test(c.ownTip(tk)) && !L.paneCellIsPlain(c, ordinary); }));
+	ok('Tables: those six cells are read-only for the pressure tank and typeable for another tank',
+		lockedKeys.every((k) => { const c = spec.cols.filter((x) => x.key === k)[0]; return L.paneCellIsPlain(c, tk) && !L.paneCellIsPlain(c, ordinary); }));
 	// Find and replace and the Settings push share pushSpecList(): its applies() leaves the pressure tank out, and the preview note names the well.
 	ok('Find and replace: the diameter, minimum volume and overflow pushes skip the pressure tank and keep another tank',
 		['tankDiameter', 'minVolume', 'overflow', 'level', 'minLevel', 'maxLevel'].every((k) => { const sp = L.pushSpecList().filter((x) => x.key === k)[0]; return sp && !sp.applies(tk) && sp.applies(ordinary); }));

@@ -30767,12 +30767,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						get: function (n) { var b = effective(n, 'bottomElev'); return b === null ? undefined : b; },
 						set: function (n, v) { setTankBottom(n, v); updateNode(n.id, true); } },
 					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level_short', unit: paneUnitElevHead,
-						plainFor: paneOwnedFor('level'), ownTip: paneOwnTip('level'), prop: 'level', get: function (n) { return effective(n, 'level'); },
+						plainFor: paneOwnedFor('level'), prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
-					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel_short', unit: paneUnitElevHead, prop: 'minLevel', plainFor: paneOwnedFor('minLevel'), ownTip: paneOwnTip('minLevel'),
+					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel_short', unit: paneUnitElevHead, prop: 'minLevel', plainFor: paneOwnedFor('minLevel'),
 						get: function (n) { return effective(n, 'minLevel'); },
 						set: function (n, v) { setProp(n, 'minLevel', v); updateNode(n.id, true); } },
-					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel_short', unit: paneUnitElevHead, prop: 'maxLevel', plainFor: paneOwnedFor('maxLevel'), ownTip: paneOwnTip('maxLevel'),
+					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel_short', unit: paneUnitElevHead, prop: 'maxLevel', plainFor: paneOwnedFor('maxLevel'),
 						get: function (n) { return effective(n, 'maxLevel'); },
 						set: function (n, v) { setProp(n, 'maxLevel', v); updateNode(n.id, true); } },
 					// **THE LENGTH UNIT, NOT ELEVATION/HEAD AND NOT THE PIPE-DIAMETER UNIT** (CLAUDE.md;
@@ -30780,19 +30780,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// WS)" in German -- a head suffix on a horizontal distance). Not the pipe unit
 					// either: inches or millimetres would put a 15 m tank on screen as 15000. The
 					// popup says the same thing in its tip.
-					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter', plainFor: paneOwnedFor('tankDiameter'), ownTip: paneOwnTip('tankDiameter'),
+					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter', plainFor: paneOwnedFor('tankDiameter'),
 						get: function (n) { return effective(n, 'tankDiameter'); },
 						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
 					// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** (audit 2026-11). The volume is in the
 					// Length unit cubed, so its heading names that, as the Available volume column does.
 					(function () {
-						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume', plainFor: paneOwnedFor('minVolume'), ownTip: paneOwnTip('minVolume'),
+						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume', plainFor: paneOwnedFor('minVolume'),
 							get: function (n) { return effective(n, 'minVolume'); },
 							set: function (n, v) { setProp(n, 'minVolume', v); updateNode(n.id, true); } };
 						c.unitText = tankVolumeUnitText;
 						return c;
 					}()),
-					{ key: 'overflow', label: 'lpn_field_tank_overflow', em: 3.5, prop: 'overflow', plainFor: paneOwnedFor('overflow'), ownTip: paneOwnTip('overflow'),
+					{ key: 'overflow', label: 'lpn_field_tank_overflow', em: 3.5, prop: 'overflow', plainFor: paneOwnedFor('overflow'),
 						choices: function () {
 							var pc = EngCalcs.pageConfig || {};
 							return [['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']];
@@ -32137,7 +32137,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				sortKey: function (r) { return x(r) ? x(r).info.idx[x(r).scn.id] : undefined; } }
 		];
 	}
-	var PANE_SCN_EL_FNS = ['plainFor', 'ownTip', 'choices', 'choicesFor', 'disabledFor', 'hint', 'hintTip', 'refTo'];
+	var PANE_SCN_EL_FNS = ['plainFor', 'choices', 'choicesFor', 'disabledFor', 'hint', 'hintTip', 'refTo'];
 	function paneScnWrapCol(c) {
 		var w = Object.create(c);
 		function run(r, fn) {
@@ -33183,9 +33183,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// into a field of the user's. The breakdown is edited in the property popup, one row at a time.
 	// Asked in BOTH places a cell is written (built once, refilled on every solve), because a cell
 	// built as a value and refilled as a box would throw the user's input away on the next tick.
-	// A column's per-row lock for a property its group owns (ownerOfProp()): the cell is plain text, and its tip is the sentence that says whose it is.
+	// A column's per-row lock for a property its group owns (ownerOfProp()): the cell is plain text; the sentence that says whose it is stands in the element's Properties box.
 	function paneOwnedFor(prop) { return function (el) { return !!ownerOfProp(el, prop); }; }
-	function paneOwnTip(prop) { return function (el) { var a = ownerOfProp(el, prop); return a ? ownedSentence(a) : ''; }; }
 	function paneCellIsPlain(c, el) {
 		return !!(c.result || !c.set || (c.plainFor && c.plainFor(el)) || (c.roFor && c.roFor(el)));
 	}
@@ -34138,7 +34137,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// the same sentence the property popup gives, so there is one explanation and not
 				// two. `ec-help` is what js/Calculators.lib.js wires the tap tooltip on, and
 				// initTipsIn() at the foot of renderPaneTable() picks it up.
-				if (c.ownTip && c.plainFor && c.plainFor(el) && c.ownTip(el)) { td.title = c.ownTip(el); td.className += ' ec-help'; }
 				if (c.plainWord && c.plainFor && c.plainFor(el)) {
 					td.className += ' lpn-pane-stated';
 					if (c.plainTip) { td.title = c.plainTip(); td.className += ' ec-help'; }
@@ -41328,7 +41326,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The group that owns this property of this element, else null: the one question every door (Properties, Tables, Find and replace, a scenario override) asks.
 	function ownerOfProp(el, prop) { return PT_OWNED[prop] && elGroup(el) === 'node' ? pressureTankOwner(el) : null; }
 	// The sentence every door says beside a locked input.
-	function ownedSentence(a) { return String((EngCalcs.pageConfig || {}).lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', a.id); }
+	function ownedSentence(a, text) { return String(text || (EngCalcs.pageConfig || {}).lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', a.id); }
 	function curveWriterAsm(id) {
 		var list = assemblyList(), i;
 		for (i = 0; i < list.length; i++) { if (list[i].pt && list[i].pt.curve === id && wellHasTank(list[i])) { return list[i]; } }
@@ -77421,7 +77419,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			readonlyField(fields, (pc.lpn_field_tank_diameter || 'Tank diameter') + ' (' + unitLabel('lpn_u_length') + ')', effective(n, 'tankDiameter'), pc.lpn_field_tank_diameter_tip, 4);
 			readonlyField(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')', effective(n, 'minVolume') === undefined || effective(n, 'minVolume') === null ? '' : effective(n, 'minVolume'), pc.lpn_field_tank_minvol_tip, 4);
 			readonlyField(fields, pc.lpn_field_tank_overflow || 'Can overflow', tankOverflowWord(n) === 'YES' ? (pc.lpn_settings_table_yes || 'Yes') : (pc.lpn_settings_table_no || 'No'), pc.lpn_field_tank_overflow_tip);
-			readonlyField(fields, ownedSentence(owner), '');
+			readonlyField(fields, ownedSentence(owner, pc.lpn_library_control_owned), '');
 			return;
 		}
 		if (!owner) {
