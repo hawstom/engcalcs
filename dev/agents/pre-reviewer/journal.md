@@ -5041,3 +5041,8 @@ OBSERVED (re-verify; real Chromium, Net1 EPS 25 frames to 24 h, desktop 1400x900
 - OBSERVED (390 wide, touch): in the Properties box chart a finger on the line or knob seeks; a finger on the plot away from the line seeks nothing and the pane scrolls (scrollTop 14 to 0); tap moves nothing.
 - OBSERVED: at 1366x768 the floating Properties box and the "Reporting time steps" notice cover the middle of the bottom chart; plot drags must start left of x~640.
 - SPECULATION: a shared scratchpad path let a sibling agent overwrite my fast.log; use a unique filename.
+
+## 2026-11-18 feat/graph-scrub round 3 (Task 863)
+- OBSERVED: transport-ends-browser-harness passes (46 ok). Own drive, real Chromium, Net1 EPS, Junction 10: thin blue time line (1.5px, token colour) visible at 0:00 on the left plot edge in the bottom pane and on the phone Properties graph; hover shows crosshair + time/value readout and changes nothing; click set 15:00, drag scrubbed; phone tap and sideways drag set time, readout shown with finger down; no page errors.
+- OBSERVED: the run-finished Calculate dialog sits over the right of the bottom graph on first run (pre-existing, not this branch).
+- Not checked: how it feels under a real finger; pixel look beyond screenshots.
