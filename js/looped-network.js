@@ -6132,7 +6132,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setProp(el, prop, value) {
 		// A pressure tank's own limits, start level and volume curve are the Well's (syncPressureTank()): an edit through any door (Properties, Tables, Find and replace) is refused and says whose they are.
-		if (PT_OWNED[prop] && elGroup(el) === 'node' && pressureTankOwner(el)) { setNotice(String((EngCalcs.pageConfig || {}).lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', pressureTankOwner(el).id)); return; }
+		if (ownerOfProp(el, prop)) { setNotice(ownedSentence(ownerOfProp(el, prop))); return; }
 		if (prop === 'elev' && elGroup(el) === 'node' && !assemblyWriting) { wellTankFollow(assemblyOfAnyMember('node', el.id), el, value); }
 		// **THE TWO NODES OF AN ASSEMBLY SHARE ELEVATION AND PLACE** (Task 822): the partner is written
 		// by the same call, whichever door (Properties, Tables, the marker's tick) the edit came by.
@@ -9257,17 +9257,17 @@ var EngCalcs = EngCalcs || {};
 				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
 				get: function (n) { return effective(n, 'maxLevel'); }, set: function (n, v) { n.maxLevel = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', prop: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
-				applies: function (n) { return n.type === 'tank'; },
+				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
 				get: function (n) { return effective(n, 'tankDiameter'); }, set: function (n, v) { n.tankDiameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** ([TANKS] columns 7 and 9). The volume is a number
 			// in the Length unit cubed; Can overflow is a YES/NO choice on the same `choices` door the
 			// mixing model uses, the codes being EPANET's own words.
 			{ key: 'minVolume', group: 'node', field: 'minVolume', prop: 'minVolume', label: pc.lpn_field_tank_minvol || 'Minimum volume',
-				applies: function (n) { return n.type === 'tank'; },
+				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
 				get: function (n) { return effective(n, 'minVolume'); }, set: function (n, v) { n.minVolume = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'overflow', group: 'node', field: 'overflow', prop: 'overflow', choices: ['YES', 'NO'],
 				label: pc.lpn_field_tank_overflow || 'Can overflow',
-				applies: function (n) { return n.type === 'tank'; },
+				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
 				get: function (n) { return tankOverflowWord(n); }, set: function (n, v) { n.overflow = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **THE MIXING MODEL, A FOUR-WAY CHOICE**, on the same `choices` door `status` uses
 			// above. The CODES are the internal EPANET tokens and are never translated, so a saved
@@ -27406,7 +27406,7 @@ var EngCalcs = EngCalcs || {};
 		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs())
 			.concat(labelReplaceSpecs()).concat(nodeCoordReplaceSpecs()).filter(function (s) {
 			if (srcKeys && !srcKeys[s.field]) { return false; }
-			return cands.some(function (c) { return replaceSpecGroupOk(s, c.group) && s.applies(c.el); });
+			return cands.some(function (c) { return replaceSpecGroupOk(s, c.group) && (s.applies(c.el) || (s.prop && ownerOfProp(c.el, s.prop))); });
 		});
 	}
 	function replaceSpec(field) {
@@ -27510,6 +27510,20 @@ var EngCalcs = EngCalcs || {};
 		v = parseFloat(raw);
 		return isFinite(v) ? v : undefined;
 	}
+	// The groups that own this property of an element the query found: Find and replace leaves those elements out, and says whose they are.
+	function replaceOwnedGroups(spec) {
+		var seen = {}, out = [];
+		if (!spec || !spec.prop) { return out; }
+		replaceFoundSet().forEach(function (c) {
+			var a = replaceSpecGroupOk(spec, c.group) ? ownerOfProp(c.el, spec.prop) : null;
+			if (a && !seen[a.id]) { seen[a.id] = 1; out.push(a); }
+		});
+		return out;
+	}
+	function replaceOwnedNote(spec) {
+		var g = replaceOwnedGroups(spec);
+		return g.length ? ownedSentence({ id: g.map(function (a) { return a.id; }).join(', ') }) : '';
+	}
 	function replaceTargets() {
 		if (replaceIsDem()) { return replaceDemTargets(); }
 		var spec = replaceSpec(replaceState.prop), v, out = [];
@@ -27597,7 +27611,7 @@ var EngCalcs = EngCalcs || {};
 		refs = replaceTargets();
 		if (!refs.length) {
 			replacePending = null;
-			renderReplace(pc.lpn_replace_none || 'Nothing would change.');
+			renderReplace(replaceOwnedNote(replaceSpec(replaceState.prop)) || pc.lpn_replace_none || 'Nothing would change.');
 			return;
 		}
 		replacePending = { prop: replaceState.prop, value: replaceValueOf(replaceSpec(replaceState.prop)),
@@ -27629,6 +27643,7 @@ var EngCalcs = EngCalcs || {};
 		// **ONE SNAPSHOT FOR THE WHOLE SET, so it is ONE undo step.** Snapshotting per element would
 		// make undoing a 37-pipe replace 37 presses of Ctrl+Z -- and with UNDO_LIMIT at 20 the first
 		// seventeen would already be gone, leaving the document permanently half-replaced.
+		var ownedNote = replaceOwnedNote(spec);
 		saveUndoSnapshot();
 		// Every label written first and measured together (withOneLabelBatch()).
 		withOneLabelBatch(function () { replacePending.refs.forEach(function (ref) {
@@ -27651,7 +27666,7 @@ var EngCalcs = EngCalcs || {};
 		// claim about the map: after "diameter equal to 6, set to 8" that list is correctly empty.
 		findResults = replaceFoundSet();
 		renderFindResults(null);
-		renderReplace(String(pc.lpn_replace_done || 'Assets changed: {n}. This can be undone in one step.').replace('{n}', String(n)));
+		renderReplace(String(pc.lpn_replace_done || 'Assets changed: {n}. This can be undone in one step.').replace('{n}', String(n)) + (ownedNote ? ' ' + ownedNote : ''));
 		return n;
 	}
 	// The preview line and its two buttons. `message` is a state the write cannot start from -- no
@@ -30752,12 +30767,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						get: function (n) { var b = effective(n, 'bottomElev'); return b === null ? undefined : b; },
 						set: function (n, v) { setTankBottom(n, v); updateNode(n.id, true); } },
 					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level_short', unit: paneUnitElevHead,
-						prop: 'level', get: function (n) { return effective(n, 'level'); },
+						plainFor: paneOwnedFor('level'), ownTip: paneOwnTip('level'), prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
-					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel_short', unit: paneUnitElevHead, prop: 'minLevel',
+					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel_short', unit: paneUnitElevHead, prop: 'minLevel', plainFor: paneOwnedFor('minLevel'), ownTip: paneOwnTip('minLevel'),
 						get: function (n) { return effective(n, 'minLevel'); },
 						set: function (n, v) { setProp(n, 'minLevel', v); updateNode(n.id, true); } },
-					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel_short', unit: paneUnitElevHead, prop: 'maxLevel',
+					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel_short', unit: paneUnitElevHead, prop: 'maxLevel', plainFor: paneOwnedFor('maxLevel'), ownTip: paneOwnTip('maxLevel'),
 						get: function (n) { return effective(n, 'maxLevel'); },
 						set: function (n, v) { setProp(n, 'maxLevel', v); updateNode(n.id, true); } },
 					// **THE LENGTH UNIT, NOT ELEVATION/HEAD AND NOT THE PIPE-DIAMETER UNIT** (CLAUDE.md;
@@ -30765,19 +30780,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// WS)" in German -- a head suffix on a horizontal distance). Not the pipe unit
 					// either: inches or millimetres would put a 15 m tank on screen as 15000. The
 					// popup says the same thing in its tip.
-					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter',
+					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter', plainFor: paneOwnedFor('tankDiameter'), ownTip: paneOwnTip('tankDiameter'),
 						get: function (n) { return effective(n, 'tankDiameter'); },
 						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
 					// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** (audit 2026-11). The volume is in the
 					// Length unit cubed, so its heading names that, as the Available volume column does.
 					(function () {
-						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume',
+						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume', plainFor: paneOwnedFor('minVolume'), ownTip: paneOwnTip('minVolume'),
 							get: function (n) { return effective(n, 'minVolume'); },
 							set: function (n, v) { setProp(n, 'minVolume', v); updateNode(n.id, true); } };
 						c.unitText = tankVolumeUnitText;
 						return c;
 					}()),
-					{ key: 'overflow', label: 'lpn_field_tank_overflow', em: 3.5, prop: 'overflow',
+					{ key: 'overflow', label: 'lpn_field_tank_overflow', em: 3.5, prop: 'overflow', plainFor: paneOwnedFor('overflow'), ownTip: paneOwnTip('overflow'),
 						choices: function () {
 							var pc = EngCalcs.pageConfig || {};
 							return [['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']];
@@ -32122,7 +32137,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				sortKey: function (r) { return x(r) ? x(r).info.idx[x(r).scn.id] : undefined; } }
 		];
 	}
-	var PANE_SCN_EL_FNS = ['plainFor', 'choices', 'choicesFor', 'disabledFor', 'hint', 'hintTip', 'refTo'];
+	var PANE_SCN_EL_FNS = ['plainFor', 'ownTip', 'choices', 'choicesFor', 'disabledFor', 'hint', 'hintTip', 'refTo'];
 	function paneScnWrapCol(c) {
 		var w = Object.create(c);
 		function run(r, fn) {
@@ -33168,6 +33183,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// into a field of the user's. The breakdown is edited in the property popup, one row at a time.
 	// Asked in BOTH places a cell is written (built once, refilled on every solve), because a cell
 	// built as a value and refilled as a box would throw the user's input away on the next tick.
+	// A column's per-row lock for a property its group owns (ownerOfProp()): the cell is plain text, and its tip is the sentence that says whose it is.
+	function paneOwnedFor(prop) { return function (el) { return !!ownerOfProp(el, prop); }; }
+	function paneOwnTip(prop) { return function (el) { var a = ownerOfProp(el, prop); return a ? ownedSentence(a) : ''; }; }
 	function paneCellIsPlain(c, el) {
 		return !!(c.result || !c.set || (c.plainFor && c.plainFor(el)) || (c.roFor && c.roFor(el)));
 	}
@@ -34120,6 +34138,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// the same sentence the property popup gives, so there is one explanation and not
 				// two. `ec-help` is what js/Calculators.lib.js wires the tap tooltip on, and
 				// initTipsIn() at the foot of renderPaneTable() picks it up.
+				if (c.ownTip && c.plainFor && c.plainFor(el) && c.ownTip(el)) { td.title = c.ownTip(el); td.className += ' ec-help'; }
 				if (c.plainWord && c.plainFor && c.plainFor(el)) {
 					td.className += ' lpn-pane-stated';
 					if (c.plainTip) { td.title = c.plainTip(); td.className += ' ec-help'; }
@@ -41298,12 +41317,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			on: niceDefault('lpn_u_pressure', 'psi', 40, 28), off: niceDefault('lpn_u_pressure', 'psi', 60, 42) };
 	}
 	// The group that wrote this curve, if any: it is read-only in the Library and changed in that group's Properties box.
-	var PT_OWNED = { level: 1, minLevel: 1, maxLevel: 1, volCurve: 1 };
+	// **WHAT A GROUP OWNS OF ITS MEMBER** (Tom, round 11 pass: one fact gets one door): the pressure tank's whole vessel -- start level, limits, curve, diameter, minimum volume and overflow -- is the Well's.
+	// Its Elevation and Base elevation stay the tank's own (a tank may stand below the well's ground).
+	var PT_OWNED = { level: 1, minLevel: 1, maxLevel: 1, volCurve: 1, tankDiameter: 1, minVolume: 1, overflow: 1 };
 	// The group whose pressure tank this node is, else null.
 	function pressureTankOwner(n) {
 		var a = n && n.type === 'tank' ? assemblyIndex().anyNode[n.id] : null;
 		return a && a.pt && a.tank === n.id && wellHasTank(a) ? a : null;
 	}
+	// The group that owns this property of this element, else null: the one question every door (Properties, Tables, Find and replace, a scenario override) asks.
+	function ownerOfProp(el, prop) { return PT_OWNED[prop] && elGroup(el) === 'node' ? pressureTankOwner(el) : null; }
+	// The sentence every door says beside a locked input.
+	function ownedSentence(a) { return String((EngCalcs.pageConfig || {}).lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', a.id); }
 	function curveWriterAsm(id) {
 		var list = assemblyList(), i;
 		for (i = 0; i < list.length; i++) { if (list[i].pt && list[i].pt.curve === id && wellHasTank(list[i])) { return list[i]; } }
@@ -77392,7 +77417,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			readonlyField(fields, (pc.lpn_field_tank_minlevel_short || 'Minimum depth') + eu, effective(n, 'minLevel'), pc.lpn_field_tank_minlevel_short_tip, 4);
 			readonlyField(fields, (pc.lpn_field_tank_maxlevel_short || 'Maximum depth') + eu, effective(n, 'maxLevel'), pc.lpn_field_tank_maxlevel_short_tip, 4);
 			readonlyField(fields, pc.lpn_curve_kind_volume || 'Tank volume', effective(n, 'volCurve') || '');
-			readonlyField(fields, String(pc.lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', owner.id), '');
+			// The rest of the vessel, shown and not typed (the group owns it: PT_OWNED), then the one sentence that says whose it is.
+			readonlyField(fields, (pc.lpn_field_tank_diameter || 'Tank diameter') + ' (' + unitLabel('lpn_u_length') + ')', effective(n, 'tankDiameter'), pc.lpn_field_tank_diameter_tip, 4);
+			readonlyField(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')', effective(n, 'minVolume') === undefined || effective(n, 'minVolume') === null ? '' : effective(n, 'minVolume'), pc.lpn_field_tank_minvol_tip, 4);
+			readonlyField(fields, pc.lpn_field_tank_overflow || 'Can overflow', tankOverflowWord(n) === 'YES' ? (pc.lpn_settings_table_yes || 'Yes') : (pc.lpn_settings_table_no || 'No'), pc.lpn_field_tank_overflow_tip);
+			readonlyField(fields, ownedSentence(owner), '');
+			return;
 		}
 		if (!owner) {
 		unitNumberField(fields, pc.lpn_field_tank_level_short || 'Initial depth', 'lpn_u_elevhead',

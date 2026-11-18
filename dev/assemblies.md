@@ -374,5 +374,19 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **Check:** 44 gal, 38 psig, 40/60 gives 11.35 gal drawdown by the formula; Amtrol-based sheets for the WX-250 print 11.8, 12.9 and 13.0 (they disagree with each other), so
   the harness holds the formula to within 4% of 11.8 and does not claim a table match. 32 gal gives 8.25 gal.
 - **The curve is the group's:** read-only in the Libraries box (`curveWriterAsm()`), restored from `PT=vol,pre,on,off,curve` on the `;ASSEMBLY:` line, a plain curve
-  after Explode. The tank's own box shows its initial depth, limits and curve reference read-only with "Written by well {id}", and `setProp()` refuses those four properties (so Tables and Find and replace too). Scenarios: like the open-air form, the group writes Base and the document (controls and the curve are document data); an owned property is not overridable; the Well's ground elevation override still reaches the tank. The volume is typed in the Elevation/Head unit cubed, the family a VOLUME curve is read in.
+  after Explode. The tank's own box shows its owned properties read-only with "Written by well {id}" (Round 12 lists them), and `setProp()` refuses them (so Tables and Find and replace too). Scenarios: like the open-air form, the group writes Base and the document (controls and the curve are document data); an owned property is not overridable; the Well's ground elevation override still reaches the tank. The volume is typed in the Elevation/Head unit cubed, the family a VOLUME curve is read in.
 - **`.inp` grouping comments (round 11 review):** matched exactly and case-sensitively (`;VIRTUAL: ` and `;ASSEMBLY: `), so a user's `;Virtual: ...` stays a comment. A group is restored only when every named element is the right kind (a curveless pump reads back as a pipe and still counts), else it is reported (`assembly-kind`); a malformed line is reported (`assembly-malformed`). A virtual pipe's export keeps the stand-in row, and its typed length, diameter, roughness and minor loss ride on the `;VIRTUAL:` line as `id=length|diameter|roughness|minor` (several lines, each under 255 characters), so a round trip restores them. No call of Tom's on virtual-pipe export was found; this keeps the stand-in he was shown and loses nothing.
+
+### Round 12: a member whose inputs the group owns is locked (Tom, round 11 pass: "the tank properties can be edited"; `well-tank-three-point-harness.js`, `well-pressure-tank-lock-browser-harness.js`)
+
+- **The rule:** one fact gets one door, the Well's Properties box. `PT_OWNED` lists what a pressure tank takes from its Well: initial, minimum and maximum depth, volume
+  curve, tank diameter, minimum volume and can overflow. `ownerOfProp(el, prop)` is the one question every door asks. The tank's Properties shows those rows read-only
+  (ID, results and the other rows stay), then one sentence: "Written by well W1. Change it in the Properties box of the well." (`lpn_library_control_owned`, the Controls
+  editor's sentence). Tables draws those six cells as plain text with the sentence as the tip (`plainFor`, `ownTip`). `setProp()` refuses them with the sentence, so a scenario
+  cannot override them and Find and replace, the Settings push and paste cannot write them; Find and replace offers the property, leaves the tank out, and says the sentence
+  instead of "Nothing would change." Explode removes the lock (no group, no owner).
+- **Not locked, the tank's own:** Elevation, Base elevation, position, Description, Tag, reaction, mixing, initial quality. The open-air Well with tank's tank, the tee and the two
+  branch pipes keep every input: Round 7 puts their values in their own boxes, and the Well's box asks only the pump's two levels.
+- **No Select-the-well button:** no such door exists yet (the Controls editor's sentence is text).
+- **Well symbol sketches (Tom, 2026-11-17):** circle with a vertical arrow (Well), joined to a rectangle (with tank) or a capsule (with pressure tank); a diagonal arrow
+  variant reads as the male sign. Proofs only: `_panel/www/img/pump-plus/r12-well-symbol-proofs.png`. The branch's symbols are unchanged until he decides.
