@@ -39133,7 +39133,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function tsHours(t) { return (t || 0) / 3600; }
 	// **THE TIME LINE IS A HANDLE** (Tom, 2026-11-14, Ida's second door to the time: the transport is the
 	// only way to change the instant on a phone, and the chart already says which moment it is). A press
-	// on the dashed line and a drag along the chart steps the run to the transport's own stop nearest the
+	// on the time line and a drag along the chart steps the run to the transport's own stop nearest the
 	// pointer, by its own seek, EngCalcs.lpnTimeGoTo(), which is also what Back, Forward and the time
 	// selector end in. A wide invisible stroke carries the press (a finger cannot hit a 1 px line) and
 	// `touch-action: none` on it keeps a finger from scrolling the pane instead.
@@ -39193,7 +39193,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		e.preventDefault();
 		tsNowSeek(e);
 	}
-	// **THE DASHED LINE AND ITS HANDLE, ONE HELPER FOR EVERY CHART THAT CARRIES THE TRANSPORT'S TIME.**
+	// **THE TIME LINE (SOLID, IN THE ACCENT COLOUR, SO IT IS NOT TAKEN FOR A SERIES OR THE FRAME) AND ITS HANDLE, ONE HELPER FOR EVERY CHART THAT CARRIES THE TRANSPORT'S TIME.**
 	// Called twice per chart: 'line' under the series, 'hit' last, so the handle is on top of every line,
 	// dot and ring and a press where a series crosses the line still takes the line.
 	function tsNowMark(host, svg, now, X, box, xB, part) {
