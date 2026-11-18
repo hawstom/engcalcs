@@ -9124,7 +9124,7 @@ var EngCalcs = EngCalcs || {};
 				applies: function (n) { return n.type === 'tank'; },
 				get: function (n) { return effective(n, 'tankDiameter'); }, set: function (n, v) { n.tankDiameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** ([TANKS] columns 7 and 9). The volume is a number
-			// in the Length unit cubed; Can overflow is a YES/NO choice on the same `choices` door the
+			// in the Volume unit; Can overflow is a YES/NO choice on the same `choices` door the
 			// mixing model uses, the codes being EPANET's own words.
 			{ key: 'minVolume', group: 'node', field: 'minVolume', prop: 'minVolume', label: pc.lpn_field_tank_minvol || 'Minimum volume',
 				applies: function (n) { return n.type === 'tank'; },
@@ -30534,8 +30534,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						get: function (n) { return effective(n, 'tankDiameter'); },
 						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
 					// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** (audit 2026-11). The volume is in the
-					// Length unit cubed, so its heading names that; the Available volume column beside it
-					// is a result and follows the Volume selector.
+					// Volume unit, so its heading names that, as the Available volume column beside it does.
 					(function () {
 						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume',
 							get: function (n) { return effective(n, 'minVolume'); },
@@ -69770,8 +69769,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (kind === 'volume') {
 			// A volume curve's axes are a LEVEL and a VOLUME. The level is in the elevation unit like
-			// every other vertical distance on a tank; the volume has no family on this page and is
-			// carried as the file's own number, so it names no unit rather than an invented one.
+			// every other vertical distance on a tank; the volume is carried as the file's own number
+			// (the elevation unit cubed), outside the Volume selector, so it names no unit rather than an invented one.
 			return { x: (pc.lpn_field_tank_level || 'Water depth') + ' (' + unitLabel('lpn_u_elevhead') + ')',
 				y: pc.lpn_curve_volume_col || 'Volume' };
 		}
