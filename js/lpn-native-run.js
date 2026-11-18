@@ -2593,6 +2593,13 @@
 			f.demands[n.id] = n.type === 'junction' ? (res.demands && res.demands[n.id] !== undefined ? res.demands[n.id]
 				: (n.demand || 0) + (n.emitter > 0 ? n.emitter * Math.pow(Math.max((res.heads[n.id] || 0) - (n.elev || 0), 0), model.emitterExponent || 0.5) : 0)) : 0;
 		});
+		// A reservoir's pressure is its head less its elevation (epanet.c EN_PRESSURE), and EPANET's elevation for a reservoir is its
+		// BASE head: 0 on a steady head, head less base head when a head pattern moves it. lpnSolve answers 0 always.
+		cur.forEach(function (n) {
+			var sg = (model.hydraulics && typeof model.hydraulics.specificGravity === 'number' && isFinite(model.hydraulics.specificGravity))
+				? model.hydraulics.specificGravity : 1;
+			if (n.type === 'reservoir' && n.headPattern && typeof n.headBase === 'number') { f.pressures[n.id] = (res.heads[n.id] - n.headBase) * sg; }
+		});
 		// A pressure-driven run also reports what each junction asked for and did not get (EN_DEMANDDEFICIT).
 		if (res.demandDeficits) { f.demandDeficits = Object.assign({}, res.demandDeficits); }
 		// EPANET's demand at a reservoir is the water it takes from the network: negative while it supplies.
