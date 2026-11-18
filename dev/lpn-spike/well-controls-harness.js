@@ -23,6 +23,7 @@ require(ROOT + 'js/lpn-time.js');
 require(ROOT + 'js/lpn-native-run.js');
 
 const L = loadLoopedNetwork(
+	"\t\tviaOwnerDoor: viaOwnerDoor,\n" +
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode,\n" +
@@ -88,7 +89,7 @@ function network(on, off) {
 	L.setProp(doc.links[1], 'curveId', 'PC1');
 	const t = L.nodeById('T1');
 	L.setProp(t, 'elev', 150); L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
-	L.setProp(t, 'minLevel', 0); L.setProp(t, 'maxLevel', 8); L.setProp(t, 'level', 4.5); L.setProp(t, 'tankDiameter', 6);
+	L.viaOwnerDoor(() => { L.setProp(t, 'minLevel', 0); L.setProp(t, 'maxLevel', 8); L.setProp(t, 'level', 4.5); L.setProp(t, 'tankDiameter', 6); });
 	doc.times = Object.assign(EC.lpnTimesDefaults(), { duration: 24 * 3600 });
 	const a = L.assemblyById('W1');
 	if (on !== undefined) { a.pumpOn = on; }
@@ -203,7 +204,7 @@ console.log('\n--- the Well with pressure tank, in both engines (round 11) ---')
 		d.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
 		L.setProp(L.linkById('W1DV'), 'curveId', 'DD1'); L.setProp(L.linkById('W1P'), 'curveId', 'PC1');
 		[['W1', 150], ['J1', 150], ['W1R', 120]].forEach(([id, e]) => { if (L.nodeById(id)) { L.setProp(L.nodeById(id), 'elev', e); } });
-		if (withTank) { L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById(d.assemblies[0].tank), 'elev', 150); }
+		if (withTank) { L.setProp(L.nodeById('J1'), 'elev', 150); L.viaOwnerDoor(() => L.setProp(L.nodeById(d.assemblies[0].tank), 'elev', 150)); }
 		return d;
 	}
 	async function both(label, step, dur) {
@@ -263,7 +264,7 @@ console.log('\n--- the Well with pressure tank, every switch pair 20 to 100 psi,
 		d.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) }, { id: 'PC1', kind: 'head', points: hd });
 		L.setProp(L.linkById('W1DV'), 'curveId', 'DD1'); L.setProp(L.linkById('W1P'), 'curveId', 'PC1');
 		[['W1', 150], ['J1', 150], ['W1R', 120]].forEach(([id, e]) => L.setProp(L.nodeById(id), 'elev', e));
-		L.setProp(L.nodeById(a.tank), 'elev', 150);
+		L.viaOwnerDoor(() => L.setProp(L.nodeById(a.tank), 'elev', 150));
 		a.pt.on = us ? on : on * 0.70307; a.pt.off = us ? off : off * 0.70307;
 		L.syncPressureTank(a);
 		return { d, a };

@@ -30,6 +30,7 @@ require(ROOT + 'js/lpn-time.js');
 require(ROOT + 'js/lpn-native-run.js');
 
 const L = loadLoopedNetwork(
+	"\t\tviaOwnerDoor: viaOwnerDoor,\n" +
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode, getMode: function () { return mode; },\n" +
@@ -212,7 +213,7 @@ console.log('\n--- 4. a Well with tank: the tee and the tank follow the Well\'s 
 	L.setProp(well, 'elev', 250);
 	ok('typing the Well\'s elevation moves both', tee.elev === 250 && tank.elev === 250);
 	L.snap();
-	L.setProp(tank, 'elev', 300);
+	L.viaOwnerDoor(() => L.setProp(tank, 'elev', 300));
 	ok('typing a tank elevation of its own ends the tank\'s following and leaves the tee following', a.tankFollow === undefined && a.teeFollow === true && tank.elev === 300 && tee.elev === 250);
 	L.setProp(well, 'elev', 260);
 	ok('the Well\'s next elevation moves the tee, and the tank stays as typed', tee.elev === 260 && tank.elev === 300, [tee.elev, tank.elev].join());
@@ -224,7 +225,7 @@ console.log('\n--- 4. a Well with tank: the tee and the tank follow the Well\'s 
 	const a2 = L.getDoc().assemblies[0];
 	ok('Undo restores the following, flags and elevations (the flags are part of the document)', a2.tankFollow === true && a2.teeFollow === true && L.nodeById(a2.tank).elev === 250 && L.nodeById(a2.tee).elev === 250, JSON.stringify([a2.teeFollow, a2.tankFollow, L.nodeById(a2.tank).elev]));
 	// Diverge, save, reopen.
-	L.setProp(L.nodeById(a2.tank), 'elev', 400);
+	L.viaOwnerDoor(() => L.setProp(L.nodeById(a2.tank), 'elev', 400));
 	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
 	L.applySaved(L.migrateSaved(saved)); L.buildDom();
 	const a3 = L.getDoc().assemblies[0];

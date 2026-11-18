@@ -28,6 +28,7 @@ require(ROOT + 'js/lpn-native-run.js');
 
 const L = loadLoopedNetwork(
 	"\t\townerOfProp: ownerOfProp, pushSpecList: pushSpecList, replaceOwnedNote: replaceOwnedNote, paneTables: paneTables, paneCellIsPlain: paneCellIsPlain,\n" +
+	"\t\tviaOwnerDoor: viaOwnerDoor, paneCellText: paneCellText,\n" +
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode, getMode: function () { return mode; },\n" +
@@ -228,7 +229,7 @@ console.log('\n--- 4. the group, its box and its controls ---');
 	const labels = boxLabels();
 	console.log('        box: ' + labels.join(' | '));
 	ok('Pump on below and Pump off above are asked once, on the well', labels.filter((x) => /^Pump on below/.test(x)).length === 1 && labels.filter((x) => /^Pump off above/.test(x)).length === 1);
-	ok('and the tank\'s own depths and diameter are not on the well\'s box (it is an ordinary tank with a box of its own)', !labels.some((x) => /Initial depth|Minimum depth|Maximum depth|Tank diameter/.test(x)));
+	ok('and the tank\'s two elevations and its depths and size are typed on the well\'s box, in the tank\'s section (one door), each once', ['Elevation', 'Base elevation', 'Initial depth', 'Minimum depth', 'Maximum depth', 'Tank diameter', 'Minimum volume', 'Can overflow'].every((o) => labels.filter((x) => x.indexOf(o) === 0).length === (o === 'Elevation' ? 2 : 1)), labels.join(' | '));
 	ok('the Well\'s flow is stated once, above the headings; the only other Flow rows are the two branch pipes\' own (Round 8: every member has its heading)', labels.filter((x) => /^Flow/.test(x)).length === 3);
 	a.pumpOn = 3; a.pumpOff = 6; L.syncWellControls(a);
 	const mine = L.getDoc().controls.filter((c) => c.asm === 'W1');
@@ -350,7 +351,7 @@ console.log('\n--- 8. the solvers ---');
 	curves(doc, a);
 	L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
 	L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'demand', 10);
-	L.setProp(L.nodeById('T1'), 'elev', 150);
+	L.viaOwnerDoor(() => L.setProp(L.nodeById('T1'), 'elev', 150));
 	const m = L.currentModel();
 	ok('the model carries the well with its tank for the diagnosis', m.wells.length === 1 && m.wells[0].gpv === 'W1DV' && m.wells[0].pump === 'W1P');
 	const issues = EC.lpnDiagnose(m);
@@ -579,8 +580,11 @@ console.log('\n--- 10. round 11 review fixes ---');
 	const vesselBefore = JSON.stringify([tk.tankDiameter, tk._tankDiameter, tk.minVolume, tk.overflow]);
 	L.setProp(tk, 'tankDiameter', 7); L.setProp(tk, 'minVolume', 3); L.setProp(tk, 'overflow', 'YES');
 	ok('the tank diameter, minimum volume and overflow are refused too', JSON.stringify([tk.tankDiameter, tk._tankDiameter, tk.minVolume, tk.overflow]) === vesselBefore);
-	L.setProp(tk, 'bottomElev', 1.5);
-	ok('the tank\'s Base elevation stays its own', L.effective(tk, 'bottomElev') === 1.5);
+	L.setProp(tk, 'bottomElev', 1.5); L.setProp(tk, 'elev', 99);
+	ok('the tank\'s Elevation and Base elevation are refused too (round 12 pass: "Or above. Yes.")', L.effective(tk, 'bottomElev') !== 1.5 && L.effective(tk, 'elev') !== 99);
+	L.viaOwnerDoor(() => L.setProp(tk, 'bottomElev', 1.5));
+	ok('and the owner\'s door writes them', L.effective(tk, 'bottomElev') === 1.5);
+	L.viaOwnerDoor(() => L.setProp(tk, 'bottomElev', undefined));
 	// Properties: every owned input is a read-only row (no input element), the sentence shows once, and the identity rows stay typeable.
 	const owned = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank volume'];
 	const inputsOf = (lab) => { let n = 0; walk(lab, (e) => { if (e.tagName === 'INPUT' || e.tagName === 'SELECT') { n++; } }); return n; };
@@ -590,17 +594,19 @@ console.log('\n--- 10. round 11 review fixes ---');
 	ok('the four owned rows that mean something to a pressure tank are listed, none typeable, and diameter, minimum volume and overflow have no row', ownedEls.length === 4 && ownedEls.every((e) => inputsOf(e) === 0) && !labelEls.some((e) => /^(Tank diameter|Minimum volume|Can overflow)/.test(txt(e))), ownedEls.map(txt).join(' | '));
 	const notes = []; walk(byId.lpn_popup_fields, (e) => { if (e.className === 'lpn-owned-note') { notes.push(e); } });
 	ok('the sentence shows exactly once, naming the well', notes.length === 1 && /^Associated with Well W1\. Change volume and control properties there\.$/.test(txt(notes[0])));
-	ok('the tank\'s Elevation and Base elevation are still typeable', ['Elevation', 'Base elevation'].every((o) => labelEls.some((e) => txt(e).indexOf(o) === 0 && inputsOf(e) > 0)));
+	ok('the tank\'s Elevation and Base elevation are read-only rows too, with no DEM row', ['Elevation', 'Base elevation'].every((o) => labelEls.filter((e) => txt(e).indexOf(o) === 0).length === 1 && labelEls.filter((e) => txt(e).indexOf(o) === 0).every((e) => inputsOf(e) === 0)));
 	// Tables: the six columns are plain cells for this tank, and typeable for an ordinary tank.
 	const spec = L.paneTables().filter((t) => t.cols.some((c) => c.key === 'tankDiameter'))[0];
 	const ordinary = { id: 'T9', type: 'tank', x: 0, y: 0 };
-	const lockedKeys = ['level', 'minLevel', 'maxLevel', 'tankDiameter', 'minVolume', 'overflow'];
-	ok('Tables: those six cells are read-only for the pressure tank and typeable for another tank',
+	const lockedKeys = ['elev', 'bottomElev', 'level', 'minLevel', 'maxLevel', 'tankDiameter', 'minVolume', 'overflow'];
+	ok('Tables: those eight cells are read-only for the pressure tank and typeable for another tank',
 		lockedKeys.every((k) => { const c = spec.cols.filter((x) => x.key === k)[0]; return L.paneCellIsPlain(c, tk) && !L.paneCellIsPlain(c, ordinary); }));
+	ok('Tables: the three cells a pressure tank has no use for say "Not used", and a Well\'s open-air tank\'s do not (checked in section 10)',
+		['tankDiameter', 'minVolume', 'overflow'].every((k) => L.paneCellText(spec.cols.filter((x) => x.key === k)[0], tk) === 'Not used') && ['level', 'minLevel', 'maxLevel', 'elev'].every((k) => L.paneCellText(spec.cols.filter((x) => x.key === k)[0], tk) !== 'Not used'));
 	// Find and replace and the Settings push share pushSpecList(): its applies() leaves the pressure tank out, and the preview note names the well.
 	ok('Find and replace: the diameter, minimum volume and overflow pushes skip the pressure tank and keep another tank',
-		['tankDiameter', 'minVolume', 'overflow', 'level', 'minLevel', 'maxLevel'].every((k) => { const sp = L.pushSpecList().filter((x) => x.key === k)[0]; return sp && !sp.applies(tk) && sp.applies(ordinary); }));
-	ok('ownerOfProp finds it for each owned property and not for its Elevation', ['level', 'minLevel', 'maxLevel', 'volCurve', 'tankDiameter', 'minVolume', 'overflow'].every((k) => L.ownerOfProp(tk, k) === a) && !L.ownerOfProp(tk, 'elev') && !L.ownerOfProp(tk, 'bottomElev'));
+		['nodeElev', 'bottomElev', 'tankDiameter', 'minVolume', 'overflow', 'level', 'minLevel', 'maxLevel'].every((k) => { const sp = L.pushSpecList().filter((x) => x.key === k)[0]; return sp && !sp.applies(tk) && sp.applies(ordinary); }));
+	ok('ownerOfProp finds it for each owned property, the two elevations included, and not for its position', ['elev', 'bottomElev', 'level', 'minLevel', 'maxLevel', 'volCurve', 'tankDiameter', 'minVolume', 'overflow'].every((k) => L.ownerOfProp(tk, k) === a) && !L.ownerOfProp(tk, 'x') && !L.ownerOfProp(tk, 'y') && !L.ownerOfProp(tk, 'mixingModel'));
 	// scenarios: like the open-air Well with tank, the group writes Base (its controls are document data, its numbers are Base's); an owned property is not overridable.
 	L.createScenario('Dry year');
 	const scn = L.getScenarios()[L.getScenarios().length - 1];
@@ -613,6 +619,74 @@ console.log('\n--- 10. round 11 review fixes ---');
 	ok('the Well\'s ground elevation overridden in the scenario reaches the tank as for the open-air form', L.effective(tk, 'elev') === 77, L.effective(tk, 'elev'));
 	L.switchScenario('base');
 	ok('back in Base the tank and the group are as Base had them', tk.maxLevel === 50 && L.effective(tk, 'elev') !== 77);
+}
+
+console.log('\n--- 10. the open-air Well with tank: the tank\'s inputs are the Well\'s (round 13; Tom: "Yes.") ---');
+{
+	const doc = fresh();
+	const a = place3(200, 150, 500, 150, 500, 400);
+	curves(doc, a);
+	L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
+	const tk = L.nodeById(a.tank);
+	const txt = (e) => (e.textContent || '').replace(/\s+/g, ' ').trim();
+	const labelEls = () => { const o = []; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL') { o.push(e); } }); return o; };
+	const inputOf = (lab) => { let r = null; walk(lab, (e) => { if (!r && (e.tagName === 'INPUT' || e.tagName === 'SELECT')) { r = e; } }); return r; };
+	const type = (inp, v) => { inp.value = v; (inp._listeners.change || []).forEach((fn) => fn({})); };
+	const row = (name, nth) => labelEls().filter((e) => txt(e).indexOf(name) === 0)[nth || 0];
+	const OWNED = ['Elevation', 'Base elevation', 'Initial depth', 'Minimum depth', 'Maximum depth', 'Tank diameter', 'Minimum volume', 'Can overflow'];
+	// The tank's own box: the sentence first, every owned row read-only, position and mixing still its own.
+	L.openPopup(a.tank, 10, 10);
+	const kids = byId.lpn_popup_fields.children || byId.lpn_popup_fields.childNodes;
+	ok('the tank\'s box opens with the sentence, above every row', /^Associated with Well W1\. Change volume and control properties there\.$/.test(txt(kids[0])) && kids[0].className === 'lpn-owned-note', txt(kids[0]));
+	ok('all eight owned rows are read-only on the tank\'s box (one each, no control)', OWNED.every((o) => labelEls().filter((e) => txt(e).indexOf(o) === 0).length === 1 && !inputOf(row(o))), boxLabels().join(' | '));
+	ok('and the tank\'s position and mixing model stay its own, typeable', ['X', 'Y', 'Mixing model'].every((o) => labelEls().some((e) => txt(e).indexOf(o) === 0 && inputOf(e))));
+	ok('no DEM row on the locked Elevation', !(function () { let f = false; walk(byId.lpn_popup_fields, (e) => { if (/lpn-elev-dem/.test(e.className || '')) { f = true; } }); return f; }()));
+	// Every door refuses and says whose it is.
+	const snap = () => JSON.stringify([tk._elev, tk.elev, tk.bottomElev, tk._bottomElev, tk._level, tk.minLevel, tk.maxLevel, tk.tankDiameter, tk._tankDiameter, tk.minVolume, tk.overflow]);
+	const b0 = snap();
+	['elev', 'bottomElev', 'level', 'minLevel', 'maxLevel', 'tankDiameter', 'minVolume', 'overflow'].forEach((k) => L.setProp(tk, k, k === 'overflow' ? 'YES' : 41));
+	ok('setProp (so Tables paste, Find and replace, the Settings push) refuses every one and names the Well', snap() === b0 && /W1/.test(L.notices()), L.notices());
+	ok('ownerOfProp says W1 for all eight', ['elev', 'bottomElev', 'level', 'minLevel', 'maxLevel', 'tankDiameter', 'minVolume', 'overflow'].every((k) => L.ownerOfProp(tk, k) === a));
+	ok('and the Settings push and Find and replace skip this tank', ['nodeElev', 'bottomElev', 'level', 'minLevel', 'maxLevel', 'tankDiameter', 'minVolume', 'overflow'].every((k) => { const sp = L.pushSpecList().filter((x) => x.key === k)[0]; return sp && !sp.applies(tk) && sp.applies({ id: 'T9', type: 'tank' }); }));
+	// Tables.
+	const spec = L.paneTables().filter((t) => t.cols.some((c) => c.key === 'tankDiameter'))[0];
+	ok('Tables: the eight cells are read-only for this tank, and say "Not used" for none of them',
+		['elev', 'bottomElev', 'level', 'minLevel', 'maxLevel', 'tankDiameter', 'minVolume', 'overflow'].every((k) => { const c = spec.cols.filter((x) => x.key === k)[0]; return L.paneCellIsPlain(c, tk) && L.paneCellText(c, tk) !== 'Not used'; }));
+	// The Well's box: the tank's section holds the typeable rows, written through the owner's door.
+	L.openPopup('W1', 10, 10);
+	ok('the Well\'s box types the tank\'s eight (the Well\'s own Elevation is the first of two)', OWNED.every((o) => labelEls().filter((e) => txt(e).indexOf(o) === 0).length === (o === 'Elevation' ? 2 : 1) && inputOf(row(o, o === 'Elevation' ? 1 : 0))), boxLabels().join(' | '));
+	type(inputOf(row('Elevation', 1)), '140'); L.openPopup('W1', 10, 10);
+	type(inputOf(row('Base elevation')), '138'); L.openPopup('W1', 10, 10);
+	type(inputOf(row('Initial depth')), '2'); L.openPopup('W1', 10, 10);
+	type(inputOf(row('Minimum depth')), '0.5'); L.openPopup('W1', 10, 10);
+	type(inputOf(row('Maximum depth')), '4'); L.openPopup('W1', 10, 10);
+	type(inputOf(row('Tank diameter')), '8'); L.openPopup('W1', 10, 10);
+	type(inputOf(row('Minimum volume')), '3'); L.openPopup('W1', 10, 10);
+	type(inputOf(row('Can overflow')), 'YES');
+	ok('what is typed on the Well lands on the tank, in Base', tk.elev === 140 && tk.bottomElev === 138 && tk._level === 2 && tk.minLevel === 0.5 && tk.maxLevel === 4 && tk.tankDiameter === 8 && tk.minVolume === 3 && tk.overflow === 'YES', snap());
+	ok('a typed tank elevation ends its following of the Well (the tee still follows)', !a.tankFollow && !!a.teeFollow);
+	L.openPopup(a.tank, 10, 10);
+	ok('and the tank\'s box shows them read-only', labelEls().some((e) => txt(e).indexOf('Maximum depth') === 0 && /4/.test(txt(e)) && !inputOf(e)) && labelEls().some((e) => txt(e).indexOf('Minimum volume') === 0 && /3/.test(txt(e))));
+	// Scenario: typed on the Well, an override on the tank, Base untouched; the tank's own box still shows it read-only.
+	L.createScenario('Drought');
+	const scn = L.getScenarios()[L.getScenarios().length - 1];
+	L.switchScenario(scn.id);
+	L.openPopup('W1', 10, 10);
+	type(inputOf(row('Maximum depth')), '5'); L.openPopup('W1', 10, 10);
+	type(inputOf(row('Base elevation')), '136');
+	const ov = 'the override sits in the scenario\'s physical alternative: ' + JSON.stringify(L.getScenarios().length);
+	ok('in a scenario the Well\'s box overrides the tank\'s value, as the tank\'s own box did, and Base is untouched', L.effective(tk, 'maxLevel') === 5 && tk.maxLevel === 4 && L.effective(tk, 'bottomElev') === 136 && tk.bottomElev === 138, ov);
+	L.setProp(tk, 'maxLevel', 9);
+	ok('the tank\'s own door still refuses in the scenario', L.effective(tk, 'maxLevel') === 5 && !/9/.test(JSON.stringify(scn.overrides || {})));
+	L.setProp(L.nodeById('W1'), 'elev', 77);
+	L.switchScenario('base');
+	ok('back in Base the tank is as Base had it', L.effective(tk, 'maxLevel') === 4 && L.effective(tk, 'bottomElev') === 138);
+	// Explode gives the tank its inputs back.
+	L.snap(); L.explode('W1');
+	L.setProp(tk, 'maxLevel', 6);
+	ok('after Explode every input is the tank\'s own again', tk.maxLevel === 6 && !L.ownerOfProp(tk, 'elev'));
+	L.undo();
+	ok('Undo of Explode locks them again', !!L.ownerOfProp(L.nodeById(a.tank), 'maxLevel'));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

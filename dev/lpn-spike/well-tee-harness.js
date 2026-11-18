@@ -23,6 +23,7 @@ require(ROOT + 'js/lpn-time.js');
 require(ROOT + 'js/lpn-native-run.js');
 
 const L = loadLoopedNetwork(
+	"\t\tviaOwnerDoor: viaOwnerDoor,\n" +
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode, getMode: function () { return mode; },\n" +
@@ -111,11 +112,11 @@ function network(level) {
 	L.setProp(doc.links[1], 'curveId', 'PC1');
 	L.setProp(L.nodeById('W1'), 'elev', 150);
 	L.setProp(L.nodeById(a.tee), 'elev', 150);
-	L.setProp(L.nodeById(a.tank), 'elev', 150);
+	L.viaOwnerDoor(() => L.setProp(L.nodeById(a.tank), 'elev', 150));
 	L.setProp(L.nodeById('W1R'), 'elev', 120);
-	L.setProp(L.nodeById(a.tank), 'minLevel', 0);
-	L.setProp(L.nodeById(a.tank), 'maxLevel', 3);
-	L.setProp(L.nodeById(a.tank), 'level', level);
+	L.viaOwnerDoor(() => L.setProp(L.nodeById(a.tank), 'minLevel', 0));
+	L.viaOwnerDoor(() => L.setProp(L.nodeById(a.tank), 'maxLevel', 3));
+	L.viaOwnerDoor(() => L.setProp(L.nodeById(a.tank), 'level', level));
 	return doc;
 }
 // EXPECT: filled from EPANET (m3/s). Full tank: pump 0.010, branch 0. Half full: tank head 151.5, pump above the demand.
@@ -153,7 +154,7 @@ for (const [label, level] of [['full', 3], ['half full', 1.5]]) {
 	const doc = network(level);
 	const a = doc.assemblies[0];
 	L.linkById(a.branch[1]).virtual = false;
-	L.setProp(L.nodeById(a.tank), 'elev', 150 - 213.36);
+	L.viaOwnerDoor(() => L.setProp(L.nodeById(a.tank), 'elev', 150 - 213.36));
 	const model = L.currentModel();
 	const res = [['built-in', EC.lpnSolve(model)], ['EPANET', await EC.lpnSolveEpanet(model, { moduleUrl: NODE_ENGINE_URL })]];
 	for (const [nm, r] of res) {

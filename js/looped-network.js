@@ -9124,7 +9124,7 @@ var EngCalcs = EngCalcs || {};
 		return [
 			{ key: 'nodeElev', group: 'node', field: 'elev', prop: 'elev', label: pc.lpn_field_elev || 'Elevation',
 				// Overridable since 2026-10-12 (Tom: every property), so the scenario push reaches it.
-				applies: function () { return true; }, get: function (n) { return effective(n, 'elev'); }, set: function (n, v) { n.elev = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (n) { return !wellTankOwner(n); }, get: function (n) { return effective(n, 'elev'); }, set: function (n, v) { n.elev = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// `altField` exists for this one row and says why it has to: a push is scoped by the
 			// labels on screen, and since 2026-08-25 a map showing a junction's demand is normally
 			// showing the RESOLVED one. Both labels describe the same stored number, so either being
@@ -9245,29 +9245,29 @@ var EngCalcs = EngCalcs || {};
 			// **FOUR TANK SCALARS (gap #4).** All four are overridable (the geometry since
 			// 2026-10-12), so each has its `prop`; each `set` is the push's bare Base write, marked.
 			{ key: 'level', group: 'node', field: 'level', prop: 'level', label: pc.lpn_field_tank_level || 'Water depth',
-				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
+				applies: function (n) { return n.type === 'tank' && !wellTankOwner(n); },
 				get: function (n) { return effective(n, 'level'); }, set: function (n, v) { n._level = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'bottomElev', group: 'node', field: 'bottomElev', prop: 'bottomElev', label: pc.lpn_field_tank_base_elev || 'Base elevation',
-				applies: function (n) { return n.type === 'tank'; },
+				applies: function (n) { return n.type === 'tank' && !wellTankOwner(n); },
 				get: function (n) { return effective(n, 'bottomElev'); }, set: function (n, v) { setTankBottom(n, v); } },
 			{ key: 'minLevel', group: 'node', field: 'minLevel', prop: 'minLevel', label: pc.lpn_field_tank_minlevel || 'Lowest water depth',
-				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
+				applies: function (n) { return n.type === 'tank' && !wellTankOwner(n); },
 				get: function (n) { return effective(n, 'minLevel'); }, set: function (n, v) { n.minLevel = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'maxLevel', group: 'node', field: 'maxLevel', prop: 'maxLevel', label: pc.lpn_field_tank_maxlevel || 'Highest water depth',
-				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
+				applies: function (n) { return n.type === 'tank' && !wellTankOwner(n); },
 				get: function (n) { return effective(n, 'maxLevel'); }, set: function (n, v) { n.maxLevel = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'tankDiameter', group: 'node', field: 'tankDiameter', prop: 'tankDiameter', label: pc.lpn_field_tank_diameter || 'Tank diameter',
-				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
+				applies: function (n) { return n.type === 'tank' && !wellTankOwner(n); },
 				get: function (n) { return effective(n, 'tankDiameter'); }, set: function (n, v) { n.tankDiameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** ([TANKS] columns 7 and 9). The volume is a number
 			// in the Length unit cubed; Can overflow is a YES/NO choice on the same `choices` door the
 			// mixing model uses, the codes being EPANET's own words.
 			{ key: 'minVolume', group: 'node', field: 'minVolume', prop: 'minVolume', label: pc.lpn_field_tank_minvol || 'Minimum volume',
-				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
+				applies: function (n) { return n.type === 'tank' && !wellTankOwner(n); },
 				get: function (n) { return effective(n, 'minVolume'); }, set: function (n, v) { n.minVolume = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'overflow', group: 'node', field: 'overflow', prop: 'overflow', choices: ['YES', 'NO'],
 				label: pc.lpn_field_tank_overflow || 'Can overflow',
-				applies: function (n) { return n.type === 'tank' && !pressureTankOwner(n); },
+				applies: function (n) { return n.type === 'tank' && !wellTankOwner(n); },
 				get: function (n) { return tankOverflowWord(n); }, set: function (n, v) { n.overflow = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **THE MIXING MODEL, A FOUR-WAY CHOICE**, on the same `choices` door `status` uses
 			// above. The CODES are the internal EPANET tokens and are never translated, so a saved
@@ -29597,6 +29597,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function paneColElev() {
 		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead, em: 3.5, prop: 'elev',
+			plainFor: paneOwnedFor('elev'),
 			get: function (n) { return effective(n, 'elev'); },
 			set: function (n, v) { setProp(n, 'elev', v); updateNode(n.id, true); } };
 	}
@@ -30764,7 +30765,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// at the ground -- the popup's rule -- so an empty cell shows the ground as its
 					// placeholder and writes nothing.
 					{ key: 'bottomElev', em: 3.5, label: 'lpn_field_tank_base_elev', unit: paneUnitElevHead,
-						blank: true, prop: 'bottomElev',
+						blank: true, prop: 'bottomElev', plainFor: paneOwnedFor('bottomElev'),
 						hint: function (n) { var e = effective(n, 'elev'); return typeof e === 'number' ? String(+(+e).toFixed(6)) : ''; },
 						get: function (n) { var b = effective(n, 'bottomElev'); return b === null ? undefined : b; },
 						set: function (n, v) { setTankBottom(n, v); updateNode(n.id, true); } },
@@ -30782,19 +30783,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// WS)" in German -- a head suffix on a horizontal distance). Not the pipe unit
 					// either: inches or millimetres would put a 15 m tank on screen as 15000. The
 					// popup says the same thing in its tip.
-					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter', plainFor: paneOwnedFor('tankDiameter'),
+					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter', plainFor: paneOwnedFor('tankDiameter'), plainWord: paneNotUsedWord, plainWordIf: paneOnPressureTank,
 						get: function (n) { return effective(n, 'tankDiameter'); },
 						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
 					// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** (audit 2026-11). The volume is in the
 					// Length unit cubed, so its heading names that, as the Available volume column does.
 					(function () {
-						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume', plainFor: paneOwnedFor('minVolume'),
+						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume', plainFor: paneOwnedFor('minVolume'), plainWord: paneNotUsedWord, plainWordIf: paneOnPressureTank,
 							get: function (n) { return effective(n, 'minVolume'); },
 							set: function (n, v) { setProp(n, 'minVolume', v); updateNode(n.id, true); } };
 						c.unitText = tankVolumeUnitText;
 						return c;
 					}()),
-					{ key: 'overflow', label: 'lpn_field_tank_overflow', em: 3.5, prop: 'overflow', plainFor: paneOwnedFor('overflow'),
+					{ key: 'overflow', label: 'lpn_field_tank_overflow', em: 3.5, prop: 'overflow', plainFor: paneOwnedFor('overflow'), plainWord: paneNotUsedWord, plainWordIf: paneOnPressureTank,
 						choices: function () {
 							var pc = EngCalcs.pageConfig || {};
 							return [['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']];
@@ -33186,6 +33187,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Asked in BOTH places a cell is written (built once, refilled on every solve), because a cell
 	// built as a value and refilled as a box would throw the user's input away on the next tick.
 	// A column's per-row lock for a property its group owns (ownerOfProp()): the cell is plain text; the sentence that says whose it is stands in the element's Properties box.
+	// A pressure tank has no use for its diameter, minimum volume or overflow (its volume curve sets volume against depth), so those cells say "Not used", as Properties draws no row.
+	function paneOnPressureTank(el) { return !!pressureTankOwner(el); }
 	function paneOwnedFor(prop) { return function (el) { return !!ownerOfProp(el, prop); }; }
 	function paneCellIsPlain(c, el) {
 		return !!(c.result || !c.set || (c.plainFor && c.plainFor(el)) || (c.roFor && c.roFor(el)));
@@ -33233,7 +33236,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **THE PER-ROW PLAIN WORD COMES FIRST**, because a column that is plain for THIS row is a
 		// column whose stored value is not the answer: see paneTextAttachedWord(). One function
 		// decides what a cell says, so the screen, the refill and the printed sheet all say it.
-		if (c.plainWord && c.plainFor && c.plainFor(el)) { return c.plainWord(); }
+		if (c.plainWord && c.plainFor && c.plainFor(el) && (!c.plainWordIf || c.plainWordIf(el))) { return c.plainWord(); }
 		var v = c.get(el), d;
 		// **A COLUMN MAY BE A YES/NO, A CHOICE OR A LINE OF TEXT** (Tom, 2026-09-08: the Text table
 		// and the Active column). A yes/no reads as 1 or 0 -- what a pasted sheet can carry and
@@ -33269,7 +33272,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// printing a blank as blank. A per-row plain word still comes first.
 	function paneCellDisplayText(c, el, blankLabel) {
 		var v, choices, i, key;
-		if (!c.choices || c.bool || (c.plainWord && c.plainFor && c.plainFor(el))) { return paneCellText(c, el); }
+		if (!c.choices || c.bool || (c.plainWord && c.plainFor && c.plainFor(el) && (!c.plainWordIf || c.plainWordIf(el)))) { return paneCellText(c, el); }
 		v = c.get(el);
 		if (!panePresent(v) && !blankLabel) { return ''; }
 		key = panePresent(v) ? v : '';
@@ -34139,7 +34142,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// the same sentence the property popup gives, so there is one explanation and not
 				// two. `ec-help` is what js/Calculators.lib.js wires the tap tooltip on, and
 				// initTipsIn() at the foot of renderPaneTable() picks it up.
-				if (c.plainWord && c.plainFor && c.plainFor(el)) {
+				if (c.plainWord && c.plainFor && c.plainFor(el) && (!c.plainWordIf || c.plainWordIf(el))) {
 					td.className += ' lpn-pane-stated';
 					if (c.plainTip) { td.title = c.plainTip(); td.className += ' ec-help'; }
 				}
@@ -34974,7 +34977,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A cell that is plain FOR THIS ROW shows its plain word, and a paste that lands on it
 		// carrying that exact word back is the round trip a copy of this very cell produces -- not a
 		// stray write to refuse, a no-op to accept. See paneParseCellText()'s own comment.
-		if (c.plainWord && c.plainFor && c.plainFor(el) &&
+		if (c.plainWord && c.plainFor && c.plainFor(el) && (!c.plainWordIf || c.plainWordIf(el)) &&
 			String(text === null || text === undefined ? '' : text).trim() === String(c.plainWord()).trim()) { return true; }
 		if (paneCellIsPlain(c, el) || !c.set) { return false; }
 		p = paneParseCellText(c, text, el);
@@ -41317,16 +41320,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			on: niceDefault('lpn_u_pressure', 'psi', 40, 28), off: niceDefault('lpn_u_pressure', 'psi', 60, 42) };
 	}
 	// The group that wrote this curve, if any: it is read-only in the Library and changed in that group's Properties box.
-	// **WHAT A GROUP OWNS OF ITS MEMBER** (Tom, round 11 pass: one fact gets one door): the pressure tank's whole vessel -- start level, limits, curve, diameter, minimum volume and overflow -- is the Well's.
-	// Its Elevation and Base elevation stay the tank's own (a tank may stand below the well's ground).
-	var PT_OWNED = { level: 1, minLevel: 1, maxLevel: 1, volCurve: 1, tankDiameter: 1, minVolume: 1, overflow: 1 };
+	// **WHAT A GROUP OWNS OF ITS MEMBER** (Tom, round 11 pass: one fact gets one door; round 12 pass: "Or above. Yes." and, of the open-air tank, "Yes."): a Well's tank, either form,
+	// takes its whole vessel and its two elevations from the Well's Properties box. A pressure tank's volume curve, limits and start level are derived from the Well's pressures
+	// (syncPressureTank()); an open-air tank's are typed on the Well, in the tank's own section. The tank's position, Description, Tag, reaction, mixing and initial quality
+	// stay its own. A scenario overrides an owned value exactly as before, from the Well's box.
+	var TANK_OWNED = { elev: 1, bottomElev: 1, level: 1, minLevel: 1, maxLevel: 1, volCurve: 1, tankDiameter: 1, minVolume: 1, overflow: 1 };
+	// What the group writes itself on a pressure tank, so a scenario override of it (a file from before it was owned) is cleared: never the two elevations, which stay overridable.
+	var PT_WRITTEN = { level: 1, minLevel: 1, maxLevel: 1, volCurve: 1, tankDiameter: 1, minVolume: 1, overflow: 1 };
+	// The Well's own box writes the tank's owned values through this one door; nothing else does.
+	var ownerDoorOpen = false;
+	function viaOwnerDoor(fn) {
+		var was = ownerDoorOpen;
+		ownerDoorOpen = true;
+		try { return fn(); } finally { ownerDoorOpen = was; }
+	}
+	// The group whose tank this node is, either form, else null.
+	function wellTankOwner(n) {
+		var a = n && n.type === 'tank' ? assemblyIndex().anyNode[n.id] : null;
+		return a && a.tank === n.id && wellHasTank(a) ? a : null;
+	}
 	// The group whose pressure tank this node is, else null.
 	function pressureTankOwner(n) {
-		var a = n && n.type === 'tank' ? assemblyIndex().anyNode[n.id] : null;
-		return a && a.pt && a.tank === n.id && wellHasTank(a) ? a : null;
+		var a = wellTankOwner(n);
+		return a && a.pt ? a : null;
 	}
 	// The group that owns this property of this element, else null: the one question every door (Properties, Tables, Find and replace, a scenario override) asks.
-	function ownerOfProp(el, prop) { return PT_OWNED[prop] && elGroup(el) === 'node' ? pressureTankOwner(el) : null; }
+	// The program's own writes (the follow of the Well's ground elevation, the DEM fill) and the Well's box pass.
+	function ownerOfProp(el, prop) { return TANK_OWNED[prop] && !ownerDoorOpen && !wellTankAuto && elGroup(el) === 'node' ? wellTankOwner(el) : null; }
 	// The sentence every door says beside a locked input.
 	function ownedSentence(a, text) { return String(text || (EngCalcs.pageConfig || {}).lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', a.id); }
 	function curveWriterAsm(id) {
@@ -41364,7 +41384,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		delete tank.minVolume; delete tank.overflow;   // base-write: the group's own vessel has no extra minimum volume and cannot overflow (the curve and the levels say what it holds)
 		eachOverrideMap(function (map) {   // a scenario override of an owned property (a file from before it was owned) would be effective and uneditable
 			var ov = map[ovKeyFor('node', tank.id)];
-			if (ov) { Object.keys(PT_OWNED).forEach(function (k) { delete ov[k]; }); }
+			if (ov) { Object.keys(PT_WRITTEN).forEach(function (k) { delete ov[k]; }); }
 		});
 		a.pumpOn = lv(s.on); a.pumpOff = lv(s.off);
 		syncWellControls(a);
@@ -41776,15 +41796,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		asmSection(fields, pc.lpn_tool_add_junction || 'Junction', t.id, function (rows) { asmJunctionRows(rows, t.id, false); });
 		// **EVERY MEMBER, UNDER ITS OWN ID, NO EXCEPTIONS** (Tom, 2026-11-14: "I like that we are transparent in that we list every model element in
 		// Properties. Let's ensure that we make that a rule with no exceptions."): a Well with tank adds its pipe, tee, pipe and tank, results only
-		// (the tank's own depths and elevation are typed in the tank's own box).
+		// (the tank's elevations, and an open-air tank's depths and size, are the Well's to type: wellTankOwnedRows()).
 		if (tankForm) {
 			asmSection(fields, pc.lpn_tool_add_pipe || 'Pipe', a.branch[0], function (rows) { asmLinkRows(rows, linkById(a.branch[0])); });
 			asmSection(fields, pc.lpn_tool_add_junction || 'Junction', a.tee, function (rows) { asmJunctionRows(rows, a.tee); });
 			asmSection(fields, pc.lpn_tool_add_pipe || 'Pipe', a.branch[1], function (rows) { asmLinkRows(rows, linkById(a.branch[1])); });
-			asmSection(fields, pc.lpn_tool_add_tank || 'Tank', a.tank, function (rows) { tankResultFields(rows, nodeById(a.tank)); });
+			asmSection(fields, pc.lpn_tool_add_tank || 'Tank', a.tank, function (rows) { wellTankOwnedRows(rows, a); tankResultFields(rows, nodeById(a.tank)); });
 		}
 		lpnPropsGrid(fields);
 		tipsIn(fields);
+	}
+	// **A WELL'S TANK'S INPUTS ARE TYPED HERE** (Tom, round 12 pass: one door, the Well's): the tank's Elevation and Base elevation in either form, and for the open-air form its
+	// initial, minimum and maximum depth, diameter, minimum volume and overflow (a pressure tank's are derived from the Well's pressures). Each is written through the
+	// owner's door, so a scenario overrides it from here exactly as it did from the tank's own box, and the tank's own box shows it read-only.
+	function wellTankOwnedRows(rows, a) {
+		var tank = nodeById(a.tank);
+		if (!tank) { return; }
+		tankElevationRows(rows, tank, tank.id, false, true);
+		if (!a.pt) { tankDepthFields(rows, tank, tank.id, true); }
 	}
 	// **THE PRESSURE TANK'S FIELDS, IN THE SAME PLACE THE OPEN-AIR TANK'S ARE** (Tom, round 10 pass: "Do it like the open-air assembly."): the pump's switch points in the
 	// project's Pressure unit, the empty pressure (gauge; blank follows pump on less 2 psi), the vessel's volume, and the two switch points again as the pressure head the
@@ -77426,36 +77455,63 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		note.textContent = String((EngCalcs.pageConfig || {}).lpn_tank_associated || 'Associated with Well {id}. Change volume and control properties there.').replace('{id}', a.id);
 		fields.appendChild(note);
 	}
-	// A tank's four depth and size inputs, in the order a person builds one: how much water is in it, how far it can go
-	// either way, and how wide it is. The one place they are drawn, for a tank's own box and for a well's.
-	function tankDepthFields(fields, n, nodeId) {
-		var pc = EngCalcs.pageConfig || {}, owner = pressureTankOwner(n), eu = ' (' + unitLabel('lpn_u_elevhead') + ')';
-		// A pressure tank's initial depth, limits and volume curve are the Well's, shown as it set them (syncPressureTank()), with whose they are.
-		if (owner) {
-			// The sentence stands at the top of the box (renderNodeFields()). Tank diameter, minimum volume and can overflow mean nothing to a
-			// pressure tank (its volume curve sets volume against depth in both engines), so they have no row; the group still writes them.
-			// One tagged group (`#owned`), so propsReorder() keeps the four rows together, in place of Minimum depth.
-			popRows(fields, '#owned', function () {
+	// A tank's two elevations: the ground it stands on (read from the terrain like a junction's) and where its base sits (blank is the ground). `ownRow` is true in a tank's
+	// own box, where they are typed and the DEM row stands under the first; false there when a Well owns the tank, where they are read-only; undefined in the Well's box,
+	// where the Well types them (`door`: a write through the owner's door).
+	function tankElevationRows(fields, n, nodeId, own, door) {
+		var pc = EngCalcs.pageConfig || {}, eu = ' (' + unitLabel('lpn_u_elevhead') + ')', W = door ? viaOwnerDoor : function (f) { return f(); }, base;
+		if (own === false && !door) {
+			readonlyField(fields, (pc.lpn_field_elev || 'Elevation') + eu, lockedNumber(effective(n, 'elev')), pc.lpn_tank_ground_elev_tip);
+			base = effective(n, 'bottomElev');
+			readonlyField(fields, (pc.lpn_field_tank_base_elev || 'Base elevation') + eu, lockedNumber(typeof base === 'number' ? base : effective(n, 'elev')), pc.lpn_field_tank_base_elev_tip);
+			return;
+		}
+		unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
+			function () { return effective(n, 'elev'); },
+			function (v) { W(function () { setProp(n, 'elev', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
+			pc.lpn_tank_ground_elev_tip, { el: n, prop: 'elev' });
+		if (own) { elevationDemRow(fields, n, nodeId, function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); }); }
+		unitNumberFieldBlank(fields, pc.lpn_field_tank_base_elev || 'Base elevation', 'lpn_u_elevhead',
+			function () { return effective(n, 'bottomElev'); },
+			function (v) { W(function () { setTankBottom(n, v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
+			effective(n, 'elev'), pc.lpn_field_tank_base_elev_tip, { el: n, prop: 'bottomElev' });
+	}
+	// A locked value as the typed number, whole, or blank.
+	function lockedNumber(v) { return typeof v === 'number' && isFinite(v) ? String(+v) : ''; }
+	// A tank's depth and size inputs, in the order a person builds one: how much water is in it, how far it can go either way, and how wide it is. The one place they are
+	// drawn, for a tank's own box and for the Well's box. A tank a Well owns shows them read-only in its own box; `door` draws them typeable, written through the owner's door.
+	// A pressure tank's diameter, minimum volume and overflow mean nothing to it (its volume curve sets volume against depth in both engines), so it has no row for them.
+	function tankDepthFields(fields, n, nodeId, door) {
+		var pc = EngCalcs.pageConfig || {}, owner = wellTankOwner(n), eu = ' (' + unitLabel('lpn_u_elevhead') + ')',
+			W = door ? viaOwnerDoor : function (f) { return f(); };
+		if (owner && !door) {
+			// Read-only, as the Well set them (syncPressureTank() or the Well's box). The rows keep the places an ordinary tank's have (PROP_ORDER).
+			popRows(fields, owner.pt ? '#owned' : '', function () {
 				readonlyField(fields, (pc.lpn_field_tank_level_short || 'Initial depth') + eu, effective(n, 'level'), pc.lpn_field_tank_level_short_tip, 4);
 				readonlyField(fields, (pc.lpn_field_tank_minlevel_short || 'Minimum depth') + eu, effective(n, 'minLevel'), pc.lpn_field_tank_minlevel_short_tip, 4);
 				readonlyField(fields, (pc.lpn_field_tank_maxlevel_short || 'Maximum depth') + eu, effective(n, 'maxLevel'), pc.lpn_field_tank_maxlevel_short_tip, 4);
-				readonlyField(fields, pc.lpn_curve_kind_volume || 'Tank volume', effective(n, 'volCurve') || '');
+				if (owner.pt) { readonlyField(fields, pc.lpn_curve_kind_volume || 'Tank volume', effective(n, 'volCurve') || ''); }
 			});
+			if (!owner.pt) {
+				readonlyField(fields, (pc.lpn_field_tank_diameter || 'Tank diameter') + ' (' + unitLabel('lpn_u_length') + ')', lockedNumber(effective(n, 'tankDiameter')), pc.lpn_field_tank_diameter_tip);
+				readonlyField(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')', lockedNumber(effective(n, 'minVolume')), pc.lpn_field_tank_minvol_tip);
+				readonlyField(fields, pc.lpn_field_tank_overflow || 'Can overflow', tankOverflowWord(n) === 'YES' ? (pc.lpn_settings_table_yes || 'Yes') : (pc.lpn_settings_table_no || 'No'), pc.lpn_field_tank_overflow_tip);
+			}
 			return;
 		}
 		unitNumberField(fields, pc.lpn_field_tank_level_short || 'Initial depth', 'lpn_u_elevhead',
 			function () { return effective(n, 'level'); },
-			function (v) { setProp(n, 'level', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+			function (v) { W(function () { setProp(n, 'level', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_level_short_tip, { el: n, prop: 'level' });
 		// These two name their field themselves for the ⚠ (a depth limit is judged against the
 		// other two depths, valueWarnText()).
 		valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_minlevel_short || 'Minimum depth', 'lpn_u_elevhead',
 			function () { return effective(n, 'minLevel'); },
-			function (v) { setProp(n, 'minLevel', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+			function (v) { W(function () { setProp(n, 'minLevel', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_minlevel_short_tip, { el: n, prop: 'minLevel' }), valueWarnText('minLevel', n, effective(n, 'minLevel')));
 		valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_maxlevel_short || 'Maximum depth', 'lpn_u_elevhead',
 			function () { return effective(n, 'maxLevel'); },
-			function (v) { setProp(n, 'maxLevel', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+			function (v) { W(function () { setProp(n, 'maxLevel', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_maxlevel_short_tip, { el: n, prop: 'maxLevel' }), valueWarnText('maxLevel', n, effective(n, 'maxLevel')));
 		// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
 		// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
@@ -77463,18 +77519,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// screen as 15000. The tip says so.
 		unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length',
 			function () { return effective(n, 'tankDiameter'); },
-			function (v) { setProp(n, 'tankDiameter', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+			function (v) { W(function () { setProp(n, 'tankDiameter', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
 		// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is in the Length unit cubed, as the
 		// Available volume below it is; blank is EPANET's 0, "use the diameter".
 		numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')',
 			effective(n, 'minVolume'),
-			function (v) { setProp(n, 'minVolume', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+			function (v) { W(function () { setProp(n, 'minVolume', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_minvol_tip, { el: n, prop: 'minVolume' });
 		selectFieldPlain(fields, pc.lpn_field_tank_overflow || 'Can overflow',
 			[['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']],
 			tankOverflowWord(n),
-			function (v) { tankOverflowWrite(n, v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+			function (v) { W(function () { tankOverflowWrite(n, v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_overflow_tip);
 	}
 	// A junction's solved rows (head, pressure, and what a pressure-driven run delivered), shared by its box and an assembly's sections.
@@ -77525,7 +77581,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		idField(n.id, function (newId) { renameNode(nodeId, newId); }, 'node');
 		clearFields(fields);
 		// A tank a Well owns says so first, above every row (Tom, round 12 pass: "at the top of the box").
-		if (pressureTankOwner(n)) { ownedTankNote(fields, pressureTankOwner(n)); }
+		if (wellTankOwner(n)) { ownedTankNote(fields, wellTankOwner(n)); }
 		// **POSITION SITS IMMEDIATELY AFTER THE ID, ON TOM'S RULING OF 2026-09-15** -- `idField()`
 		// above writes the popup's header, so first in `fields` IS slot 2. His reason for one order
 		// across the popup AND the tables rather than two: *"one rule, no special case to
@@ -77575,16 +77631,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Elevation (depth and volume tank base)."*). Elevation is the ground, read and filled
 			// from the terrain exactly as a junction's is; the base is blank-means-the-ground, so its
 			// placeholder is the ground.
-			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
-				function () { return effective(n, 'elev'); },
-				function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_tank_ground_elev_tip, { el: n, prop: 'elev' });
-			elevationDemRow(fields, n, nodeId,
-				function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); });
-			unitNumberFieldBlank(fields, pc.lpn_field_tank_base_elev || 'Base elevation', 'lpn_u_elevhead',
-				function () { return effective(n, 'bottomElev'); },
-				function (v) { setTankBottom(n, v); updateNode(nodeId, true); refreshPopupIfOpen(); },
-				effective(n, 'elev'), pc.lpn_field_tank_base_elev_tip, { el: n, prop: 'bottomElev' });
+			if (wellTankOwner(n)) {
+				// A Well's tank: its two elevations are the Well's, typed in the tank's section of the Well's box (wellTankOwnedRows()).
+				tankElevationRows(fields, n, nodeId, false);
+			} else {
+				tankElevationRows(fields, n, nodeId, true);
+			}
 			tankDepthFields(fields, n, nodeId);
 			// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), shown on the same terms as the
 			// pipe pair: only while a chemical is being tracked, blank-capable because blank means

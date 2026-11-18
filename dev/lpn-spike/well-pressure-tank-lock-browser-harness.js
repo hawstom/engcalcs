@@ -101,7 +101,8 @@ async function main() {
 		const wellRows = await (async () => { await P.keyboard.press('Escape'); const w0 = await centreOf('W1'); await P.mouse.click(w0.x, w0.y); await a.settle(900); const r0 = await rows(); await P.keyboard.press('Escape'); return r0; })();
 		ok('the Well\'s own volume row is "Total tank volume" (m^3 or ft^3), and the Well has no plain "Tank volume" row', wellRows.some((r) => /^Total tank volume/.test(r.t)) && !wellRows.some((r) => /^Tank volume/.test(r.t)), wellRows.map((r) => r.t).join(' | '));
 		const c1 = await centreOf('T1'); await P.mouse.click(c1.x, c1.y); await a.settle(900); rs = await rows();
-		ok('Elevation and Base elevation are still typeable', find('Elevation').controls > 0 && find('Base elevation').controls > 0);
+		ok('Elevation and Base elevation are locked too (a tank may stand below or above the well\'s ground): read-only rows on the tank\'s box', find('Elevation').controls === 0 && find('Base elevation').controls === 0);
+		ok('the Well\'s box holds them, typeable, in the tank\'s section (the Well\'s own Elevation is the first of two)', wellRows.filter((r) => /^Elevation/.test(r.t)).length === 2 && wellRows.filter((r) => /^Elevation/.test(r.t)).every((r) => r.controls > 0) && wellRows.some((r) => /^Base elevation/.test(r.t) && r.controls > 0), wellRows.map((r) => r.t + ':' + r.controls).join(' | '));
 		const before = rs.map((r) => r.t).join('|');
 		for (const o of OWNED) {
 			const box = await P.evaluate((name) => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.textContent.replace(/\s+/g, ' ').trim().indexOf(name) === 0)[0]; const sp = l.querySelector('span') || l, r = sp.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, o);
@@ -124,7 +125,7 @@ async function main() {
 		await P.mouse.click(c2.x, c2.y);
 		await a.settle(900);
 		rs = await rows();
-		ok('after Explode the inputs are typeable (diameter, minimum volume and overflow are back; an ordinary tank has no volume-curve row) and the sentence is gone', OWNED.filter((o) => o !== 'Tank volume').concat(ABSENT).every((o) => find(o) && find(o).controls > 0) && !(await P.evaluate(() => !!document.querySelector('#lpn_popup_fields .lpn-owned-note'))), OWNED.map((o) => o + ':' + (find(o) ? find(o).controls : 'missing')).join(' '));
+		ok('after Explode the inputs are typeable (diameter, minimum volume and overflow are back; an ordinary tank has no volume-curve row) and the sentence is gone', OWNED.filter((o) => o !== 'Tank volume').concat(ABSENT).concat(['Elevation', 'Base elevation']).every((o) => find(o) && find(o).controls > 0) && !(await P.evaluate(() => !!document.querySelector('#lpn_popup_fields .lpn-owned-note'))), OWNED.map((o) => o + ':' + (find(o) ? find(o).controls : 'missing')).join(' '));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {
