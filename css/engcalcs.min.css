@@ -3548,10 +3548,12 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-profile-chip:hover, .lpn-profile-chip:focus { background: var(--ec-gray-eaeaea); border-color: var(--ec-gray-888); }
 .lpn-ts-line { fill: none; stroke-width: 1.5; stroke-linejoin: round; }
 .lpn-ts-dot { stroke: none; }
-.lpn-ts-now { stroke: var(--ec-accent); stroke-width: 2; }
-.lpn-ts-now-knob { fill: var(--ec-accent); stroke: none; cursor: ew-resize; touch-action: none; }
-.lpn-ts-plot-hit { fill: transparent; stroke: none; pointer-events: visible; cursor: ew-resize; }
-.lpn-ts-now-hit { stroke: transparent; stroke-width: 24px; fill: none; pointer-events: visible; cursor: ew-resize; touch-action: none; }
+.lpn-ts-now { stroke: var(--ec-accent); stroke-width: 1.5; pointer-events: none; }
+.lpn-ts-now-halo { stroke: var(--ec-bg); stroke-width: 4; pointer-events: none; }
+.lpn-ts-scrub { cursor: crosshair; touch-action: pan-y; -webkit-user-select: none; user-select: none; }
+.lpn-ts-cross { pointer-events: none; }
+.lpn-ts-cross-line { stroke: var(--ec-gray-888); stroke-width: 1; }
+.lpn-ts-read-bg { fill: var(--ec-bg); fill-opacity: .92; stroke: var(--ec-border); stroke-width: 1; }
 .lpn-ts-pick { font: inherit; font-size: .95em; max-width: 12em; }
 .lpn-ts-swatch {
 	display: inline-block; width: 1.1em; height: 0; margin-right: .35em;
