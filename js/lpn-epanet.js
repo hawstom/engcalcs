@@ -620,24 +620,8 @@
 			warnings.push({ code: 'manning-constant-differs', ids: [] });
 		}
 
-		// MINOR LOSSES ARE THE SECOND DECLARED DISAGREEMENT, and it is the same shape as Manning:
-		// EPANET's constant is the rounded one and we are not adopting it.
-		//
-		// A minor loss is k V^2 / 2g, so g is the whole of the coefficient. EPANET's g is
-		// 32.2 ft/s^2 = 9.81456; ours is standard gravity, 9.80665. Ours are therefore 0.081%
-		// LARGER, per pipe, and it accumulates along a path -- which is how it is noticed: Tom,
-		// 2026-08-17, saw 0.003 psi build up with distance from the source on Elm Street Center,
-		// where every pipe carries k = 2. Measured by differencing two k values on one pipe so
-		// friction cancels (dev/lpn-spike/minor-loss-gravity-harness.js): implied g, ours 9.80665,
-		// EPANET 9.815822 -- 32.2 ft/s^2 plus EPANET's own rounded 28.317 L/s per cfs.
-		//
-		// FRICTION IS NOT AFFECTED and must not be blamed for this: our Hazen-Williams reproduces
-		// EPANET's own 4.727 equation to 6.7e-16, and EPANET's answer is 1.0e-5 LOW against that
-		// equation from the same L/s-per-cfs rounding. Only the minor-loss term carries g.
-		//
-		// Announced only when there is a minor loss to announce, so a network without one says
-		// nothing. Raised in valueWarnings() rather than here, because it is a fact about CURRENT
-		// VALUES and must not be cached on the session -- see that function and Task 526.
+		// MINOR LOSSES AGREE: the built-in solver forms them with EPANET's own 0.02517 constant
+		// (EngCalcs.EPANET_G_MINOR, js/PipeHydraulics.lib.js), so there is nothing to declare.
 
 		// ---- the clock, written only for an extended-period run (Task 248) ----
 		//
@@ -1006,43 +990,8 @@
 			warnings = warnings.concat(model.ruleWarnings);
 		}
 
-		// TWO LISTS, AND THE SPLIT IS THE WHOLE OF TASK 526. `signatureWarnings` are the ones that
-		// cannot change while signatureOf(model) holds -- the method, which pumps have curves, which
-		// controls were dropped -- so the session may cache them. `warnings` is what this build
-		// actually warrants, signature-stable plus value-derived, and it is what every caller that
-		// is not the warm session should read.
-		return {
-			inp: inp,
-			warnings: warnings.concat(valueWarnings(model)),
-			signatureWarnings: warnings
-		};
+		return { inp: inp, warnings: warnings };
 	};
-
-	/**
-	 * The warnings that depend on VALUES rather than on shape, recomputed at every solve.
-	 *
-	 * There is one, and it is why this function exists (ROADMAP Task 526). The minor-loss gravity
-	 * note is raised from `lpnLinkK(link) > 0` -- a number a setter can change without moving the
-	 * signature one bit. Cached alongside the others it went stale in both directions, and the
-	 * costly one is silent: ADDING a minor loss to a network that had none announced nothing, so a
-	 * real difference between the two engines was never mentioned.
-	 *
-	 * `k` is read through the same lpnLinkK() the .inp writer uses, or the note would claim a
-	 * difference on a throttle valve whose loss comes from its SETTING instead.
-	 *
-	 * The rule for anything added here: if a value edit can change the answer, it belongs in this
-	 * function; if only the signature can, it belongs in the build.
-	 */
-	function valueWarnings(model) {
-		var out = [], i;
-		for (i = 0; i < model.links.length; i++) {
-			if (EngCalcs.lpnLinkK(model.links[i]) > 0) {
-				out.push({ code: 'minor-loss-gravity-differs', ids: [] });
-				break;
-			}
-		}
-		return out;
-	}
 
 	// Cached module promise -- the 664 KB import happens at most once per page.
 	//
@@ -1425,10 +1374,8 @@
 
 	// Build the .inp, hand EPANET a fresh Project, and cache everything that stays fixed for as
 	// long as the signature holds: the index of every node, link and pump curve, and lpnToInp's
-	// SIGNATURE warnings -- only those. The value-derived ones are recomputed at every solve by
-	// valueWarnings(), because caching them here was Task 526's defect: the invariant this comment
-	// used to claim ("a cached warning list can never go stale under a value edit") stopped being
-	// true the day a warning was raised from a `k`.
+	// warnings, which depend on the signature alone (a warning raised from a VALUE would go
+	// stale under an edit and must be recomputed at every solve, not cached here).
 	// THE WORKSPACE OUTLIVES THE PROJECT. A Workspace owns the instantiated WASM engine; a Project
 	// is one network inside it. Building a new Workspace and calling loadModule() per solve costs
 	// 8-9 ms of a ~10 ms solve -- five times more than the .inp parse. Keeping it means even a
@@ -1510,7 +1457,7 @@
 			p.open('net.inp', 'net.rpt', 'net.out');
 			var s = {
 				ws: ws, project: p, sig: sig, moduleUrl: moduleUrl || null,
-				warnings: built.signatureWarnings, nodeIdx: {}, linkIdx: {}, curveIdx: {}
+				warnings: built.warnings, nodeIdx: {}, linkIdx: {}, curveIdx: {}
 			}, i, n, l;
 			for (i = 0; i < model.nodes.length; i++) {
 				n = model.nodes[i];
@@ -1836,7 +1783,7 @@
 					// belong here, deficient nodes and demand reduction, exist only under
 					// pressure-driven analysis, which this bridge never asks for.
 					issues: [],
-					warnings: s.warnings.concat(valueWarnings(model)),
+					warnings: s.warnings,
 					converged: conv.converged,
 					iterations: conv.iterations,
 					relativeError: conv.relativeError,
@@ -1856,7 +1803,7 @@
 				// answer from that unknown state, so drop it -- and the engine it lives in, untouched
 				// (retireEngine()) -- and let the next call reopen cold.
 				retireEngine();
-				return engineRefusal(e, { warnings: (s.warnings || []).concat(valueWarnings(model)) });
+				return engineRefusal(e, { warnings: s.warnings || [] });
 			}
 		}, function (e) {
 			// openSession() itself threw: EPANET would not even parse the file we wrote. The same

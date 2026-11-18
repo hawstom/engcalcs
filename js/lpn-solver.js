@@ -26,7 +26,6 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	? require('./PipeHydraulics.lib.js')
 	: (EngCalcs || {});
 
-EngCalcs.lpnG = EngCalcs.G;
 
 // Guard against the zero-flow singularity.
 //
@@ -775,7 +774,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		qMin = EngCalcs.lpnQMin,
 		gradMin = EngCalcs.lpnGradMin,
 		emitterExp = model.emitterExponent || 0.5,
-		g = EngCalcs.lpnG,
+		g = EngCalcs.EPANET_G_MINOR,
 		nodes = model.nodes,
 		links = model.links,
 		byId = {},
@@ -1912,7 +1911,7 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		m,
 		kEff,
 		vs,
-		g = EngCalcs.lpnG;
+		g = EngCalcs.EPANET_G_MINOR;
 
 	// **SPECIFIC GRAVITY TURNS A HEAD INTO A PRESSURE, AND NOTHING ELSE** (Task 553). Every head in
 	// this solver is a head OF THE FLUID -- the energy equation does not care what the fluid weighs,
