@@ -292,6 +292,19 @@ async function main() {
 				await s.page.evaluate((l) => { Array.from(document.querySelectorAll('.lpn-pane-ctxmenu button')).filter((x) => x.textContent.trim() === l)[0].click(); }, lbl);
 				await s.settle(800);
 				await behaveOn('.lpn-tsb .lpn-tsb-chart', 'a graph bubble on the map');
+				// A chart under a graph bubble draws no crosshair of its own while the pointer is over the pane's chart
+				// and the run plays (every step redraws both).
+				const gh = await geo();
+				await s.page.mouse.move(gh.left + (gh.right - gh.left) * 0.2, gh.y + 10);
+				await s.settle(300);
+				await s.page.evaluate(() => { EngCalcs.lpnTimeGoTo(0); });
+				await s.page.click('#lpn_toolbar_run button[data-icon="play"]');
+				await s.page.mouse.move(gh.left + (gh.right - gh.left) * 0.2 + 1, gh.y + 10);
+				await s.settle(1800);
+				const both = await s.page.evaluate(() => ({ pane: !!document.querySelector('#lpn_ts_chart .lpn-ts-cross'), bubble: document.querySelectorAll('.lpn-tsb .lpn-tsb-chart .lpn-ts-cross').length, now: EngCalcs.lpnTimeNow() }));
+				await s.page.click('#lpn_toolbar_run button[data-icon="pause"]');
+				ok(tag + ': during playback the bubble chart draws no crosshair of its own, and the pane chart keeps its own', both.now > 0 && both.pane && both.bubble === 0, JSON.stringify(both));
+				await s.page.mouse.move(5, 5);
 			}
 			// The Flow balance chart: the same hover readout, click and drag.
 			if (!await s.page.evaluate(() => { const t = document.getElementById('lpn_pane_tab_sysflow'); return !!t; })) { ok(tag + ': there is a Flow balance tab', false); }
@@ -353,6 +366,99 @@ async function main() {
 				ok('phone: ...and the page itself did not move sideways', await s.page.evaluate(() => window.scrollX === 0 && document.documentElement.scrollWidth <= window.innerWidth));
 			}
 			ok('phone: no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
+			await s.context.close().catch(() => {});
+		}
+
+		// ---- THE CHART SNAPS TO ITS OWN FRAMES: Recalculate off, then a changed Report step (the run drawn is the old one) ----
+		{
+			s = await Session.open(browser, 'A', { viewport: { width: 1400, height: 900 } });
+			await s.goto('Looped-Network.php');
+			await s.settle(1200);
+			await s.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await openNet1(s);
+			await s.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+			await s.waitFor(() => s.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 120000);
+			const frames = await s.page.evaluate(() => EngCalcs.lpnTimeRunFrames().map((f) => f.t));
+			const bb3 = await (await s.page.$('.lpn-node-hit[data-node="10"]')).boundingBox();
+			await s.page.mouse.click(bb3.x + bb3.width / 2, bb3.y + bb3.height / 2);
+			await s.settle(500);
+			await s.toolbarClick(await s.lang('lpn_pane_toggle'));
+			await s.settle(500);
+			await s.page.evaluate(() => document.getElementById('lpn_pane_tab_timeseries').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(800);
+			await s.page.evaluate(() => document.getElementById('lpn_ts_add').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(600);
+			await s.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c && c.offsetParent) { c.click(); } });
+			await s.toolbarClick(await s.lang('lpn_tool_settings'));
+			await s.settle(600);
+			await s.page.evaluate(() => {
+				const rows = Array.from(document.querySelectorAll('[data-lpn-setting]')).filter((r) => r.getAttribute('data-lpn-setting') === '[["settings","autoRun"]]');
+				const box = rows[0].querySelector('input[type=checkbox]'); box.checked = false; box.dispatchEvent(new Event('change', { bubbles: true }));
+			});
+			await s.page.evaluate(() => {
+				const row = Array.from(document.querySelectorAll('#lpn_set_time_fields .lpn-time-row')).filter((r) => JSON.parse(r.getAttribute('data-lpn-setting'))[0][1] === 'reportStep')[0];
+				const inp = row.querySelector('input'); inp.value = '0:30'; inp.dispatchEvent(new Event('change', { bubbles: true }));
+			});
+			await s.settle(800);
+			const kept = await s.page.evaluate(() => ({ n: EngCalcs.lpnTimeRunFrames().length, stops: EngCalcs.lpnTimeStops().length }));
+			ok('snap: with Recalculate off the old run is kept while the Report step changed (the transport now offers more stops than the run has frames)', kept.n === frames.length && kept.stops > frames.length, JSON.stringify(kept));
+			const sg = await s.page.evaluate(() => { const f = document.querySelector('#lpn_ts_chart .lpn-profile-frame').getBoundingClientRect(); return { l: f.left, r: f.right, y: f.top + f.height / 2 + 10 }; });
+			const seenT = new Set();
+			for (let k = 0; k < 30; k++) {
+				await s.page.mouse.move(sg.l + 3 + (sg.r - sg.l) * 0.4 * k / 29, sg.y);
+				const at = await s.page.evaluate(() => { const v = document.querySelector('#lpn_ts_chart svg'); return v ? v._tsCrossAt : null; });
+				if (at !== null && at !== undefined) { seenT.add(at); }
+			}
+			ok('snap: hovering reaches only plotted times', seenT.size > 3 && Array.from(seenT).every((t) => frames.indexOf(t) >= 0), Array.from(seenT).join(','));
+			await s.page.mouse.click(sg.l + (sg.r - sg.l) * 0.123, sg.y);
+			await s.settle(600);
+			const nowT = await s.page.evaluate(() => EngCalcs.lpnTimeNow());
+			ok('snap: a click sets a plotted time, never one between frames', frames.indexOf(nowT) >= 0, String(nowT));
+			ok('snap: no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
+			await s.context.close().catch(() => {});
+		}
+
+		// ---- A SMALL GRAPH WITH MANY SERIES: the readout stays inside the frame ----
+		{
+			s = await Session.open(browser, 'A', { viewport: { width: 1400, height: 900 } });
+			await s.goto('Looped-Network.php');
+			await s.settle(1200);
+			await s.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await openNet1(s);
+			await s.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+			await s.waitFor(() => s.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 120000);
+			await s.toolbarClick(await s.lang('lpn_pane_toggle'));
+			await s.settle(500);
+			await s.page.evaluate(() => document.getElementById('lpn_pane_tab_timeseries').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(800);
+			for (const id of ['10', '11', '12', '13', '22']) {
+				const b4 = await (await s.page.$('.lpn-node-hit[data-node="' + id + '"]')).boundingBox();
+				await s.page.mouse.click(b4.x + b4.width / 2, b4.y + b4.height / 2);
+				await s.settle(400);
+				await s.page.evaluate(() => document.getElementById('lpn_ts_add').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+				await s.settle(400);
+				await s.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c && c.offsetParent) { c.click(); } });
+				await s.settle(200);
+			}
+			// Now make the window small: the pane's chart shrinks with it.
+			await s.page.setViewportSize({ width: 1000, height: 480 });
+			await s.settle(900);
+			const nSeries = await s.page.evaluate(() => document.querySelectorAll('#lpn_ts_chart polyline.lpn-ts-line').length);
+			const fr4 = await s.page.evaluate(() => { const f = document.querySelector('#lpn_ts_chart .lpn-profile-frame').getBoundingClientRect(); return { l: f.left, r: f.right, y: f.top + f.height / 2, h: f.height }; });
+			console.log('   small chart: ' + nSeries + ' series, plot ' + Math.round(fr4.h) + ' px high');
+			ok('small: five series are plotted on a short chart', nSeries >= 5 && fr4.h > 20 && fr4.h < 140, nSeries + ' series, ' + Math.round(fr4.h));
+			for (const f of [0.05, 0.5, 0.97]) {
+				await s.page.mouse.move(fr4.l + (fr4.r - fr4.l) * f, fr4.y);
+				await s.settle(250);
+				const inside = await s.page.evaluate(() => {
+					const bg = document.querySelector('#lpn_ts_chart .lpn-ts-read-bg'), fr = document.querySelector('#lpn_ts_chart .lpn-profile-frame');
+					if (!bg) { return null; }
+					const a = bg.getBoundingClientRect(), b = fr.getBoundingClientRect();
+					return { ok: a.top >= b.top - 0.5 && a.bottom <= b.bottom + 0.5 && a.left >= b.left - 0.5 && a.right <= b.right + 0.5, a: [a.left, a.top, a.right, a.bottom].map(Math.round), b: [b.left, b.top, b.right, b.bottom].map(Math.round) };
+				});
+				ok('small: the readout lies inside the plot frame at ' + Math.round(f * 100) + '% across', !!inside && inside.ok, JSON.stringify(inside));
+			}
+			ok('small: no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
 			await s.context.close().catch(() => {});
 		}
 

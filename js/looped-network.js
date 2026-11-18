@@ -39156,18 +39156,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		for (i = 0; i < all.length; i++) { if (all[i]._tsNow && all[i].isConnected) { return all[i]; } }
 		return null;
 	}
-	// The reporting time nearest the pointer, among those the chart covers, and its x in the svg's own units.
+	// The plotted reporting time nearest the pointer: from the chart's OWN frame times (c.times, kept per draw), not the
+	// transport's current settings, which a Report step changed with Recalculate off no longer describe the run drawn.
 	function tsNearestStop(svg, clientX) {
-		var c = svg._tsNow, stops = EngCalcs.lpnTimeStops ? EngCalcs.lpnTimeStops() : [], pt, p, hrs, best = null, i;
-		if (!c || !svg.getScreenCTM || !svg.getScreenCTM()) { return null; }
+		var c = svg._tsNow, tm = c && c.times, p, hrs, best = -1, i, ctm = svg.getScreenCTM && svg.getScreenCTM(), pt;
+		if (!c || !tm || !tm.length || !ctm) { return null; }
 		pt = svg.createSVGPoint(); pt.x = clientX; pt.y = 0;
-		p = pt.matrixTransform(svg.getScreenCTM().inverse());
+		p = pt.matrixTransform(ctm.inverse());
 		hrs = c.xB.min + (p.x - c.box.left) / (c.box.width || 1) * (c.xB.max - c.xB.min);
-		for (i = 0; i < stops.length; i++) {
-			if (tsHours(stops[i]) < c.xB.min - 1e-9 || tsHours(stops[i]) > c.xB.max + 1e-9) { continue; }
-			if (best === null || Math.abs(tsHours(stops[i]) - hrs) < Math.abs(tsHours(best) - hrs)) { best = stops[i]; }
+		for (i = 0; i < tm.length; i++) {
+			if (tsHours(tm[i]) < c.xB.min - 1e-9 || tsHours(tm[i]) > c.xB.max + 1e-9) { continue; }
+			if (best < 0 || Math.abs(tsHours(tm[i]) - hrs) < Math.abs(tsHours(tm[best]) - hrs)) { best = i; }
 		}
-		return best === null ? null : { t: best, x: c.box.left + (tsHours(best) - c.xB.min) / ((c.xB.max - c.xB.min) || 1) * c.box.width };
+		return best < 0 ? null : { i: best, t: tm[best], x: c.box.left + (tsHours(tm[best]) - c.xB.min) / ((c.xB.max - c.xB.min) || 1) * c.box.width };
 	}
 	function tsCrossHide(svg) {
 		var g = svg && svg.querySelector('.lpn-ts-cross');
@@ -39179,22 +39180,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tsCrossHide(svg);
 		if (!s) { return; }
 		g = el('g', { class: 'lpn-ts-cross' }, svg);
+		svg._tsCrossAt = s.t;
 		el('line', { x1: s.x, y1: c.box.top, x2: s.x, y2: c.box.top + c.box.height, class: 'lpn-ts-cross-line' }, g);
-		rd = c.readout ? c.readout(s.t) : null;
+		rd = c.readout ? c.readout(s.t, s.i) : null;
 		rows = rd && rd.rows ? rd.rows : [];
-		n = Math.max(0, Math.min(TS_READ_ROWS, Math.floor((c.box.height - 2 * pad) / lh) - 1));
+		// Lines that fit in the frame below the readout's 4 px offset: the title, the rows, and a "+k" line when rows are cut.
+		n = Math.floor((c.box.height - 8 - 2 * pad) / lh);
+		n = rows.length > TS_READ_ROWS || rows.length + 1 > n ? Math.max(0, Math.min(TS_READ_ROWS, n - 2)) : rows.length;
 		lines = [{ text: rd && rd.title ? rd.title : (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(s.t) : String(s.t)) }]
 			.concat(rows.slice(0, n));
 		if (rows.length > n) { lines.push({ text: '+' + (rows.length - n) }); }
 		el('rect', { class: 'lpn-ts-read-bg', rx: 3 }, g);
 		lines.forEach(function (ln, k) {
-			if (ln.color) { el('circle', { cx: pad + 4, cy: pad + (k + 1) * lh - 4, r: 3, fill: ln.color, class: 'lpn-ts-dot' }, g); }
+			if (ln.color) { el('circle', { cx: pad + 4, cy: pad + (k + 1) * lh - 4, r: 3, fill: ln.color, class: 'lpn-ts-read-swatch' }, g); }
 			t = tsText(g, pad + (ln.color ? sw : 0), pad + (k + 1) * lh - 3, ln.text, { class: 'lpn-profile-tick lpn-ts-read-text' });
 			try { w = Math.max(w, t.getComputedTextLength() + (ln.color ? sw : 0)); } catch (e) { w = Math.max(w, ln.text.length * 6); }
 		});
 		w += 2 * pad; h = lines.length * lh + 2 * pad;
 		x0 = s.x + 8;
 		if (x0 + w > c.box.left + c.box.width) { x0 = s.x - 8 - w; }
+		if (x0 + w > c.box.left + c.box.width) { x0 = c.box.left + c.box.width - w; }
 		x0 = Math.max(c.box.left, x0);
 		g.querySelector('.lpn-ts-read-bg').setAttribute('width', w);
 		g.querySelector('.lpn-ts-read-bg').setAttribute('height', h);
@@ -39227,10 +39232,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!tsNowDrag.moved && e.type === 'pointerup') { tsNowSeek(e.clientX); }
 		if (!tsNowDrag.touch) { tsHover = { host: tsNowDrag.host, x: e.clientX, y: e.clientY }; }
 		tsNowEnd(e);
-		if (tsHover) { tsHoverShow(tsNowLiveSvg({ host: tsHover.host })); }
+		if (tsHover) { tsHoverShow(tsNowLiveSvg({ host: tsHover.host }), tsHover.host); }
 	}
 	function tsNowMove(e) {
-		var svg;
 		if (!tsNowDrag || e.pointerId !== tsNowDrag.id) { return; }
 		// A pointerup that never arrived (released outside the window, or over a frame) must not leave the
 		// chart following a pointer with no button down.
@@ -39240,14 +39244,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (Math.abs(e.clientX - tsNowDrag.x0) < TS_NOW_SLOP) { return; }
 			tsNowDrag.moved = true;
 		}
+		// The seek redraws the chart, and the redraw puts the crosshair back (tsNowMark 'hit'), once.
 		tsNowSeek(e.clientX);
-		svg = tsNowLiveSvg(tsNowDrag);
-		if (svg) { tsCrossShow(svg, e.clientX); }
 	}
 	// Put a mouse's crosshair back on a chart that was just redrawn under it, if the pointer is still over its plot.
-	function tsHoverShow(svg) {
+	function tsHoverShow(svg, hostId) {
 		var r, c;
-		if (!svg || !tsHover) { return; }
+		if (!svg || !tsHover || tsHover.host !== hostId) { return; }
 		c = svg._tsNow; r = svg.getBoundingClientRect();
 		if (!c || tsHover.x < r.left || tsHover.x > r.right || tsHover.y < r.top || tsHover.y > r.bottom) { return; }
 		tsCrossShow(svg, tsHover.x);
@@ -39257,7 +39260,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// lies on the chart's left frame, it is still seen (Tom, 2026-11-17: "I don't see a time line").
 	// Called twice per chart: 'line' under the series, 'hit' last, which takes the pointer and carries `readout`,
 	// the chart's own function from a reporting time to {title, rows: [{color, text}]}.
-	function tsNowMark(host, svg, now, X, box, xB, part, readout) {
+	function tsNowMark(host, svg, now, X, box, xB, part, readout, times) {
 		var x, hostId = host.id || host;
 		if (part === 'line') {
 			svg._tsNow = { box: box, xB: xB };
@@ -39269,15 +39272,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return;
 		}
 		svg._tsNow.readout = readout;
+		svg._tsNow.times = times;
 		function inPlot(e) {
-			var r = svg.getBoundingClientRect(), k = r.width / (svg.viewBox.baseVal.width || r.width || 1);
-			return e.clientX >= r.left + box.left * k && e.clientX <= r.left + (box.left + box.width) * k &&
-				e.clientY >= r.top + box.top * k && e.clientY <= r.top + (box.top + box.height) * k;
+			var m = svg.getScreenCTM(), pt, p;
+			if (!m) { return false; }
+			pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+			p = pt.matrixTransform(m.inverse());
+			return p.x >= box.left && p.x <= box.left + box.width && p.y >= box.top && p.y <= box.top + box.height;
 		}
 		svg.addEventListener('pointermove', function (e) {
+			var near;
 			if (e.pointerType === 'touch' || tsNowDrag) { return; }
 			if (!inPlot(e)) { tsHover = null; tsCrossHide(svg); return; }
 			tsHover = { host: hostId, x: e.clientX, y: e.clientY };
+			// Nothing to redraw while the pointer stays nearest the same reporting time.
+			near = tsNearestStop(svg, e.clientX);
+			if (near && svg._tsCrossAt === near.t && svg.querySelector('.lpn-ts-cross')) { return; }
 			tsCrossShow(svg, e.clientX);
 		});
 		svg.addEventListener('pointerleave', function (e) {
@@ -39306,7 +39316,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}, { passive: false });
 		}());
 		if (tsNowDrag && tsNowDrag.host === hostId) { tsCrossShow(svg, tsNowDrag.x); }
-		else { tsHoverShow(svg); }
+		else { tsHoverShow(svg, hostId); }
 	}
 	function tsWaitingText(pc) {
 		var why;
@@ -39537,22 +39547,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 
 		unit = colorFieldUnitText(group, field);
-		tsNowMark(host, svg, now, X, box, xB, 'hit', function (t) {
+		tsNowMark(host, svg, now, X, box, xB, 'hit', function (t, i) {
 			var rows = [];
 			series.forEach(function (s) {
-				s.points.forEach(function (p) {
-					if (p.y !== undefined && Math.abs(p.t - t) < 1e-6) { rows.push({ color: s.color, text: s.id + '  ' + plainRound(p.y, 2) + (unit ? ' ' + unit : '') }); }
-				});
+				var p = s.points[i];
+				if (p && p.y !== undefined) { rows.push({ color: s.color, text: s.id + '  ' + plainRound(p.y, 2) + (unit ? ' ' + unit : '') }); }
 			});
 			return { title: EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(t) : String(t), rows: rows };
-		});
+		}, frames.map(function (f) { return f.t; }));
 
 		// Axis titles. The y one is the quantity and its unit, built the way renderColorLegend()
 		// builds its heading -- the same whole label and the same parenthesised unit, so the chart
 		// and the map key name one quantity the same way. THE UNIT IS THE PROJECT'S: every value
 		// above came through colorValueOf(), which converts a solved number into whatever the units
 		// strip currently says, and colorFieldUnitText() is that strip read for this one field.
-		unit = colorFieldUnitText(group, field);
 		tsText(svg, 0, 0, (labelOverride || colorFieldLabel(group, field)) + (unit ? ' (' + unit + ')' : ''),
 			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
 			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
@@ -40540,16 +40548,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					'data-reading': ttlName[key] + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : p.t) + '   ' + plainRound(p[key], 2) }, svg);
 			});
 		});
-		tsNowMark(host, svg, now, X, box, xB, 'hit', function (t) {
-			var u = unitLabel(resultUnit('flow')), rows = [];
-			pts.forEach(function (p) {
-				if (Math.abs(p.t - t) >= 1e-6) { return; }
+		tsNowMark(host, svg, now, X, box, xB, 'hit', function (t, i) {
+			var u = unitLabel(resultUnit('flow')), p = pts[i], rows = [];
+			if (p) {
 				['produced', 'consumed'].forEach(function (key) {
 					rows.push({ color: SYSFLOW_COLORS[key], text: ttlName[key] + '  ' + plainRound(p[key], 2) + (u ? ' ' + u : '') });
 				});
-			});
+			}
 			return { title: EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(t) : String(t), rows: rows };
-		});
+		}, pts.map(function (p) { return p.t; }));
 		// Axis titles: EPANET's "Flow (units)", built from the page's own Flow label and the units
 		// strip, the way the map key and Time series build theirs.
 		unit = unitLabel(resultUnit('flow'));

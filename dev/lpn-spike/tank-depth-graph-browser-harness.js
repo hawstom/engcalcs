@@ -62,7 +62,7 @@ async function main() {
 			const chart = await a.page.evaluate(() => {
 				const host = document.getElementById('lpn_pgraph_chart');
 				return { text: host.textContent, lines: host.querySelectorAll('.lpn-ts-line').length,
-					dots: Array.from(host.querySelectorAll('.lpn-ts-dot')).map((t) => t.getAttribute('data-reading')) };
+					dots: Array.from(host.querySelectorAll('.lpn-ts-dot[data-reading]')).map((t) => t.getAttribute('data-reading')) };
 			});
 			ok('a line is drawn, with the quantity named on the axis', chart.lines >= 1 && chart.text.indexOf(depthName) >= 0, chart.text.slice(0, 90));
 			const frames = await a.page.evaluate(() => EngCalcs.lpnTimeRunFrames().map((f) => ({ t: f.t, head: f.heads['2'], level: f.levels && f.levels['2'] })));
@@ -92,7 +92,7 @@ async function main() {
 				const sel = document.getElementById('lpn_ts_quantity'); sel.value = 'depth'; sel.dispatchEvent(new Event('change', { bubbles: true }));
 			});
 			await a.settle(700);
-			const tab = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ts_chart .lpn-ts-dot')).map((t) => t.getAttribute('data-reading'))
+			const tab = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ts_chart .lpn-ts-dot[data-reading]')).map((t) => t.getAttribute('data-reading'))
 				.filter((t) => t.trim().indexOf('2 ') === 0).map((t) => t.trim().split(/\s+/).pop()));
 			ok('the Time series tab plots the same numbers for tank 2', tab.length === chart.dots.length &&
 				tab.every((v, i) => v === chart.dots[i].trim().split(/\s+/).pop()), tab.length + ' dots');

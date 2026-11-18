@@ -3553,6 +3553,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-ts-scrub { cursor: crosshair; touch-action: pan-y; -webkit-user-select: none; user-select: none; }
 .lpn-ts-cross { pointer-events: none; }
 .lpn-ts-cross-line { stroke: var(--ec-gray-888); stroke-width: 1; }
+.lpn-ts-read-swatch { stroke: none; }
 .lpn-ts-read-bg { fill: var(--ec-bg); fill-opacity: .92; stroke: var(--ec-border); stroke-width: 1; }
 .lpn-ts-pick { font: inherit; font-size: .95em; max-width: 12em; }
 .lpn-ts-swatch {
