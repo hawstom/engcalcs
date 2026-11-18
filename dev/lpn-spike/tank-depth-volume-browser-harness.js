@@ -127,7 +127,7 @@ async function main() {
 		await a.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
 		await runDone(a);
 		await openTanks(a);
-		// The page opens on gallons (US preset); the checks below are in cubic feet, so say so.
+		// A US example opens on cubic feet (its MinVol unit); the checks below are in them, so say so anyway.
 		await setVol(a, 'ft3');
 		const depthName = await a.lang('lpn_result_depth');
 		const volName = await a.lang('lpn_result_tank_volume');

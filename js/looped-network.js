@@ -12961,16 +12961,11 @@ var EngCalcs = EngCalcs || {};
 		if (tankOverflowWord(n) === word && effective(n, 'overflow')) { return; }
 		setProp(n, 'overflow', word);
 	}
-	// An AVAILABLE volume is a result, read in the Volume selector like any solved number.
-	function tankVolumeUnitText() { return unitLabel(resultUnit('volume')); }
-	// A typed MINIMUM volume is a number in the file's own terms: EPANET states it in the Length
-	// unit cubed, so its heading names that and no selector converts it.
-	function tankMinVolumeUnitText() {
-		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_length');
-		if (k === 'ft') { return pc.u_ft3 || 'ft^3'; }
-		if (k === 'm') { return pc.u_m3 || 'm^3'; }
-		return unitLabel('lpn_u_length') + '^3';
-	}
+	// **ONE VOLUME UNIT, TYPED AND SOLVED ALIKE** (Task 857; Tom's "one set of units", Task 522): a tank's
+	// typed Minimum volume and its Available volume result are both in the Volume selector, as a pipe
+	// Length and a pipe's solved length are in Length. The .inp boundary (js/lpn-inp.js) converts to
+	// the file's own length unit cubed; assembleModel() converts to cubic metres for both engines.
+	function tankVolumeUnitText() { return unitLabel('lpn_u_volume'); }
 	function colorLinkValue(l, field) {
 		if (field === 'diameter') { return l.type === 'pump' ? undefined : effective(l, 'diameter'); }
 		if (field === 'roughness') { return l.type === 'pipe' ? effective(l, 'roughness') : undefined; }
@@ -24956,7 +24951,7 @@ var EngCalcs = EngCalcs || {};
 			var tankVal = prop === 'bottomElev' ? tankBottom(cand.el) : effective(cand.el, prop);
 			return (typeof tankVal === 'number' && isFinite(tankVal)) ? tankVal : undefined;
 		}
-		// **MINIMUM VOLUME AND CAN OVERFLOW** (a volume in the Length unit cubed; EPANET's YES/NO).
+		// **MINIMUM VOLUME AND CAN OVERFLOW** (a volume in the Volume unit; EPANET's YES/NO).
 		if (prop === 'minVolume') {
 			var mv = (cand.group === 'node' && cand.el.type === 'tank') ? effective(cand.el, 'minVolume') : undefined;
 			return (typeof mv === 'number' && isFinite(mv)) ? mv : undefined;
@@ -30545,7 +30540,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume',
 							get: function (n) { return effective(n, 'minVolume'); },
 							set: function (n, v) { setProp(n, 'minVolume', v); updateNode(n.id, true); } };
-						c.unitText = tankMinVolumeUnitText;
+						c.unitText = tankVolumeUnitText;
 						return c;
 					}()),
 					{ key: 'overflow', label: 'lpn_field_tank_overflow', em: 3.5, prop: 'overflow',
@@ -38860,12 +38855,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// run too, but they are its identity rather than a condition it starts from, a flat line for
 	// them says something true, and Tom named one field.
 	var TS_FIELD_SKIP = { node: { initQuality: 1 }, link: {} };
+	// **A TANK'S TWO RESULTS THAT ARE NEITHER A MAP COLOUR NOR A LABEL** (Task 783), the one list both
+	// graphs read: the Time series tab below (tsFieldOptions) and the Properties box's own graph
+	// (PG_FIELDS), so a result offered by one is never missing from the other (Task 857, Tom 2026-11-16).
+	var TANK_RESULT_FIELDS = ['depth', 'volume'];
 	function tsFieldOptions(group) {
 		var skip = TS_FIELD_SKIP[group] || {},
 			out = colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
 		// A tank's depth and usable volume (Task 783): graphable, but neither a map colour nor a label.
 		if (group === 'node') {
-			out.push(['depth', colorFieldLabel('node', 'depth')], ['volume', colorFieldLabel('node', 'volume')]);
+			TANK_RESULT_FIELDS.forEach(function (f) { out.push([f, colorFieldLabel('node', f)]); });
 		}
 		return out;
 	}
@@ -39418,9 +39417,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// starting level (see its `pressure` branch), so over a run it is a flat line while the head
 	// above it moves. The head is the tank's moving reading, and it is offered.
 	var PG_FIELDS = {
-		// 'depth' is a tank-only result (Task 783): pgAvailable() keeps a candidate only if the run has a
-		// number for this element, so a junction, a reservoir and every link never offer it.
-		node: ['pressure', 'head', 'depth', 'demandActual', 'quality'],
+		// A tank's depth and Available volume are tank-only results (Task 783): pgAvailable() keeps a
+		// candidate only if the run has a number for this element, so a junction, a reservoir and every
+		// link never offer them.
+		node: ['pressure', 'head'].concat(TANK_RESULT_FIELDS, ['demandActual', 'quality']),
 		link: ['velocity', 'flow', 'headloss', 'gradient', 'friction', 'status', 'quality', 'rate']
 	};
 	var PG_SKIP_BY_TYPE = { tank: { pressure: 1 } };
@@ -41077,7 +41077,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				label: pc.lpn_field_tank_maxlevel_short || 'Maximum depth' },
 			{ types: ['tank'], keys: ['tankDiameter'], props: ['tankDiameter'], unit: 'lpn_u_length',
 				label: pc.lpn_field_tank_diameter || 'Tank diameter' },
-			{ types: ['tank'], keys: ['minVolume'], props: ['minVolume'], unitText: tankMinVolumeUnitText, label: pc.lpn_field_tank_minvol || 'Minimum volume' },
+			{ types: ['tank'], keys: ['minVolume'], props: ['minVolume'], unitText: tankVolumeUnitText, label: pc.lpn_field_tank_minvol || 'Minimum volume' },
 			{ types: ['tank'], keys: ['overflow'], props: ['overflow'], none: ['NO', 'no', 'No'], label: pc.lpn_field_tank_overflow || 'Can overflow' },
 			{ types: ['tank'], keys: ['volCurve'], props: ['volCurve'], label: pc.lpn_curve_kind_volume || 'Tank volume' },
 			{ types: ['tank'], keys: ['mixingModel'], props: ['mixingModel'], none: ['MIXED'], label: pc.lpn_mixing_model || 'Mixing model' },
@@ -47610,8 +47610,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_u_diameter: us ? 'in' : 'mm',
 			lpn_u_flow: LPN_INP_FLOW_UNIT[parsed.flowUnits] || (us ? 'gpm' : 'lps'),
 			lpn_u_velocity: us ? 'ftps' : 'mps',
-			// A tank's volume is a result, so the file states no unit for it; the file's own system picks the preset's.
-			lpn_u_volume: us ? 'gal' : 'm3'
+			// A file states no volume unit, but its MinVol is the length unit cubed: the project's Volume
+			// unit starts as that, so no typed number changes and an unedited export is byte-identical.
+			lpn_u_volume: us ? 'ft3' : 'm3'
 			// No lpn_u_gradient: head-loss gradient is dimensionless and an .inp does not name one.
 		};
 		// **A D-W FILE'S ROUGHNESS IS IN EPANET'S OWN UNIT** (audit 2026-11, F1): millimetres in an
@@ -61667,7 +61668,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// has no unit at all, which is why qualityUnitId() below answers '' for that mode rather
 		// than naming this one.
 		age: 'lpn_u_age',
-		// A tank's Available volume. Results-only: a typed Minimum volume stays in the Length unit cubed.
+		// A tank's Available volume, in the same Volume unit its typed Minimum volume is in.
 		volume: 'lpn_u_volume'
 	};
 	function resultUnit(q) { return LPN_RESULT_UNIT[q]; }
@@ -61783,11 +61784,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// matched branch would leave one document's unknown unit refusing to solve the next one.
 		unresolvedUnits = {};
 		if (!units) { return false; }
-		// A project saved before the Volume selector existed names none: take the one that goes with
-		// its Length unit (feet: gallons; metres: cubic metres), as an .inp import does, never whatever
-		// the last project left showing.
+		// A project saved before the Volume selector existed typed its Minimum volume in the Length unit
+		// cubed: take that (feet: cubic feet; metres: cubic metres), as an .inp import does, so no
+		// number changes meaning and never whatever the last project left showing.
 		if (!units.lpn_u_volume && units.lpn_u_length) {
-			units.lpn_u_volume = units.lpn_u_length === 'm' ? 'm3' : (/ft/.test(units.lpn_u_length) ? 'gal' : undefined);
+			units.lpn_u_volume = units.lpn_u_length === 'm' ? 'm3' : (/ft/.test(units.lpn_u_length) ? 'ft3' : undefined);
 			if (!units.lpn_u_volume) { delete units.lpn_u_volume; }
 		}
 		var changed = false;
@@ -61843,9 +61844,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// that actually now owns the number, or a Length change would rescale a field this dialog
 		// never mentioned.
 		if (name === 'lpn_u_length') {
-			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter',
-				pc.lpn_field_tank_minvol || 'Minimum volume'];
+			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter'];
 		}
+		if (name === 'lpn_u_volume') { return [pc.lpn_field_tank_minvol || 'Minimum volume']; }
 		if (name === 'lpn_u_diameter') { return [pc.lpn_field_diameter || 'Diameter']; }
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
 		if (name === 'lpn_u_elevhead') {
@@ -61933,14 +61934,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// rescale it and an Elevation/Head change must leave it alone, both now true below.
 			doc.nodes.forEach(function (nd) { conv(nd, 'tankDiameter'); });
 			convOverrides('tankDiameter');
-			// **MINIMUM VOLUME IS THE LENGTH UNIT CUBED**, so it moves by the cube of the length factor.
-			(function () {
-				var k1 = k;
-				k = k1 * k1 * k1;
-				doc.nodes.forEach(function (nd) { conv(nd, 'minVolume'); });
-				convOverrides('minVolume');
-				k = k1;
-			}());
+		} else if (name === 'lpn_u_volume') {
+			// **MINIMUM VOLUME IS TYPED IN THE VOLUME UNIT** (Task 857), not the Length unit cubed: a
+			// Length change leaves it alone, as an Elevation/Head change leaves a tank diameter alone.
+			// A stated zero is EPANET's "no separate minimum volume" and means the same in any unit, so
+			// it is neither counted (it would ask the question over nothing) nor rewritten.
+			doc.nodes.forEach(function (nd) { if (nd.minVolume) { conv(nd, 'minVolume'); } });
+			eachOverrideMap(function (map) {
+				Object.keys(map).forEach(function (key) { if (map[key] && map[key].minVolume) { conv(map[key], 'minVolume'); } });
+			});
 		} else if (name === 'lpn_u_diameter') {
 			doc.links.forEach(function (l) { conv(l, '_diameter'); });
 			convOverrides('diameter');
@@ -76180,7 +76182,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is a typed file number in the Length
 			// unit cubed, so no selector converts it (Available volume below it follows the Volume
 			// selector); blank is EPANET's 0, "use the diameter".
-			numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankMinVolumeUnitText() + ')',
+			numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')',
 				effective(n, 'minVolume'),
 				function (v) { setProp(n, 'minVolume', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_minvol_tip, { el: n, prop: 'minVolume' });
@@ -79957,10 +79959,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// curve's points (overridable since 2026-10-12, so the document's name is not enough).
 					volCurveName: effective(n, 'volCurve') || null,
 					// **THE FILE'S MinVol AND Overflow** (audit 2026-11, F2), for both engines: MinVol in
-					// cubic metres (the length unit cubed), Overflow as a flag. Absent where the file
-					// stated none, so a tank drawn here is built exactly as before.
+					// cubic metres, from the Volume unit it is typed in (the one place it is converted for
+					// a solve; Task 857), Overflow as a flag. Absent where the file stated none, so a tank
+					// drawn here is built exactly as before.
 					minVolume: (typeof effective(n, 'minVolume') === 'number' && effective(n, 'minVolume') > 0)
-						? effective(n, 'minVolume') * Math.pow(toSI(1, 'lpn_u_length'), 3) : undefined,
+						? toSI(effective(n, 'minVolume'), 'lpn_u_volume') : undefined,
 					overflow: (effective(n, 'overflow') && /^y/i.test(String(effective(n, 'overflow')))) ? true : undefined
 				};
 			}

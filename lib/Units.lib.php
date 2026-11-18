@@ -123,8 +123,8 @@ $ec_unit_families = Array(
     'volume'           => Array('m3', 'ft3', 'acft'),
     // A tank's volume on the looped-network page. Split from 'volume' because the DEFAULT differs
     // (US utilities report storage in gallons, and million gallons for a large tank; 'volume' opens
-    // on cubic feet for the drain-time and seepage pages). Results only: a typed Minimum volume
-    // stays in the Length unit cubed, as EPANET's file states it.
+    // on cubic feet for the drain-time and seepage pages). Governs a tank's typed Minimum volume
+    // and its Available volume alike; an .inp file states MinVol in its length unit cubed.
     'volume_tank'      => Array('gal', 'mgal', 'ft3', 'acft', 'm3', 'l', 'megaliter'),
     'unit_discharge'   => Array('m2ps', 'ft2ps'),
     'application_rate' => Array('mmph', 'inph'),

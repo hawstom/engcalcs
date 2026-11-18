@@ -197,7 +197,9 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
   kinds, stated in a `;PUMP:`-style comment: PUMP, EFFICIENCY, VOLUME, HEADLOSS. A reference is
   *stated*/*selected*, never "named", in visitor strings. A VOLUME curve is used only by a run.
 - **A tank is a fixed head at its water surface** (`EngCalcs.lpnIsFixedHead`). Tank diameter is in
-  the LENGTH unit, pipe diameter in millimetres.
+  the LENGTH unit, pipe diameter in millimetres. A tank's Minimum volume (typed) and Available volume
+  (result) are both in the VOLUME unit; `.inp` MinVol is the file's length unit cubed, converted at
+  export only when the two differ (`dev/unit-rulings.md`).
 - **Basemap and terrain** (`js/lpn-terrain.js`): OSM street tiles; Mapbox satellite and Terrain-RGB,
   gated on `EC_MAPBOX_TOKEN`. Never cached, never precached, attribution required, stored as
   `project.basemap`. Elevation fill has exactly two doors — `Settings > New assets > Elevation
