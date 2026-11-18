@@ -61782,7 +61782,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// document's units are installed, so it owns the whole of that state. Clearing only in the
 		// matched branch would leave one document's unknown unit refusing to solve the next one.
 		unresolvedUnits = {};
-		if (!units) { return false; }
+		if (!units) { rememberUnitSelections(); return false; }
 		// A project saved before the Volume selector existed typed its Minimum volume in the Length unit
 		// cubed: take that (feet: cubic feet; metres: cubic metres), as an .inp import does, so no
 		// number changes meaning and never whatever the last project left showing.
