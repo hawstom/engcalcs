@@ -11,8 +11,8 @@
                 "bold plain 'القيم' (the typed values)",
                 "bold the label string 'قيم الإنشاء' (creation values)"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "english",
+            "resolution": "Values is an ordinary noun there: bold removed from English and all 26 translations, spec lists it as a plain noun use (e52a57f6d)."
         },
         {
             "key": "lpn_guide_find_notes_def",
@@ -23,8 +23,8 @@
                 "plain word for the numbers compared, bolded as English shows",
                 "the Settings, Assets, Values label (bn: শুরুর মান)"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "english",
+            "resolution": "Values is an ordinary noun there: bold removed from English and all 26 translations, spec lists it as a plain noun use (e52a57f6d)."
         },
         {
             "key": "lpn_guide_ct_box_def",
@@ -35,8 +35,8 @@
                 "same label for both, as the label keys have it",
                 "a distinct label for Color nodes by"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "glossary",
+            "resolution": "bn Color nodes by now has its own label, distinct from Node colors, in the key and its citing definitions (975de7629)."
         },
         {
             "key": "lpn_guide_find_notes_def",
@@ -47,8 +47,8 @@
                 "bolded the ordinary Hebrew word ערכים",
                 "bolded the label string ערכי יצירה"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "english",
+            "resolution": "Values is an ordinary noun there: bold removed from English and all 26 translations, spec lists it as a plain noun use (e52a57f6d)."
         },
         {
             "key": "lpn_guide_find_query_def",
@@ -59,8 +59,8 @@
                 "bolded ערכים",
                 "bolded ערכי יצירה"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "english",
+            "resolution": "Values is an ordinary noun there: bold removed from English and all 26 translations, spec lists it as a plain noun use (e52a57f6d)."
         },
         {
             "key": "lpn_guide_find_notes_def",
@@ -71,8 +71,8 @@
                 "bolded the plain word for values",
                 "bolded the settings_defaults label"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "english",
+            "resolution": "Values is an ordinary noun there: bold removed from English and all 26 translations, spec lists it as a plain noun use (e52a57f6d)."
         },
         {
             "key": "lpn_notes_1_def",
@@ -83,8 +83,8 @@
                 "retranslated from the current English",
                 "kept old words and only added bold"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "dismissed",
+            "resolution": "Reported, not a complaint: ps retranslated the whole string."
         },
         {
             "key": "lpn_guide_ct_box_def",
@@ -95,8 +95,8 @@
                 "retranslated from current English",
                 "kept old words"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "dismissed",
+            "resolution": "Reported, not a complaint: ps retranslated the whole string."
         },
         {
             "key": "lpn_guide_find_replace_def",
@@ -107,8 +107,8 @@
                 "bolded Закрыта (the pipe status on screen)",
                 "bolded Замкнута per the spec key"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "intent",
+            "resolution": "Text means the pipe Closed field: spec now maps lpn_field_closed; my bold corrected to its label (e52a57f6d)."
         },
         {
             "key": "lpn_guide_find_query_def",
@@ -119,8 +119,8 @@
                 "bolded the heading Значения",
                 "bolded the Settings label verbatim"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "english",
+            "resolution": "Values is an ordinary noun there: bold removed from English and all 26 translations, spec lists it as a plain noun use (e52a57f6d)."
         },
         {
             "key": "lpn_guide_find_notes_def",
@@ -131,8 +131,8 @@
                 "the Find value field (lpn_find_value, 数值)",
                 "the Settings New assets Values label (创建值)"
             ],
-            "disposition": "open",
-            "resolution": ""
+            "disposition": "english",
+            "resolution": "Values is an ordinary noun there: bold removed from English and all 26 translations, spec lists it as a plain noun use (e52a57f6d)."
         }
     ]
 }
