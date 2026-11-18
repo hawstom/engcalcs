@@ -1,27 +1,31 @@
-// EVERY INTERFACE LABEL THE USER MANUAL QUOTES IS BOLD, AND THE BOLD WORDS ARE THE LABEL'S OWN STRING (Task 859, rounds 5 and 6).
-//   node dev/lpn-spike/guide-bold-labels-harness.js
-// guide-bold-labels-spec.json lists, for each manual definition key, the language KEYS of the labels it quotes (never English
-// text) and how many times each is bold and how many times it stands plain on purpose. Read from lib/lang.ec.<lang>.php:
-//   1. English: for every listed label, the value of its key appears bold exactly `bold` times and plain exactly `plain` times,
-//      so a label added to a sentence, or a bold span lost, fails here.
-//   2. English: every <strong> span in any manual definition (lpn_guide_*_def, lpn_notes_*_def, lpn_hotkeys_*_def) is the value of
-//      a label key listed for that definition. No stray bold.
-//   3. Every other language: a <strong> span, where one exists, equals the value of one of that entry's label keys in the same
-//      file, character for character. Languages not yet bolded have no spans and pass; the sprint list is in
-//      dev/guide-bold-translation-list.md. Named exceptions: ar, bg and cs have a button string that is itself mistranslated
-//      ("Add a rule"), so their span keeps the word for "control".
-// Strings that cannot carry bold (the entry's opening paragraphs, which are the `?` tips, rendered as plain text) are not here.
+// EVERY INTERFACE LABEL THE USER MANUAL NAMES IS BOLD, OR IS LISTED AS A DELIBERATE PLAIN USE (Task 859, rounds 5 to 7).
+//   node dev/lpn-spike/guide-bold-labels-harness.js        (EC_LIB_DIR=<dir> reads the lang files from another folder)
+// The rule (Tom): bold every word or phrase that names something the visitor sees on screen in those words. Plain is for a word used as
+// an ordinary noun, a cross-reference to the manual's own headings, query text or a quoted line, an example's own name or id, or a key.
+//
+// The LABELS are read from lib/lang.ec.<lang>.php: every lpn_ value (plus the keys the spec lists as extra) that is a short capitalised
+// string, a trailing "…" also allowed to be left off, minus the manual's own texts and the sentence-like strings. Nothing is typed here in
+// English. guide-bold-labels-spec.json lists, for each manual definition (lpn_guide_*_def, lpn_notes_*_def, lpn_hotkeys_*_def), each label
+// it quotes by KEY, how many times it is bold, and how many times it stands plain, by reason.
+//   1. English: for every label occurrence in every definition (longest label first, the manual's own heading phrases set aside), the bold
+//      and plain counts equal the spec's. A plain occurrence the spec does not list FAILS: a skipped label cannot pass.
+//   2. English: every <strong> span is a label (or a label with a unit, as in "Pressure (psi)"). No stray bold.
+//   3. Every other language: a <strong> span, where one exists, equals the value of one of that definition's label keys in the same file.
+//      Languages not yet bolded have none and pass; dev/guide-bold-translation-list.md is the sprint list. Named exceptions: ar, bg and cs
+//      have a button string that is itself mistranslated ("Add a rule"), so their span keeps the word for "control".
+// Strings that cannot carry bold (the entry's opening paragraphs, which are the `?` tips, plain text) are not here.
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const LIB = path.join(__dirname, '..', '..', 'lib');
-const SPEC = JSON.parse(fs.readFileSync(path.join(__dirname, 'guide-bold-labels-spec.json'), 'utf8'));
+const LIB = process.env.EC_LIB_DIR || path.join(__dirname, '..', '..', 'lib');
+const SPECFILE = JSON.parse(fs.readFileSync(path.join(__dirname, 'guide-bold-labels-spec.json'), 'utf8'));
+const SPEC = SPECFILE.entries;
 const EXCEPT = { 'ar:lpn_guide_lib_ctl_def:0': 1, 'bg:lpn_guide_lib_ctl_def:0': 1, 'cs:lpn_guide_lib_ctl_def:0': 1 };
+const REASONS = ['noun', 'xref', 'syntax', 'data', 'key'];
 const MANUAL = /^lpn_(guide_|notes_|hotkeys_).*_def$/;
 const unesc = (s) => s.replace(/\\(['\\])/g, '$1');
 function load(f) {
-	const out = {};
-	const unread = [];
+	const out = {}, unread = [];
 	fs.readFileSync(path.join(LIB, f), 'utf8').split('\n').forEach((line) => {
 		const m = line.match(/^\$ec_lang\['([^']+)'\]='((?:[^'\\]|\\.)*)';\s*$/);
 		if (m) { out[m[1]] = unesc(m[2]); return; }
@@ -37,29 +41,79 @@ let fails = 0, checks = 0;
 const fail = (m) => { fails++; console.log('  FAIL ' + m); };
 const en = load('lang.ec.en.php');
 
-// 1 and 2: English.
-Object.keys(SPEC).forEach((mk) => {
-	const v = en[mk];
-	if (v === undefined) { fail(mk + ' is not a language key'); return; }
-	const bolds = (v.match(/<strong>.*?<\/strong>/gsu) || []).map((s) => s.replace(/<\/?strong>/g, ''));
-	const plainText = v.replace(/<strong>.*?<\/strong>/gsu, '\u0001').replace(/<[^>]+>/g, '\u0002');
-	const listed = [];
-	SPEC[mk].forEach((e) => {
-		const label = en[e.key];
-		checks++;
-		if (!label) { fail(mk + ': label key ' + e.key + ' has no English value'); return; }
-		listed.push(label);
-		const nb = bolds.filter((b) => b === label).length;
-		const np = (plainText.match(new RegExp('(?<![' + LETTER + '])' + esc(label) + '(?![' + LETTER + '])', 'gu')) || []).length;
-		if (nb !== e.bold) { fail(mk + ': "' + label + '" is bold ' + nb + ' times, want ' + e.bold); }
-		if (np !== e.plain) { fail(mk + ': "' + label + '" stands plain ' + np + ' times, want ' + e.plain); }
+// The universe of labels, as strings, from the English file.
+function universe(t) {
+	const U = {};
+	Object.keys(t).forEach((k) => {
+		const v = t[k];
+		if (!(/^lpn_/.test(k) || SPECFILE.extraLabelKeys.indexOf(k) >= 0)) { return; }
+		if (/^lpn_(guide_|notes_|hotkeys_)/.test(k) && !/_term$|_heading$/.test(k)) { return; }
+		if (k !== 'lpn_menu_help' && /_(tip|help|intro|body|msg|note|hint|warn|text)$|^lpn_msg/.test(k)) { return; }
+		if (/[<>{}]|\.$|:$|\?$/u.test(v) && !/…$/u.test(v)) { return; }
+		if (v !== v.trim()) { return; }
+		const n = Array.from(v).length;
+		if (n < 2 || n > 45 || /^[\p{Ll}\d(]/u.test(v)) { return; }
+		(U[v] = U[v] || []).push(k);
+		if (/…$/u.test(v)) { (U[v.replace(/…$/u, '')] = U[v.replace(/…$/u, '')] || []).push(k); }
 	});
-	bolds.forEach((b) => { checks++; if (listed.indexOf(b) < 0) { fail(mk + ': bold span "' + b + '" is not a label listed for it'); } });
+	return U;
+}
+const U = universe(en);
+const TOK = Object.keys(U).sort((a, b) => Buffer.byteLength(b) - Buffer.byteLength(a));
+const XREF = SPECFILE.xrefPhrases;
+const labelOf = (e, t) => e.stripEllipsis ? t[e.key].replace(/…$/u, '') : t[e.key];
+
+// What a definition says: bold spans, and the plain occurrences of each label string.
+function scan(v) {
+	const bold = (v.match(/<strong>.*?<\/strong>/gsu) || []).map((s) => s.replace(/<\/?strong>/g, ''));
+	const plain = {};
+	v.replace(/<strong>.*?<\/strong>/gsu, '\u0001').split(/<[^>]+>/).forEach((seg) => {
+		const marks = [];
+		const mark = (s, l, lab) => { if (marks.some((m) => s < m[0] + m[1] && s + l > m[0])) { return; } marks.push([s, l, lab]); };
+		XREF.forEach((x) => { let p = -1; while ((p = seg.indexOf(x, p + 1)) >= 0) { mark(p, x.length, x); } });
+		TOK.forEach((l) => {
+			const re = new RegExp('(?<![' + LETTER + '])' + esc(l) + '(?![' + LETTER + '])', 'gu');
+			let m;
+			while ((m = re.exec(seg))) { mark(m.index, m[0].length, l); }
+		});
+		marks.forEach((m) => { if (U[m[2]]) { plain[m[2]] = (plain[m[2]] || 0) + 1; } });
+	});
+	return { bold, plain };
+}
+
+// 1 and 2: English.
+const manualKeys = Object.keys(en).filter((k) => MANUAL.test(k) && k.indexOf('lpn_guide_text_') !== 0);
+manualKeys.forEach((mk) => {
+	const got = scan(en[mk]), entries = SPEC[mk] || [], want = {};
+	entries.forEach((e) => {
+		const lab = labelOf(e, en);
+		checks++;
+		if (!en[e.key]) { fail(mk + ': label key ' + e.key + ' has no English value'); return; }
+		const nPlain = Object.keys(e.plain || {}).reduce((n, r) => { if (REASONS.indexOf(r) < 0) { fail(mk + ': "' + lab + '" has an unknown reason ' + r); } return n + e.plain[r]; }, 0);
+		want[lab] = { bold: e.bold | 0, boldUnit: e.boldUnit | 0, plain: nPlain };
+	});
+	const spans = {}, unitSpans = {};
+	got.bold.forEach((b) => {
+		checks++;
+		if (U[b]) { spans[b] = (spans[b] || 0) + 1; return; }
+		const m = b.match(/^(.+) \([^)]*\)$/u);
+		if (m && U[m[1]]) { unitSpans[m[1]] = (unitSpans[m[1]] || 0) + 1; return; }
+		fail(mk + ': bold span "' + b + '" is not a label');
+	});
+	Object.keys(want).concat(Object.keys(got.plain), Object.keys(spans), Object.keys(unitSpans)).filter((x, i, a) => a.indexOf(x) === i).forEach((lab) => {
+		const w = want[lab], nb = spans[lab] | 0, nu = unitSpans[lab] | 0, np = got.plain[lab] | 0;
+		checks++;
+		if (!w) {
+			if (np) { fail(mk + ': "' + lab + '" stands plain ' + np + ' time(s) and is not listed (bold it, or list it with a reason)'); }
+			if (nb || nu) { fail(mk + ': "' + lab + '" is bold and not listed'); }
+			return;
+		}
+		if (nb !== w.bold) { fail(mk + ': "' + lab + '" is bold ' + nb + ' times, spec ' + w.bold); }
+		if (nu !== w.boldUnit) { fail(mk + ': "' + lab + '" is bold with a unit ' + nu + ' times, spec ' + w.boldUnit); }
+		if (np !== w.plain) { fail(mk + ': "' + lab + '" stands plain ' + np + ' times, spec ' + w.plain); }
+	});
 });
-Object.keys(en).filter((k) => MANUAL.test(k) && !SPEC[k]).forEach((k) => {
-	checks++;
-	if (/<strong>/.test(en[k])) { fail(k + ' has bold spans and no entry in the spec'); }
-});
+Object.keys(SPEC).filter((k) => manualKeys.indexOf(k) < 0).forEach((k) => fail('spec names ' + k + ', which is not a manual definition'));
 
 // 3: the other languages.
 let langs = 0, spans = 0;
@@ -69,15 +123,17 @@ fs.readdirSync(LIB).filter((f) => /^lang\.ec\.[a-z]{2}\.php$/.test(f) && f !== '
 	Object.keys(SPEC).forEach((mk) => {
 		const v = t[mk];
 		if (v === undefined) { return; }
-		const got = (v.match(/<strong>.*?<\/strong>/gsu) || []).map((s) => s.replace(/<\/?strong>/g, ''));
-		got.forEach((g, i) => {
+		const gotB = (v.match(/<strong>.*?<\/strong>/gsu) || []).map((s) => s.replace(/<\/?strong>/g, ''));
+		gotB.forEach((g, i) => {
 			spans++; checks++;
-			const ok = SPEC[mk].some((e) => [e.key].concat(e.also || []).some((k) => t[k] === g));
+			const ok = SPEC[mk].some((e) => [e.key].concat(e.also || []).some((k) => t[k] !== undefined && (t[k] === g || t[k].replace(/…$/u, '') === g || g.indexOf(t[k].replace(/…$/u, '') + ' (') === 0)));
 			if (!ok && !EXCEPT[l + ':' + mk + ':' + i]) { fail(l + ' ' + mk + ' span ' + i + ': ' + JSON.stringify(g) + ' is none of its labels'); }
 			if (ok && EXCEPT[l + ':' + mk + ':' + i]) { fail(l + ' ' + mk + ' span ' + i + ' now matches: remove the exception'); }
 		});
 	});
 });
-console.log('English: ' + Object.keys(SPEC).length + ' entries, ' + Object.keys(SPEC).reduce((n, k) => n + SPEC[k].reduce((m, e) => m + e.bold, 0), 0) + ' bold spans; other languages: ' + langs + ' files, ' + spans + ' spans');
+const nb = Object.keys(SPEC).reduce((n, k) => n + SPEC[k].reduce((m, e) => m + (e.bold | 0) + (e.boldUnit | 0), 0), 0);
+const np = Object.keys(SPEC).reduce((n, k) => n + SPEC[k].reduce((m, e) => m + Object.keys(e.plain || {}).reduce((q, r) => q + e.plain[r], 0), 0), 0);
+console.log('English: ' + Object.keys(SPEC).length + ' definitions with labels, ' + nb + ' bold spans, ' + np + ' deliberate plain uses; other languages: ' + langs + ' files, ' + spans + ' spans');
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall ' + checks + ' checks passed');
 process.exit(fails ? 1 : 0);

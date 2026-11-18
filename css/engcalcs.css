@@ -4956,6 +4956,8 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 table.lpn-notes-table { border-collapse: collapse; margin: .25em 0 0; width: 100%; }
 table.lpn-notes-table td { padding: 0 .75em .3em 0; vertical-align: top; }
 table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
+/* A bold label inside a bold cell is the same weight, never the heavier "bolder" (700 inside 700 renders 900). */
+.lpn-guide-content strong, .lpn-guidebox strong { font-weight: 700; }
 @media (max-width: 480px) {
 	table.lpn-notes-table, table.lpn-notes-table tbody, table.lpn-notes-table tr, table.lpn-notes-table td { display: block; width: auto; }
 	table.lpn-notes-table tr { margin-bottom: .4em; }

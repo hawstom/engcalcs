@@ -70270,7 +70270,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				lines.push((pc.lpn_library_import_comments || 'Comment rows copied in with them: {n}').replace('{n}', String(p.comments)));
 			}
 			if (p.left) {
-				lines.push((pc.lpn_library_import_comments_left || 'Comment rows not copied in, because the item below each was not copied, or none follows: {n}').replace('{n}', String(p.left)));
+				lines.push((pc.lpn_library_import_comments_left || 'Comment rows left out because the item below each was skipped, or nothing follows them: {n}').replace('{n}', String(p.left)));
 			}
 			if (p.clashed.length) {
 				lines.push((pc.lpn_library_import_conflict || 'Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.')
