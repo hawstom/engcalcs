@@ -19,6 +19,7 @@ Find unique names for each. A group is added only where two meanings sit side by
 1. label, text, description, tag, ID
 2. hydraulic grade line, head loss gradient, colour ramp
 3. scenario, status
+4. control, rule
 
 ## For every translator
 
@@ -696,6 +697,18 @@ Tree, parent, child and inherit are the words of a family tree. Use the everyday
 - English: ID (element identifier)
 - id: `element-id`
 - Uniqueness attention: group 1
+
+### Simple control or one-line instruction that opens, closes, or sets one pipe, pump, or valve by time, tank level, or pressure
+
+- English: control (simple control)
+- id: `control-simple`
+- Uniqueness attention: group 4
+
+### Rule-based control or IF, THEN, ELSE rule with conditions and actions
+
+- English: rule (rule-based control)
+- id: `control-rule`
+- Uniqueness attention: group 4
 
 ### Rule, method, or formula for turning earth coordinates into paper, map, or flat coordinates
 
