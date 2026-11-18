@@ -61772,7 +61772,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// document's units are installed, so it owns the whole of that state. Clearing only in the
 		// matched branch would leave one document's unknown unit refusing to solve the next one.
 		unresolvedUnits = {};
-		if (!units) { return false; }
+		if (!units) { rememberUnitSelections(); return false; }
 		var changed = false;
 		LPN_UNIT_SELECTS.forEach(function (name) {
 			var want = units[name], sel = unitEl(name), i;
