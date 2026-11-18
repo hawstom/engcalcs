@@ -3481,9 +3481,9 @@
             "answer": "His word of 2026-10-17: \"example\", not \"worked example\"."
         },
         "lpn_guide_lib_ctl_def": {
-            "on": "<p>A control is one statement. A rule is several lines that begin with RULE. Keywords are typed in English whatever the language of the page, and numbers are in the units of the project. Add a control starts from a statement built from the network, which is then edited into the one intended.</p><p>Controls and rules change a result only in an extended-period simulation, that is, when Total run time is greater than 0. A steady-state solution is not changed by either. Rules are applied by the EPANET engine only. Both are saved with the project and written to an EPANET file.</p>",
-            "ruled": "2026-10-17",
-            "answer": "His own edit of 2026-10-17, applied by CC (steady state hyphenated as a modifier)."
+            "on": "<p>A control is a single statement, for example LINK 10 OPEN AT TIME 1. A rule is a block of lines that begins with RULE. Whatever the language of the page, type the keywords in English and the numbers in the project's units. <strong>Add a control</strong> inserts a statement built from this network, ready to edit.</p><p>Controls and rules change a result only in an extended-period simulation, that is, when <strong>Total run time</strong> is greater than 0. A steady-state solution is not changed by either. Both are saved with the project and written to an EPANET file.</p>",
+            "ruled": "2026-11-18",
+            "answer": "Tom, 2026-11-18: \"Good.\""
         },
         "lpn_guide_lib_ctl_term": {
             "on": "Controls and rules in a run",
@@ -8582,6 +8582,16 @@
             "on": "EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:",
             "ruled": "2026-11-03",
             "answer": "OK."
+        },
+        "lpn_inp_drop_control_comments": {
+            "on": "These comments at the end of control lines were not imported, because those controls were not imported. Every control that could be imported was.",
+            "ruled": "2026-11-18",
+            "answer": "Tom, 2026-11-18: \"Good.\""
+        },
+        "lpn_library_import_comments_left": {
+            "on": "Comment rows left out because the item below each was skipped, or nothing follows them: {n}",
+            "ruled": "2026-11-18",
+            "answer": "Tom, 2026-11-18: \"Good.\""
         }
     }
 }
