@@ -2132,6 +2132,7 @@ EngCalcs.pageConfig = {
 	lpn_field_well_pt_off_tip: <?=json_encode($ec_lang['lpn_field_well_pt_off_tip'])?>,
 	lpn_field_well_pt_empty: <?=json_encode($ec_lang['lpn_field_well_pt_empty'])?>,
 	lpn_field_well_pt_empty_tip: <?=json_encode($ec_lang['lpn_field_well_pt_empty_tip'])?>,
+	lpn_field_well_pt_volume: <?=json_encode($ec_lang['lpn_field_well_pt_volume'])?>,
 	lpn_field_well_pt_volume_tip: <?=json_encode($ec_lang['lpn_field_well_pt_volume_tip'])?>,
 	lpn_field_well_pt_on_head: <?=json_encode($ec_lang['lpn_field_well_pt_on_head'])?>,
 	lpn_field_well_pt_off_head: <?=json_encode($ec_lang['lpn_field_well_pt_off_head'])?>,
