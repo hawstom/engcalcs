@@ -175,8 +175,8 @@ async function main() {
 				const moved = await P.evaluate(() => ({ explode: !!document.querySelector('[data-assembly-explode]'), note: !!document.querySelector('#lpn_popup_fields .lpn-owned-note') }));
 				ok(label + ': after the Well is dragged, a press on the vessel at its new place selects the tank, and the old place selects nothing', !moved.explode && moved.note, JSON.stringify(moved));
 				await P.keyboard.press('Escape'); await a.settle(300);
-				await P.mouse.click(m.l + m.w * 0.85, m.t + m.h * 0.5); await a.settle(500);
-				ok(label + ': and the old place of the vessel selects nothing', !(await P.evaluate(() => !!document.querySelector('#lpn_popup_fields .lpn-owned-note'))));
+				const oldHit = await P.evaluate((q) => { const e = document.elementFromPoint(q.x, q.y); return e && e.closest ? { node: (e.closest('[data-node]') || {}).dataset ? e.closest('[data-node]').dataset.node : null, cls: e.getAttribute && e.getAttribute('class') } : null; }, { x: m.l + m.w * 0.85, y: m.t + m.h * 0.5 });
+				ok(label + ': and nothing answers a press at the vessel\'s old place', !oldHit || !oldHit.node, JSON.stringify(oldHit));
 				await P.keyboard.press('Escape'); await a.settle(300);
 			}
 			if (kind === 'welltankp') {
