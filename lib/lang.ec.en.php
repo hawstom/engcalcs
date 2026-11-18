@@ -5392,7 +5392,6 @@ $ec_lang['lpn_field_well_pt_on_head']='Pump on pressure head';
 $ec_lang['lpn_field_well_pt_off_head']='Pump off pressure head';
 $ec_lang['lpn_field_well_pt_head_tip']='The pump on or pump off pressure as a head of water. It is the tank\'s level, which the pump controls compare.';
 $ec_lang['lpn_tank_associated']='Associated with Well {id}. Change volume and control properties there.';
-$ec_lang['lpn_library_control_owned']='Written by well {id}. Change it in the Properties box of the well.';
 $ec_lang['lpn_diag_rules_refused']='EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:';
 $ec_lang['lpn_diag_control_refused']='EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:';
 $ec_lang['lpn_diag_rule_step_refused']='Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.';

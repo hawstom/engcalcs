@@ -232,7 +232,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **What is written:** two ordinary simple controls, `LINK pump OPEN IF NODE tank BELOW on` and `LINK pump CLOSED IF NODE tank ABOVE off`,
   into `doc.controls`, each tagged `asm` with the Well's id. Both engines run them in an extended-period run like any control. Either level
   alone writes just its own control. The levels live on the grouping (`pumpOn`, `pumpOff`) and ride in the project.
-- **In the Controls editor** they appear as the sentence, read-only, with "Written by well W1. Change it in the Properties box of the well."
+- **In the Controls editor** they appear as the sentence, read-only, with "Associated with Well W1. Change volume and control properties there."
   Read-only because the Well rewrites them on every edit of its inputs; an editable copy would be overwritten, and one fact gets one door.
 - **Explode** removes the tag and leaves two plain controls the user owns. Deleting any member of the Well does the same.
 - **.inp:** the controls are ordinary [CONTROLS] lines. The `;ASSEMBLY:` comment gains `ON=3 OFF=6`. On reading, the Well owns a control only
@@ -378,7 +378,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   (`syncPressureTank()`), and its diameter, minimum volume and overflow mean nothing to it (diameter 15 and 3 give identical steady and 6 hour results in both engines), so it has no row for them.
 - **The sentence** (Tom, round 12: "How about the message goes at the top of the box and says, 'Associated with Well W3. Change volume and control properties there'?"):
   "Associated with Well {id}. Change volume and control properties there." (`lpn_tank_associated`) is the first thing in the tank's Properties box, in either form. The Library and the
-  refusal notice keep "Written by well {id}. Change it in the Properties box of the well." (`lpn_library_control_owned`).
+  refusal notice say the same.
 - **Tables:** a locked cell is plain text with no tip. A pressure tank's diameter, minimum volume and overflow cells say "Not used" (`plainWordIf`), as Properties draws no row.
 - **The Well's own row** for the vessel is "Total tank volume" (`lpn_field_well_pt_volume`), not confused with the tank's "Tank volume" curve row.
 - **Explode writes nothing** (Tom, round 12: "I don't understand why the Total tank volume of 1000 ft^3 becomes Minimum volume 1000 ft^3 when exploded."): section 11 of the three-point harness

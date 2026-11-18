@@ -41365,7 +41365,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The program's own writes (the follow of the Well's ground elevation, the DEM fill) and the Well's box pass.
 	function ownerOfProp(el, prop) { return TANK_OWNED[prop] && !ownerDoorOpen && !wellTankAuto && elGroup(el) === 'node' ? wellTankOwner(el) : null; }
 	// The sentence every door says beside a locked input.
-	function ownedSentence(a, text) { return String(text || (EngCalcs.pageConfig || {}).lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', a.id); }
+	function ownedSentence(a) { return String((EngCalcs.pageConfig || {}).lpn_tank_associated || 'Associated with Well {id}. Change volume and control properties there.').replace('{id}', a.id); }
 	function curveWriterAsm(id) {
 		var list = assemblyList(), i;
 		for (i = 0; i < list.length; i++) { if (list[i].pt && list[i].pt.curve === id && wellHasTank(list[i])) { return list[i]; } }
@@ -77469,7 +77469,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var note = document.createElement('span');
 		note.className = 'lpn-owned-note';
 		note.__prow = '#ownednote';   // propsReorder() keeps it first
-		note.textContent = String((EngCalcs.pageConfig || {}).lpn_tank_associated || 'Associated with Well {id}. Change volume and control properties there.').replace('{id}', a.id);
+		note.textContent = ownedSentence(a);
 		fields.appendChild(note);
 	}
 	// A tank's two elevations: the ground it stands on (read from the terrain like a junction's) and where its base sits (blank is the ground). `ownRow` is true in a tank's

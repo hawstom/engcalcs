@@ -4,7 +4,7 @@
 // Task 822, round 12 (Tom, round 11 pass: the tank's properties can be edited). Opens well-pressure-tank-fixture.lwn (written by
 // `well-tank-three-point-harness.js --write-fixture`), selects the tank on the map and asserts: the seven owned rows (initial, minimum and
 // maximum depth, volume curve, diameter, minimum volume, can overflow) are not form controls and typing over them changes nothing; the
-// sentence "Written by well W1. Change it in the Properties box of the well." shows once; Elevation and Base elevation are still typeable;
+// sentence "Associated with Well W1. Change volume and control properties there." shows once; Elevation and Base elevation are still typeable;
 // Explode gives the tank its inputs back (`well-tank-three-point-harness.js` holds the Tables and Find and replace halves).
 //
 // Copyright 2009 Thomas Gail Haws

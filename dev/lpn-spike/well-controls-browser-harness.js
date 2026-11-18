@@ -110,7 +110,7 @@ async function main() {
 		await typeIn(/^Pump on below/, '1');
 		await typeIn(/^Pump off above/, '2.5');
 		const two = await owned();
-		ok('typing the two depths puts the Well\'s two controls into the open Controls library at once, without a section switch', two.length === 2 && /OPEN IF NODE T1 BELOW 1/i.test(two[0]) && /CLOSED IF NODE T1 ABOVE 2.5/i.test(two[1]) && /Written by well W2/.test(two[0]), two.join(' || '));
+		ok('typing the two depths puts the Well\'s two controls into the open Controls library at once, without a section switch', two.length === 2 && /OPEN IF NODE T1 BELOW 1/i.test(two[0]) && /CLOSED IF NODE T1 ABOVE 2.5/i.test(two[1]) && /Associated with Well W2/.test(two[0]), two.join(' || '));
 		await typeIn(/^Pump on below/, '');
 		ok('clearing one depth takes its control out of the open library at once', (await owned()).length === 1);
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
