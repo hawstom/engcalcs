@@ -13,6 +13,12 @@
             "plain": 0
         },
         {
+            "key": "lpn_dock_float",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
             "key": "lpn_dock_autohide",
             "also": [],
             "bold": 2,
@@ -21,6 +27,12 @@
     ],
     "lpn_guide_bx_keep_def": [
         {
+            "key": "lpn_popup_boxtitle",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
             "key": "lpn_crit_title",
             "also": [],
             "bold": 1,
@@ -28,6 +40,12 @@
         },
         {
             "key": "lpn_ds_title",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_reports_calib",
             "also": [],
             "bold": 1,
             "plain": 0
@@ -157,6 +175,20 @@
             "plain": 0
         },
         {
+            "key": "lpn_tool_add_junction",
+            "also": [
+                "lpn_ff_col_junction"
+            ],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_result_pressure",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
             "key": "lpn_full_col_time",
             "also": [],
             "bold": 2,
@@ -166,6 +198,34 @@
             "key": "lpn_scncmp_col_maxvelocity",
             "also": [],
             "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_result_velocity",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_cmp_notes_def": [
+        {
+            "key": "lpn_scncmp_same",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_sm_title",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_cmp_run_def": [
+        {
+            "key": "lpn_time_duration",
+            "also": [],
+            "bold": 2,
             "plain": 0
         }
     ],
@@ -190,6 +250,12 @@
         },
         {
             "key": "lpn_ff_minpressure",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_ff_title",
             "also": [],
             "bold": 1,
             "plain": 0
@@ -267,6 +333,12 @@
             "plain": 0
         },
         {
+            "key": "lpn_settings_sec_symbology",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
             "key": "lpn_color_node_field",
             "also": [],
             "bold": 1,
@@ -291,10 +363,22 @@
             "plain": 0
         },
         {
+            "key": "lpn_contour_fill",
+            "also": [],
+            "bold": 2,
+            "plain": 0
+        },
+        {
             "key": "lpn_contour_lines",
             "also": [],
             "bold": 2,
             "plain": 0
+        },
+        {
+            "key": "lpn_tool_labels",
+            "also": [],
+            "bold": 1,
+            "plain": 1
         },
         {
             "key": "lpn_sm_unused_none",
@@ -305,6 +389,18 @@
                 "lpn_ff_design_off",
                 "lpn_ff_mode_none"
             ],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_contour_fill_smooth",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_contour_fill_bands",
+            "also": [],
             "bold": 1,
             "plain": 0
         },
@@ -713,6 +809,44 @@
             "plain": 0
         }
     ],
+    "lpn_guide_ff_dur_def": [
+        {
+            "key": "lpn_dur_option",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_when",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_ff_required",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_dur_start",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_dur_length",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_ff_residual",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
     "lpn_guide_ff_example_def": [
         {
             "key": "lpn_menu_project",
@@ -964,6 +1098,18 @@
             "plain": 0
         },
         {
+            "key": "lpn_result_flow",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_result_velocity",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
             "key": "lpn_result_headloss",
             "also": [],
             "bold": 1,
@@ -974,6 +1120,12 @@
             "also": [
                 "lpn_curve_kind_head"
             ],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_result_status",
+            "also": [],
             "bold": 1,
             "plain": 0
         },
@@ -1012,6 +1164,48 @@
         {
             "key": "lpn_time_duration",
             "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_lib_example_def": [
+        {
+            "key": "lpn_menu_project",
+            "also": [],
+            "bold": 4,
+            "plain": 0
+        },
+        {
+            "key": "lpn_library_menu",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_report_pump_head",
+            "also": [
+                "lpn_curve_kind_head"
+            ],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_time_run",
+            "also": [],
+            "bold": 2,
+            "plain": 0
+        },
+        {
+            "key": "lpn_reports_menu",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_reports_status",
+            "also": [
+                "lpn_status_title"
+            ],
             "bold": 1,
             "plain": 0
         }
@@ -1124,6 +1318,22 @@
             "plain": 0
         }
     ],
+    "lpn_guide_lib_notes_def": [
+        {
+            "key": "lpn_library_menu",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_lib_scn_def": [
+        {
+            "key": "lpn_library_menu",
+            "also": [],
+            "bold": 1,
+            "plain": 1
+        }
+    ],
     "lpn_guide_map_del_def": [
         {
             "key": "lpn_sm_title",
@@ -1133,6 +1343,12 @@
         }
     ],
     "lpn_guide_map_esc_def": [
+        {
+            "key": "lpn_popup_boxtitle",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
         {
             "key": "lpn_tool_settings",
             "also": [],
@@ -1158,6 +1374,14 @@
         {
             "key": "lpn_tool_zoom_window",
             "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_hotkeys_snip_heading",
+            "also": [
+                "lpn_screenshot_menu"
+            ],
             "bold": 1,
             "plain": 0
         }
@@ -1252,6 +1476,62 @@
             "plain": 0
         }
     ],
+    "lpn_guide_prop_edit_def": [
+        {
+            "key": "lpn_settings_auto_run",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_pipetype_detach",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_prop_example_def": [
+        {
+            "key": "lpn_result_headloss",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_prop_open_def": [
+        {
+            "key": "lpn_popup_boxtitle",
+            "also": [],
+            "bold": 1,
+            "plain": 1
+        },
+        {
+            "key": "lpn_copy_props_menu",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_paste_props_menu",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_tsb_menu",
+            "also": [],
+            "bold": 2,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_prop_scn_def": [
+        {
+            "key": "lpn_sm_title",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
     "lpn_guide_rr_example_def": [
         {
             "key": "lpn_menu_project",
@@ -1267,6 +1547,32 @@
         },
         {
             "key": "lpn_reports_epanet",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_rr_what_def": [
+        {
+            "key": "lpn_menu_project",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_reports_menu",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_reports_epanet",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_time_run_report",
             "also": [],
             "bold": 1,
             "plain": 0
@@ -1552,6 +1858,12 @@
             "plain": 0
         },
         {
+            "key": "lpn_alt_cat_demand",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
             "key": "lpn_alt_cat_topology",
             "also": [],
             "bold": 1,
@@ -1559,6 +1871,18 @@
         },
         {
             "key": "lpn_alt_cat_initial",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_alt_cat_constituent",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_alt_cat_fireflow",
             "also": [],
             "bold": 1,
             "plain": 0
@@ -1582,7 +1906,95 @@
             "plain": 0
         }
     ],
+    "lpn_guide_scn_use_def": [
+        {
+            "key": "lpn_ff_title",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_set_assets_def": [
+        {
+            "key": "lpn_settings_id_prefixes",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_settings_defaults",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_settings_apply_to_all",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_settings_row_id_prefix",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_set_reset_def": [
+        {
+            "key": "lpn_settings_id_prefixes",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_settings_wipe_btn",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_set_scn_def": [
+        {
+            "key": "lpn_sm_title",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_guide_set_search_def": [
+        {
+            "key": "lpn_settings_search",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_settings_symbol_opacity",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_settings_backdrop_opacity",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_settings_emitter_exponent",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
     "lpn_guide_set_where_def": [
+        {
+            "key": "lpn_settings_sec_symbology",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
         {
             "key": "lpn_labels_heading_node",
             "also": [],
@@ -1604,6 +2016,24 @@
         {
             "key": "lpn_settings_sym_link_colors",
             "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_tool_add_meter",
+            "also": [
+                "lpn_settings_sym_customer"
+            ],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_export_table_all",
+            "also": [
+                "lpn_sm_tree_all",
+                "lpn_settings_sym_all",
+                "lpn_ff_design_all"
+            ],
             "bold": 1,
             "plain": 0
         },
@@ -1634,6 +2064,12 @@
             "plain": 0
         },
         {
+            "key": "lpn_settings_defaults",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
             "key": "lpn_settings_custom_props",
             "also": [],
             "bold": 1,
@@ -1650,6 +2086,12 @@
             "also": [],
             "bold": 2,
             "plain": 0
+        },
+        {
+            "key": "lpn_settings_solver",
+            "also": [],
+            "bold": 1,
+            "plain": 1
         },
         {
             "key": "lpn_settings_runbox",
@@ -1744,6 +2186,12 @@
     ],
     "lpn_guide_tb_two_def": [
         {
+            "key": "lpn_tool_zoom_extent",
+            "also": [],
+            "bold": 3,
+            "plain": 0
+        },
+        {
             "key": "lpn_tool_area_window",
             "also": [],
             "bold": 2,
@@ -1786,7 +2234,49 @@
             "plain": 0
         },
         {
+            "key": "lpn_pane_tab_junctions",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_pane_tab_reservoirs",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
             "key": "lpn_pane_tab_tanks",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_pane_tab_pipes",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_pane_tab_pumps",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_pane_tab_valves",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_pane_tab_customers",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        },
+        {
+            "key": "lpn_pane_tab_shapes",
             "also": [],
             "bold": 1,
             "plain": 0
@@ -1838,9 +2328,25 @@
             "plain": 0
         }
     ],
+    "lpn_guide_use_def": [
+        {
+            "key": "lpn_guide_bx_phone_term",
+            "also": [],
+            "bold": 2,
+            "plain": 0
+        }
+    ],
     "lpn_hotkeys_zoomwin_def": [
         {
             "key": "lpn_tool_zoom_window",
+            "also": [],
+            "bold": 1,
+            "plain": 0
+        }
+    ],
+    "lpn_notes_1_def": [
+        {
+            "key": "lpn_settings_engine_native",
             "also": [],
             "bold": 1,
             "plain": 0
@@ -1866,6 +2372,12 @@
             "also": [],
             "bold": 2,
             "plain": 4
+        },
+        {
+            "key": "lpn_lock_ask",
+            "also": [],
+            "bold": 1,
+            "plain": 0
         },
         {
             "key": "lpn_lock_open_readonly",

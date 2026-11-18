@@ -17,18 +17,22 @@ const path = require('path');
 const LIB = path.join(__dirname, '..', '..', 'lib');
 const SPEC = JSON.parse(fs.readFileSync(path.join(__dirname, 'guide-bold-labels-spec.json'), 'utf8'));
 const EXCEPT = { 'ar:lpn_guide_lib_ctl_def:0': 1, 'bg:lpn_guide_lib_ctl_def:0': 1, 'cs:lpn_guide_lib_ctl_def:0': 1 };
+const MANUAL = /^lpn_(guide_|notes_|hotkeys_).*_def$/;
 const unesc = (s) => s.replace(/\\(['\\])/g, '$1');
 function load(f) {
 	const out = {};
+	const unread = [];
 	fs.readFileSync(path.join(LIB, f), 'utf8').split('\n').forEach((line) => {
 		const m = line.match(/^\$ec_lang\['([^']+)'\]='((?:[^'\\]|\\.)*)';\s*$/);
-		if (m) { out[m[1]] = unesc(m[2]); }
+		if (m) { out[m[1]] = unesc(m[2]); return; }
+		const k = line.match(/^\$ec_lang\['([^']+)'\]/);
+		if (k && MANUAL.test(k[1])) { unread.push(k[1]); }
 	});
+	if (unread.length) { console.log('  FAIL ' + f + ': manual definitions this harness cannot read: ' + unread.join(', ')); process.exit(1); }
 	return out;
 }
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const LETTER = '\\p{L}\\p{N}_';
-const MANUAL = /^lpn_(guide_|notes_|hotkeys_).*_def$/;
 let fails = 0, checks = 0;
 const fail = (m) => { fails++; console.log('  FAIL ' + m); };
 const en = load('lang.ec.en.php');
