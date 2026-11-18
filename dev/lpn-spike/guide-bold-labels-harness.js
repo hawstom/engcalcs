@@ -13,6 +13,7 @@
 //   3. Every other language: a <strong> span, where one exists, equals the value of one of that definition's label keys in the same file.
 //      Languages not yet bolded have none and pass; dev/guide-bold-translation-list.md is the sprint list. Named exceptions: ar, bg and cs
 //      have a button string that is itself mistranslated ("Add a rule"), so their span keeps the word for "control".
+//   4. Every language: every cell dev/scripts/guide_bold_mechanical.php covers is bold (its --check mode), so a later edit cannot drop one.
 // Strings that cannot carry bold (the entry's opening paragraphs, which are the `?` tips, plain text) are not here.
 'use strict';
 const fs = require('fs');
@@ -133,6 +134,12 @@ fs.readdirSync(LIB).filter((f) => /^lang\.ec\.[a-z]{2}\.php$/.test(f) && f !== '
 		});
 	});
 });
+// 4: every cell the mechanical rule covers (dev/scripts/guide_bold_mechanical.php) is bold in every language.
+{
+	const r = require('child_process').spawnSync('php', [path.join(__dirname, '..', 'scripts', 'guide_bold_mechanical.php'), '--check'], { encoding: 'utf8' });
+	checks++;
+	if (r.status !== 0) { fail('a cell the mechanical rule covers is not bold (run php dev/scripts/guide_bold_mechanical.php --apply):\n' + (r.stdout || r.stderr).split('\n').filter((x) => /NOT BOLD|REFUSED/.test(x)).slice(0, 15).join('\n')); }
+}
 const nb = Object.keys(SPEC).reduce((n, k) => n + SPEC[k].reduce((m, e) => m + (e.bold | 0) + (e.boldUnit | 0), 0), 0);
 const np = Object.keys(SPEC).reduce((n, k) => n + SPEC[k].reduce((m, e) => m + Object.keys(e.plain || {}).reduce((q, r) => q + e.plain[r], 0), 0), 0);
 console.log('English: ' + Object.keys(SPEC).length + ' definitions with labels, ' + nb + ' bold spans, ' + np + ' deliberate plain uses; other languages: ' + langs + ' files, ' + spans + ' spans');
