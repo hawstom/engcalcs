@@ -95,6 +95,9 @@ async function main() {
 		});
 		ok('the sentence shows once, whole, with its right edge inside the box', !!geo && geo.text === SENTENCE && geo.right <= geo.boxRight + 1 && geo.sw <= geo.cw + 1, JSON.stringify(geo));
 		ok('and stands directly above the first locked row', !!geo && geo.above && geo.gap < 40, JSON.stringify(geo));
+		const order = rs.map((r) => r.t.replace(/ \(.*$/, '').replace(/\s*\?.*$/, ''));
+		const at = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank volume'].map((n) => order.findIndex((x) => x.indexOf(n) === 0));
+		ok('the four locked rows stand together, in one run under the sentence', Math.max.apply(null, at) - Math.min.apply(null, at) === 3, JSON.stringify(at));
 		const wellRows = await (async () => { await P.keyboard.press('Escape'); const w0 = await centreOf('W1'); await P.mouse.click(w0.x, w0.y); await a.settle(900); const r0 = await rows(); await P.keyboard.press('Escape'); return r0; })();
 		ok('the Well\'s own volume row is "Total tank volume" (m^3 or ft^3), and the Well has no plain "Tank volume" row', wellRows.some((r) => /^Total tank volume/.test(r.t)) && !wellRows.some((r) => /^Tank volume/.test(r.t)), wellRows.map((r) => r.t).join(' | '));
 		const c1 = await centreOf('T1'); await P.mouse.click(c1.x, c1.y); await a.settle(900); rs = await rows();

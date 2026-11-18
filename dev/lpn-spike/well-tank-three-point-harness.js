@@ -539,23 +539,31 @@ console.log('\n--- 10. round 11 review fixes ---');
 	ok('a group that clashes and cannot be renamed is not restored, and the notice names its ID', /W1P/.test(L.notices()) && /share an ID/.test(L.notices()), L.notices());
 }
 {
+	// The diameter means nothing to a pressure tank: its volume curve sets volume against depth, in both engines, steady and extended period (so its box does not show it).
+	const doc = fresh();
+	L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
+	const a = doc.assemblies[0], tk = L.nodeById(a.tank);
+	curves(doc, a);
+	L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'demand', 10);
+	doc.times = EC.lpnTimesDefaults(); doc.times.duration = 6 * 3600;
+	const runBoth = async (d) => { tk.tankDiameter = d; const m = L.currentModel(); m.hydraulics = Object.assign({}, m.hydraulics, { accuracy: 1e-5 });
+		return [EC.lpnSolve(L.currentModel()), await EC.lpnSolveEpanet(L.currentModel(), { moduleUrl: NODE_ENGINE_URL }), EC.lpnNativeRun(JSON.parse(JSON.stringify(m))), await EC.lpnEpanetRun(JSON.parse(JSON.stringify(m)))]; };
+	const big = await runBoth(15), small = await runBoth(3);
+	['built-in', 'EPANET'].forEach((nm, i) => {
+		const diffs = Object.keys(big[i].heads).map((k) => Math.abs(big[i].heads[k] - small[i].heads[k]));
+		ok(nm + ': a pressure tank solves the same with diameter 15 and 3 (steady)', big[i].ok && small[i].ok && Math.max.apply(null, diffs) < 1e-9, 'max head difference ' + Math.max.apply(null, diffs).toExponential(2));
+		const b = big[i + 2], s = small[i + 2];
+		let worst = 0;
+		if (b.ok && s.ok) { b.frames.forEach((f, k) => { worst = Math.max(worst, Math.abs(f.levels[a.tank] - s.frames[k].levels[a.tank])); }); }
+		ok(nm + ': and over 6 hours the tank level series are the same with diameter 15 and 3', b.ok && s.ok && b.frames.length > 2 && b.frames.some((f) => Math.abs(f.levels[a.tank] - b.frames[0].levels[a.tank]) > 1e-4) && worst < 1e-9, 'frames ' + (b.frames || []).length + ', worst level difference ' + worst.toExponential(2));
+	});
+}
+{
 	// A, B. The pressure tank's own box and scenarios.
 	const doc = fresh();
 	L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
 	const a = doc.assemblies[0];
 	const tk = L.nodeById(a.tank);
-	{
-		// The diameter means nothing to a pressure tank: its volume curve sets volume against depth, in both engines (so the box does not show it).
-		curves(doc, a);
-		L.setProp(L.nodeById('W1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'elev', 150); L.setProp(L.nodeById('J1'), 'demand', 10);
-		const solveBoth = async (d) => { tk.tankDiameter = d; const m = L.currentModel(); return [EC.lpnSolve(m), await EC.lpnSolveEpanet(L.currentModel(), { moduleUrl: NODE_ENGINE_URL })]; };
-		const big = await solveBoth(15), small = await solveBoth(3);
-		['built-in', 'EPANET'].forEach((nm, i) => {
-			const diffs = Object.keys(big[i].heads).map((k) => Math.abs(big[i].heads[k] - small[i].heads[k]));
-			ok(nm + ': a pressure tank solves the same with diameter 15 and 3', big[i].ok && small[i].ok && Math.max.apply(null, diffs) < 1e-9, 'max head difference ' + Math.max.apply(null, diffs).toExponential(2));
-		});
-		tk.tankDiameter = 15;
-	}
 	L.setMode('select'); L.openPopup(a.tank, 10, 10);
 	const labels = boxLabels();
 	console.log('        tank box: ' + labels.join(' | '));

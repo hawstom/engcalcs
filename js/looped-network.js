@@ -30783,13 +30783,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// either: inches or millimetres would put a 15 m tank on screen as 15000. The
 					// popup says the same thing in its tip.
 					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength, prop: 'tankDiameter', plainFor: paneOwnedFor('tankDiameter'),
-						get: function (n) { return pressureTankOwner(n) ? undefined : effective(n, 'tankDiameter'); },
+						get: function (n) { return effective(n, 'tankDiameter'); },
 						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
 					// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** (audit 2026-11). The volume is in the
 					// Length unit cubed, so its heading names that, as the Available volume column does.
 					(function () {
 						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume', plainFor: paneOwnedFor('minVolume'),
-							get: function (n) { return pressureTankOwner(n) ? undefined : effective(n, 'minVolume'); },
+							get: function (n) { return effective(n, 'minVolume'); },
 							set: function (n, v) { setProp(n, 'minVolume', v); updateNode(n.id, true); } };
 						c.unitText = tankVolumeUnitText;
 						return c;
@@ -30799,7 +30799,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 							var pc = EngCalcs.pageConfig || {};
 							return [['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']];
 						},
-						get: function (n) { return pressureTankOwner(n) ? '' : tankOverflowWord(n); },
+						get: function (n) { return tankOverflowWord(n); },
 						set: function (n, v) { tankOverflowWrite(n, v); updateNode(n.id, true); } },
 					// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), the twin of the pipe pair:
 					// water sits in a tank far longer than it sits in any main, so this is where a
@@ -77420,15 +77420,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (owner) {
 			// The sentence first, across the whole box and wrapping, then the rows it is about. Tank diameter, minimum volume and can overflow mean nothing to a
 			// pressure tank (its volume curve sets volume against depth in both engines), so they have no row; the group still writes them.
-			var note = document.createElement('span');
-			note.className = 'lpn-owned-note';
-			note.textContent = ownedSentence(owner, pc.lpn_library_control_owned);
-			note.__prow = '#owned';   // propsReorder() sets it directly above the first locked row (Minimum depth)
-			fields.appendChild(note);
-			readonlyField(fields, (pc.lpn_field_tank_level_short || 'Initial depth') + eu, effective(n, 'level'), pc.lpn_field_tank_level_short_tip, 4);
-			readonlyField(fields, (pc.lpn_field_tank_minlevel_short || 'Minimum depth') + eu, effective(n, 'minLevel'), pc.lpn_field_tank_minlevel_short_tip, 4);
-			readonlyField(fields, (pc.lpn_field_tank_maxlevel_short || 'Maximum depth') + eu, effective(n, 'maxLevel'), pc.lpn_field_tank_maxlevel_short_tip, 4);
-			readonlyField(fields, pc.lpn_curve_kind_volume || 'Tank volume', effective(n, 'volCurve') || '');
+			// One tagged group (`#owned`), so propsReorder() keeps the sentence and the four rows it is about together, in place of Minimum depth.
+			popRows(fields, '#owned', function () {
+				var note = document.createElement('span');
+				note.className = 'lpn-owned-note';
+				note.textContent = ownedSentence(owner, pc.lpn_library_control_owned);
+				fields.appendChild(note);
+				readonlyField(fields, (pc.lpn_field_tank_level_short || 'Initial depth') + eu, effective(n, 'level'), pc.lpn_field_tank_level_short_tip, 4);
+				readonlyField(fields, (pc.lpn_field_tank_minlevel_short || 'Minimum depth') + eu, effective(n, 'minLevel'), pc.lpn_field_tank_minlevel_short_tip, 4);
+				readonlyField(fields, (pc.lpn_field_tank_maxlevel_short || 'Maximum depth') + eu, effective(n, 'maxLevel'), pc.lpn_field_tank_maxlevel_short_tip, 4);
+				readonlyField(fields, pc.lpn_curve_kind_volume || 'Tank volume', effective(n, 'volCurve') || '');
+			});
 			return;
 		}
 		unitNumberField(fields, pc.lpn_field_tank_level_short || 'Initial depth', 'lpn_u_elevhead',
