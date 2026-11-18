@@ -5045,3 +5045,8 @@ OBSERVED (re-verify; real Chromium via the branch's env.js server, Net3 US, scra
 - Stale comment left in js/looped-network.js near the Properties-box Minimum volume field: still says the Length unit cubed and no selector.
 - .inp export: ft^3 20000 -> 20000; after gal reinterpret 20000 gal -> 2673.61 ft^3. Right.
 - NOT DONE: mutation test, SI example, phone, other languages, volume-curve tank, scenarios.
+
+## 2026-11-18 feat/volume-unit round 3 (Task 857)
+- OBSERVED: Net3 tank 1, Minimum volume 20000, Volume ft^3 to gal Convert gives 149610; Keep is the focused button and Enter keeps; Cancel leaves ft; Length ft to m Convert, Decimals 2 gives 25.91 m (85 ft); 3 ft^3 to gal with Decimals 0 gives 22.44 (4 significant figure floor); SI preset Convert asks five blocks with one set of buttons, one Undo restores units and numbers. Harnesses green: unit-change, unit-change-first-browser, tank-depth-volume-browser, unit-preset-ask-browser, initial-volume-label (compares EPANET's own initial volume), convert-as, geojson, inp-export. No em dash in new English.
+- TRAP for drivers: a bare element.click() in page.evaluate is ignored by the dialog buttons (needs a pointer press, detail 1); use a real click.
+- Not checked: how Vi= looks on the map; Settings > New assets conversion by eye.
