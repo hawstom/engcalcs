@@ -570,7 +570,7 @@ console.log('\n--- 10. round 11 review fixes ---');
 	ok('all seven owned inputs are listed in the tank\'s box, none of them typeable', ownedEls.length === 7 && ownedEls.every((e) => inputsOf(e) === 0), ownedEls.map(txt).join(' | '));
 	ok('the sentence shows exactly once, naming the well', labelEls.filter((e) => /^Written by well W1\. Change it in the Properties box of the well\.$/.test(txt(e))).length === 1);
 	ok('the tank\'s Elevation and Base elevation are still typeable', ['Elevation', 'Base elevation'].every((o) => labelEls.some((e) => txt(e).indexOf(o) === 0 && inputsOf(e) > 0)));
-	// Tables: the six columns are plain cells for this tank with the sentence as tip, and typeable for an ordinary tank.
+	// Tables: the six columns are plain cells for this tank, and typeable for an ordinary tank.
 	const spec = L.paneTables().filter((t) => t.cols.some((c) => c.key === 'tankDiameter'))[0];
 	const ordinary = { id: 'T9', type: 'tank', x: 0, y: 0 };
 	const lockedKeys = ['level', 'minLevel', 'maxLevel', 'tankDiameter', 'minVolume', 'overflow'];

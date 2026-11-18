@@ -27520,8 +27520,10 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
-	function replaceOwnedNote(spec) {
+	// Only when nothing the query found can take the value, so "Nothing would change." is never misread as the well's doing.
+	function replaceOwnedNote(spec, onlyIfNoneApply) {
 		var g = replaceOwnedGroups(spec);
+		if (g.length && onlyIfNoneApply && replaceFoundSet().some(function (c) { return replaceSpecGroupOk(spec, c.group) && spec.applies(c.el); })) { return ''; }
 		return g.length ? ownedSentence({ id: g.map(function (a) { return a.id; }).join(', ') }) : '';
 	}
 	function replaceTargets() {
@@ -27611,7 +27613,7 @@ var EngCalcs = EngCalcs || {};
 		refs = replaceTargets();
 		if (!refs.length) {
 			replacePending = null;
-			renderReplace(replaceOwnedNote(replaceSpec(replaceState.prop)) || pc.lpn_replace_none || 'Nothing would change.');
+			renderReplace(replaceOwnedNote(replaceSpec(replaceState.prop), true) || pc.lpn_replace_none || 'Nothing would change.');
 			return;
 		}
 		replacePending = { prop: replaceState.prop, value: replaceValueOf(replaceSpec(replaceState.prop)),
@@ -41359,6 +41361,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else { a.pt.curve = ptCurveId(a); docCurves().push({ id: a.pt.curve, kind: 'volume', points: pts }); }
 		tank.minLevel = 0; tank.maxLevel = lv(s.off); tank.volCurve = a.pt.curve;   // base-write: the group's own tank, written by the group in Base
 		tank._level = lv((s.on + s.off) / 2);   // base-write: it opens between the two switch points
+		delete tank.minVolume; delete tank.overflow;   // base-write: the group's own vessel has no extra minimum volume and cannot overflow (the curve and the levels say what it holds)
+		eachOverrideMap(function (map) {   // a scenario override of an owned property (a file from before it was owned) would be effective and uneditable
+			var ov = map[ovKeyFor('node', tank.id)];
+			if (ov) { Object.keys(PT_OWNED).forEach(function (k) { delete ov[k]; }); }
+		});
 		a.pumpOn = lv(s.on); a.pumpOff = lv(s.off);
 		syncWellControls(a);
 		updateNode(tank.id, true);
@@ -73297,7 +73304,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (writer) {
 				own = libEl('div', 'lpn-lib-entry lpn-lib-owned');
 				own.appendChild(libEl('div', 'lpn-lib-verdict', c.id + ' (' + (pc.lpn_curve_kind_volume || 'Tank volume') + ')'));
-				own.appendChild(libEl('div', 'lpn-lib-note', (pc.lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', writer.id)));
+				own.appendChild(libEl('div', 'lpn-lib-note', ownedSentence(writer)));
 				host.appendChild(own);
 				return;
 			}
@@ -73956,7 +73963,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (ctl && ctl.asm) {
 				var own = libEl('div', 'lpn-lib-entry lpn-lib-owned');
 				own.appendChild(libEl('div', 'lpn-lib-verdict', libControlText(ctl)));
-				own.appendChild(libEl('div', 'lpn-lib-note', (pc.lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', ctl.asm)));
+				own.appendChild(libEl('div', 'lpn-lib-note', ownedSentence({ id: ctl.asm })));
 				host.appendChild(own);
 				return;
 			}
@@ -77422,7 +77429,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			readonlyField(fields, ownedSentence(owner, pc.lpn_library_control_owned), '');
 			return;
 		}
-		if (!owner) {
 		unitNumberField(fields, pc.lpn_field_tank_level_short || 'Initial depth', 'lpn_u_elevhead',
 			function () { return effective(n, 'level'); },
 			function (v) { setProp(n, 'level', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
@@ -77437,7 +77443,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function () { return effective(n, 'maxLevel'); },
 			function (v) { setProp(n, 'maxLevel', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_maxlevel_short_tip, { el: n, prop: 'maxLevel' }), valueWarnText('maxLevel', n, effective(n, 'maxLevel')));
-		}
 		// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
 		// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
 		// and NOT the pipe-diameter unit either, or inches/millimetres would put a 15 m tank on

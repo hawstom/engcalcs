@@ -75,7 +75,7 @@ async function main() {
 		const rows = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields label')).map((l) => ({
 			t: l.textContent.replace(/\s+/g, ' ').trim(), controls: l.querySelectorAll('input, select, textarea, [contenteditable="true"]').length })));
 		const tankId = await P.evaluate(() => { const n = Array.from(document.querySelectorAll('#lpn_canvas [data-node]')).map((e) => e.getAttribute('data-node')); return n.indexOf('T1') >= 0 ? 'T1' : null; });
-		ok('the fixture has its tank T1 on the map', tankId === 'T1');
+		ok('the fixture has its tank T1 on the map and its Well holds a pressure tank (`pt`); regenerate it with `well-tank-three-point-harness.js --write-fixture` if not', tankId === 'T1' && (JSON.parse(fixture).assemblies || []).some((g) => g.pt && g.tank === 'T1'));
 		await P.keyboard.press('Escape');
 		const c = await centreOf('T1');
 		await P.mouse.click(c.x, c.y);
@@ -88,7 +88,7 @@ async function main() {
 		ok('Elevation and Base elevation are still typeable', find('Elevation').controls > 0 && find('Base elevation').controls > 0);
 		const before = rs.map((r) => r.t).join('|');
 		for (const o of OWNED) {
-			const box = await P.evaluate((name) => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.textContent.replace(/\s+/g, ' ').trim().indexOf(name) === 0)[0]; const r = l.getBoundingClientRect(); return { x: r.right - 10, y: r.top + r.height / 2 }; }, o);
+			const box = await P.evaluate((name) => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.textContent.replace(/\s+/g, ' ').trim().indexOf(name) === 0)[0]; const sp = l.querySelector('span') || l, r = sp.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, o);
 			await P.mouse.dblclick(box.x, box.y);
 			await P.keyboard.type('777');
 			await P.keyboard.press('Enter');
