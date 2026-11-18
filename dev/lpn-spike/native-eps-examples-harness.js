@@ -56,8 +56,22 @@ require(ROOT + 'js/lpn-epanet.js');
 require(ROOT + 'js/lpn-time.js');
 require(ROOT + 'js/lpn-native-run.js');
 
+require(ROOT + 'js/lpn-net.js');
+global.alert = global.window.alert = function () { };
+global.FileReader = function () {
+	this.readAsArrayBuffer = function (file) {
+		const bytes = new TextEncoder().encode(file._text);
+		this.result = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+		if (this.onload) { this.onload({ target: { result: this.result } }); }
+	};
+};
 const L = loadLoopedNetwork(EXAMPLE_EXPORTS +
-	"\t\tcurrentModel: function () { return assembleModel(); },\n");
+	"\t\tcurrentModel: function () { return assembleModel(); },\n" +
+	"\t\timportInp: importInpFromFile,\n" +
+	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas'); world = el('g', {}, svg);\n" +
+	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world); linksLayer = el('g', {}, world);\n" +
+	"\t\t\tnodesLayer = el('g', {}, world); labelsLayer = el('g', {}, world); rubberBandEl = el('line', {}, world); },\n");
+L.buildLayers();
 const EC = global.EngCalcs;
 
 const HEAD_TOL = 0.8e-3, FLOW_TOL = 2e-6, FLOW_REL = 1e-5, H = 3600;
@@ -116,13 +130,17 @@ async function compare(file, text) {
 	const nat = EC.lpnNativeRun(model);
 	if (!epa.ok || !nat.ok) { ok(file, false, `ok native=${nat.ok} epanet=${epa.ok} ` + JSON.stringify(nat.issues || epa.issues || '')); return; }
 	const same = epa.frames.length === nat.frames.length && epa.frames.every((f, i) => f.t === nat.frames[i].t);
-	let dH = 0, atH = '', dL = 0, atL = '', dQ = 0, atQ = '', qMax = 0, st = 0, sw = 0;
+	let dH = 0, atH = '', dL = 0, atL = '', dQ = 0, atQ = '', qMax = 0, st = 0, sw = 0, dP = 0, dV = 0, dHL = 0, dD = 0;
 	if (same) {
 		epa.frames.forEach((fe, i) => {
 			const fn = nat.frames[i];
 			model.nodes.forEach((n) => {
 				const d = Math.abs(fn.heads[n.id] - fe.heads[n.id]);
 				if (d > dH) { dH = d; atH = n.id + '@' + fe.t / H + 'h'; }
+				// EPS audit 2026-11-18: pressure and demand were never compared, only heads and flows. A reservoir's
+				// pressure (EPANET: head less its base head) is a known difference, so reservoirs are left out of dP.
+				if (n.type !== 'reservoir') { dP = Math.max(dP, Math.abs(fn.pressures[n.id] - fe.pressures[n.id])); }
+				dD = Math.max(dD, Math.abs(fn.demands[n.id] - fe.demands[n.id]));
 				if (n.type === 'tank') {
 					const dl = Math.abs(fn.levels[n.id] - fe.levels[n.id]);
 					if (dl > dL) { dL = dl; atL = n.id + '@' + fe.t / H + 'h'; }
@@ -132,6 +150,8 @@ async function compare(file, text) {
 				qMax = Math.max(qMax, Math.abs(fe.flows[l.id]));
 				const d = Math.abs(fn.flows[l.id] - fe.flows[l.id]);
 				if (d > dQ) { dQ = d; atQ = l.id + '@' + fe.t / H + 'h'; }
+				dV = Math.max(dV, Math.abs(fn.velocities[l.id] - fe.velocities[l.id]));
+				dHL = Math.max(dHL, Math.abs(fn.headlosses[l.id] - fe.headlosses[l.id]));
 				if (fn.statuses[l.id] !== fe.statuses[l.id]) { st++; }
 				if (i && fe.statuses[l.id] !== epa.frames[i - 1].statuses[l.id]) { sw++; }
 			});
@@ -146,9 +166,10 @@ async function compare(file, text) {
 			qSwing = Math.max(qSwing, Math.max(...q) - Math.min(...q));
 		});
 	}
-	ok(`${file}, ${nCtl} controls`, same && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && st === 0 && (text ? qSwing > 1e-3 : sw > 0),
+	ok(`${file}, ${nCtl} controls`, same && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && dP <= HEAD_TOL && dHL <= HEAD_TOL && dD <= qTol && dV <= 1e-5 && st === 0 && (text ? qSwing > 1e-3 : sw > 0),
 		`steps ${nat.frames.length}/${epa.frames.length}${same ? '' : ' DIFFER'}  dH=${dH.toExponential(2)} m @${atH}  ` +
 		`dLevel=${dL.toExponential(2)} m @${atL || '-'}  dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})  ` +
+		`dPressure=${dP.toExponential(1)} m dHeadloss=${dHL.toExponential(1)} m dVelocity=${dV.toExponential(1)} m/s dDemand=${dD.toExponential(1)} m3/s  ` +
 		`[${sw} status changes in EPANET's frames${text ? `; pump flow swing ${(qSwing * 1000).toFixed(1)} L/s` : ''}${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
 }
 
@@ -266,8 +287,62 @@ async function compareCurves(file) {
 		`[the curve moves a level ${shape.toFixed(3)} m from the cylinder's${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
 }
 
+// ---- STEADY RESULTS AGAINST EPANET, TIGHT (EPS audit 2026-11-18, findings 1 to 3) ------------------------------------
+// The 0.8 mm tolerance above let three real defects through, because the constructed networks carry little minor loss,
+// no emitter and no reservoir pattern. These sources do, and are held to 0.02 mm and 1e-6 m3/s:
+//   Valves.lwn, Elm-Street-Center.lwn, descriptions.inp   minor loss and a TCV setting use EPANET's 0.02517 (finding 1)
+//   import-cases.inp                                       a junction's demand includes its emitter's discharge (finding 2)
+//   pattern-attach.inp                                     a reservoir on a head pattern reads head less base head (finding 3)
+const TIGHT_M = 2e-5, TIGHT_Q = 1e-6;
+async function compareSteady(label, extra) {
+	EC.lpnTimeArrived();
+	const model = L.currentModel();
+	model.hydraulics = Object.assign({}, model.hydraulics || {}, { accuracy: 1e-5 });
+	delete model.quality; delete model.msx; delete model.energy;
+	const still = EC.lpnNativeRunRefusals(model);
+	if (still.length) { ok(label, false, 'refused: ' + JSON.stringify(still)); return; }
+	const epa = await EC.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
+	const nat = EC.lpnNativeRun(model);
+	if (!epa.ok || !nat.ok) { ok(label, false, `ok native=${nat.ok} epanet=${epa.ok}`); return; }
+	const same = epa.frames.length === nat.frames.length;
+	let dH = 0, dP = 0, dHL = 0, dQ = 0, dD = 0, resPSwing = 0, emitD = 0;
+	epa.frames.forEach((fe, i) => {
+		const fn = nat.frames[i];
+		model.nodes.forEach((n) => {
+			dH = Math.max(dH, Math.abs(fn.heads[n.id] - fe.heads[n.id]));
+			dP = Math.max(dP, Math.abs(fn.pressures[n.id] - fe.pressures[n.id]));   // reservoirs included
+			dD = Math.max(dD, Math.abs(fn.demands[n.id] - fe.demands[n.id]));
+			if (n.type === 'reservoir') { resPSwing = Math.max(resPSwing, Math.abs(fe.pressures[n.id])); }
+			if (n.type === 'junction' && n.emitter > 0) { emitD = Math.max(emitD, fn.demands[n.id] - (n.demand || 0)); }
+		});
+		model.links.forEach((l) => {
+			dQ = Math.max(dQ, Math.abs(fn.flows[l.id] - fe.flows[l.id]));
+			dHL = Math.max(dHL, Math.abs(fn.headlosses[l.id] - fe.headlosses[l.id]));
+		});
+	});
+	const needs = extra && extra.emitter ? emitD > 1e-4 : (extra && extra.reservoirPattern ? resPSwing > 1 : true);
+	ok(label, same && dH <= TIGHT_M && dP <= TIGHT_M && dHL <= TIGHT_M && dQ <= TIGHT_Q && dD <= TIGHT_Q && needs,
+		`dHead=${dH.toExponential(1)} dPressure=${dP.toExponential(1)} dHeadloss=${dHL.toExponential(1)} m  dFlow=${dQ.toExponential(1)} dDemand=${dD.toExponential(1)} m3/s` +
+		(extra && extra.emitter ? `  [emitter discharge in the demand ${(emitD * 1000).toFixed(3)} L/s]` : '') +
+		(extra && extra.reservoirPattern ? `  [reservoir pressure moves ${resPSwing.toFixed(3)} m]` : ''));
+}
+const STEADY_INP = [
+	['dev/lpn-spike/reference/descriptions.inp', 'descriptions.inp: a TCV and minor losses agree with EPANET', {}],
+	['dev/lpn-spike/reference/import-cases.inp', 'import-cases.inp: a demand includes its emitter discharge', { emitter: true }],
+	['dev/lpn-spike/reference/pattern-attach.inp', 'pattern-attach.inp: a reservoir on a head pattern reads head less base head', { reservoirPattern: true }]
+];
+
 (async function () {
 	setUnitSet('us');
+	// child mode: one .inp per process, because a project holding one asks where a second file goes
+	const inpArg = (process.argv.find((a) => /^--inp=/.test(a)) || '').slice(6);
+	if (inpArg) {
+		await warmEpanet();
+		const row = STEADY_INP.find((r) => r[0] === inpArg);
+		L.importInp({ name: inpArg.split('/').pop(), _text: fs.readFileSync(ROOT + inpArg, 'utf8') });
+		await compareSteady(row[1], row[2]);
+		process.exit(fail ? 1 : 0);
+	}
 	await warmEpanet();
 	ok('the gallery has examples with controls', EXAMPLES.length >= 2, EXAMPLES.join(', '));
 	for (const f of EXAMPLES) { await compare(f); }
@@ -276,6 +351,16 @@ async function compareCurves(file) {
 	for (const f of PUMPED) { await compareEnergy(f, false); await compareEnergy(f, true); }
 	ok('the gallery has examples with tanks and a period', TANKED.length >= 5, TANKED.join(', '));
 	for (const f of TANKED) { await compareCurves(f); }
+	for (const f of ['Valves.lwn', 'Elm-Street-Center.lwn']) {
+		L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + f, 'utf8')));
+		await compareSteady(f + ': minor losses and valve settings agree with EPANET', {});
+	}
+	for (const r of STEADY_INP) {
+		const c = require('child_process').spawnSync(process.execPath, [__filename, '--inp=' + r[0]], { encoding: 'utf8', maxBuffer: 1 << 26 });
+		const lines = (c.stdout || '').split('\n').filter((x) => /^(PASS|FAIL) /.test(x));
+		if (!lines.length) { ok(r[1], false, 'child exit ' + c.status + ' ' + (c.stderr || '').slice(0, 300)); continue; }
+		lines.forEach((x) => { console.log(x); if (/^PASS/.test(x)) { pass++; } else { fail++; } });
+	}
 	console.log(`\n${pass} passed, ${fail} failed`);
 	process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(2); });

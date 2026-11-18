@@ -77,8 +77,17 @@ EngCalcs.EPANET_VISCOS = EngCalcs.EPANET_VISCOS_FT2S * 0.3048 * 0.3048;
 
 // EPANET's hydcoeffs.c resistcoeff() writes a Darcy-Weisbach pipe's resistance with g = 32.2 ft/s2,
 // not 32.174, which is 9.81456 m/s2 against the suite's EngCalcs.G = 9.80665 (0.08 % more head loss).
-// Used for the friction term only: EPANET's minor loss has its own rounded 0.02517 (see lpn-solver.js).
+// Used for the friction term only: EPANET's minor loss has its own rounded 0.02517 (below).
 EngCalcs.EPANET_G_DW = 32.2 * 0.3048;
+
+// EPANET's minor loss (and a TCV's setting) is the resistance Km = 0.02517 * K / d^4, d in feet and
+// flow in cfs, so that h = Km * Q^2 in feet (EPANET 2.x input3.c pipedata() and valvedata(); the
+// vendored engine is wasm only, so the constant is confirmed by measurement, dev/audits/
+// eps-vs-epanet-2026-11-18.md finding 1). It is 8 / (pi^2 g) with g = 32.2056 ft/s2, NOT the
+// 32.2 above, and not standard gravity. In SI that is h = EPANET_G_MINOR-form K V^2 / (2 g):
+// the g below makes K / (2 g A^2) equal 0.02517 K / d^4 converted to metres and m3/s.
+EngCalcs.EPANET_KM_US = 0.02517;
+EngCalcs.EPANET_G_MINOR = 8 * 0.3048 / (Math.PI * Math.PI * EngCalcs.EPANET_KM_US);
 
 // Darcy-Weisbach friction factor, branch for branch with EPANET's hydcoeffs.c frictionFactor():
 //   Re <= 2000   Hagen-Poiseuille, f = 64/Re

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**94 still to read on master**, of 105 untranslated keys, of 3381 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**95 still to read on master**, of 106 untranslated keys, of 3382 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -45,10 +45,10 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   *Current plain sentence:* Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else.
   @@ NEEDS RULING
 
-## lpn_  (104, 93 to read @@ NEEDS RULING)
+## lpn_  (105, 94 to read @@ NEEDS RULING)
 
 - **`lpn_contour_follows`**
-  > Follows project "{link}" settings.
+  > Uses the project "{link}" settings.
   @@ NEEDS RULING
 - **`lpn_contour_none_note`**
   > Nothing to plot: "Color nodes by" is set to "No color".
@@ -57,7 +57,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > An error occurred in the built-in solver: {message}
   @@ NEEDS RULING
 - **`lpn_diag_builtin_stopped`**
-  > The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.
+  > The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting in Settings, Calculation, Solver.
   @@ NEEDS RULING
 - **`lpn_diag_builtin_stopped_at`**
   > The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.
@@ -68,6 +68,9 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 - **`lpn_diag_energy_refused`**
   > EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:
   _Ruled OK 2026-11-03._
+- **`lpn_diag_pda_pressure_gap`**
+  > EPANET does not accept these pressure-driven demand limits: Required pressure must exceed Minimum pressure by at least {limit}.
+  @@ NEEDS RULING
 - **`lpn_diag_quality_refused`**
   > EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:
   _Ruled OK 2026-11-03._
@@ -75,7 +78,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.
   _Ruled OK 2026-11-03._
 - **`lpn_diag_rules_refused`**
-  > EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:
+  > EPANET does not accept these rules. A clause in each is not valid for the element it refers to, or gives a value that cannot be read. Correct or delete them:
   @@ NEEDS RULING
 - **`lpn_diag_speed_pattern_refused`**
   > These pumps use a speed pattern that does not exist or that holds a negative value. A speed pattern must exist and hold values of 0 or more:
@@ -93,7 +96,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Solved with the built-in solver.
   @@ NEEDS RULING
 - **`lpn_export_table_scn_keeps`**
-  > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
+  > With All chosen, the file holds one sheet for each scenario. Parent scenarios, alternatives, and inheritance are not in the file.
   @@ NEEDS RULING
 - **`lpn_field_tank_minvol`**
   > Minimum volume
@@ -105,7 +108,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Can overflow
   @@ NEEDS RULING
 - **`lpn_field_tank_overflow_tip`**
-  > Yes lets a full tank spill what it cannot hold, so the pipe into it stays open; No closes the pipe into a full tank. Only an extended period simulation uses it.
+  > Choose Yes to let a full tank spill what it cannot hold, so the pipe into it stays open. Choose No to close the pipe into a full tank. Only an extended period simulation uses this setting.
   @@ NEEDS RULING
 - **`lpn_file_export_item_wtg`**
   > .wtg file…
@@ -120,13 +123,13 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > These comments at the end of control lines were not imported, because those controls were not imported. Every control that could be imported was.
   _Ruled 2026-11-18: Tom, 2026-11-18: "Good."_
 - **`lpn_inp_drop_dup_curve`**
-  > These curve IDs are defined in more than one place in this file. EPANET adds the later points after the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start.
+  > These curve IDs are defined in more than one place in this file. EPANET appends the later points to the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start.
   @@ NEEDS RULING
 - **`lpn_inp_drop_dup_pattern`**
-  > These pattern IDs are defined in more than one place in this file. EPANET adds the later multipliers after the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start.
+  > These pattern IDs are defined in more than one place in this file. EPANET appends the later multipliers to the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start.
   @@ NEEDS RULING
 - **`lpn_inp_drop_quality_options`**
-  > This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.
+  > This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.
   @@ NEEDS RULING
 - **`lpn_inp_dup_and`**
   >  and 
@@ -141,13 +144,13 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Pattern {id} (lines {lines})
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_label_semicolon`**
-  > Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.
+  > Texts ({n}) in this project contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written in full in the file, and EPANET will read only the part before the semicolon.
   @@ NEEDS RULING
 - **`lpn_inpalt_base`**
   > The Base alternative
   @@ NEEDS RULING
 - **`lpn_inpalt_base_note`**
-  > Every scenario inherits the Base alternative, so choosing it changes them all.
+  > Every scenario inherits the Base alternative, so choosing it changes the values in every scenario.
   @@ NEEDS RULING
 - **`lpn_inpalt_cancelled`**
   > Nothing was changed.
@@ -156,7 +159,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Alternative for {category}
   @@ NEEDS RULING
 - **`lpn_inpalt_lead`**
-  > This file changes values in the categories below. Choose the alternative that receives the values of each.
+  > This file changes values in the categories below. For each category, choose the alternative that receives its values.
   @@ NEEDS RULING
 - **`lpn_inpalt_more`**
   > and others ({n})
@@ -183,7 +186,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Add a comment
   @@ NEEDS RULING
 - **`lpn_library_import_comments`**
-  > Comment rows copied in with them: {n}
+  > Comment rows copied with the imported items: {n}
   @@ NEEDS RULING
 - **`lpn_library_import_comments_left`**
   > Comment rows left out because the item below each was skipped, or nothing follows them: {n}
@@ -198,28 +201,28 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Moves the selected item. Click an item to select it. The order is saved with the project.
   @@ NEEDS RULING
 - **`lpn_library_move_tip_controls`**
-  > When two controls change the same link at the same time, the control lower in the list takes effect.
+  > When two controls change the same link at the same time, the control nearer the bottom of the list is the one applied.
   @@ NEEDS RULING
 - **`lpn_library_move_tip_none`**
   > The order does not change a run.
   @@ NEEDS RULING
 - **`lpn_library_move_tip_rules`**
-  > When two rules call for conflicting actions on the same link, the rule with the higher PRIORITY takes effect, and at equal priority the rule higher in the list takes effect.
+  > When two rules call for conflicting actions on the same link, the rule with the larger PRIORITY number is applied, and at equal PRIORITY the rule nearer the top of the list is applied.
   @@ NEEDS RULING
 - **`lpn_library_move_top`**
   > Move to top
   @@ NEEDS RULING
 - **`lpn_ovm_push_ask`**
-  > Push override upward to {target}?
+  > Move this override up to {target}?
   @@ NEEDS RULING
 - **`lpn_ovm_push_ask_cur`**
-  > Push override upward? Current value in {target}: {old}.
+  > Move this override up? Current value in {target}: {old}.
   @@ NEEDS RULING
 - **`lpn_ovm_push_others`**
-  >  Scenarios that inherit it change ({n} total).
+  >  The {n} scenarios that inherit it will change.
   @@ NEEDS RULING
 - **`lpn_ovm_push_tip`**
-  > Push override upward
+  > Move this override up
   @@ NEEDS RULING
 - **`lpn_pane_paste_text_no_words`**
   > Row {row}: a new Text needs its words.
@@ -234,10 +237,10 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²/s for US flow units and m²/s for SI flow units. Blank uses the EPANET default of 1.0.
   @@ NEEDS RULING
 - **`lpn_settings_color_node_field_tip`**
-  > Colors the nodes by this property. The contour plot follows it.
+  > Sets the node colors from this property. The contour plot uses the same property.
   @@ NEEDS RULING
 - **`lpn_settings_color_ramp_node_tip`**
-  > Colors the nodes, the contour plot and its key.
+  > Sets the colors of the nodes, the contour plot, and its legend.
   @@ NEEDS RULING
 - **`lpn_settings_row_contour_show`**
   > Show contour plot
@@ -249,7 +252,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Velocity warning limit
   @@ NEEDS RULING
 - **`lpn_settings_velocity_limit_tip`**
-  > The velocity above which a run reports the fastest pipe and how many other pipes also exceed it. Blank uses the default. Zero turns the warning off.
+  > The velocity above which a run reports the pipe with the highest velocity and how many other pipes also exceed it. Blank uses the default. Zero turns the warning off.
   @@ NEEDS RULING
 - **`lpn_settings_viscosity`**
   > Viscosity
@@ -264,10 +267,10 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > The built-in solver ran this network, because the EPANET solver could not be used. {reason}
   @@ NEEDS RULING
 - **`lpn_velocity_warn`**
-  > ⚠ Pipe {id} velocity is {velocity} at {time}.
+  > ⚠ Pipe {id} velocity is {velocity} at {time}, above the limit.
   @@ NEEDS RULING
 - **`lpn_velocity_warn_more`**
-  > ⚠ And more pipes ({n}) above {limit}.
+  > ⚠ Other pipes above {limit}: {n}.
   @@ NEEDS RULING
 - **`lpn_velocity_warn_steady`**
   > ⚠ Pipe {id} velocity is {velocity}.
@@ -276,7 +279,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Exported {zip}, holding {wtg} and {sqlite}.
   @@ NEEDS RULING
 - **`lpn_wtg_export_extract`**
-  > Extract both files into one folder, then open the .wtg.
+  > Unzip the .zip file into one folder, then open the .wtg file.
   @@ NEEDS RULING
 - **`lpn_wtg_export_failed`**
   > The .wtg project was not written: {detail}
@@ -288,7 +291,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > The background picture.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_controls_pressure`**
-  > Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.
+  > Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which the EPANET run opened or closed the link.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_demand_model`**
   > Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.
@@ -324,7 +327,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.
   @@ NEEDS RULING
 - **`lpn_wtg_export_no_pump_curve`**
-  > This network cannot be written: pumps {ids} have no three-point or one-point head curve. A power pump or another multiple-point curve is not written.
+  > This network cannot be written: pumps {ids} have no three-point or one-point head curve. A power pump, or a head curve with any other number of points, is not written.
   @@ NEEDS RULING
 - **`lpn_wtg_export_no_units`**
   > This network cannot be written: its flow unit is {unit}, and only gpm is written.
@@ -339,19 +342,19 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > Valve {id} has no headloss curve in this project.
   @@ NEEDS RULING
 - **`lpn_wtg_export_t_head_pattern`**
-  > Reservoir {id} names a head pattern that this project does not define.
+  > Reservoir {id} states a head pattern that this project does not define.
   @@ NEEDS RULING
 - **`lpn_wtg_export_t_integrity`**
-  > The files written failed their own check, so they were not offered.
+  > The files failed an integrity check after they were written, so they were not offered for download.
   @@ NEEDS RULING
 - **`lpn_wtg_export_t_layout`**
-  > The export template does not match the layout this export writes.
+  > The export template does not match the structure of the files this export writes.
   @@ NEEDS RULING
 - **`lpn_wtg_export_t_offline`**
-  > The export needs a connection to this site the first time, to load its template and the database and EPANET engines. Check the connection and try again.
+  > The export needs a connection to this site the first time, to load its template, the database engine, and the EPANET engine. Check the connection and try again.
   @@ NEEDS RULING
 - **`lpn_wtg_export_t_vol_missing`**
-  > Tank {id} names a volume curve that this project does not define.
+  > Tank {id} states a volume curve that this project does not define.
   @@ NEEDS RULING
 - **`lpn_wtg_export_t_vol_range`**
   > The volume curve of tank {id} does not cover the tank's range of water depth.
@@ -370,7 +373,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 
 # Strings waiting on a branch
 
-**73 still to read**, of 73 new keys across 6 unmerged branch(es).
+**74 still to read**, of 74 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -381,7 +384,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/assembly (`27a957a3b`) — 67 new, 67 to read @@ NEEDS RULING
+### feat/assembly (`ed3b9b048`) — 68 new, 68 to read @@ NEEDS RULING
 
 - **`lpn_assembly_down_head`**
   > Downstream head
@@ -512,6 +515,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pgraph_which`**
   > Graph which sub-asset?
   @@ NEEDS RULING
+- **`lpn_tank_associated`**
+  > Associated with Well {id}. Change volume and control properties there.
+  @@ NEEDS RULING
 - **`lpn_tool_add_pumpplus`**
   > Pump+
   @@ NEEDS RULING
@@ -587,7 +593,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/graph-scrub (`fa2f689dc`) — adds no English strings
 
-### feat/library-order (`a2ae75212`) — adds no English strings
+### feat/library-order (`51e5ece85`) — adds no English strings
 
 ### feat/pick-chooser (`50e757d1d`) — 1 new, 1 to read @@ NEEDS RULING
 

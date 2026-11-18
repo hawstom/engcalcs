@@ -4445,6 +4445,7 @@ EngCalcs.pageConfig = {
 	lpn_diag_speed_pattern_refused: <?=json_encode($ec_lang['lpn_diag_speed_pattern_refused'])?>,
 	lpn_diag_tank_curve_refused: <?=json_encode($ec_lang['lpn_diag_tank_curve_refused'])?>,
 	lpn_diag_tank_levels_refused: <?=json_encode($ec_lang['lpn_diag_tank_levels_refused'])?>,
+	lpn_diag_pda_pressure_gap: <?=json_encode($ec_lang['lpn_diag_pda_pressure_gap'])?>,
 	lpn_diag_quality_refused: <?=json_encode($ec_lang['lpn_diag_quality_refused'])?>,
 	lpn_diag_energy_refused: <?=json_encode($ec_lang['lpn_diag_energy_refused'])?>,
 	lpn_diag_builtin_stopped: <?=json_encode($ec_lang['lpn_diag_builtin_stopped'])?>,

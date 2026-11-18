@@ -2295,7 +2295,7 @@
         "lpn_settings_option_unset": "Not stated",
         "lpn_settings_demand_multiplier_tip": "A single factor applied to every demand in the network at once. Each scenario can have a separate value, so average day, maximum day, or peak hour can be created by changing only this setting.",
         "lpn_settings_engine_native": "Use the built-in solver",
-        "lpn_settings_engine_native_tip": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_settings_engine_native_tip": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device.",
         "lpn_engine_loading": "Loading the EPANET solver…",
         "lpn_engine_failed": "The EPANET solver could not be loaded. Showing the built-in solver instead.",
         "lpn_engine_failed_why": "{reason} Showing the built-in solver instead.",
@@ -3283,6 +3283,7 @@
         "lpn_settings_velocity_limit": "Velocity warning limit",
         "lpn_settings_velocity_limit_tip": "The velocity above which a run reports the fastest pipe and how many other pipes also exceed it. Blank uses the default. Zero turns the warning off.",
         "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
+        "lpn_diag_pda_pressure_gap": "EPANET does not accept these pressure-driven demand limits: Required pressure must exceed Minimum pressure by at least {limit}.",
         "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.",
         "lpn_screenshot_menu": "Screenshot",
         "lpn_screenshot_tip": "Take a picture of the map area you drag, at a higher resolution than the screen. Annotate it, then copy it into a report with the Copy button. Click without dragging to take the whole map.",
@@ -3364,7 +3365,7 @@
         "lpn_field_auto_length_tip": "Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.",
         "lpn_prop_label_symbol": "{label}, {symbol}"
     },
-    "count": 3362,
+    "count": 3363,
     "active_prefixes": [
         "about",
         "bpn",
