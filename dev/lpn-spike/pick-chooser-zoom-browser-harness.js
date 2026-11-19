@@ -280,7 +280,21 @@ async function main() {
 		const fClear = async () => { await F.page.evaluate(() => { document.querySelectorAll('.lpn-pane-ctxmenu').forEach((m) => m.remove()); const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } }); await F.page.touchscreen.tap(380, 835); await F.settle(300); };
 		const mid = (sel) => F.page.evaluate((q) => { const e = document.querySelector(q); if (!e) { return null; } const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }, sel);
 		const pump = async (done) => {
-			const g = await mid('#lpn_canvas path.lpn-link-symbol-hit[data-link="335"]');
+			// A point on the pump's own ink, outside the disc of every node and every other glyph: the farthest such from the nodes.
+			const g = await F.page.evaluate(() => {
+				const gl = document.querySelector('#lpn_canvas path.lpn-link-symbol-hit[data-link="335"]'), P = gl.ownerSVGElement.createSVGPoint(), gm = gl.getScreenCTM().inverse(), b = gl.getBoundingClientRect();
+				const discs = Array.from(document.querySelectorAll('#lpn_canvas circle.lpn-node[data-node]')).map((e) => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width / 2 + 1 }; });
+				let best = null;
+				for (let x = b.left; x <= b.right; x += 0.25) { for (let y = b.top; y <= b.bottom; y += 0.25) {
+					P.x = x; P.y = y;
+					if (!gl.isPointInFill(P.matrixTransform(gm))) { continue; }
+					const d = Math.min.apply(null, discs.map((c) => Math.hypot(x - c.x, y - c.y) - c.r));
+					if (d > 0 && (!best || d > best.d)) { best = { x, y, d }; }
+				} }
+				return best;
+			});
+			ok(done + ' notches out: Pump 335 has ink clear of every node disc', !!g, JSON.stringify(g));
+			if (!g) { return; }
 			await F.page.touchscreen.tap(g.x, g.y); await F.settle(600);
 			const rr = await fRows(), ss = await fSel();
 			ok(done + ' notches out: a tap on Pump 335\'s ink selects the pump with no box', rr.length === 0 && ss === 'l335', JSON.stringify([rr, ss, g]));
@@ -300,7 +314,8 @@ async function main() {
 				} }
 				return best;
 			});
-			if (!o) { console.log('  (no pump ink under Junction 61 at ' + done + ' notches)'); return; }
+			ok(done + ' notches out: Pump 335\'s ink overlaps Junction 61\'s disc somewhere', !!o, JSON.stringify(o));
+			if (!o) { return; }
 			await F.page.touchscreen.tap(o.x, o.y); await F.settle(600);
 			const rr = await fRows();
 			ok(done + ' notches out: a tap where Pump 335\'s ink overlaps Junction 61 opens the box listing both', rr.includes('Pump 335') && rr.includes('Junction 61'), JSON.stringify([rr, o]));
@@ -368,7 +383,7 @@ async function main() {
 		await P.page.touchscreen.tap(at.x, at.y);
 		await P.settle(700);
 		const lrows = await P.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => b.textContent.trim()));
-		ok('a tap (touchscreen.tap) where the reservoir overlaps the pump opens a box with the two (and the junction a finger also covers)', lrows.length >= 2 && lrows.some((x) => /Lake/.test(x)) && lrows.some((x) => /Pump 10/.test(x)), JSON.stringify(lrows));
+		ok('a tap (touchscreen.tap) where the reservoir overlaps the pump opens the box of the two', lrows.length === 2 && lrows.some((x) => /Lake/.test(x)) && lrows.some((x) => /Pump 10/.test(x)), JSON.stringify(lrows));
 		await P.page.close();
 
 		ok('no page error', errors.length === 0, errors.join(' | '));

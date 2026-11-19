@@ -624,6 +624,34 @@ async function main() {
 		}
 
 
+		// =========================================================== round 7: a lone Text with a junction 10 px away
+		console.log('\nN. Round 7: a finger on a lone Text, a junction 10 px from the point, selects the Text');
+		{
+			const projT = JSON.parse(project); projT.view = { cx: 135, cy: -57, s: 3.5 };
+			projT.labels = projT.labels.concat([{ id: 'XT', text: 'Valve house', x: 110, y: -110, anchorNode: null, sizeMult: 2 }]);
+			const NT = await Session.open(browser, NAME + '-t', { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+			await open(NT, JSON.stringify(projT));
+						const tb = await NT.page.evaluate(() => { const e = document.querySelector('#lpn_canvas text[data-lbl="XT"]'); const b = e.getBoundingClientRect(); return { l: b.left, t: b.top, r: b.right, b: b.bottom }; });
+			ok('(the Text is drawn on the phone with its box on screen)', tb.r - tb.l > 20 && tb.l > 12 && tb.r < 380, J(tb));
+			const projT2 = JSON.parse(JSON.stringify(projT));
+			projT2.nodes.push({ id: 'XJ', type: 'junction', x: 110 - 73 / 3.5, y: -110, elev: 700, _demand: 0, tok: { x: (110 - 73 / 3.5).toFixed(2), y: '-110.00' }, _initQuality: 0 });
+			await NT.page.close();
+			const NT2 = await Session.open(browser, NAME + '-t2', { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+			await open(NT2, JSON.stringify(projT2));
+			const n2 = tools(NT2), c2 = await NT2.page.context().newCDPSession(NT2.page);
+			const g2 = await NT2.page.evaluate(() => { const b = document.querySelector('#lpn_canvas text[data-lbl="XT"]').getBoundingClientRect(), j = document.querySelector('#lpn_canvas circle.lpn-node[data-node="XJ"]').getBoundingClientRect(); return { l: b.left, t: b.top, r: b.right, b: b.bottom, jx: j.left + j.width / 2, jy: j.top + j.height / 2, jr: j.width / 2 }; });
+			const press2 = { x: g2.l + 2, y: (g2.t + g2.b) / 2 };
+			const dj = Math.hypot(press2.x - g2.jx, press2.y - g2.jy);
+			ok('(the junction is within the finger\'s reach of the press and its disc is clear of the Text\'s box)', dj < 24 && dj > g2.jr + 1 && g2.jx + g2.jr < g2.l, J([g2, press2, dj]));
+			await c2.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: press2.x, y: press2.y, id: 1 }] });
+			await sleep(60);
+			await c2.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+			await NT2.settle(600);
+			const lblSel = await NT2.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas .lpn-selected')).map((e) => e.dataset.node ? 'node:' + e.dataset.node : (e.dataset.lbl !== undefined ? 'text:' + e.dataset.lbl : (e.closest('[data-lbl]') ? 'text:' + e.closest('[data-lbl]').dataset.lbl : 'other:' + e.tagName))));
+			ok('a tap on the lone Text selects the Text, not the junction 10 px away, and opens no box', J(lblSel) === J(['text:XT']) && !(await n2.chooserOpen()), J([lblSel, await n2.rows()]));
+			await NT2.page.close();
+		}
+
 		// =========================================================== a narrow phone: the box never sits under the press
 		console.log('\nM. A 390 px phone, a tap at x = 180 near the top, the middle and the bottom: no row under the finger, the box on screen');
 		for (const [name, Y] of [['near the top', 72], ['in the middle', 420], ['near the bottom', 742]]) {

@@ -1030,6 +1030,7 @@ EngCalcs.lpnGeom = (function () {
 		return b;
 	}
 	function pickInInk(m, x, y) {
+		if (m.outline && m.outline.pts.length > 1 && !m.outline.closed) { return false; }   // an open polyline is a line, never ink
 		if (m.outline) { return pointToPolylineDistance(pickOutlinePts(m.outline), x, y) <= PICK_SHAPE_INK; }
 		return pickPartHas(pickPartsOf(m), x, y);
 	}
@@ -1065,7 +1066,7 @@ EngCalcs.lpnGeom = (function () {
 	// The items whose drawn ink holds the point itself (a Text or Shape included), for a caller that must know
 	// whether a press is on exactly one.
 	function pickInkHits(items, x, y) {
-		return items.filter(function (m) { return !m.soft && !(m.outline && m.outline.pts.length > 1 && !m.outline.closed) && pickInInk(m, x, y); });
+		return items.filter(function (m) { return !m.soft && pickInInk(m, x, y); });
 	}
 	function pickSymbols(items, x, y, opts) {
 		var o = opts || {}, cap = o.cap === undefined ? 6 : o.cap, coin = o.coincident === undefined ? 1 : o.coincident,
@@ -1077,7 +1078,7 @@ EngCalcs.lpnGeom = (function () {
 		function entry(m) { return { m: m, d: pickExtentDistance(m, x, y), coin: (pa && pickAnchor(m) && Math.hypot(pa.x - pickAnchor(m).x, pa.y - pickAnchor(m).y) <= coin) ? 1 : 0 }; }
 		// A line is never an item, whoever hands it in: an open polyline (a point and a closed outline are not lines).
 		items = items.filter(function (m) { return !(m.outline && m.outline.pts.length > 1 && !m.outline.closed); });
-		items.forEach(function (m) { if (!m.soft && pickInInk(m, x, y)) { inkSet.push(m); } });
+		inkSet = pickInkHits(items, x, y);
 		if (!inkSet.length) { return []; }
 		infos = pickInfos(items);
 		primary = inkSet.filter(function (m) { return o.first && m.kind === o.first.kind && m.id === o.first.id; })[0] || inkSet.map(entry).sort(order)[0].m;

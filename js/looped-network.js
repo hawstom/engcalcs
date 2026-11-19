@@ -10518,6 +10518,11 @@ var EngCalcs = EngCalcs || {};
 		var n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX);
 		return (n && nodeEls[n.id]) ? nodeEls[n.id].circle : null;
 	}
+	// **A SYMBOL THE POINT IS ON OUTRANKS A NODE NEARBY** (Tom, 2026-11-18, of Pump 335 beside Junctions 60
+	// and 61: *"I repeatedly select N60 or N61"*): when the finger's point is on the drawn ink of exactly one
+	// symbol (a pump or valve glyph, a Text, a Shape, a node), that symbol is the press, whatever node is within
+	// reach; on two or more the chooser asks (pickPressAt). Everything below is for a point on no ink.
+	//
 	// **WHAT A NEARBY NODE OUTRANKS.** (ROADMAP Task 562. Tom, 2026-09-01: *"nodes need to get
 	// precedence always, because they are hardest to aim at"*, and the defect underneath it:
 	// *"many times pipes would edit when I was trying to edit nodes."*)
@@ -10578,11 +10583,20 @@ var EngCalcs = EngCalcs || {};
 	// the desktop design. The ONE KNOB is still one knob -- reachPx(e) answers per press for both
 	// hands at every call site -- it is the PRECEDENCE that a finger gets and a pointer does not.
 	function touchNodeOver(cx, cy, hit) {
-		var n, hn, best = null, bestPx = Infinity, i, d, w, r, far, ink;
-		// A finger that lands ON one pump's or valve's drawn symbol, and on no other symbol, meant that symbol,
-		// whatever node is within reach (a pump beside a junction was otherwise unreachable). Two inks is the chooser's.
-		ink = Geom.pickInkHits(pickItemsNear(cx, cy, TOUCH_REACH_PX), cx, cy);
-		if (ink.length === 1 && ink[0].kind === 'link' && linkEls[ink[0].id] && linkEls[ink[0].id].symbolHit) { return linkEls[ink[0].id].symbolHit; }
+		var n, hn, best = null, bestPx = Infinity, i, d, w, r, far, ink, pick;
+		// What a node never outranks (a vertex handle, a meter, a grip, ...) is kept before anything is measured.
+		if (hit && !(hit.dataset && hit.dataset.node !== undefined) && !nodeOutranks(hit)) { return hit; }
+		// A node's or pipe's data label over a symbol is read as it always was (the node outranks it, else it stays).
+		ink = hit && hit.dataset && (hit.dataset.nodelbl !== undefined || hit.dataset.linklbl !== undefined) ? [] : Geom.pickInkHits(pickItemsNear(cx, cy, 0), cx, cy);
+		// A finger whose POINT is on exactly one symbol's drawn ink (a pump or valve glyph, a Text, a Shape, a node)
+		// meant that symbol, whatever node is within reach. Two inks are the chooser's. The point is all this needs.
+		if (ink.length === 1) {
+			pick = ink[0].kind === 'node' ? (nodeEls[ink[0].id] && nodeEls[ink[0].id].circle)
+				: ink[0].kind === 'link' ? (linkEls[ink[0].id] && linkEls[ink[0].id].symbolHit)
+				: ink[0].kind === 'label' ? (labelEls[ink[0].id] && labelEls[ink[0].id].text)
+				: (shapeEls[ink[0].id] && shapeEls[ink[0].id].g);
+			if (pick) { return pick; }
+		}
 		if (hit && hit.dataset && hit.dataset.node !== undefined) {
 			// A node's band was hit. Where the press is on that node's own ink it stays; where it is not
 			// but IS on another node's ink (a band drawn on top of a neighbour's centre), the finger
@@ -14456,7 +14470,8 @@ var EngCalcs = EngCalcs || {};
 		// this steals a node's press is answered by the shape rather than by the layer: the grab
 		// shape is now the symbol's OWN OUTLINE (SYMBOL_SILHOUETTE) rather than a square round it,
 		// so it claims only the ground the pump covers. A FINGER still gives the node precedence
-		// wherever it is near one -- that is touchNodeOver(), unchanged, and it reads data-link.
+		// wherever it is near one and its point is on no symbol's ink -- that is touchNodeOver(), which
+		// reads data-link and lets one symbol under the point win.
 		var symbolG = null, symbolSvg = null, symbolHit = null, symbolBox = null;
 		if (l.type === 'pump' || l.type === 'valve') {
 			// `|| nodesLayer` is for the spike harnesses that build their own layer stack by hand and
@@ -59113,7 +59128,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		//
 		// One layer between the two answers both: above every pipe, below every node, by
 		// construction rather than by anybody remembering. `touchNodeOver()` is the finger's
-		// separate rule and is unaffected -- it reads `nodeOutranks()` and is deliberately touch-only
+		// separate rule, reading the ink under the point and then `nodeOutranks()`, and is deliberately touch-only
 		// (a pointer can see what it is over and move three pixels; a finger covers the target).
 		linkSymbolLayer = el('g', { 'class': 'lpn-symbols' }, modelLayer);
 		nodesLayer = el('g', { 'class': 'lpn-symbols' }, modelLayer);
@@ -61204,8 +61219,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// helpful"*): the symbol nearest the press and those truly coincident with it first, then the
 	// nearest others that overlap it, by distance from the press. A mouse press is a point.
 	// **A FINGER'S POINT ON INK IS READ AS A MOUSE'S** (Tom, 2026-11-18, of Pump 335 beside Junctions 60 and
-	// 61 on a phone: *"I repeatedly select N60 or N61"*): one glyph under the point is selected (touchNodeOver)
-	// though a node is within reach, and two inks open the box. Off all ink the finger's reach is the old one. Geom.pickSymbols() is the rule, pure and in screen pixels; pickItemsNear() hands it
+	// 61 on a phone: *"I repeatedly select N60 or N61"*): one symbol under the point is selected (touchNodeOver)
+	// though a node is within reach, and two inks open the box. Off all ink the finger's reach is the old one.
+	// Geom.pickSymbols() is the rule, pure and in screen pixels; pickItemsNear() hands it
 	// the drawn extents, from the draw code's own size helpers. pickCandidatesAt() is the one door;
 	// an assembly group would map the list it returns (members to one row) and nothing else here
 	// would change. `dev/lpn-spike/pick-chooser-zoom-browser-harness.js` counts it on Net3.
