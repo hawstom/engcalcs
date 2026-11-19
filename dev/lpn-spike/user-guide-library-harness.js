@@ -121,7 +121,9 @@ async function main() {
 		});
 		const bold = await boldOf(P);
 		ok('the Controls paragraph marks "Add a control" and "Total run time" in bold, each a single span, in the language file\'s words',
-			JSON.stringify(bold.map((x) => x.text)) === JSON.stringify([await T('lpn_library_control_add'), await T('lpn_time_duration')]) && bold.every((x) => x.weight >= 600 && x.weight > x.plainWeight), JSON.stringify(bold));
+			// Every interface label in the entry is bold now (manual bold evened, Tom 2026-11-16), so the entry holds
+			// many spans; these two must each be one of them, and in bold against the text around them.
+			[await T('lpn_library_control_add'), await T('lpn_time_duration')].every((w) => bold.some((x) => x.text === w && x.weight >= 600 && x.weight > x.plainWeight)), JSON.stringify(bold.slice(0, 40)));
 		ok('...and the entry no longer quotes either label', !/"(Add a control|Total run time)"/.test(en.text), en.text.slice(0, 0));
 		await P.keyboard.press('Escape');
 		await settle(300);
