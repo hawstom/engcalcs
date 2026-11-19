@@ -188,6 +188,14 @@ async function runForm(browser, Session, form) {
 		const r = rowIn(rows, i[0]);
 		ok(form + ': the Well\'s box shows a typeable "' + i[0] + '" row in the tank\'s section', !!r && r.has && r.visible && !r.disabled, JSON.stringify(r));
 	});
+	const order = await P.evaluate(() => {
+		const secs = Array.from(document.querySelectorAll('#lpn_popup_fields section.lpn-asm-section')), top = (e) => e.getBoundingClientRect().top;
+		const tank = secs.filter((x) => /^Tank /.test(x.textContent.trim()))[0], others = secs.filter((x) => x !== tank);
+		const firstRow = tank && tank.querySelector('label');
+		return { tank: tank ? top(firstRow) : null, firstOther: others.length ? Math.min.apply(null, others.map(top)) : null, nth: tank ? secs.indexOf(tank) : -1 };
+	});
+	ok(form + ': the tank section\'s first row sits above the first result section of the Well\'s box (the section is the first of them)', order.tank !== null && order.firstOther !== null && order.tank < order.firstOther && order.nth === 0, JSON.stringify(order));
+	if (process.env.EC_PICS && form === 'Well with tank') { await P.setViewportSize({ width: 1366, height: 900 }); await a.settle(500); await P.screenshot({ path: process.env.EC_PICS }); }
 	const baseTank = (await stored(P)).nodes.find((n) => n.id === 'T1');
 	// 2. typing
 	for (const i of INPUTS) { await typeInSection(ctx, i[0], i[1]); }

@@ -42094,6 +42094,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		helpTip(btn, tankForm ? pc.lpn_assembly_explode_welltank_tip : pc.lpn_assembly_explode_well_tip);
 		btn.addEventListener('click', function () { saveUndoSnapshot(); explodeAssembly(a.id); });
 		fields.appendChild(btn);
+		// **THE TANK'S SECTION STANDS HERE, UNDER THE WELL'S OWN INPUTS AND ABOVE EVERY RESULT SECTION** (round 14; Tom called the tank's inputs "disabled" because they were the last block, a screen and a half down):
+		// they are typed on the Well, so they are found with the Well's own rows.
+		if (tankForm) { asmSection(fields, pc.lpn_tool_add_tank || 'Tank', a.tank, function (rows) { wellTankOwnedRows(rows, a); tankResultFields(rows, nodeById(a.tank)); }); }
 		// The well's one flow, once, above every heading (the pump's: the drawdown valve carries the same water).
 		if (res && !linkResultHeld(pump) && res.flows[pump.id] !== undefined) {
 			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(res.flows[pump.id]), undefined, resultDec('link', 'flow'));
@@ -42114,7 +42117,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			asmSection(fields, pc.lpn_tool_add_pipe || 'Pipe', a.branch[0], function (rows) { asmLinkRows(rows, linkById(a.branch[0])); });
 			asmSection(fields, pc.lpn_tool_add_junction || 'Junction', a.tee, function (rows) { asmJunctionRows(rows, a.tee); });
 			asmSection(fields, pc.lpn_tool_add_pipe || 'Pipe', a.branch[1], function (rows) { asmLinkRows(rows, linkById(a.branch[1])); });
-			asmSection(fields, pc.lpn_tool_add_tank || 'Tank', a.tank, function (rows) { wellTankOwnedRows(rows, a); tankResultFields(rows, nodeById(a.tank)); });
 		}
 		lpnPropsGrid(fields);
 		tipsIn(fields);
