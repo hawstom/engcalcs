@@ -751,5 +751,58 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 		shapeRows[2] === String(pc.lpn_file_import_shp), `Shapes holds the GeoJSON, DXF and Shapefile rows: ${JSON.stringify(shapeRows)}`);
 }());
 
+// ---- 13. COMMENT ROWS TRAVEL WITH THE ITEM BELOW THEM (Task 859) ----------------------------------
+head('13. importing Controls and Rules brings the comment rows above the copied items and leaves the ones above skipped items');
+(function () {
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 }, controls: [{ link: '9', raw: 'LINK 9 OPEN AT TIME 1', action: {}, condition: null, text: {} }], rules: ['RULE R1', 'IF SYSTEM CLOCKTIME >= 5 AM', 'THEN LINK 9 STATUS IS OPEN'] });
+	clearReport();
+	L.libImportRun({ v: 6, units: {},
+		controls: [
+			{ comment: true, lines: [';heading'] },
+			{ link: '9', raw: 'LINK 9 OPEN AT TIME 1', action: {}, condition: null, text: {} },
+			{ comment: true, lines: [';above a new one'], gap: 1 },
+			{ link: '9', raw: 'LINK 9 CLOSED AT TIME 2', action: {}, condition: null, text: {} },
+			{ comment: true, lines: [';closing note'], gap: 1 }
+		],
+		rules: [';first', 'RULE R1', 'IF SYSTEM CLOCKTIME >= 6 AM', 'THEN LINK 9 STATUS IS CLOSED', '', ';second', 'RULE R2', 'IF SYSTEM CLOCKTIME >= 7 AM', 'THEN LINK 9 STATUS IS OPEN']
+	}, 'from.lwn', ['controls', 'rules']);
+	const c = L.getDoc().controls;
+	check(JSON.stringify(c.map((x) => x.comment ? x.lines[0] : x.raw)) === JSON.stringify(['LINK 9 OPEN AT TIME 1', ';above a new one', 'LINK 9 CLOSED AT TIME 2']),
+		'Controls: the same control is skipped with the comment above it; the new one comes with its comment; a closing comment stays behind: ' + JSON.stringify(c.map((x) => x.comment ? x.lines[0] : x.raw)));
+	const r = L.getDoc().rules;
+	check(r.indexOf(';second') > 0 && r.indexOf('RULE R2') === r.indexOf(';second') + 1 && r.indexOf(';first') < 0,
+		'Rules: R2 comes with ";second"; R1 clashed, so ";first" is left behind with it: ' + JSON.stringify(r));
+	check(said('lpn_library_import_comments'), 'the receipt says comment rows were copied in: ' + JSON.stringify(reportLines()));
+}());
+
+head('14. a comment row imported after the last comment row of the open project is set off by a blank line, so the two stay two rows');
+(function () {
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 }, controls: [{ link: '9', raw: 'LINK 9 OPEN AT TIME 1', action: {}, condition: null, text: {} }, { comment: true, lines: [';ours'] }], rules: [] });
+	clearReport();
+	L.libImportRun({ v: 6, units: {}, controls: [
+		{ comment: true, lines: [';theirs'] },
+		{ link: '9', raw: 'LINK 9 CLOSED AT TIME 2', action: {}, condition: null, text: {} }
+	], rules: [] }, 'from.lwn', ['controls']);
+	const c = L.getDoc().controls;
+	check(c.length === 4 && c[1].comment && c[2].comment && c[2].gap === 1, 'Controls: ;ours then ;theirs, the second with one blank line: ' + JSON.stringify(c.map((x) => x.comment ? x.lines[0] + '/' + (x.gap | 0) : x.raw)));
+}());
+
+head('15. comment rows left behind by an import are said in the receipt, never dropped in silence');
+(function () {
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 }, controls: [{ link: '9', raw: 'LINK 9 OPEN AT TIME 1', action: {}, condition: null, text: {} }], rules: [] });
+	clearReport();
+	L.libImportRun({ v: 6, units: {}, controls: [
+		{ comment: true, lines: [';above the clash'] },
+		{ link: '9', raw: 'LINK 9 OPEN AT TIME 1', action: {}, condition: null, text: {} },
+		{ comment: true, lines: [';closing note'], gap: 1 }
+	], rules: [] }, 'from.lwn', ['controls']);
+	check(said('lpn_library_import_comments_left') && reportLines().some((t) => /: 2$/.test(t) && /left out/.test(t)), 'the receipt counts the comment above the clash and the closing note: ' + JSON.stringify(reportLines()));
+	// the same for Rules: a clash leaves its comment behind, and the receipt counts it
+	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 }, controls: [], rules: ['RULE R1', 'IF SYSTEM CLOCKTIME >= 5 AM', 'THEN LINK 9 STATUS IS OPEN'] });
+	clearReport();
+	L.libImportRun({ v: 6, units: {}, controls: [], rules: [';above the clash', 'RULE R1', 'IF SYSTEM CLOCKTIME >= 6 AM', 'THEN LINK 9 STATUS IS CLOSED'] }, 'from.lwn', ['rules']);
+	check(reportLines().some((t) => /left out/.test(t) && /: 1$/.test(t)), 'Rules: the comment above the clashing rule is counted in the receipt: ' + JSON.stringify(reportLines()));
+}());
+
 console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All library-import checks passed.'));
 process.exit(failures ? 1 : 0);

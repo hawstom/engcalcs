@@ -357,7 +357,7 @@ console.log('\n--- the native solver ---');
 	const res = EngCalcs.lpnSolve(model);
 	ok('a network with a throttle valve solves natively', res.ok && res.converged, JSON.stringify(res.issues));
 	const q = Math.abs(res.flows.V1), d = 0.25, a = Math.PI * d * d / 4;
-	const expect = 8 * Math.pow(q / a, 2) / (2 * EngCalcs.lpnG);
+	const expect = 8 * Math.pow(q / a, 2) / (2 * EngCalcs.EPANET_G_MINOR);
 	ok('...and its head loss is k V^2 / 2g from the SETTING',
 		near(Math.abs(res.headlosses.V1), expect, 1e-9), Math.abs(res.headlosses.V1) + ' vs ' + expect);
 	// The trap the other direction: a valve must contribute NO friction. Its zero length is what

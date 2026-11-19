@@ -158,8 +158,7 @@ async function until(pred, ms) {
 	L.openLinkPopup(pump.id, 100, 100);
 	choose('headloss');
 	check(/(^|\| )Head \(/.test(chartText()) && chartText().indexOf('Head gain') < 0, 'the axis reads Head');
-	const titles = byCls('lpn-ts-dot').map((c) => (c.children || []).map((x) =>
-		(x.children || []).map((y) => String(y.textContent)).join('')).join('')).filter(Boolean).map(lastNum);
+	const titles = byCls('lpn-ts-dot').map((c) => String(c.getAttribute('data-reading') || '')).filter(Boolean).map(lastNum);
 	check(titles.length > 0 && titles.every((v) => v >= 0) && titles.some((v) => v > 0), `every plotted value is positive (max ${Math.max.apply(null, titles)})`);
 	L.closePopup();
 

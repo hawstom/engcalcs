@@ -36,7 +36,7 @@ function ecGuideChapters() {
         'notes' => array('page' => false, 'title' => 'lpn_help_notes', 'intro' => array(), 'terms' => array('lpn_notes_3', 'lpn_notes_5', 'lpn_notes_color', 'lpn_notes_engine', 'lpn_guide_nt_example')),
         'find' => array('title' => 'lpn_find_title', 'intro' => array('lpn_guide_text_find_popup'), 'terms' => array('lpn_guide_find_query', 'lpn_guide_find_examples', 'lpn_guide_find_results', 'lpn_guide_find_replace', 'lpn_guide_find_notes')),
         'scenarios' => array('title' => 'lpn_sm_title', 'intro' => array('lpn_sm_help'), 'terms' => array('lpn_guide_scn_use', 'lpn_guide_scn_open', 'lpn_guide_scn_marks', 'lpn_guide_scn_make', 'lpn_guide_scn_move', 'lpn_guide_scn_scope', 'lpn_guide_scn_example', 'lpn_guide_scn_notes')),
-        'libraries' => array('title' => 'lpn_library_menu', 'intro' => array('lpn_guide_text_library_box'), 'terms' => array('lpn_guide_lib_kinds', 'lpn_guide_lib_curves', 'lpn_guide_lib_pipetypes', 'lpn_guide_lib_fittings', 'lpn_guide_lib_refs', 'lpn_guide_lib_scn', 'lpn_guide_lib_ctl', 'lpn_guide_lib_import', 'lpn_guide_lib_example', 'lpn_guide_lib_notes')),
+        'libraries' => array('title' => 'lpn_library_menu', 'intro' => array('lpn_guide_text_library_box'), 'terms' => array('lpn_guide_lib_kinds', 'lpn_guide_lib_patterns', 'lpn_guide_lib_curves', 'lpn_guide_lib_pipetypes', 'lpn_guide_lib_fittings', 'lpn_guide_lib_refs', 'lpn_guide_lib_scn', 'lpn_guide_lib_ctl', 'lpn_guide_lib_import', 'lpn_guide_lib_example', 'lpn_guide_lib_notes')),
         'properties' => array('title' => 'lpn_popup_boxtitle', 'intro' => array('lpn_guide_text_popup'), 'terms' => array('lpn_guide_prop_open', 'lpn_guide_prop_edit', 'lpn_guide_prop_id', 'lpn_guide_prop_scn', 'lpn_guide_prop_multi', 'lpn_guide_prop_example')),
         'settings' => array('title' => 'lpn_tool_settings', 'intro' => array('lpn_guide_text_settings_box'), 'terms' => array('lpn_guide_set_where', 'lpn_guide_set_search', 'lpn_guide_set_scn', 'lpn_guide_set_units', 'lpn_guide_set_assets', 'lpn_guide_set_reset')),
         'fire-flow' => array('title' => 'lpn_ff_title', 'intro' => array('lpn_ff_intro'), 'terms' => array('lpn_guide_ff_asks', 'lpn_guide_ff_result', 'lpn_guide_ff_marks', 'lpn_guide_ff_dur', 'lpn_guide_ff_example')),
@@ -151,6 +151,7 @@ function ecGuideTermKey($stem) {
         'lpn_guide_cmp_notes' => 'lpn_guide_scn_notes_term',
         'lpn_guide_find_notes' => 'lpn_guide_scn_notes_term',
         'lpn_guide_lib_notes' => 'lpn_guide_scn_notes_term',
+        'lpn_guide_lib_patterns' => 'lpn_library_patterns',
         'lpn_guide_lib_curves' => 'lpn_library_curves',
         'lpn_guide_lib_pipetypes' => 'lpn_library_pipetypes',
         'lpn_guide_lib_fittings' => 'lpn_library_fittings',
@@ -178,10 +179,24 @@ function ecGuideTermKey($stem) {
  * @return array        the language keys, or an empty array.
  */
 function ecGuideDefKeys($stem) {
-    $alias = array('lpn_guide_lib_curves' => array('lpn_library_curves_note', 'lpn_library_curve_values_tip'),
-        'lpn_guide_lib_pipetypes' => array('lpn_library_pipetypes_note', 'lpn_library_pipetype_blank_tip'),
-        'lpn_guide_lib_fittings' => array('lpn_library_fittings_note', 'lpn_library_fittings_source'));
+    // Each ends with the sentence the section's Move tip says about the order, in the same words (lpn_library_move_tip_none).
+    $alias = array('lpn_guide_lib_patterns' => array('lpn_library_patterns_tip', 'lpn_library_move_tip_none'),
+        'lpn_guide_lib_curves' => array('lpn_library_curves_note', 'lpn_library_curve_values_tip', 'lpn_library_move_tip_none'),
+        'lpn_guide_lib_pipetypes' => array('lpn_library_pipetypes_note', 'lpn_library_pipetype_blank_tip', 'lpn_library_move_tip_none'),
+        'lpn_guide_lib_fittings' => array('lpn_library_fittings_note', 'lpn_library_fittings_source', 'lpn_library_move_tip_none'));
     return isset($alias[$stem]) ? $alias[$stem] : array();
+}
+
+/**
+ * Whether a term is the landing place of a `?` in the application, so its heading carries an id
+ * (`guide-term-<stem>`): the terms that borrow an interface section's words, and the one entry that
+ * the Libraries box's Controls and Rules `?` both open.
+ *
+ * @param string $stem  a chapter term's stem.
+ * @return bool
+ */
+function ecGuideTermAnchored($stem) {
+    return $stem === 'lpn_guide_lib_ctl' || count(ecGuideDefKeys($stem)) > 0;
 }
 
 /**
@@ -193,6 +208,12 @@ function ecGuideDefKeys($stem) {
 function ecGuideDefHtml($stem) {
     global $ec_lang;
     $keys = ecGuideDefKeys($stem);
+    // Controls and rules in a run: its own paragraphs, then how the order of the list decides a conflict, in the very words of the
+    // Move tips in the Libraries box (the Controls and Rules `?` lands here), and that no other list's order matters.
+    if ($stem === 'lpn_guide_lib_ctl') {
+        return $ec_lang[$stem . '_def'] . '<p>' . htmlspecialchars($ec_lang['lpn_library_move_tip_controls'] . ' '
+            . $ec_lang['lpn_library_move_tip_rules'] . ' ' . $ec_lang['lpn_guide_lib_order_none']) . '</p>';
+    }
     if (!$keys) { return $ec_lang[$stem . '_def']; }
     $html = '';
     foreach ($keys as $k) { $html .= '<p>' . htmlspecialchars($ec_lang[$k]) . '</p>'; }
@@ -215,7 +236,7 @@ function ecGuideDl($slug) {
         // A term that only repeats its chapter's heading is marked, and the stylesheet hides it.
         $dup = ($stem === 'lpn_hotkeys_map' || $stem === 'lpn_hotkeys_snip') ? ' class="lpn-guide-dup"' : '';
         $termKey = ecGuideTermKey($stem);
-        $html .= "\t<dt" . (ecGuideDefKeys($stem) ? ' id="guide-term-' . $stem . '"' : '') . $dup . '>' . $ec_lang[$termKey] . '</dt><dd>' . $def . "</dd>\n";
+        $html .= "\t<dt" . (ecGuideTermAnchored($stem) ? ' id="guide-term-' . $stem . '"' : '') . $dup . '>' . $ec_lang[$termKey] . '</dt><dd>' . $def . "</dd>\n";
     }
     return $html . "</dl>";
 }

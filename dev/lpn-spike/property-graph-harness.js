@@ -164,8 +164,7 @@ async function until(pred, ms) {
 	{
 		const frames = EngCalcs.lpnTimeRunFrames();
 		const ftPerM = 3.28084;
-		const titles = () => byCls('lpn-ts-dot').map((c) => (c.children || []).map((t) =>
-			(t.children || []).map((x) => String(x.textContent)).join('')).join('')).filter(Boolean);
+		const titles = () => byCls('lpn-ts-dot').map((c) => String(c.getAttribute('data-reading') || '')).filter(Boolean);
 		const lastNum = (t) => parseFloat(t.trim().split(/\s+/).pop());
 		L.openLinkPopup(pump, 100, 100);
 		check(options().indexOf('headloss') >= 0 &&

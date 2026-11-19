@@ -1,0 +1,3472 @@
+{
+    "_note": "For each manual definition: the interface labels (language KEYS) it quotes, how many times each is bold, and how many times it stands plain on purpose, by reason: noun (an ordinary word, not the on-screen name), xref (a cross-reference to the manual's own heading), syntax (query text, a keyword or a quoted line the reader types or reads), data (an example's own name or id), key (a keyboard key). Read by guide-bold-labels-harness.js.",
+    "extraLabelKeys": [
+        "bpn_demand_mult",
+        "bpn_p_min"
+    ],
+    "xrefPhrases": [
+        "Replace and Undo",
+        "Example on Net1",
+        "Example on Net3",
+        "Several assets selected",
+        "Using the user manual",
+        "Notes on this page",
+        "About this calculator",
+        "How scenarios and alternatives work",
+        "How to manage scenarios"
+    ],
+    "entries": {
+        "lpn_guide_bx_dock_def": [
+            {
+                "key": "lpn_dock_left",
+                "bold": 1
+            },
+            {
+                "key": "lpn_dock_right",
+                "bold": 1
+            },
+            {
+                "key": "lpn_dock_float",
+                "bold": 1
+            },
+            {
+                "key": "lpn_dock_autohide",
+                "bold": 2
+            }
+        ],
+        "lpn_guide_bx_keep_def": [
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_menu",
+                "stripEllipsis": true,
+                "bold": 1
+            },
+            {
+                "key": "lpn_ds_menu",
+                "stripEllipsis": true,
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_calib",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_bx_phone_def": [
+            {
+                "key": "lpn_quality_none",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            }
+        ],
+        "lpn_guide_cal_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_junction",
+                "bold": 0,
+                "plain": {
+                    "noun": 6
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_calib",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_pressure",
+                "bold": 1
+            },
+            {
+                "key": "lpn_calib_tab_stats",
+                "bold": 1
+            },
+            {
+                "key": "lpn_calib_col_rms_err",
+                "bold": 2
+            },
+            {
+                "key": "lpn_calib_network",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_cal_file_def": [
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_ts_menu",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_cal_what_def": [
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_calib",
+                "bold": 1
+            },
+            {
+                "key": "lpn_calib_param",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_demand",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_head",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_pressure",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_flow",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_velocity",
+                "bold": 1
+            },
+            {
+                "key": "lpn_calib_load",
+                "bold": 1
+            },
+            {
+                "key": "lpn_calib_tab_stats",
+                "bold": 1
+            },
+            {
+                "key": "lpn_calib_col_rms_err",
+                "bold": 1
+            },
+            {
+                "key": "lpn_calib_network",
+                "bold": 1
+            },
+            {
+                "key": "lpn_calib_tab_corr",
+                "bold": 1
+            },
+            {
+                "key": "lpn_calib_tab_means",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_cmp_byasset_def": [
+            {
+                "key": "lpn_time_stat_maximum",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scnres_title",
+                "bold": 1
+            },
+            {
+                "key": "lpn_survey_codes_col_type",
+                "bold": 1
+            },
+            {
+                "key": "lpn_full_download_csv",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_cmp_cols_def": [
+            {
+                "key": "lpn_scenario_label",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_pane_tab_reservoirs",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 2
+                }
+            },
+            {
+                "key": "lpn_ds_col_link",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_pane_tab_pumps",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scenario_overrides",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scenario_menu",
+                "bold": 1
+            },
+            {
+                "key": "bpn_demand_mult",
+                "bold": 1
+            },
+            {
+                "key": "lpn_time_duration",
+                "bold": 1
+            },
+            {
+                "key": "lpn_time_hyd_step",
+                "bold": 1
+            },
+            {
+                "key": "bpn_p_min",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_add_junction",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_pressure",
+                "bold": 1
+            },
+            {
+                "key": "lpn_full_col_time",
+                "bold": 2
+            },
+            {
+                "key": "lpn_scncmp_col_maxvelocity",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_velocity",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_cmp_notes_def": [
+            {
+                "key": "lpn_scncmp_same",
+                "bold": 1
+            },
+            {
+                "key": "lpn_sm_title",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_cmp_run_def": [
+            {
+                "key": "lpn_time_duration",
+                "bold": 2
+            }
+        ],
+        "lpn_guide_cr_case_def": [
+            {
+                "key": "lpn_crit_col_unserved",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_col_below",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_minpressure",
+                "bold": 2
+            },
+            {
+                "key": "lpn_ff_minpressure",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_menu",
+                "stripEllipsis": true,
+                "bold": 1
+            }
+        ],
+        "lpn_guide_cr_dead_def": [
+            {
+                "key": "lpn_find_scope_all",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_ts_group_links",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_crit_skipdead",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_col_unserved",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_col_cutoff",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_col_below",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_scope_selected",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_cr_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_analyze_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_minpressure",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_calculate",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ct_box_def": [
+            {
+                "key": "lpn_settings_elev_source_dem",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_settings_sym_node_colors",
+                "bold": 3
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 2
+            },
+            {
+                "key": "lpn_settings_sec_symbology",
+                "bold": 1
+            },
+            {
+                "key": "lpn_color_node_field",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_color_ramp",
+                "bold": 1
+            },
+            {
+                "key": "lpn_color_none",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_show",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_fill",
+                "bold": 2
+            },
+            {
+                "key": "lpn_contour_lines",
+                "bold": 2
+            },
+            {
+                "key": "lpn_tool_labels",
+                "bold": 2
+            },
+            {
+                "key": "lpn_sm_unused_none",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_fill_smooth",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_fill_bands",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_opacity",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_buffer",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_interval",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ct_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_ds_col_link",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_sec_symbology",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_sym_node_colors",
+                "bold": 1
+            },
+            {
+                "key": "lpn_color_node_field",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_pressure",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_graphs_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_show",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_fill",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ct_what_def": [
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_graphs_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_show",
+                "bold": 1
+            },
+            {
+                "key": "lpn_contour_fill",
+                "bold": 1
+            },
+            {
+                "key": "lpn_color_node_field",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_sec_symbology",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_sym_node_colors",
+                "bold": 1
+            },
+            {
+                "key": "lpn_color_none",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ds_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_ds_col_link",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_junction",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_analyze_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ds_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_find_btn",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ds_multiplier",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_calculate",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ds_find_def": [
+            {
+                "key": "lpn_find_btn",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_minpressure",
+                "bold": 2
+            },
+            {
+                "key": "lpn_ff_stop",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_minpressure",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_menu",
+                "stripEllipsis": true,
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ds_run_def": [
+            {
+                "key": "lpn_ff_calculate",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ds_multiplier",
+                "bold": 2
+            },
+            {
+                "key": "lpn_ds_head_lowest",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ds_head_velocity",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ds_col_scaled",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ds_col_unscaled",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ds_scope_def": [
+            {
+                "key": "lpn_field_to",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_ff_selected",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_en_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_settings_table_no",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_pump",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_price",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_energy",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_total_cost",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_en_read_def": [
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_time_duration",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_col_running",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_col_avg_kw",
+                "bold": 2
+            },
+            {
+                "key": "lpn_energy_col_peak_kw",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_col_cost",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_total_kwh",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_total_energy_cost",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_peak_kw",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_total_demand_charge",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_total_cost",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_en_set_def": [
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_energy",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_efficiency",
+                "bold": 2
+            },
+            {
+                "key": "lpn_energy_price",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_price_pattern",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_demand_charge",
+                "bold": 1
+            },
+            {
+                "key": "lpn_energy_currency",
+                "bold": 1
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_energy",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ff_asks_def": [
+            {
+                "key": "lpn_ff_minpressure",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_maxvelocity",
+                "bold": 1
+            },
+            {
+                "key": "lpn_sm_unused_none",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_required",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ff_dur_def": [
+            {
+                "key": "lpn_dur_option",
+                "bold": 1
+            },
+            {
+                "key": "lpn_when",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_required",
+                "bold": 1
+            },
+            {
+                "key": "lpn_dur_start",
+                "bold": 1
+            },
+            {
+                "key": "lpn_dur_length",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_residual",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ff_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_junction",
+                "bold": 0,
+                "plain": {
+                    "noun": 3
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_analyze_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_calculate",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ff_marks_def": [
+            {
+                "key": "lpn_ff_selected",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_stop",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_ff_result_def": [
+            {
+                "key": "lpn_ff_col_static",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_col_required",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_col_atrequired",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_col_available",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_col_residual",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_col_affected",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_col_limit",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_col_solves",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_col_modes",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_find_examples_def": [
+            {
+                "key": "lpn_result_pressure",
+                "bold": 0,
+                "plain": {
+                    "noun": 1,
+                    "syntax": 4
+                }
+            },
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 3
+                }
+            },
+            {
+                "key": "lpn_find_scope_all",
+                "bold": 0,
+                "plain": {
+                    "noun": 1,
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_pipe",
+                "bold": 0,
+                "plain": {
+                    "noun": 5,
+                    "syntax": 4
+                }
+            },
+            {
+                "key": "lpn_tool_add_junction",
+                "bold": 0,
+                "plain": {
+                    "noun": 2,
+                    "syntax": 6
+                }
+            },
+            {
+                "key": "lpn_pane_tab_junctions",
+                "bold": 0,
+                "plain": {
+                    "noun": 4
+                }
+            },
+            {
+                "key": "lpn_result_velocity",
+                "bold": 0,
+                "plain": {
+                    "syntax": 3
+                }
+            },
+            {
+                "key": "lpn_pane_tab_pipes",
+                "bold": 0,
+                "plain": {
+                    "noun": 2
+                }
+            },
+            {
+                "key": "lpn_find_q_or",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_field_elev",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_find_q_and",
+                "bold": 0,
+                "plain": {
+                    "syntax": 2
+                }
+            },
+            {
+                "key": "lpn_pane_shape_closed",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_find_prop_connection",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_quality_none",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            }
+        ],
+        "lpn_guide_find_notes_def": [
+            {
+                "key": "lpn_result_pressure",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 3
+                }
+            },
+            {
+                "key": "lpn_tool_add_junction",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_pane_tab_junctions",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_settings_defaults",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_settings_auto_run",
+                "bold": 1
+            },
+            {
+                "key": "lpn_time_run",
+                "bold": 1
+            },
+            {
+                "key": "lpn_find_scope_all",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_desc",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_tag",
+                "bold": 1
+            },
+            {
+                "key": "lpn_find_prop_connection",
+                "bold": 2
+            },
+            {
+                "key": "lpn_find_scope",
+                "bold": 1
+            },
+            {
+                "key": "lpn_crs_search",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_find_query_def": [
+            {
+                "key": "lpn_find_property",
+                "bold": 1,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_find_scope_source",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_meter",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_valve",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_pump",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_pipe",
+                "bold": 0,
+                "plain": {
+                    "syntax": 2
+                }
+            },
+            {
+                "key": "lpn_tool_add_tank",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_reservoir",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_junction",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_find_scope_all",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_result_velocity",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_find_prop_connection",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_find_q_or",
+                "bold": 0,
+                "plain": {
+                    "syntax": 2
+                }
+            },
+            {
+                "key": "lpn_find_q_and",
+                "bold": 0,
+                "plain": {
+                    "syntax": 2
+                }
+            },
+            {
+                "key": "lpn_find_value",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_defaults",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_find_replace_def": [
+            {
+                "key": "lpn_field_diameter",
+                "bold": 1,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_pipe",
+                "bold": 0,
+                "plain": {
+                    "noun": 1,
+                    "syntax": 2
+                }
+            },
+            {
+                "key": "lpn_pane_tab_pipes",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_find_scope_all",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_settings_elev_source_dem",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_replace_title",
+                "bold": 1
+            },
+            {
+                "key": "lpn_replace_prop",
+                "bold": 1
+            },
+            {
+                "key": "lpn_replace_value",
+                "bold": 2
+            },
+            {
+                "key": "lpn_replace_btn",
+                "bold": 4
+            },
+            {
+                "key": "lpn_replace_apply",
+                "bold": 3
+            },
+            {
+                "key": "lpn_cancel",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 3
+            },
+            {
+                "key": "lpn_field_closed",
+                "bold": 2
+            },
+            {
+                "key": "lpn_find_scope",
+                "bold": 1
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_elev",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_find_results_def": [
+            {
+                "key": "lpn_tool_select",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 2
+                }
+            },
+            {
+                "key": "lpn_find_q_or",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_find_q_and",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_field_to",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_find_btn",
+                "bold": 2
+            },
+            {
+                "key": "lpn_find_filter_btn",
+                "bold": 2
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_select_on_map",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_fr_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_junction",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_full",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_fr_what_def": [
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_full",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_full_col_type",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_demand",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_head",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_pressure",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_flow",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_velocity",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_headloss",
+                "bold": 1
+            },
+            {
+                "key": "lpn_report_pump_head",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_status",
+                "bold": 1
+            },
+            {
+                "key": "lpn_full_step_label",
+                "bold": 1
+            },
+            {
+                "key": "lpn_full_download_csv",
+                "bold": 1
+            },
+            {
+                "key": "lpn_report_copy_html",
+                "bold": 1
+            },
+            {
+                "key": "lpn_full_print",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_keys_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 3
+                }
+            },
+            {
+                "key": "lpn_tool_select",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            }
+        ],
+        "lpn_guide_lib_ctl_def": [
+            {
+                "key": "lpn_library_controls",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_file_import_inp",
+                "stripEllipsis": true,
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_library_control_add",
+                "bold": 1
+            },
+            {
+                "key": "lpn_time_duration",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_lib_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_alt_cat_demand",
+                "bold": 0,
+                "plain": {
+                    "data": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_pump",
+                "bold": 0,
+                "plain": {
+                    "noun": 3
+                }
+            },
+            {
+                "key": "lpn_ds_col_link",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_tank",
+                "bold": 0,
+                "plain": {
+                    "noun": 3
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 4
+            },
+            {
+                "key": "lpn_library_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_patterns",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_curves",
+                "bold": 1
+            },
+            {
+                "key": "lpn_report_pump_head",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_controls",
+                "bold": 2
+            },
+            {
+                "key": "lpn_library_rules",
+                "bold": 1
+            },
+            {
+                "key": "lpn_time_run",
+                "bold": 2
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_status",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_lib_import_def": [
+            {
+                "key": "lpn_tool_file",
+                "bold": 1
+            },
+            {
+                "key": "lpn_file_import_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_import",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_pipetypes",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_lib_kinds_def": [
+            {
+                "key": "lpn_file_import_inp",
+                "stripEllipsis": true,
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_find_q_or",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_find_q_and",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_library_patterns",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_pattern_values",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_sec_calculation",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_hydraulics",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_curves",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_curve_type",
+                "bold": 1
+            },
+            {
+                "key": "lpn_report_pump_head",
+                "bold": 1
+            },
+            {
+                "key": "lpn_curve_kind_effic",
+                "bold": 1
+            },
+            {
+                "key": "lpn_curve_kind_volume",
+                "bold": 1
+            },
+            {
+                "key": "lpn_curve_kind_headloss",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_curve_equation",
+                "bold": 1
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 2
+            },
+            {
+                "key": "lpn_edit_curves",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_pipetypes",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pipetype_detach",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_fittings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_fitting_other",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_controls",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_rules",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_lib_notes_def": [
+            {
+                "key": "lpn_file_import_inp",
+                "stripEllipsis": true,
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_library_menu",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_lib_refs_def": [
+            {
+                "key": "lpn_tool_add_meter",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 3
+                }
+            }
+        ],
+        "lpn_guide_lib_scn_def": [
+            {
+                "key": "lpn_library_menu",
+                "bold": 2
+            }
+        ],
+        "lpn_guide_map_del_def": [
+            {
+                "key": "lpn_tool_delete",
+                "bold": 0,
+                "plain": {
+                    "key": 3
+                }
+            },
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 2
+                }
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 1
+            },
+            {
+                "key": "lpn_sm_title",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_map_esc_def": [
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_select",
+                "bold": 3
+            }
+        ],
+        "lpn_guide_map_letters_def": [
+            {
+                "key": "lpn_tool_add_shape",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_zoom_window",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_map_undo_def": [
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_mn_kbd_def": [
+            {
+                "key": "lpn_tool_file",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_edit",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_map",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_help",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_vertices",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_insert",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_zoom_window",
+                "bold": 1
+            },
+            {
+                "key": "lpn_screenshot_menu",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_mn_list_def": [
+            {
+                "key": "lpn_tool_file",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_edit",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_map",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_help",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_nt_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_pump",
+                "bold": 0,
+                "plain": {
+                    "noun": 2
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_menu",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_own_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_crit_menu",
+                "bold": 2
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_analyze_menu",
+                "bold": 2
+            },
+            {
+                "key": "lpn_find_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ff_menu",
+                "stripEllipsis": true,
+                "bold": 1
+            },
+            {
+                "key": "lpn_crit_menu",
+                "stripEllipsis": true,
+                "bold": 1
+            }
+        ],
+        "lpn_guide_prop_edit_def": [
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_auto_run",
+                "bold": 1
+            },
+            {
+                "key": "lpn_time_run",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pipetype_detach",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_prop_example_def": [
+            {
+                "key": "lpn_tool_add_pipe",
+                "bold": 0,
+                "plain": {
+                    "noun": 5
+                }
+            },
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_pane_tab_pipes",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_multi_varies",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_flow",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_velocity",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_headloss",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_diameter",
+                "bold": 3
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_prop_id_def": [
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 4
+                }
+            },
+            {
+                "key": "lpn_backdrop_target_node",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            }
+        ],
+        "lpn_guide_prop_multi_def": [
+            {
+                "key": "lpn_pane_tab_pipes",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_multi_varies",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_diameter",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_prop_open_def": [
+            {
+                "key": "lpn_tool_add_meter",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_shape",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_select",
+                "bold": 1
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 2
+            },
+            {
+                "key": "lpn_copy_props_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_paste_props_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tsb_menu",
+                "bold": 2
+            }
+        ],
+        "lpn_guide_prop_scn_def": [
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_meter",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_sm_title",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_desc",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_tag",
+                "bold": 1
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_rr_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_epanet",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_rr_what_def": [
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_epanet",
+                "bold": 1
+            },
+            {
+                "key": "lpn_time_run_report",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_scn_example_def": [
+            {
+                "key": "lpn_time_stat_maximum",
+                "bold": 0,
+                "plain": {
+                    "noun": 3
+                }
+            },
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_pipe",
+                "bold": 0,
+                "plain": {
+                    "noun": 2
+                }
+            },
+            {
+                "key": "lpn_tool_select",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 5
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 2
+            },
+            {
+                "key": "lpn_scenario_menu",
+                "bold": 2
+            },
+            {
+                "key": "lpn_scenario_new",
+                "bold": 2
+            },
+            {
+                "key": "lpn_dialog_ok",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_diameter",
+                "bold": 1
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "bpn_demand_mult",
+                "bold": 2
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_sec_calculation",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_hydraulics",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scncmp_title",
+                "bold": 1
+            },
+            {
+                "key": "bpn_p_min",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scncmp_col_maxvelocity",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scenario_label",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scenario_overrides",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_add_junction",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_pressure",
+                "bold": 0,
+                "boldUnit": 1
+            },
+            {
+                "key": "lpn_full_col_time",
+                "bold": 2
+            },
+            {
+                "key": "lpn_ds_col_link",
+                "bold": 1
+            },
+            {
+                "key": "lpn_result_velocity",
+                "bold": 0,
+                "boldUnit": 1
+            }
+        ],
+        "lpn_guide_scn_make_def": [
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 6
+                }
+            },
+            {
+                "key": "lpn_pane_tab_customers",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_shape",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_tool_select",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 2
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 2
+            },
+            {
+                "key": "lpn_replace_btn",
+                "bold": 1
+            },
+            {
+                "key": "lpn_find_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_morph_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_paste_props_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_delete",
+                "bold": 3
+            },
+            {
+                "key": "lpn_sm_list_overrides",
+                "stripEllipsis": true,
+                "bold": 1
+            },
+            {
+                "key": "lpn_scenario_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_ovl_clear_selected",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_clear_override",
+                "bold": 2
+            },
+            {
+                "key": "lpn_ovl_clear_all",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_scn_marks_def": [
+            {
+                "key": "lpn_alt_cat_physical",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_to",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 3
+            },
+            {
+                "key": "lpn_settings_sec_symbology",
+                "bold": 1
+            },
+            {
+                "key": "lpn_labels_heading_node",
+                "bold": 1
+            },
+            {
+                "key": "lpn_labels_heading_link",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 2
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 2
+            },
+            {
+                "key": "lpn_pane_scn_show",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_override_marks",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_page",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_map",
+                "bold": 1
+            },
+            {
+                "key": "lpn_clean_map",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_scn_move_def": [
+            {
+                "key": "lpn_field_to",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_pane_scn_show",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_row_label_on",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_clear_override",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_scn_notes_def": [
+            {
+                "key": "lpn_file_import_inp",
+                "stripEllipsis": true,
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_sm_list_overrides",
+                "stripEllipsis": true,
+                "bold": 1
+            },
+            {
+                "key": "lpn_scenario_basic",
+                "bold": 1
+            },
+            {
+                "key": "lpn_sm_title",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_scn_open_def": [
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scenario_label",
+                "bold": 1,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scenario_overrides",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scenario_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_sm_title",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scenario_basic",
+                "bold": 1
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scncmp_title",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_scn_scope_def": [
+            {
+                "key": "lpn_tool_add_shape",
+                "bold": 0,
+                "plain": {
+                    "noun": 2
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            },
+            {
+                "key": "lpn_pane_tab_customers",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_morph_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_physical",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_demand",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_topology",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_initial",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_constituent",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_fireflow",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_energy",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_custom_props",
+                "bold": 1
+            },
+            {
+                "key": "lpn_alt_cat_presentation",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_sec_calculation",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scncmp_same",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_desc",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_tag",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_menu",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_scn_use_def": [
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 3
+                }
+            },
+            {
+                "key": "lpn_scenario_menu",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_file_import_inp",
+                "stripEllipsis": true,
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_time_stat_maximum",
+                "bold": 0,
+                "plain": {
+                    "noun": 4
+                }
+            },
+            {
+                "key": "lpn_result_flow",
+                "bold": 0,
+                "plain": {
+                    "data": 3
+                }
+            },
+            {
+                "key": "lpn_inpup_btn_new",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_alt_cat_fireflow",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_ff_menu",
+                "stripEllipsis": true,
+                "bold": 1
+            }
+        ],
+        "lpn_guide_set_assets_def": [
+            {
+                "key": "lpn_field_id",
+                "bold": 0,
+                "plain": {
+                    "syntax": 2
+                }
+            },
+            {
+                "key": "lpn_settings_id_prefixes",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_defaults",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_apply_to_all",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_row_id_prefix",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_set_reset_def": [
+            {
+                "key": "lpn_settings_id_prefixes",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_wipe_btn",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_set_scn_def": [
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 2
+                }
+            },
+            {
+                "key": "lpn_view_units",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_sm_title",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_set_search_def": [
+            {
+                "key": "lpn_full_col_type",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_settings_search",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_symbol_opacity",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_backdrop_opacity",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_emitter_exponent",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_set_units_def": [
+            {
+                "key": "lpn_tool_add_pipe",
+                "bold": 0,
+                "plain": {
+                    "noun": 2
+                }
+            },
+            {
+                "key": "lpn_view_units",
+                "bold": 2
+            },
+            {
+                "key": "lpn_units_nondestructive",
+                "bold": 2
+            },
+            {
+                "key": "lpn_units_destructive",
+                "bold": 2
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 2
+            },
+            {
+                "key": "lpn_cancel",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_diameter",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_set_where_def": [
+            {
+                "key": "lpn_find_scope_all",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_settings_sec_symbology",
+                "bold": 1
+            },
+            {
+                "key": "lpn_labels_heading_node",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_sym_node_colors",
+                "bold": 1
+            },
+            {
+                "key": "lpn_labels_heading_link",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_sym_link_colors",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_add_meter",
+                "bold": 1
+            },
+            {
+                "key": "lpn_export_table_all",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_map",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_page",
+                "bold": 2
+            },
+            {
+                "key": "lpn_settings_sec_assets",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_id_prefixes",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_defaults",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_custom_props",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_sec_calculation",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_solver",
+                "bold": 2
+            },
+            {
+                "key": "lpn_view_units",
+                "bold": 1
+            },
+            {
+                "key": "lpn_time_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_hydraulics",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_energy",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_quality",
+                "bold": 1
+            },
+            {
+                "key": "lpn_about_credits",
+                "bold": 1
+            },
+            {
+                "key": "lpn_saved_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_saved_browser",
+                "bold": 2
+            },
+            {
+                "key": "lpn_settings_runbox",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_table_category",
+                "bold": 1
+            },
+            {
+                "key": "lpn_find_value",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_st_example_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_pump",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_add_tank",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_status",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_st_what_def": [
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_reports_status",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_full_title",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_tb_dim_def": [
+            {
+                "key": "lpn_time_run",
+                "bold": 1
+            },
+            {
+                "key": "lpn_settings_auto_run",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_toggle",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_tb_two_def": [
+            {
+                "key": "lpn_tool_zoom_extent",
+                "bold": 3
+            },
+            {
+                "key": "lpn_tool_area_window",
+                "bold": 2
+            },
+            {
+                "key": "lpn_tool_zoom_window",
+                "bold": 2
+            }
+        ],
+        "lpn_guide_tbl_cell_def": [
+            {
+                "key": "lpn_tool_undo",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_tbl_fill_def": [
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_id",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_tbl_tabs_def": [
+            {
+                "key": "lpn_field_to",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_pane_toggle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tables_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_tab_junctions",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_tab_reservoirs",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_tab_tanks",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_tab_pipes",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_tab_pumps",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_tab_valves",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_tab_customers",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_tab_shapes",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_settings",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scenario_menu",
+                "bold": 2
+            },
+            {
+                "key": "lpn_ts_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_profile_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_freq_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_sysflow_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_scenario_basic",
+                "bold": 1
+            }
+        ],
+        "lpn_guide_use_def": [
+            {
+                "key": "lpn_crs_search",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_calib_network",
+                "bold": 0,
+                "plain": {
+                    "syntax": 1
+                }
+            }
+        ],
+        "lpn_hotkeys_map_def": [
+            {
+                "key": "lpn_tool_select",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_backdrop_add",
+                "bold": 0,
+                "plain": {
+                    "noun": 8
+                }
+            },
+            {
+                "key": "lpn_tool_delete",
+                "bold": 0,
+                "plain": {
+                    "noun": 2
+                }
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_zoom_in",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_zoom_out",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            }
+        ],
+        "lpn_hotkeys_menu_def": [
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_georef_goto",
+                "stripEllipsis": true,
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            }
+        ],
+        "lpn_hotkeys_snip_def": [
+            {
+                "key": "lpn_screenshot_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_undo",
+                "bold": 1
+            },
+            {
+                "key": "lpn_cancel",
+                "bold": 1
+            }
+        ],
+        "lpn_hotkeys_zoomwin_def": [
+            {
+                "key": "lpn_tool_zoom_window",
+                "bold": 1
+            }
+        ],
+        "lpn_notes_1_def": [
+            {
+                "key": "lpn_settings_engine_native",
+                "bold": 1
+            }
+        ],
+        "lpn_notes_2_def": [
+            {
+                "key": "lpn_file_import_msx",
+                "stripEllipsis": true,
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_result_water_age",
+                "bold": 1
+            }
+        ],
+        "lpn_notes_3_def": [
+            {
+                "key": "lpn_quality_none",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_tool_file",
+                "bold": 2
+            },
+            {
+                "key": "lpn_file_save",
+                "bold": 4
+            },
+            {
+                "key": "lpn_file_saveas",
+                "stripEllipsis": true,
+                "bold": 2
+            },
+            {
+                "key": "lpn_lock_ask",
+                "bold": 1
+            },
+            {
+                "key": "lpn_lock_open_readonly",
+                "bold": 1
+            },
+            {
+                "key": "lpn_lock_break",
+                "bold": 1
+            }
+        ],
+        "lpn_notes_5_def": [
+            {
+                "key": "lpn_menu_project",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_menu",
+                "bold": 1
+            },
+            {
+                "key": "lpn_report_pump_head",
+                "bold": 1
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_library_curve_equation",
+                "bold": 1
+            }
+        ],
+        "lpn_notes_6_def": [
+            {
+                "key": "lpn_tool_select",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_backdrop_add",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_backdrop_position",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_text_align_right",
+                "bold": 0,
+                "plain": {
+                    "noun": 2
+                }
+            },
+            {
+                "key": "lpn_pane_manage_cols",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_filter_clear",
+                "bold": 1
+            },
+            {
+                "key": "lpn_pane_paste_append",
+                "bold": 1
+            }
+        ],
+        "lpn_notes_7_def": [
+            {
+                "key": "lpn_backdrop_position",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_contour_fill",
+                "bold": 0,
+                "plain": {
+                    "noun": 2
+                }
+            },
+            {
+                "key": "lpn_tool_select",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_field_to",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_pane_paste_append",
+                "bold": 1
+            },
+            {
+                "key": "lpn_tool_delete",
+                "bold": 2
+            },
+            {
+                "key": "lpn_cancel",
+                "bold": 1
+            }
+        ],
+        "lpn_notes_color_def": [
+            {
+                "key": "lpn_field_to",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_scenario_base",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_settings_color_breaks",
+                "bold": 1
+            }
+        ],
+        "lpn_notes_engine_def": [
+            {
+                "key": "lpn_menu_project",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            },
+            {
+                "key": "lpn_examples_open",
+                "bold": 0,
+                "plain": {
+                    "noun": 1
+                }
+            }
+        ]
+    }
+}

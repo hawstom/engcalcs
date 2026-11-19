@@ -4961,6 +4961,8 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 table.lpn-notes-table { border-collapse: collapse; margin: .25em 0 0; width: 100%; }
 table.lpn-notes-table td { padding: 0 .75em .3em 0; vertical-align: top; }
 table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
+/* A bold label inside a bold cell is the same weight, never the heavier "bolder" (700 inside 700 renders 900). */
+.lpn-guide-content strong, .lpn-guidebox strong, .ec-guide-page strong { font-weight: 700; }
 @media (max-width: 480px) {
 	table.lpn-notes-table, table.lpn-notes-table tbody, table.lpn-notes-table tr, table.lpn-notes-table td { display: block; width: auto; }
 	table.lpn-notes-table tr { margin-bottom: .4em; }
@@ -5456,9 +5458,19 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
    One viewport of the scrollport itself, not a fixed number of pixels: the box is resizable and on
    a phone it fills the screen, so any constant would be too much on one and too little on the
    other. `100%` of a flex scrollport resolves against its own height, which is exactly the measure
-   wanted -- scroll the last heading to the top and the blank space is what sits below it. */
-.lpn-setbox-content::after {
-	content: ""; display: block; min-height: 100%;
+   wanted -- scroll the last heading to the top and the blank space is what sits below it.
+
+   **ITS HEIGHT IS THE PANE'S MINUS THE LAST SECTION'S**, set by setboxSizeRoom() (js/looped-network.js) as `--lpn-setbox-room`: a whole pane
+   of blank room left the end of the scroll range empty (Tom, 2026-11-14: "never return to any view with nothing visible"), and this leaves the last
+   section's own top as the end of the range.
+
+   **THE SETTINGS BOX ALONE HAS IT** (Tom, 2026-11-14, Libraries: *"When visiting a Library ... the Library is not
+   scrolled to the top, or at least so that something is visible. I think that we should never return to any view with
+   nothing visible."*). The Libraries box borrows this shell but is a list of separate sections, none of which needs to reach
+   the top, and the browser keeps the scroll position while one list is swapped for another: scrolled to the end of Patterns
+   and then shown Controls, the room let the position stand, below all of Controls. */
+#lpn_setbox_content::after {
+	content: ""; display: block; min-height: var(--lpn-setbox-room, 0px);
 }
 /* An index row is flat text, like a menu row: it is a destination, not a command. The SUB rows are
    indented under their section, which is what makes the two levels readable at a glance. */
@@ -6798,6 +6810,16 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-lib-head { display: flex; align-items: center; gap: 6px; }
 .lpn-lib-head .lpn-lib-id { width: 9em; }
 .lpn-lib-del { margin-left: auto; }
+/* THE ORDER BUTTONS (Libraries, Move to top/up/down/bottom): the Add button and the four icon buttons share the box's sticky
+   `.lpn-box-tools` row. The entry the buttons act on carries a bar and a tint in the selection colours. An entry scrolled into
+   view stops below the sticky row (scroll-margin). */
+.lpn-lib-toolrow { align-items: center; }
+.lpn-lib-order { display: inline-flex; gap: 2px; }
+.lpn-lib-move { padding: 2px 6px; line-height: 1; }
+.lpn-lib-move > .ec-icon { margin-inline-end: 0; }
+.lpn-lib-entry { scroll-margin-top: 3em; }
+.lpn-lib-entry-sel { background: var(--ec-accent-hover-bg); box-shadow: inset 3px 0 0 var(--ec-select); }
+html[dir="rtl"] .lpn-lib-entry-sel { box-shadow: inset -3px 0 0 var(--ec-select); }
 /* A fitting's quantity is a small whole number; the fitting NAME beside it is what needs the room. */
 .lpn-lib-qty { width: 5em; }
 /* THE CURVE EDITOR'S TWO HEADER LINES (Tom, 2026-09-05: "put pump ID (with new ID label above it)
@@ -7436,9 +7458,17 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
    is still changed in one place. */
 .lpn-ts-line { fill: none; stroke-width: 1.5; stroke-linejoin: round; }
 .lpn-ts-dot { stroke: none; }
-/* Where the transport is parked. Dashed and grey on purpose: it is the one mark on the chart that
-   is not a reading, so it must not read as a series. */
-.lpn-ts-now { stroke: var(--ec-gray-888); stroke-width: 1; stroke-dasharray: 3, 3; }
+/* Where the transport is parked: the one mark on the chart that is not a reading. A thin accent line on a paper halo,
+   because a grey dashed line lay on the frame at 0:00 and was not seen (Tom, 2026-11-17). No handle. */
+.lpn-ts-now { stroke: var(--ec-accent); stroke-width: 1.5; pointer-events: none; }
+.lpn-ts-now-halo { stroke: var(--ec-bg); stroke-width: 4; pointer-events: none; }
+/* The chart reads and sets the time: a light crosshair on the nearest reporting time under the pointer, and a small
+   readout. A vertical swipe still scrolls the box (pan-y); a horizontal drag is the scrub. */
+.lpn-ts-scrub { cursor: crosshair; touch-action: pan-y; -webkit-user-select: none; user-select: none; }
+.lpn-ts-cross { pointer-events: none; }
+.lpn-ts-cross-line { stroke: var(--ec-gray-888); stroke-width: 1; }
+.lpn-ts-read-swatch { stroke: none; }
+.lpn-ts-read-bg { fill: var(--ec-bg); fill-opacity: .92; stroke: var(--ec-border); stroke-width: 1; }
 /* The two pull-downs sit on the control row's baseline with the chips and the buttons, so they take
    the row's own type size rather than the browser's default form size. */
 .lpn-ts-pick { font: inherit; font-size: .95em; max-width: 12em; }
