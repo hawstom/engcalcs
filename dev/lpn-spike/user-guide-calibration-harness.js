@@ -57,7 +57,7 @@ async function main() {
 
 		console.log('\n3. The Parameter list');
 		const opts = await P.evaluate(() => ({ o: Array.from(document.querySelectorAll('#lpn_calib_param option')).map((x) => x.textContent), v: document.getElementById('lpn_calib_param').value }));
-		const what = plain(enString('lpn_guide_cal_what_def')).replace(/ ([,.:])/g, '$1');   // plain() turns each <strong> edge into a space
+		const what = plain(enString('lpn_guide_cal_what_def'));
 		ok('six parameters, in the order the chapter lists them, and Pressure chosen', opts.o.length === 6 && what.indexOf(opts.o.slice(0, 5).join(', ') + ', or ' + opts.o[5]) >= 0 && opts.v === 'pressure', JSON.stringify(opts));
 
 		console.log('\n4. The example file');
