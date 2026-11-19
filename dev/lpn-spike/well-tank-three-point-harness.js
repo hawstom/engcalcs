@@ -717,10 +717,30 @@ for (const form of ['open-air', 'pressure', 'pressure in US units']) {
 	ok(form + ': the steady solve is identical before and after (built-in)', r0[0].ok && r1[0].ok && same(r0[0].heads, r1[0].heads) && same(r0[0].flows, r1[0].flows));
 	ok(form + ': so is the 6 hour run in both engines, every frame', [1, 2].every((i) => r0[i].ok && r1[i].ok && r0[i].frames.length > 2 && same(r0[i].frames.map((f) => [f.t, f.heads, f.flows, f.levels]), r1[i].frames.map((f) => [f.t, f.heads, f.flows, f.levels]))));
 	L.openPopup(a.tank, 10, 10);
-	let mv = null; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL' && /^Minimum volume/.test((e.textContent || '').trim())) { walk(e, (i) => { if (i.tagName === 'INPUT') { mv = i.value; } }); } });
-	ok(form + ': the exploded tank\'s Minimum volume row is blank', mv === '' || mv === undefined || mv === null, JSON.stringify(mv));
+	const rowsOf = () => { const out = []; walk(byId.lpn_popup_fields, (e) => { if (e.tagName === 'LABEL') { const f = []; walk(e, (i) => { if (i.tagName === 'INPUT' || i.tagName === 'SELECT') { f.push(i); } }); out.push({ t: (e.textContent || '').trim(), n: f.length, v: f.map((i) => { if (i.tagName === 'SELECT') { let sv = ''; walk(i, (o) => { if (o.tagName === 'OPTION' && o.selected) { sv = o.value; } }); return sv; } return i.value; }).join('/') }); } }); return out; };
+	const rs = rowsOf(), at = (re) => rs.filter((r) => re.test(r.t))[0];
+	if (a.pt) {
+		ok(form + ': the exploded pressure tank\'s box shows the volume curve it uses, as a chooser, and no Minimum volume or diameter it never showed', !!at(/^Tank volume/) && at(/^Tank volume/).n === 1 && at(/^Tank volume/).v === a.pt.curve && !at(/^Minimum volume/) && !at(/^Tank diameter/), JSON.stringify(rs.filter((r) => /volume|diameter/i.test(r.t))));
+		ok(form + ': nothing in the box carries the Well\'s 1000', !rs.some((r) => r.v === '1000'));
+	} else {
+		ok(form + ': an open-air tank has no curve, so its box keeps the diameter and a blank Minimum volume', !at(/^Tank volume/) && !!at(/^Tank diameter/) && at(/^Minimum volume/) && at(/^Minimum volume/).v === '');
+	}
 }
 setUnitSet('si');
+
+{
+	// A file from before the Well owned its tank may hold a Minimum volume and Can overflow on a pressure tank, hidden; opening it clears them so Explode shows nothing new.
+	setUnitSet('us');
+	const doc = fresh();
+	L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
+	const a = doc.assemblies[0];
+	const sv = JSON.parse(JSON.stringify(L.serializeProject()));
+	sv.nodes.forEach((n) => { if (n.id === a.tank) { n.minVolume = 1000; n.overflow = 'YES'; n.tankDiameter = 200; } });
+	L.applySaved(L.migrateSaved(sv)); L.buildDom();
+	const t = L.nodeById(a.tank);
+	ok('opening an older file clears a pressure tank\'s hidden Minimum volume and overflow (its diameter is left as it is)', t.minVolume === undefined && t.overflow === undefined && t.tankDiameter === 200, JSON.stringify([t.minVolume, t.overflow, t.tankDiameter]));
+	setUnitSet('si');
+}
 
 console.log('\n--- 12. round 13 review: joined only when nothing else joins, box-select, the DEM fill ---');
 {

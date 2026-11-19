@@ -45997,6 +45997,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		doc.shapes = Array.isArray(saved.shapes) ? saved.shapes : [];
 		// The groupings (Task 822). Only those whose every element is in the file are kept.
 		doc.assemblies = assembliesFromSaved(saved.assemblies, doc);
+		// A pressure tank has no minimum volume or overflow of its own (syncPressureTank()); a file from before the Well owned its tank may still hold them, hidden, to surface on Explode.
+		doc.assemblies.forEach(function (g) {
+			var tk = g.pt && g.tank ? (doc.nodes || []).filter(function (nd) { return nd.id === g.tank; })[0] : null;
+			if (tk) { delete tk.minVolume; delete tk.overflow; }   // base-write: the group's own vessel, at load
+		});
 		// The clock (Task 423). A file written before this existed has none and behaves exactly as
 		// it always did -- an empty pattern list resolves to a multiplier of 1 everywhere.
 		doc.patterns = saved.patterns || [];
@@ -78078,20 +78083,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function () { return effective(n, 'maxLevel'); },
 			function (v) { W(function () { setProp(n, 'maxLevel', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_maxlevel_short_tip, { el: n, prop: 'maxLevel' }), valueWarnText('maxLevel', n, effective(n, 'maxLevel')));
+		// **A TANK THAT HAS A VOLUME CURVE** (a Well's pressure tank after Explode, an imported one) shows the curve it uses, and no diameter or minimum volume: both engines read
+		// the curve for volume against depth and ignore those two, so a row for them would show a number the tank does not run on (Tom, round 13 pass: Explode showed a diameter and a
+		// minimum volume the tank had not shown). The stored values are untouched; clearing the curve brings the rows back.
+		var curved = !door && typeof effective(n, 'volCurve') === 'string' && effective(n, 'volCurve') !== '';
+		if (curved) { popRows(fields, '#owned', function () { curveChooser(fields, n, 'volCurve', 'volume', pc.lpn_curve_kind_volume || 'Tank volume'); }); }
 		// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
 		// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
 		// and NOT the pipe-diameter unit either, or inches/millimetres would put a 15 m tank on
 		// screen as 15000. The tip says so.
-		unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length',
-			function () { return effective(n, 'tankDiameter'); },
-			function (v) { W(function () { setProp(n, 'tankDiameter', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
-			pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
+		if (!curved) {
+			unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length',
+				function () { return effective(n, 'tankDiameter'); },
+				function (v) { W(function () { setProp(n, 'tankDiameter', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
+		}
 		// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is in the Length unit cubed, as the
 		// Available volume below it is; blank is EPANET's 0, "use the diameter".
-		numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')',
-			effective(n, 'minVolume'),
-			function (v) { W(function () { setProp(n, 'minVolume', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
-			pc.lpn_field_tank_minvol_tip, { el: n, prop: 'minVolume' });
+		if (!curved) {
+			numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')',
+				effective(n, 'minVolume'),
+				function (v) { W(function () { setProp(n, 'minVolume', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_minvol_tip, { el: n, prop: 'minVolume' });
+		}
 		selectFieldPlain(fields, pc.lpn_field_tank_overflow || 'Can overflow',
 			[['YES', pc.lpn_settings_table_yes || 'Yes'], ['NO', pc.lpn_settings_table_no || 'No']],
 			tankOverflowWord(n),
