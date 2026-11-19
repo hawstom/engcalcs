@@ -2578,6 +2578,7 @@ $ec_lang['lpn_storage_unreadable']='Non enregistré. Ce projet n\'a pas pu être
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='Crédits';
+$ec_lang['lpn_about_source']='Code source';
 $ec_lang['lpn_help_welcome']='Page d\'accueil';
 $ec_lang['lpn_about_license']='Distribué sous licence GNU General Public License v3.0 ou ultérieure.';
 $ec_lang['lpn_about_dedication']='Tu es aimé et chéri pour toujours, tu n\'as rien à craindre et tu n\'es pas en train de tout gâcher.';
@@ -5349,7 +5350,7 @@ $ec_lang['lpn_inp_dup_curve_entry']='Courbe {id} (lignes {lines})';
 $ec_lang['lpn_inp_dup_and']=' et ';
 $ec_lang['lpn_inp_dup_comma']=', ';
 $ec_lang['lpn_inp_drop_control_comments']='Ces commentaires à la fin de lignes de contrôle n\'ont pas été importés, car ces contrôles n\'ont pas été importés. Tous les contrôles qui pouvaient l\'être l\'ont été.';
-$ec_lang['lpn_inp_drop_quality_options']='Ce fichier indique des options de qualité de l\'eau EPANET : l\'option Quality, qui indique le type d\'analyse de la qualité de l\'eau, et deux réglages liés à un produit chimique, Diffusivity et Tolerance. Les trois sont conservés et utilisés. L\'âge de l\'eau, le traçage de la source et une analyse d\'un produit chimique sont chacun calculés ici, et les deux réglages liés au produit chimique servent lorsqu\'une analyse chimique est calculée. Tous sont réécrits si vous enregistrez un fichier EPANET.';
+$ec_lang['lpn_inp_drop_quality_options']='Ce fichier indique des options de qualité de l\'eau EPANET : l\'option Quality, qui indique le type d\'analyse de la qualité de l\'eau, et deux réglages liés à un produit chimique, Diffusivity et Tolérance de qualité. Les trois sont conservés et utilisés. L\'âge de l\'eau, le traçage de la source et une analyse d\'un produit chimique sont chacun calculés ici, et les deux réglages liés au produit chimique servent lorsqu\'une analyse chimique est calculée. Tous sont réécrits si vous enregistrez un fichier EPANET.';
 $ec_lang['lpn_inpalt_lead']='Ce fichier modifie des valeurs dans les catégories ci-dessous. Pour chaque catégorie, choisissez l\'alternative qui reçoit ses valeurs.';
 $ec_lang['lpn_inpalt_base_note']='Chaque scénario hérite de l\'alternative Base ; la choisir modifie donc les valeurs de tous les scénarios.';
 $ec_lang['lpn_inpalt_heading']='Alternative pour {category}';

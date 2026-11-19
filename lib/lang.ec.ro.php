@@ -2578,6 +2578,7 @@ $ec_lang['lpn_storage_unreadable']='Nu s-a salvat. Acest proiect nu a putut fi c
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='Mulțumiri';
+$ec_lang['lpn_about_source']='Cod sursă';
 $ec_lang['lpn_help_welcome']='Pagina de bun venit';
 $ec_lang['lpn_about_license']='Licențiat sub GNU General Public License v3.0 sau o versiune ulterioară.';
 $ec_lang['lpn_about_dedication']='Ești iubit și prețuit pentru totdeauna, nu ai de ce să te temi și nu strici totul.';

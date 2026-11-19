@@ -2578,6 +2578,7 @@ $ec_lang['lpn_storage_unreadable']='Não salvo. Este projeto não pôde ser lido
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='Créditos';
+$ec_lang['lpn_about_source']='Código-fonte';
 $ec_lang['lpn_help_welcome']='Página de boas-vindas';
 $ec_lang['lpn_about_license']='Licenciado sob a GNU General Public License v3.0 ou posterior.';
 $ec_lang['lpn_about_dedication']='Você é amado e querido para sempre, não tem nada a temer e não está arruinando tudo.';
@@ -5363,14 +5364,14 @@ $ec_lang['lpn_inpalt_receipt']='Alternativas que receberam os valores: {list}';
 $ec_lang['lpn_inpalt_cancelled']='Nada foi alterado.';
 $ec_lang['lpn_settings_row_contour_show']='Mostrar gráfico de isolinhas';
 $ec_lang['lpn_settings_viscosity']='Viscosidade';
-$ec_lang['lpn_settings_viscosity_tip']='O EPANET lê um valor acima de 0,001 como a razão entre a viscosidade do fluido e a da água a 20 graus Celsius, e um valor de 0,001 ou menos como a própria viscosidade cinemática, em ft²/s para unidades de vazão dos EUA e em m²/s para unidades de vazão do SI. Só altera a resposta pelo método de Darcy-Weisbach.';
+$ec_lang['lpn_settings_viscosity_tip']='O EPANET lê um valor acima de 0,001 como a razão em relação à viscosidade da água a 20 graus Celsius, e um valor de 0,001 ou menos como a própria viscosidade cinemática, em ft²/s para unidades de vazão dos EUA e em m²/s para unidades de vazão do SI. Só altera a resposta pelo método de Darcy-Weisbach.';
 $ec_lang['lpn_settings_color_node_field_tip']='Define as cores dos nós a partir desta propriedade. O mapa de isolinhas usa a mesma propriedade.';
 $ec_lang['lpn_settings_color_ramp_node_tip']='Define as cores dos nós, do mapa de isolinhas e de sua legenda.';
 $ec_lang['lpn_time_epanet_fallback']='Não foi possível carregar o solucionador do EPANET, então o solucionador integrado resolveu esta rede.';
 $ec_lang['lpn_time_epanet_fallback_why']='O solucionador integrado resolveu esta rede, porque o solucionador do EPANET não pôde ser usado. {reason}';
 $ec_lang['lpn_settings_solver']='Solucionador';
 $ec_lang['lpn_quality_diffusivity']='Difusividade';
-$ec_lang['lpn_quality_diffusivity_tip']='O EPANET lê um valor acima de 0,0001 como a razão entre a difusividade e a do cloro na água, e um valor de 0,0001 ou menos como a própria difusividade, em ft²/s para unidades de vazão dos EUA e em m²/s para unidades de vazão do SI. Em branco usa o padrão do EPANET, 1,0.';
+$ec_lang['lpn_quality_diffusivity_tip']='O EPANET lê um valor acima de 0,0001 como a razão em relação à difusividade do cloro na água, e um valor de 0,0001 ou menos como a própria difusividade, em ft²/s para unidades de vazão dos EUA e em m²/s para unidades de vazão do SI. Em branco usa o padrão do EPANET, 1,0.';
 $ec_lang['lpn_library_import_comments']='Linhas de comentário copiadas com os itens importados: {n}';
 $ec_lang['lpn_library_import_comments_left']='Linhas de comentário deixadas de fora porque o item abaixo de cada uma foi ignorado, ou nada vem depois delas: {n}';
 $ec_lang['lpn_inp_export_flat_label_semicolon']='Textos ({n}) neste projeto contêm um ponto e vírgula, e o EPANET corta um Texto no primeiro ponto e vírgula. Cada um é gravado por inteiro no arquivo, e o EPANET lerá apenas a parte antes do ponto e vírgula.';

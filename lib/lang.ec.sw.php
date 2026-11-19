@@ -2578,6 +2578,7 @@ $ec_lang['lpn_storage_unreadable']='Hakijahifadhiwa. Mradi huu haukuweza kusomwa
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='Shukrani';
+$ec_lang['lpn_about_source']='Msimbo chanzo';
 $ec_lang['lpn_help_welcome']='Ukurasa wa karibu';
 $ec_lang['lpn_about_license']='Imepewa leseni chini ya GNU General Public License v3.0 au toleo jipya zaidi.';
 $ec_lang['lpn_about_dedication']='Unapendwa na kuthaminiwa milele, huna chochote cha kuogopa, na hutaharibu kila kitu.';

@@ -2580,6 +2580,7 @@ $ec_lang['lpn_storage_unreadable']='ذخیره نشد. این پروژه را ن
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='اعتبارها';
+$ec_lang['lpn_about_source']='کد منبع';
 $ec_lang['lpn_help_welcome']='صفحهٔ خوش‌آمد';
 $ec_lang['lpn_about_license']='تحت مجوز GNU General Public License نسخهٔ ۳.۰ یا بالاتر.';
 $ec_lang['lpn_about_dedication']='تو برای همیشه دوست داشته می‌شوی و عزیزی، چیزی برای ترسیدن نداری، و همه چیز را خراب نمی‌کنی.';
@@ -5351,7 +5352,7 @@ $ec_lang['lpn_inp_dup_curve_entry']='منحنی {id} (خطوط {lines})';
 $ec_lang['lpn_inp_dup_and']=' و ';
 $ec_lang['lpn_inp_dup_comma']='، ';
 $ec_lang['lpn_inp_drop_control_comments']='این توضیح‌ها در انتهای خطوط کنترل وارد نشدند، چون آن کنترل‌ها وارد نشدند. هر کنترلی که قابل وارد کردن بود وارد شد.';
-$ec_lang['lpn_inp_drop_quality_options']='این فایل گزینه‌های کیفیت آب EPANET را بیان می‌کند: گزینهٔ Quality که نوع تحلیل کیفیت آب را بیان می‌کند، و دو تنظیم همراه یک مادهٔ شیمیایی، Diffusivity و Quality tolerance. هر سه نگه داشته و به کار برده می‌شوند. سن آب، ردیابی منبع و تحلیل مادهٔ شیمیایی هر کدام اینجا محاسبه می‌شوند، و دو تنظیم شیمیایی هنگام محاسبهٔ تحلیل مادهٔ شیمیایی به کار می‌روند. اگر یک فایل EPANET ذخیره کنید، همهٔ آن‌ها بازنویسی می‌شوند.';
+$ec_lang['lpn_inp_drop_quality_options']='این فایل گزینه‌های کیفیت آب EPANET را بیان می‌کند: گزینهٔ کیفیت آب که نوع تحلیل کیفیت آب را بیان می‌کند، و دو تنظیم همراه یک مادهٔ شیمیایی، ضریب نفوذ و رواداری کیفیت. هر سه نگه داشته و به کار برده می‌شوند. سن آب، ردیابی منبع و تحلیل مادهٔ شیمیایی هر کدام اینجا محاسبه می‌شوند، و دو تنظیم شیمیایی هنگام محاسبهٔ تحلیل مادهٔ شیمیایی به کار می‌روند. اگر یک فایل EPANET ذخیره کنید، همهٔ آن‌ها بازنویسی می‌شوند.';
 $ec_lang['lpn_inpalt_lead']='این فایل مقادیر را در دسته‌های زیر تغییر می‌دهد. برای هر دسته، گزینهٔ جایگزینی را انتخاب کنید که مقادیر آن را دریافت می‌کند.';
 $ec_lang['lpn_inpalt_base_note']='هر سناریو گزینهٔ جایگزین پایه را به ارث می‌برد، پس انتخاب آن مقادیر هر سناریو را تغییر می‌دهد.';
 $ec_lang['lpn_inpalt_heading']='گزینهٔ جایگزین برای {category}';
