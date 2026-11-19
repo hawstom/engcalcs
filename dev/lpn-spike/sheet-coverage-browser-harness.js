@@ -144,8 +144,8 @@ async function main() {
 			for (const sec of ['controls', 'rules']) {
 				await a.page.click('#lpn_libbox_link_' + sec); await a.settle(500);
 				const n = await a.page.evaluate(() => ({ entries: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry:not(.lpn-lib-comment-entry)').length,   // a comment is a row of its own, one text box, no Label column (1d092e4c1)
-					 splits: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry .lpn-gsplit').length }));
-				ok('libraries ' + sec + ': every entry has a draggable divider', n.entries >= 1 && n.splits >= n.entries, JSON.stringify(n));
+					 rowed: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry:not(.lpn-lib-comment-entry):has(.lpn-grow)').length, splits: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry .lpn-gsplit').length }));
+				ok('libraries ' + sec + ': every entry has a draggable divider', n.entries >= 1 && n.splits >= n.rowed, JSON.stringify(n));   // a rule is one text box with no Label column (its Description is a comment row of its own now); an entry that has Label rows has the divider
 			}
 			await close('lpn_library_box');
 			// Scenario manager: the Scenario column's names do not wrap, as every selector beside them does not.
