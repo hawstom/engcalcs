@@ -62143,7 +62143,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		function convSetting(key) {
 			var h = settings.hydraulics;
 			if (!h || typeof h[key] !== 'number') { return; }
-			h[key] = rnd(+(h[key] * k).toPrecision(6));
+			h[key] = +(h[key] * k).toPrecision(6);   // a Settings value: never rounded by Decimals
 			n++;
 		}
 		function convCurveAxis(axis, kinds, factor) {
@@ -62243,7 +62243,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		} else if (name === 'lpn_u_velocity') {
 			// The velocity warning limit is typed in this unit; a scenario's own is the same number in the same unit.
-			velocityLimitHolders().forEach(function (h) { h.velocityLimit = rnd(+(h.velocityLimit * k).toPrecision(6)); n++; });
+			velocityLimitHolders().forEach(function (h) { h.velocityLimit = +(h.velocityLimit * k).toPrecision(6); n++; });
 			// A scenario's settings are read through a resolved-tree cache: the written numbers must be re-read.
 			if (n) { touchTree('convertUnitValues'); }
 		} else if (name === 'lpn_u_flow') {
@@ -62312,16 +62312,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				list.appendChild(r);
 			});
 			body.appendChild(list);
-			// The default is the number of places the page itself shows this unit with, which keeps
-			// a converted 149,610 gal whole and 457.2 mm to a whole millimeter.
+			// BLANK MEANS NO ROUNDING (Tom: "give them what they request"): the map-label display
+			// precision is not a request, so it is never the default. A typed number is obeyed exactly.
 			inp.type = 'number'; inp.min = '0'; inp.max = '8'; inp.step = '1';
-			inp.value = String(labelDecimalsForUnit(u.name, u.to));
+			inp.value = '';
 			row.className = 'lpn-unit-decimals';
 			inp.setAttribute('data-decimals-for', u.name);
 			row.appendChild(document.createTextNode(pc.lpn_labels_col_decimals || 'Decimals'));
 			row.appendChild(inp);
 			body.appendChild(row);
-			fields.push({ name: u.name, input: inp, dflt: labelDecimalsForUnit(u.name, u.to) });
+			fields.push({ name: u.name, input: inp });
 		});
 		note.textContent = pc.lpn_units_convert_note;
 		body.appendChild(note);
@@ -62332,7 +62332,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		for (i = 0; i < fields.length; i++) {
 			if (fields[i].name !== name) { continue; }
 			v = parseInt(fields[i].input.value, 10);
-			return (isFinite(v) && v >= 0) ? Math.min(v, 8) : fields[i].dflt;
+			return (isFinite(v) && v >= 0) ? Math.min(v, 8) : undefined;   // blank: no rounding
 		}
 		return undefined;
 	}

@@ -265,9 +265,9 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	// Length: the default is the number of places the page shows the new unit with (meters: 1).
 	let net = buildNetwork();
 	pickUnit('lpn_u_length', 'm');
-	ok('the Decimals field opens at the new unit\'s own places (m: 1)', decimalFields().length === 1 && decimalFields()[0].value === '1', decimalFields().map(f => f.value).join());
+	ok('the Decimals field opens blank (no rounding)', decimalFields().length === 1 && decimalFields()[0].value === '', decimalFields().map(f => f.value).join());
 	press('Convert');
-	ok('Length: Convert rounds to that default (710 ft -> 216.4 m)', net.pipe._length === 216.4, String(net.pipe._length));
+	ok('Length: blank Decimals does not round (710 ft -> 216.408 m)', Math.abs(net.pipe._length - 216.408) < 1e-9, String(net.pipe._length));
 	L.undo();
 	net = L.getDoc().links[0];
 	pickUnit('lpn_u_length', 'm');
@@ -284,7 +284,7 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	pickUnit('lpn_u_length', 'm');
 	setDecimals('');
 	press('Convert');
-	ok('Length: a blank Decimals field falls back to the default', L.getDoc().links[0]._length === 216.4, String(L.getDoc().links[0]._length));
+	ok('Length: a blank Decimals field means no rounding', Math.abs(L.getDoc().links[0]._length - 216.408) < 1e-9, String(L.getDoc().links[0]._length));
 	L.undo();
 	// Keep never rounds, whatever the field says.
 	const before = snapshot();
@@ -315,9 +315,9 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 		vlines[0] === PC.lpn_units_convert_q.replace('{old}', volText('ft3')).replace('{new}', volText('gal')), vlines[0]);
 	ok('...lists Minimum volume as what it decides', vlines.indexOf(PC.lpn_field_tank_minvol) >= 0, JSON.stringify(vlines));
 	ok('...with the same three buttons', JSON.stringify(buttonLabels()) === JSON.stringify([PC.lpn_convas_ok, PC.lpn_units_keep, PC.lpn_cancel]));
-	ok('...and a Decimals field that opens at 0 for gallons', decimalFields().length === 1 && decimalFields()[0].value === '0', decimalFields().map(f => f.value).join());
+	ok('...and a Decimals field that opens blank', decimalFields().length === 1 && decimalFields()[0].value === '', decimalFields().map(f => f.value).join());
 	press('Convert');
-	ok('Volume: Convert gives 149,610 gal at the default 0 decimals', T().minVolume === 149610, String(T().minVolume));
+	ok('Volume: blank Decimals gives the full 149610.389... gal', Math.abs(T().minVolume - 149610.3896) < 1e-3 && T().minVolume !== 149610.39, String(T().minVolume));
 	ok('...and the unit is gal', L.unitKey('lpn_u_volume') === 'gal');
 	L.undo();
 	ok('...one Undo restores 20000 and ft3', T().minVolume === 20000 && L.unitKey('lpn_u_volume') === 'ft3', T().minVolume + ' ' + L.unitKey('lpn_u_volume'));
@@ -359,6 +359,33 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 		ok('Undo restores 150 mm', L.getDoc().links[0]._diameter === 150 && L.unitKey('lpn_u_diameter') === 'mm', L.getDoc().links[0]._diameter + ' ' + L.unitKey('lpn_u_diameter'));
 	}
 	one(0, 6); one(2, 5.91);
+	// Blank: full precision, and the Settings tolerances are never rounded even when Decimals is typed.
+	function exact(dec, want, label) {
+		L.reset(); L.setCanvas(800, 600);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'mm', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'lps', lpn_u_roughness: 'mm', lpn_u_volume: 'ft3' });
+		L.remember();
+		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0);
+		const pipe = L.addLink('pipe', r.id, j.id);
+		pipe.diameter = undefined; L.setProp(pipe, 'diameter', 150); L.buildDom();
+		pickUnit('lpn_u_diameter', 'in');
+		setDecimals(dec);
+		press('Convert');
+		const got = L.getDoc().links[0]._diameter;
+		ok(label, Math.abs(got - want) <= 1e-9 * want, String(got));
+	}
+	exact('', 150 / 25.4, '150 mm to in with blank Decimals is 5.905511811...');
+	{
+		L.reset(); L.setCanvas(800, 600);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_roughness: 'mm' });
+		L.remember();
+		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0), p = L.addLink('pipe', r.id, j.id);
+		L.getSettings().method = 'dw';
+		L.setProp(p, 'roughness', 2); L.buildDom();
+		pickUnit('lpn_u_roughness', 'ft');
+		press('Convert');
+		const got = L.getDoc().links[0]._roughness;
+		ok('Darcy-Weisbach roughness 2 mm -> ft with blank Decimals within 1e-9', Math.abs(got - 2 / 304.8) <= 1e-9 * 2 / 304.8, String(got));
+	}
 }
 
 // ---- 8. Enter after a keyboard unit change keeps (code review: Convert was the focused button) ------
