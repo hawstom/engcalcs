@@ -13,7 +13,7 @@
 //      or pump glyph lies over a junction (a pump's or valve's symbol counts like any node's: Net3's pumps 10 and 335 each lie over a junction);
 //   B. phone, 390 x 844 touch, 8 notches out: the same with a finger;
 //   B3. phone, a finger is a disc of the touch reach (Tom, 2026-11-18: "I can't select Pump 335 ... I repeatedly select
-//      N60 or N61"): a tap on Pump 335 near Junctions 60 and 61 gives the box listing the pump and the junctions, at the
+//      N60 or N61"): a tap on Pump 335's ink selects the pump, a tap where its ink overlaps Junction 61 gives the box, at the
 //      opening view and 4 and 8 notches out; a tap on a lone junction far from anything selects it with no box; a tap on
 //      Tank 1 at 4 notches out gives its box.
 // The cases built by hand are in pick-chooser-browser-harness.js.
@@ -281,10 +281,29 @@ async function main() {
 		const mid = (sel) => F.page.evaluate((q) => { const e = document.querySelector(q); if (!e) { return null; } const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }, sel);
 		const pump = async (done) => {
 			const g = await mid('#lpn_canvas path.lpn-link-symbol-hit[data-link="335"]');
-			const was = await fSel();
 			await F.page.touchscreen.tap(g.x, g.y); await F.settle(600);
 			const rr = await fRows(), ss = await fSel();
-			ok(done + ' notches out: a tap on Pump 335 opens the box listing the pump and Junctions 60 and 61, the pump first, and selects nothing yet', rr[0] === 'Pump 335' && rr.includes('Junction 60') && rr.includes('Junction 61') && rr.length <= 6 && ss === was, JSON.stringify([rr, ss, was, g]));
+			ok(done + ' notches out: a tap on Pump 335\'s ink selects the pump with no box', rr.length === 0 && ss === 'l335', JSON.stringify([rr, ss, g]));
+			await fClear();
+		};
+		// Where the pump's ink overlaps a junction's disc: the box.
+		const overlapN61 = async (done) => {
+			const o = await F.page.evaluate(() => {
+				const g = document.querySelector('#lpn_canvas path.lpn-link-symbol-hit[data-link="335"]'), n = document.querySelector('#lpn_canvas circle.lpn-node[data-node="61"]');
+				const gb = g.getBoundingClientRect(), nb = n.getBoundingClientRect(), P = g.ownerSVGElement.createSVGPoint(), gm = g.getScreenCTM().inverse();
+				const cx = nb.left + nb.width / 2, cy = nb.top + nb.height / 2, r = nb.width / 2 - 0.5;
+				let best = null;
+				for (let x = gb.left; x <= gb.right; x += 0.25) { for (let y = gb.top; y <= gb.bottom; y += 0.25) {
+					P.x = x; P.y = y;
+					const d = Math.hypot(x - cx, y - cy);
+					if (d < r && g.isPointInFill(P.matrixTransform(gm)) && (!best || d < best.d)) { best = { x, y, d }; }
+				} }
+				return best;
+			});
+			if (!o) { console.log('  (no pump ink under Junction 61 at ' + done + ' notches)'); return; }
+			await F.page.touchscreen.tap(o.x, o.y); await F.settle(600);
+			const rr = await fRows();
+			ok(done + ' notches out: a tap where Pump 335\'s ink overlaps Junction 61 opens the box listing both', rr.includes('Pump 335') && rr.includes('Junction 61'), JSON.stringify([rr, o]));
 			await fClear();
 		};
 		// A lone junction at the opening view: no other node, glyph or Text within 34 px of it (past the finger's 24).
@@ -303,18 +322,18 @@ async function main() {
 				await fClear();
 			}
 		}
-		await pump(0);
+		await pump(0); await overlapN61(0);
 		await zoomOut(F, 4);
-		await pump(4);
+		await pump(4); await overlapN61(4);
 		{
 			const t1 = await mid('#lpn_canvas path.lpn-node-hit[data-node="1"]');
 			await F.page.touchscreen.tap(t1.x, t1.y); await F.settle(600);
 			const rr = await fRows();
-			ok('a tap on Tank 1, 4 notches out, gives its box: the tank and the junction it hides', rr.length >= 2 && rr[0] === 'Tank 1' && rr.includes('Junction 40'), JSON.stringify([rr, t1]));
+			ok('a tap on Tank 1\'s ink, 4 notches out, gives its box: the tank and the junction it hides', rr.length >= 2 && rr[0] === 'Tank 1' && rr.includes('Junction 40'), JSON.stringify([rr, t1]));
 			await fClear();
 		}
 		await zoomOut(F, 4);
-		await pump(8);
+		await pump(8); await overlapN61(8);
 		await F.page.close();
 
 		console.log('\nB2. Phone, the opening view: the Lake is off the left edge until panned; a real tap on the Lake over Pump 10 opens the box');

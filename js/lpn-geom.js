@@ -944,7 +944,7 @@ EngCalcs.lpnGeom = (function () {
 	//      within `coincident` px of its, then the rest of the ink set, then the hidden ones; each by
 	//      distance from the press, then rank, then id in natural order. At most `cap` (6) rows.
 	// opts: cap (6), coincident (1), first ({kind, id}), disc (0: the press is a point; a finger passes its
-	// disc's radius in px, and the ink set is then every item whose ink the disc touches).
+	// disc's radius in px, used ONLY when the point is on no ink: the ink set is then every item the disc touches).
 	//
 	// **A PUMP'S OR VALVE'S SYMBOL IS A SYMBOL** (Tom, 2026-11-16). Its item carries `parts`, the convex
 	// pieces of its drawn silhouette (a pump's casing and tail, a valve's two triangles), so the empty
@@ -1066,6 +1066,11 @@ EngCalcs.lpnGeom = (function () {
 		}
 		return any && seen;
 	}
+	// The items whose drawn ink holds the point itself (a Text or Shape included), for a caller that must know
+	// whether a press is on exactly one.
+	function pickInkHits(items, x, y) {
+		return items.filter(function (m) { return !m.soft && !(m.outline && m.outline.pts.length > 1 && !m.outline.closed) && pickInInk(m, x, y); });
+	}
 	function pickSymbols(items, x, y, opts) {
 		var o = opts || {}, cap = o.cap === undefined ? 6 : o.cap, coin = o.coincident === undefined ? 1 : o.coincident,
 			inkSet = [], hidden = [], list, primary, pa, i, it, infos;
@@ -1076,7 +1081,9 @@ EngCalcs.lpnGeom = (function () {
 		function entry(m) { return { m: m, d: pickExtentDistance(m, x, y), coin: (pa && pickAnchor(m) && Math.hypot(pa.x - pickAnchor(m).x, pa.y - pickAnchor(m).y) <= coin) ? 1 : 0 }; }
 		// A line is never an item, whoever hands it in: an open polyline (a point and a closed outline are not lines).
 		items = items.filter(function (m) { return !(m.outline && m.outline.pts.length > 1 && !m.outline.closed); });
-		items.forEach(function (m) { if (!m.soft && pickInInk(m, x, y, o.disc)) { inkSet.push(m); } });
+		items.forEach(function (m) { if (!m.soft && pickInInk(m, x, y)) { inkSet.push(m); } });
+		// A finger's disc counts only where the point itself is on no ink: a point on ink is what the mouse rule reads.
+		if (!inkSet.length && o.disc) { items.forEach(function (m) { if (!m.soft && pickInInk(m, x, y, o.disc)) { inkSet.push(m); } }); }
 		if (!inkSet.length) { return []; }
 		infos = pickInfos(items);
 		primary = inkSet.filter(function (m) { return o.first && m.kind === o.first.kind && m.id === o.first.id; })[0] || inkSet.map(entry).sort(order)[0].m;
@@ -1120,6 +1127,7 @@ EngCalcs.lpnGeom = (function () {
 		rotatedLabelBox: rotatedLabelBox,
 		orientedLabelBox: orientedLabelBox,
 		pickSymbols: pickSymbols,
+		pickInkHits: pickInkHits,
 		pickExtentDistance: pickExtentDistance,
 		pointToSegmentDistance: pointToSegmentDistance,
 		pointToPolylineDistance: pointToPolylineDistance,
