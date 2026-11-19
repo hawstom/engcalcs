@@ -101,7 +101,7 @@ async function main() {
 			await a.page.setViewportSize({ width: 1600, height: 1000 });
 			await a.goto(lang === 'en' ? 'Looped-Network.php?ec_nolog=1' : 'Looped-Network.php?ec_nolog=1&lang=es');
 			const refused = (await a.lang('lpn_engine_refused')).slice(0, 30);
-			const stopped = await a.lang('lpn_time_run_stopped');
+			const stopped = await a.lang('lpn_time_run_stopped_kept');   // a stopped run keeps its solved periods (67d6307d1)
 			const stoppedHead = stopped.slice(0, stopped.indexOf('{time}'));
 			await openFixture(a);
 			for (const name of (lang === 'en' ? scenarios : ['EPS Pump off', 'Tanks run dry'])) {
