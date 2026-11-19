@@ -5094,3 +5094,10 @@ OBSERVED (re-verify; real Chromium, Net1 EPS 25 frames to 24 h, desktop 1400x900
 - OBSERVED: transport-ends-browser-harness passes (46 ok). Own drive, real Chromium, Net1 EPS, Junction 10: thin blue time line (1.5px, token colour) visible at 0:00 on the left plot edge in the bottom pane and on the phone Properties graph; hover shows crosshair + time/value readout and changes nothing; click set 15:00, drag scrubbed; phone tap and sideways drag set time, readout shown with finger down; no page errors.
 - OBSERVED: the run-finished Calculate dialog sits over the right of the bottom graph on first run (pre-existing, not this branch).
 - Not checked: how it feels under a real finger; pixel look beyond screenshots.
+
+## 2026-11-18 feat/volume-unit round 4 (0d78e562d), Perry
+- OBSERVED (Chromium, Net1 and Net3 US): the unit question's Decimals box opens blank; typed 0 and 2 are obeyed exactly (Net3 tank 85 ft -> 25.91 m at 2; pipe 457 at 0; pump-curve points rounded likewise); Ctrl+Z after one Convert restores numbers and unit.
+- OBSERVED: blank Convert stores binary noise (609.5999999999999 mm, 40.203120000000006 m, curve point 126.18039279999998); Settings tolerances are held to 6 sig figs, element inputs are not.
+- OBSERVED: Decimals input has max 8, so a typed larger number is silently clamped; convert-as/unit-change/pda/initial-volume harnesses pass.
+- CITED: lang.ec.en.php vs round 3 lost no keys; master-only keys are the removed units_* set and lpn_about_source (master moved after the last merge).
+- Not checked: File > Convert as in a browser (static: select defaults to No rounding), DW roughness conversion, how noise displays.
