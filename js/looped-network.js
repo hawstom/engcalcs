@@ -41947,6 +41947,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (at < 0 || at > doc.controls.length) { at = doc.controls.length; }
 			doc.controls.splice.apply(doc.controls, [at, 0].concat(wrote));
 		}
+		doc.controls = EngCalcs.lpnControlsSeparate(doc.controls);
 		libCommit();
 		libControlsShown();
 	}
@@ -46000,11 +46001,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		doc.shapes = Array.isArray(saved.shapes) ? saved.shapes : [];
 		// The groupings (Task 822). Only those whose every element is in the file are kept.
 		doc.assemblies = assembliesFromSaved(saved.assemblies, doc);
-		// A pressure tank has no minimum volume or overflow of its own (syncPressureTank()); a file from before the Well owned its tank may still hold them, hidden, to surface on Explode.
-		doc.assemblies.forEach(function (g) {
-			var tk = g.pt && g.tank ? (doc.nodes || []).filter(function (nd) { return nd.id === g.tank; })[0] : null;
-			if (tk) { delete tk.minVolume; delete tk.overflow; }   // base-write: the group's own vessel, at load
-		});
 		// The clock (Task 423). A file written before this existed has none and behaves exactly as
 		// it always did -- an empty pattern list resolves to a multiplier of 1 everywhere.
 		doc.patterns = saved.patterns || [];
@@ -57418,14 +57414,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ icon: 'chain', pointerOnly: true, label: pc.lpn_tool_add_chain || 'Junction Pipe Chain', tip: toolTipWithKey('add-chain', pc.lpn_tool_add_chain_tip), hotkey: toolKeyFor('add-chain'), fn: function () { setMode('add-chain'); } },
 			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction'), hotkey: toolKeyFor('add-junction'), fn: function () { setMode('add-junction'); } },
 			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir'), hotkey: toolKeyFor('add-reservoir'), fn: function () { setMode('add-reservoir'); } },
+			{ icon: 'well', pointerOnly: true, label: pc.lpn_tool_add_well || 'Well', tip: pc.lpn_tool_add_well_tip, fn: function () { setMode('add-well'); } },
+			{ icon: 'welltank', pointerOnly: true, label: pc.lpn_tool_add_welltank || 'Well with tank', tip: pc.lpn_tool_add_welltank_tip, fn: function () { setMode('add-welltank'); } },
+			{ icon: 'welltankp', pointerOnly: true, label: pc.lpn_tool_add_welltankp || 'Well with pressure tank', tip: pc.lpn_tool_add_welltankp_tip, fn: function () { setMode('add-welltankp'); } },
 			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank'), hotkey: toolKeyFor('add-tank'), fn: function () { setMode('add-tank'); } },
 			{ icon: 'pipe', pointerOnly: true, label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe'), hotkey: toolKeyFor('add-pipe'), fn: function () { setMode('add-pipe'); } },
 			{ icon: 'virtual', pointerOnly: true, label: pc.lpn_tool_add_virtual || 'Virtual pipe', tip: pc.lpn_tool_add_virtual_tip, fn: function () { setMode('add-virtual'); } },
 			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump'), hotkey: toolKeyFor('add-pump'), fn: function () { setMode('add-pump'); } },
 			{ icon: 'pumpplus', pointerOnly: true, label: pc.lpn_tool_add_pumpplus || 'Pump+', tip: pc.lpn_tool_add_pumpplus_tip, fn: function () { setMode('add-pumpplus'); } },
-			{ icon: 'well', pointerOnly: true, label: pc.lpn_tool_add_well || 'Well', tip: pc.lpn_tool_add_well_tip, fn: function () { setMode('add-well'); } },
-			{ icon: 'welltank', pointerOnly: true, label: pc.lpn_tool_add_welltank || 'Well with tank', tip: pc.lpn_tool_add_welltank_tip, fn: function () { setMode('add-welltank'); } },
-			{ icon: 'welltankp', pointerOnly: true, label: pc.lpn_tool_add_welltankp || 'Well with pressure tank', tip: pc.lpn_tool_add_welltankp_tip, fn: function () { setMode('add-welltankp'); } },
 			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve'), hotkey: toolKeyFor('add-valve'), fn: function () { setMode('add-valve'); } },
 			{ icon: 'valveplus', pointerOnly: true, label: pc.lpn_tool_add_valveplus || 'Valve+', tip: pc.lpn_tool_add_valveplus_tip, fn: function () { setMode('add-valveplus'); } },
 			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
@@ -78086,11 +78082,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function () { return effective(n, 'maxLevel'); },
 			function (v) { W(function () { setProp(n, 'maxLevel', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_maxlevel_short_tip, { el: n, prop: 'maxLevel' }), valueWarnText('maxLevel', n, effective(n, 'maxLevel')));
-		// **A TANK THAT HAS A VOLUME CURVE** (a Well's pressure tank after Explode, an imported one) shows the curve it uses, and no diameter or minimum volume: both engines read
+		// **A TANK THAT RUNS ON A USABLE VOLUME CURVE** (a Well's pressure tank after Explode, an imported one) shows no diameter or minimum volume: both engines read
 		// the curve for volume against depth and ignore those two, so a row for them would show a number the tank does not run on (Tom, round 13 pass: Explode showed a diameter and a
 		// minimum volume the tank had not shown). The stored values are untouched; clearing the curve brings the rows back.
-		var curved = !door && typeof effective(n, 'volCurve') === 'string' && effective(n, 'volCurve') !== '';
-		if (curved) { popRows(fields, '#owned', function () { curveChooser(fields, n, 'volCurve', 'volume', pc.lpn_curve_kind_volume || 'Tank volume'); }); }
+		var vcRef = effective(n, 'volCurve'), vcCurve = vcRef ? curveById(vcRef) : null,
+			curved = !door && !!vcCurve && !!EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(curvePointsOf(vcCurve));
+		// Every tank's box holds the volume curve reference (EPANET's tank has a Volume Curve property), so a curve can be chosen, cleared and chosen again.
+		if (!door) { popRows(fields, '#owned', function () { curveChooser(fields, n, 'volCurve', 'volume', pc.lpn_curve_kind_volume || 'Tank volume'); }); }
 		// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
 		// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
 		// and NOT the pipe-diameter unit either, or inches/millimetres would put a 15 m tank on

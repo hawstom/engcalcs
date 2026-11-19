@@ -76,7 +76,7 @@ async function main() {
 		const at = arrows.find((q) => q.id === '21');
 		const armed = () => P.evaluate(() => { const b = document.querySelector('#lpn_toolbar button[aria-pressed="true"]'); return b ? b.dataset.tool : null; });
 		await P.keyboard.press('Escape');
-		for (let i = 0; i < 5 && (await armed()) !== 'add-well'; i++) { await P.keyboard.press('6'); await a.settle(150); }
+		for (let i = 0; i < 5 && (await armed()) !== 'add-well'; i++) { await P.keyboard.press('3'); await a.settle(150); }
 		ok('pressing Pump three times arms the simple Well', (await armed()) === 'add-well');
 		await P.mouse.click(at.x, at.y); await a.settle(500);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(900);
@@ -141,7 +141,7 @@ async function main() {
 		const b = await open(net1), Q = b.page;
 		await Q.keyboard.press('Escape');
 		const armedQ = () => Q.evaluate(() => { const x = document.querySelector('#lpn_toolbar button[aria-pressed="true"]'); return x ? x.dataset.tool : null; });
-		for (let i = 0; i < 6 && (await armedQ()) !== 'add-welltank'; i++) { await Q.keyboard.press('6'); await b.settle(150); }
+		for (let i = 0; i < 6 && (await armedQ()) !== 'add-welltank'; i++) { await Q.keyboard.press('3'); await b.settle(150); }
 		ok('pressing Pump four times arms Well with tank', (await armedQ()) === 'add-welltank');
 		// A point of open ground: nothing with a data-node or data-link under it, scanned outward from a start.
 		const freeNear = async (sx, sy) => Q.evaluate(([x0, y0]) => {

@@ -734,23 +734,26 @@ for (const form of ['open-air', 'pressure', 'pressure in US units']) {
 		ok(form + ': the exploded pressure tank\'s box shows the volume curve it uses, as a chooser, and no Minimum volume or diameter it never showed', !!at(/^Tank volume/) && at(/^Tank volume/).n === 1 && at(/^Tank volume/).v === a.pt.curve && !at(/^Minimum volume/) && !at(/^Tank diameter/), JSON.stringify(rs.filter((r) => /volume|diameter/i.test(r.t))));
 		ok(form + ': nothing in the box carries the Well\'s 1000', !rs.some((r) => r.v === '1000'));
 	} else {
-		ok(form + ': an open-air tank has no curve, so its box keeps the diameter and a blank Minimum volume', !at(/^Tank volume/) && !!at(/^Tank diameter/) && at(/^Minimum volume/) && at(/^Minimum volume/).v === '');
+		ok(form + ': an open-air tank has no curve, so its box keeps the diameter and a blank Minimum volume, and offers the volume curve chooser with no curve chosen', !!at(/^Tank volume/) && at(/^Tank volume/).v === '' && !!at(/^Tank diameter/) && at(/^Minimum volume/) && at(/^Minimum volume/).v === '');
 	}
 }
 setUnitSet('si');
 
 {
-	// A file from before the Well owned its tank may hold a Minimum volume and Can overflow on a pressure tank, hidden; opening it clears them so Explode shows nothing new.
-	setUnitSet('us');
-	const doc = fresh();
-	L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
-	const a = doc.assemblies[0];
-	const sv = JSON.parse(JSON.stringify(L.serializeProject()));
-	sv.nodes.forEach((n) => { if (n.id === a.tank) { n.minVolume = 1000; n.overflow = 'YES'; n.tankDiameter = 200; } });
-	L.applySaved(L.migrateSaved(sv)); L.buildDom();
-	const t = L.nodeById(a.tank);
-	ok('opening an older file clears a pressure tank\'s hidden Minimum volume and overflow (its diameter is left as it is)', t.minVolume === undefined && t.overflow === undefined && t.tankDiameter === 200, JSON.stringify([t.minVolume, t.overflow, t.tankDiameter]));
+	// Round 14 review: a Well's controls are rewritten without joining the comments around them (the Libraries box keeps a comment a row of its own).
 	setUnitSet('si');
+	const doc = fresh();
+	L.setMode('add-welltank'); press(200, 150); press(500, 150); press(500, 400);
+	const a = doc.assemblies[0], mk = (t) => ({ comment: true, lines: [';' + t] });
+	a.pumpOn = 3; a.pumpOff = 6; L.syncWellControls(a);
+	const wc = doc.controls.filter((c) => c.asm === a.id);
+	doc.controls = [mk('A')].concat(doc.controls, [mk('B')]);
+	EC.lpnControlsSeparate(doc.controls);
+	delete a.pumpOn; delete a.pumpOff; L.syncWellControls(a);
+	const left = doc.controls;
+	ok('clearing a Well\'s levels removes its two controls and leaves the two comments apart, as two rows', wc.length === 2 && left.length >= 2 && left.filter((c) => c.comment).length === 2 && left.every((c) => !c.asm), JSON.stringify(left));
+	const out = EC.lpnExportInp(L.serializeProject(), {}).inp;
+	ok('and the .inp export keeps both comments', /;A\b/.test(out) && /;B\b/.test(out));
 }
 
 console.log('\n--- 12. round 13 review: joined only when nothing else joins, box-select, the DEM fill ---');
