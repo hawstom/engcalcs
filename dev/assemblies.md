@@ -172,7 +172,7 @@ upper right of the bowtie, over the corner as in Tom's sketch, in ink with a pap
 
 ### Well, slice 1 (Sue's design, 2026-11-09; `dev/lpn-spike/well-harness.js`), as it stands after Round 7
 
-The Pump button's third form (Pump, Pump+, Well, Well with tank). Five ordinary elements at one point: **R** a reservoir whose head is the
+The Reservoir button's second form (Reservoir, Well, Well with tank, Well with pressure tank). Five ordinary elements at one point: **R** a reservoir whose head is the
 groundwater's static elevation, **D** the drawdown node (the pump's upstream junction, no demand, same elevation as R), **V** a GPV from R to D whose
 head-loss curve is the drawdown against pumping rate (it includes the point 0, 0), **W** the pump from D to **P** its outlet, the junction the system's
 pipes attach to and the one that carries the ground elevation and the drawing. The pump's curve is the head lifted from the pumping level (the static
@@ -255,7 +255,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 
 ### Round 6 (Tom, 2026-11-11; `well-simple-harness.js`, `well-round6-browser-harness.js`)
 
-- **Two Well forms on the Pump button** (Pump, Pump+, Well, Well with tank). **Well** is the simple one (Slice 1 above gives its members and IDs after
+- **Two Well forms on the Reservoir button** (Reservoir, Well, Well with tank, Well with pressure tank; round 14, Tom: "Move the wells": a well is a source; the Pump button keeps Pump and Pump+, and every form keeps its Insert row). **Well** is the simple one (Slice 1 above gives its members and IDs after
   Round 7). **Well with tank** was a one-point form here; Round 7 replaced it.
 - **The box:** the top holds every input; each member's heading holds results only and always shows its rows, blank before a run.
 - **One label block per assembly**, on its output node, placed by the ordinary node pass (the assembly's own placer is retired). Headed by the assembly
@@ -274,7 +274,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **The Properties box:** flow once, above the headings (the pump's); pressure only under the outlet. The reservoir's Pressure row is gone too.
 - **The symbol:** the circle with a vertical arrow and its two joined forms, as Round 13 states them.
 - **Well with tank is three points** (*"Physically and geographically, a well is a location/point with a reservoir, drawdown, and pump. Cramming a tank into
-  that point makes no sense"*): the Pump button cycles Pump, Pump+, Well, Well with tank. Three presses, each prompted in the status bar: the well
+  that point makes no sense"*): the Reservoir button cycles Reservoir, Well, Well with tank, Well with pressure tank. Three presses, each prompted in the status bar: the well
   (placed as a Well is, spliced into a pipe or on open ground), the tee, the tank. The tee may be the well's own point (the pipe joining them is then a
   virtual pipe), an existing junction, a point on a pipe (which splits it) or open ground; the tank an existing tank or open ground; a press on the wrong
   kind of node is refused in the status bar and asked again. Result: an ordinary Well, an ordinary junction, an ordinary tank and two ordinary pipes with
@@ -352,7 +352,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 
 ### Round 11: Well with pressure tank (Tom, 2026-11-16; `well-tank-three-point-harness.js` section 9, `well-controls-harness.js`)
 
-- **Third form of the Pump button**, beside Well and Well with tank (Tom: "It's a lot. But let's go with a third additional form."). Same wizard, same group;
+- **Fourth form of the Reservoir button**, beside Well and Well with tank (Tom: "It's a lot. But let's go with a third additional form."). Same wizard, same group;
   `pt` on the group is `{ vol, pre, on, off, curve }` as typed. `syncPressureTank()` is the one writer of everything derived from it.
 - **The model:** the tank is a fixed head at its gas pressure, so its level IS the gauge pressure head. It stands on the ground (follows the Well), minimum level 0,
   maximum level the pump-off head, a VOLUME curve from Boyle's law (water held at gauge head h is V (1 - P0/P), absolute pressures, atmosphere 14.7 psi used only for

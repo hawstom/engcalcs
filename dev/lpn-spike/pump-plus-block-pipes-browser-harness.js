@@ -144,7 +144,7 @@ async function main() {
 		for (const pid of pipes) {
 			const A = await openNet1(browser, net1, { width: 1800, height: 1200 }), P = A.P;
 			if (!A.at(pid)) { await A.s.close(); continue; }
-			await A.arm('6', 'add-well'); await A.click(A.at(pid)); await A.off(); await A.s.settle(1200);
+			await A.arm('3', 'add-well'); await A.click(A.at(pid)); await A.off(); await A.s.settle(1200);
 			const r = await P.evaluate(() => {
 				const t = document.querySelector('#lpn_canvas text[data-nodelbl$="D"][data-nodelbl^="W"]'); const out = { rows: [] };
 				if (t && t.style.visibility !== 'hidden' && t.textContent) { Array.from(t.querySelectorAll('tspan')).forEach((x) => { const b = x.getBoundingClientRect(); if (b.width > 0) { out.rows.push({ l: b.left, r: b.right, t: b.top, b: b.bottom }); } }); }

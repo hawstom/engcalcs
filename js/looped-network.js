@@ -23971,7 +23971,7 @@ var EngCalcs = EngCalcs || {};
 	// pressing it a second time rather than by a memory of what was last used.
 	var zoomToolShape = 'fit';   // 'fit' | 'window'
 	// **ONE TOOLBAR BUTTON, SEVERAL FORMS, THE SAME CONVENTION AS SELECT AREA** (Task 822; Tom, 2026-11-06:
-	// "Put Valve+ on Valve, Pump+ and Well on Pump, Virtual Pipe on Pipe"). The button shows the form it
+	// "Put Valve+ on Valve, Pump+ and Well on Pump, Virtual Pipe on Pipe"; round 13 pass: "Move the wells", under Reservoir, a well being a source). The button shows the form it
 	// will place; pressing it again while one of its forms is the tool moves to the next; a corner
 	// triangle says so. The form last used is kept for this page only. `slot` is the base tool whose
 	// digit and Insert row the button keeps.
@@ -23984,12 +23984,15 @@ var EngCalcs = EngCalcs || {};
 			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve', tip: null, label: 'Valve' },
 			{ mode: 'add-valveplus', key: 'lpn_tool_add_valveplus', icon: 'valveplus', tip: 'lpn_tool_add_valveplus_tip', label: 'Valve+' }
 		] },
-		{ slot: 'add-pump', idx: 0, repaint: null, forms: [
-			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: null, label: 'Pump' },
-			{ mode: 'add-pumpplus', key: 'lpn_tool_add_pumpplus', icon: 'pumpplus', tip: 'lpn_tool_add_pumpplus_tip', label: 'Pump+' },
+		{ slot: 'add-reservoir', idx: 0, repaint: null, forms: [
+			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir', tip: null, label: 'Reservoir' },
 			{ mode: 'add-well', key: 'lpn_tool_add_well', icon: 'well', tip: 'lpn_tool_add_well_tip', label: 'Well' },
 			{ mode: 'add-welltank', key: 'lpn_tool_add_welltank', icon: 'welltank', tip: 'lpn_tool_add_welltank_tip', label: 'Well with tank' },
 			{ mode: 'add-welltankp', key: 'lpn_tool_add_welltankp', icon: 'welltankp', tip: 'lpn_tool_add_welltankp_tip', label: 'Well with pressure tank' }
+		] },
+		{ slot: 'add-pump', idx: 0, repaint: null, forms: [
+			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: null, label: 'Pump' },
+			{ mode: 'add-pumpplus', key: 'lpn_tool_add_pumpplus', icon: 'pumpplus', tip: 'lpn_tool_add_pumpplus_tip', label: 'Pump+' }
 		] }
 	];
 	function toolFormsFor(mode) {
@@ -61261,7 +61264,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		[
 			{ mode: 'add-chain', key: 'lpn_tool_add_chain', icon: 'chain', tip: pc.lpn_tool_add_chain_tip },
 			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
-			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
+			{ mode: 'add-reservoir', form: true },
 			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
 			{ mode: 'add-pipe', form: true },
 			{ mode: 'add-pump', form: true },

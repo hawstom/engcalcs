@@ -122,30 +122,39 @@ async function main() {
 		console.log('\n--- toolbar forms: Pump+ on Pump, Virtual pipe on Pipe ---');
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		const armed = () => P.evaluate(() => { const b = document.querySelector('#lpn_toolbar button[aria-pressed="true"]'); return b ? b.dataset.tool : null; });
-		const PUMP = '#lpn_toolbar button[data-tool="add-pump"], #lpn_toolbar button[data-tool="add-pumpplus"], #lpn_toolbar button[data-tool="add-well"], #lpn_toolbar button[data-tool="add-welltank"]';
+		const PUMP = '#lpn_toolbar button[data-tool="add-pump"], #lpn_toolbar button[data-tool="add-pumpplus"]';
+		const RES = '#lpn_toolbar button[data-tool="add-reservoir"], #lpn_toolbar button[data-tool="add-well"], #lpn_toolbar button[data-tool="add-welltank"], #lpn_toolbar button[data-tool="add-welltankp"]';
 		const faceOf = (sel) => P.evaluate((q) => { const b = document.querySelector(q); return b ? b.innerHTML : null; }, sel);
-		ok('one button for Pump, Pump+ and Well, one for Pipe and Virtual pipe', await P.evaluate((q) => document.querySelectorAll(q).length === 1 &&
-			document.querySelectorAll('#lpn_toolbar button[data-tool="add-pipe"], #lpn_toolbar button[data-tool="add-virtual"]').length === 1, PUMP));
-		ok('both carry the corner triangle', await P.evaluate((q) => document.querySelector(q).classList.contains('lpn-tool-more') &&
-			document.querySelector('#lpn_toolbar button[data-tool="add-pipe"], #lpn_toolbar button[data-tool="add-virtual"]').classList.contains('lpn-tool-more'), PUMP));
+		ok('one button for Pump and Pump+, one for Reservoir and the three Wells, one for Pipe and Virtual pipe', await P.evaluate(([q, r]) => document.querySelectorAll(q).length === 1 && document.querySelectorAll(r).length === 1 &&
+			document.querySelectorAll('#lpn_toolbar button[data-tool="add-pipe"], #lpn_toolbar button[data-tool="add-virtual"]').length === 1, [PUMP, RES]));
+		ok('all three carry the corner triangle', await P.evaluate(([q, r]) => document.querySelector(q).classList.contains('lpn-tool-more') && document.querySelector(r).classList.contains('lpn-tool-more') &&
+			document.querySelector('#lpn_toolbar button[data-tool="add-pipe"], #lpn_toolbar button[data-tool="add-virtual"]').classList.contains('lpn-tool-more'), [PUMP, RES]));
 		// Put the button on Pump whatever form was remembered: press until Pump is armed.
 		for (let i = 0; i < 5 && (await armed()) !== 'add-pump'; i++) { await P.click(PUMP); await a.settle(150); }
 		const pumpFace = await faceOf(PUMP);
 		ok('Pump armed, showing the Pump face', (await armed()) === 'add-pump');
 		await P.click(PUMP); await a.settle(150);
 		ok('pressing again arms Pump+, and the button shows it', (await armed()) === 'add-pumpplus' && (await faceOf(PUMP)) !== pumpFace);
-		const plusFace = await faceOf(PUMP);
 		await P.click(PUMP); await a.settle(150);
-		ok('and again arms Well, with a face of its own', (await armed()) === 'add-well' && (await faceOf(PUMP)) !== pumpFace && (await faceOf(PUMP)) !== plusFace);
-		const wellFace = await faceOf(PUMP);
-		await P.click(PUMP); await a.settle(150);
-		ok('and again arms Well with tank, with a face of its own', (await armed()) === 'add-welltank' && (await faceOf(PUMP)) !== wellFace && (await faceOf(PUMP)) !== plusFace && (await faceOf(PUMP)) !== pumpFace);
-		await P.click(PUMP); await a.settle(150);
-		ok('and again is back to Pump', (await armed()) === 'add-pump' && (await faceOf(PUMP)) === pumpFace);
+		ok('and again is back to Pump: the Pump button holds two forms, the wells having moved to the Reservoir button', (await armed()) === 'add-pump' && (await faceOf(PUMP)) === pumpFace);
+		// The Reservoir button: Reservoir, Well, Well with tank, Well with pressure tank (a well is a source).
+		for (let i = 0; i < 6 && (await armed()) !== 'add-reservoir'; i++) { await P.click(RES); await a.settle(150); }
+		const resFace = await faceOf(RES);
+		ok('Reservoir armed, showing the Reservoir face', (await armed()) === 'add-reservoir');
+		await P.click(RES); await a.settle(150);
+		ok('pressing again arms Well, with a face of its own', (await armed()) === 'add-well' && (await faceOf(RES)) !== resFace);
+		const wellFace = await faceOf(RES);
+		await P.click(RES); await a.settle(150);
+		ok('and again arms Well with tank, with a face of its own', (await armed()) === 'add-welltank' && (await faceOf(RES)) !== wellFace && (await faceOf(RES)) !== resFace);
+		const wtFace = await faceOf(RES);
+		await P.click(RES); await a.settle(150);
+		ok('and again arms Well with pressure tank, with a face of its own', (await armed()) === 'add-welltankp' && ![resFace, wellFace, wtFace].includes(await faceOf(RES)));
+		await P.click(RES); await a.settle(150);
+		ok('and again is back to Reservoir', (await armed()) === 'add-reservoir' && (await faceOf(RES)) === resFace);
 		// A Well: four nodes at one point, dragged as one.
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
-		for (let i = 0; i < 5 && (await armed()) !== 'add-well'; i++) { await P.keyboard.press('6'); await a.settle(150); }
-		ok('key 6 cycles to Well', (await armed()) === 'add-well');
+		for (let i = 0; i < 5 && (await armed()) !== 'add-well'; i++) { await P.keyboard.press('3'); await a.settle(150); }
+		ok('key 3 cycles to Well', (await armed()) === 'add-well');
 		const wellNodes = async () => { const all = await circles(a), r = all.find((c) => /R$/.test(c.id)); return r ? all.filter((c) => Math.abs(c.x - r.x) < 1e-9 && Math.abs(c.y - r.y) < 1e-9) : []; };
 		const wellAt = { x: at.x + 250, y: at.y + 200 };
 		await P.mouse.click(wellAt.x, wellAt.y); await a.settle(300);
@@ -170,8 +179,8 @@ async function main() {
 		await undo();
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		// Well with tank (round 7): three presses, the well, the tee, the tank. The well is three nodes at one point; the tee and the tank stand apart.
-		for (let i = 0; i < 5 && (await armed()) !== 'add-welltank'; i++) { await P.keyboard.press('6'); await a.settle(150); }
-		ok('key 6 cycles on to Well with tank', (await armed()) === 'add-welltank');
+		for (let i = 0; i < 5 && (await armed()) !== 'add-welltank'; i++) { await P.keyboard.press('3'); await a.settle(150); }
+		ok('key 3 cycles on to Well with tank', (await armed()) === 'add-welltank');
 		const tankAt = { x: at.x + 250, y: at.y - 150 };
 		const nodeIds = () => P.evaluate(() => Array.from(new Set(Array.from(document.querySelectorAll('#lpn_canvas [data-node]')).map((e) => e.getAttribute('data-node')))));
 		const idsBefore = await nodeIds();
