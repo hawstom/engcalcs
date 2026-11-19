@@ -5093,3 +5093,11 @@ OBSERVED (re-verify; real Chromium, Net1 EPS 25 frames to 24 h, desktop 1400x900
 - OBSERVED: transport-ends-browser-harness passes (46 ok). Own drive, real Chromium, Net1 EPS, Junction 10: thin blue time line (1.5px, token colour) visible at 0:00 on the left plot edge in the bottom pane and on the phone Properties graph; hover shows crosshair + time/value readout and changes nothing; click set 15:00, drag scrubbed; phone tap and sideways drag set time, readout shown with finger down; no page errors.
 - OBSERVED: the run-finished Calculate dialog sits over the right of the bottom graph on first run (pre-existing, not this branch).
 - Not checked: how it feels under a real finger; pixel look beyond screenshots.
+
+## 2026-11-18 feat/pick-chooser round 8 (937be3668), Task 861, Perry
+OBSERVED (re-verify; real Chromium phone 412x915 2.6x, real touch taps, Net3, own grid probes):
+- pick-chooser-zoom harness 64 pass, pick-chooser-browser 153 pass (run WITHOUT an outer flock: they take the lock themselves; an outer flock deadlocks them into "NOT RUN").
+- Far-zoom cluster, tap grid around Pump 335: 12 notches (glyph 4x6 px) a tap within about 2-3 px of the glyph gives the pump, 4+ px right River, left Junction 601, below Junction 61; box only in a 1-2 px sliver (pump+J60/J61). 8 notches (6x8 px) a tap up to ~12 px right of the pump on bare map gives the pump. 16 notches (3x4 px) the pump is selectable by 5 pixels in a 1 px grid, otherwise River, or a box "River / Junction 60" on any tap in River's body (J60 is wholly hidden under River's ink: the hidden-under rule).
+- No 16-notch tap selecting nothing found within +-5 px of the pump; only far bare map selects nothing.
+- Tank 1 box with Junction 40 at 2, 4, 8 notches (none at opening view); zoomed in 3 and 6 notches: pump, J60, J61, River, J601, J123 each selected by tapping its centre, no box.
+- NOT DONE: pipe-body taps near a pump glyph (the new nearest-ink rule now includes pump glyphs, so a pipe tap within 24 px of a glyph may go to the pump), mutation test, a real finger.
