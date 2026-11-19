@@ -199,8 +199,8 @@ console.log('\n--- and it comes back out again ---');
 	ok('...the same default', back.defaultPattern === '1', JSON.stringify(back.defaultPattern));
 	ok('...the same duration', back.times && back.times.duration === 24 * 3600,
 		back.times && back.times.duration);
-	ok('...and the same controls', back.controls.length === doc.controls.length,
-		back.controls.length + ' vs ' + doc.controls.length);
+	ok('...and the same controls', back.controls.length === doc.controls.filter((c) => !c.comment).length,
+		back.controls.length + ' vs ' + doc.controls.filter((c) => !c.comment).length);
 	// A junction that named its own pattern still does, and one that did not still does not.
 	const named = back.nodes.filter(n => n.type === 'junction' && n.demandPattern);
 	ok('...and only the junctions that stated a pattern carry one',

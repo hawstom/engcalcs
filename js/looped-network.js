@@ -14381,9 +14381,9 @@ var EngCalcs = EngCalcs || {};
 		// their job."). Fill, lines, labels and Ground keep their values and stay editable; off, nothing is drawn.
 		// **THE STANDING LINE** names what the plot follows, always, with Node colors a way into Settings there. With No
 		// color there is no property to plot: a second line says so, and nothing turns colors on (Tom, 2026-10-29).
-		var stand = document.createElement('div'), link = document.createElement('a'), tpl = pc.lpn_contour_follows || 'Follows project "{link}" settings.', at = tpl.indexOf('{link}');
+		var stand = document.createElement('div'), link = document.createElement('a'), tpl = pc.lpn_contour_follows || 'Uses the project "{link}" settings.', at = tpl.indexOf('{link}');
 		// A translation that lost the placeholder falls back to the English sentence, so the link is always there.
-		if (at < 0) { tpl = 'Follows project "{link}" settings.'; at = tpl.indexOf('{link}'); }
+		if (at < 0) { tpl = 'Uses the project "{link}" settings.'; at = tpl.indexOf('{link}'); }
 		stand.className = 'lpn-contour-box-note'; stand.id = 'lpn_contour_follows';
 		link.href = '#'; link.id = 'lpn_contour_follows_link';
 		link.textContent = pc.lpn_settings_sym_node_colors || 'Node colors';
@@ -36649,7 +36649,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A press on a mark is not a press on the cell: it must not move the selection, enter the cell or take focus.
 		box.addEventListener('mousedown', function (e) { e.stopPropagation(); e.preventDefault(); });
 		if (push) {
-			box.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Push override upward', function () {
+			box.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Move this override up', function () {
 				var h = paneOverrideHit(c, row), vals, dest, others, now;
 				if (!h || h.col) { return; }
 				paneInScenario(h.scn, function () {
@@ -37571,12 +37571,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var ctls = libControlsRead();
 		if (ctls.length) {
 			out.push({ name: pc.lpn_library_controls || 'Controls', heads: [descH, pc.lpn_library_controls || 'Controls'], numeric: [false, false],
-				rows: ctls.map(function (c) { return [txt(c.note), libControlText(c)]; }) });
+				rows: ctls.map(function (c) { return c.comment ? [txt(libCommentText(c.lines)), ''] : [txt(c.note), libControlText(c)]; }) });
 		}
 		var ruleLines = libRulesRead(), rrows = [];
-		libRuleEntries(ruleLines).forEach(function (e) {
-			var desc = libRuleDesc(ruleLines, e);
-			libRuleBody(ruleLines, e).forEach(function (line) { rrows.push([txt(e.name), txt(desc), txt(line)]); });
+		libRuleItems(ruleLines).forEach(function (e) {
+			if (e.kind === 'comment') { rrows.push(['', txt(libCommentText(e.lines)), '']); return; }
+			e.lines.forEach(function (line) { rrows.push([txt(e.name), '', txt(line)]); });
 		});
 		if (rrows.length) {
 			out.push({ name: pc.lpn_library_rules || 'Rules', heads: [idH, descH, pc.lpn_library_rules || 'Rules'], numeric: [false, false, false], rows: rrows });
@@ -37696,7 +37696,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				note.className = 'lpn-gfull';
 				// What All holds and what it leaves out (Task 814, rows 24-26): the file is flat copies, not the tree.
 				var noteText = (pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.') + ' ' +
-					(pc.lpn_export_table_scn_keeps || 'All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.');
+					(pc.lpn_export_table_scn_keeps || 'With All chosen, the file holds one sheet for each scenario. Parent scenarios, alternatives, and inheritance are not in the file.');
 				body.appendChild(note);
 				groups.scenarios.addEventListener('change', function () { note.textContent = picked('scenarios') === 'all' ? noteText : ''; });
 			}
@@ -39433,6 +39433,193 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// reads; the label is then the transport's own format, so the axis and the scrubber say the same
 	// thing about the same moment.
 	function tsHours(t) { return (t || 0) / 3600; }
+	// **THE CHART READS AND SETS THE TIME, THE WAY A MODERN CHART DOES** (Tom, 2026-11-17: "Most modern
+	// applications find a more intuitive way to do this without a triangle and a heavy line"). The current time
+	// is a thin line, no handle. A pointer over the plot draws a light crosshair on the nearest reporting time
+	// with a small readout (the time, and each series' value then); nothing changes until the reader acts. A
+	// click or tap sets the run to that reporting time; a press and drag scrubs it. On touch the readout shows
+	// while the finger is down, because a phone has no hover, and a vertical swipe still scrolls the box.
+	// The seek is EngCalcs.lpnTimeGoTo(), which Back, Forward and the time selector end in too.
+	//
+	// **A PRESS THAT DOES NOT TRAVEL SETS THE TIME AT RELEASE; A DRAG SEEKS ONCE IT HAS TRAVELLED TS_NOW_SLOP px**,
+	// so a finger that turns into a vertical scroll (pointercancel) has set nothing.
+	//
+	// **THE CHART IS REDRAWN ON EVERY STEP, SO THE DRAG LIVES ON THE DOCUMENT**, not on the svg that was pressed:
+	// that svg is replaced under the pointer by the redraw this very seek causes. The drawing's numbers ride on
+	// the svg (svg._tsNow), at every move the live svg is found again in the chart's container (by id when it
+	// has one: the Properties box builds a new container each time), and the redraw puts the crosshair back.
+	// Nothing here outlives the drag but tsHover, the mouse's last position, which a redraw checks against the
+	// new svg's own rectangle.
+	var TS_NOW_SLOP = 3, TS_READ_ROWS = 8, tsNowDrag = null, tsHover = null;
+	function tsNowLiveSvg(d) {
+		var host = typeof d.host === 'string' ? document.getElementById(d.host) : d.host, all, i;
+		if (!host) { return null; }
+		all = host.querySelectorAll('svg');
+		for (i = 0; i < all.length; i++) { if (all[i]._tsNow && all[i].isConnected) { return all[i]; } }
+		return null;
+	}
+	// The plotted reporting time nearest the pointer: from the chart's OWN frame times (c.times, kept per draw), not the
+	// transport's current settings, which a Report step changed with Recalculate off no longer describe the run drawn.
+	function tsNearestStop(svg, clientX) {
+		var c = svg._tsNow, tm = c && c.times, p, hrs, best = -1, i, ctm = svg.getScreenCTM && svg.getScreenCTM(), pt;
+		if (!c || !tm || !tm.length || !ctm) { return null; }
+		pt = svg.createSVGPoint(); pt.x = clientX; pt.y = 0;
+		p = pt.matrixTransform(ctm.inverse());
+		hrs = c.xB.min + (p.x - c.box.left) / (c.box.width || 1) * (c.xB.max - c.xB.min);
+		for (i = 0; i < tm.length; i++) {
+			if (tsHours(tm[i]) < c.xB.min - 1e-9 || tsHours(tm[i]) > c.xB.max + 1e-9) { continue; }
+			if (best < 0 || Math.abs(tsHours(tm[i]) - hrs) < Math.abs(tsHours(tm[best]) - hrs)) { best = i; }
+		}
+		return best < 0 ? null : { i: best, t: tm[best], x: c.box.left + (tsHours(tm[best]) - c.xB.min) / ((c.xB.max - c.xB.min) || 1) * c.box.width };
+	}
+	function tsCrossHide(svg) {
+		var g = svg && svg.querySelector('.lpn-ts-cross');
+		if (g) { svg.removeChild(g); }
+	}
+	// The crosshair and its readout, drawn last in the svg so nothing covers them, and never taking a pointer.
+	function tsCrossShow(svg, clientX) {
+		var c = svg._tsNow, s = tsNearestStop(svg, clientX), g, rd, rows, lines, w = 0, h, x0, i, t, sw = 10, pad = 4, lh = 12, n;
+		tsCrossHide(svg);
+		if (!s) { return; }
+		g = el('g', { class: 'lpn-ts-cross' }, svg);
+		svg._tsCrossAt = s.t;
+		el('line', { x1: s.x, y1: c.box.top, x2: s.x, y2: c.box.top + c.box.height, class: 'lpn-ts-cross-line' }, g);
+		rd = c.readout ? c.readout(s.t, s.i) : null;
+		rows = rd && rd.rows ? rd.rows : [];
+		// Lines that fit in the frame below the readout's 4 px offset: the title, the rows, and a "+k" line when rows are cut.
+		n = Math.floor((c.box.height - 8 - 2 * pad) / lh);
+		n = rows.length > TS_READ_ROWS || rows.length + 1 > n ? Math.max(0, Math.min(TS_READ_ROWS, n - 2)) : rows.length;
+		lines = [{ text: rd && rd.title ? rd.title : (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(s.t) : String(s.t)) }]
+			.concat(rows.slice(0, n));
+		if (rows.length > n) { lines.push({ text: '+' + (rows.length - n) }); }
+		el('rect', { class: 'lpn-ts-read-bg', rx: 3 }, g);
+		lines.forEach(function (ln, k) {
+			if (ln.color) { el('circle', { cx: pad + 4, cy: pad + (k + 1) * lh - 4, r: 3, fill: ln.color, class: 'lpn-ts-read-swatch' }, g); }
+			t = tsText(g, pad + (ln.color ? sw : 0), pad + (k + 1) * lh - 3, ln.text, { class: 'lpn-profile-tick lpn-ts-read-text' });
+			try { w = Math.max(w, t.getComputedTextLength() + (ln.color ? sw : 0)); } catch (e) { w = Math.max(w, ln.text.length * 6); }
+		});
+		w += 2 * pad; h = lines.length * lh + 2 * pad;
+		x0 = s.x + 8;
+		if (x0 + w > c.box.left + c.box.width) { x0 = s.x - 8 - w; }
+		if (x0 + w > c.box.left + c.box.width) { x0 = c.box.left + c.box.width - w; }
+		x0 = Math.max(c.box.left, x0);
+		g.querySelector('.lpn-ts-read-bg').setAttribute('width', w);
+		g.querySelector('.lpn-ts-read-bg').setAttribute('height', h);
+		for (i = 1; i < g.childNodes.length; i++) {
+			g.childNodes[i].setAttribute('transform', 'translate(' + x0 + ',' + (c.box.top + 4) + ')');
+		}
+	}
+	function tsNowSeek(clientX) {
+		var svg = tsNowDrag && tsNowLiveSvg(tsNowDrag), s;
+		if (!svg || !EngCalcs.lpnTimeGoTo) { return; }
+		s = tsNearestStop(svg, clientX);
+		if (!s || s.t === tsNowDrag.last) { return; }
+		tsNowDrag.last = s.t;
+		EngCalcs.lpnTimeGoTo(s.t);
+	}
+	function tsNowEnd(e) {
+		var svg;
+		if (!tsNowDrag || (e && e.pointerId !== undefined && e.pointerId !== tsNowDrag.id)) { return; }
+		document.removeEventListener('pointermove', tsNowMove, true);
+		document.removeEventListener('pointerup', tsNowUp, true);
+		document.removeEventListener('pointercancel', tsNowEnd, true);
+		window.removeEventListener('blur', tsNowEnd);
+		svg = tsNowLiveSvg(tsNowDrag);
+		// A finger's readout goes with the finger; a mouse's stays while it is over the plot.
+		if (tsNowDrag.touch) { tsHover = null; tsCrossHide(svg); }
+		tsNowDrag = null;
+	}
+	function tsNowUp(e) {
+		if (!tsNowDrag || e.pointerId !== tsNowDrag.id) { return; }
+		if (!tsNowDrag.moved && e.type === 'pointerup') { tsNowSeek(e.clientX); }
+		if (!tsNowDrag.touch) { tsHover = { host: tsNowDrag.host, x: e.clientX, y: e.clientY }; }
+		tsNowEnd(e);
+		if (tsHover) { tsHoverShow(tsNowLiveSvg({ host: tsHover.host }), tsHover.host); }
+	}
+	function tsNowMove(e) {
+		if (!tsNowDrag || e.pointerId !== tsNowDrag.id) { return; }
+		// A pointerup that never arrived (released outside the window, or over a frame) must not leave the
+		// chart following a pointer with no button down.
+		if (e.pointerType === 'mouse' && e.buttons === 0) { tsNowEnd(null); return; }
+		tsNowDrag.x = e.clientX;
+		if (!tsNowDrag.moved) {
+			if (Math.abs(e.clientX - tsNowDrag.x0) < TS_NOW_SLOP) { return; }
+			tsNowDrag.moved = true;
+		}
+		// The seek redraws the chart, and the redraw puts the crosshair back (tsNowMark 'hit'), once.
+		tsNowSeek(e.clientX);
+	}
+	// Put a mouse's crosshair back on a chart that was just redrawn under it, if the pointer is still over its plot.
+	function tsHoverShow(svg, hostId) {
+		var r, c;
+		if (!svg || !tsHover || tsHover.host !== hostId) { return; }
+		c = svg._tsNow; r = svg.getBoundingClientRect();
+		if (!c || tsHover.x < r.left || tsHover.x > r.right || tsHover.y < r.top || tsHover.y > r.bottom) { return; }
+		tsCrossShow(svg, tsHover.x);
+	}
+	// **THE CURRENT TIME: ONE THIN LINE IN THE ACCENT COLOUR, NO HANDLE, ONE HELPER FOR EVERY CHART THAT CARRIES THE
+	// TRANSPORT'S TIME.** It reaches a few px above the frame and rests on a paper halo, so at 0:00, where it
+	// lies on the chart's left frame, it is still seen (Tom, 2026-11-17: "I don't see a time line").
+	// Called twice per chart: 'line' under the series, 'hit' last, which takes the pointer and carries `readout`,
+	// the chart's own function from a reporting time to {title, rows: [{color, text}]}.
+	function tsNowMark(host, svg, now, X, box, xB, part, readout, times) {
+		var x, hostId = host.id || host;
+		if (part === 'line') {
+			svg._tsNow = { box: box, xB: xB };
+			svg.setAttribute('class', svg.getAttribute('class') + ' lpn-ts-scrub');
+			if (now < xB.min || now > xB.max) { return; }
+			x = X(now);
+			el('line', { x1: x, y1: box.top - 4, x2: x, y2: box.top + box.height, class: 'lpn-ts-now-halo' }, svg);
+			el('line', { x1: x, y1: box.top - 4, x2: x, y2: box.top + box.height, class: 'lpn-ts-now' }, svg);
+			return;
+		}
+		svg._tsNow.readout = readout;
+		svg._tsNow.times = times;
+		function inPlot(e) {
+			var m = svg.getScreenCTM(), pt, p;
+			if (!m) { return false; }
+			pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+			p = pt.matrixTransform(m.inverse());
+			return p.x >= box.left && p.x <= box.left + box.width && p.y >= box.top && p.y <= box.top + box.height;
+		}
+		svg.addEventListener('pointermove', function (e) {
+			var near;
+			if (e.pointerType === 'touch' || tsNowDrag) { return; }
+			if (!inPlot(e)) { tsHover = null; tsCrossHide(svg); return; }
+			tsHover = { host: hostId, x: e.clientX, y: e.clientY };
+			// Nothing to redraw while the pointer stays nearest the same reporting time.
+			near = tsNearestStop(svg, e.clientX);
+			if (near && svg._tsCrossAt === near.t && svg.querySelector('.lpn-ts-cross')) { return; }
+			tsCrossShow(svg, e.clientX);
+		});
+		svg.addEventListener('pointerleave', function (e) {
+			if (tsNowDrag || e.pointerType === 'touch') { return; }
+			tsHover = null; tsCrossHide(svg);
+		});
+		svg.addEventListener('pointerdown', function (e) {
+			if ((e.button !== undefined && e.button > 0) || !inPlot(e)) { return; }
+			tsNowEnd(null);
+			if (EngCalcs.lpnTimePause) { EngCalcs.lpnTimePause(); }
+			tsNowDrag = { id: e.pointerId, host: hostId, x0: e.clientX, x: e.clientX, moved: false, touch: e.pointerType === 'touch',
+				last: (EngCalcs.lpnTimeStatisticLabel && EngCalcs.lpnTimeStatisticLabel()) ? null : EngCalcs.lpnTimeNow() };
+			document.addEventListener('pointermove', tsNowMove, true);
+			document.addEventListener('pointerup', tsNowUp, true);
+			document.addEventListener('pointercancel', tsNowEnd, true);
+			window.addEventListener('blur', tsNowEnd);
+			tsCrossShow(svg, e.clientX);
+		});
+		// A finger moving mostly sideways is a scrub, not the page's swipe-back or a pane scroll; `touch-action: pan-y`
+		// on the svg says the same to browsers that honour it.
+		(function () {
+			var sx = 0, sy = 0;
+			svg.addEventListener('touchstart', function (e) { if (e.touches.length) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; } }, { passive: true });
+			svg.addEventListener('touchmove', function (e) {
+				if (e.touches.length && e.cancelable && Math.abs(e.touches[0].clientX - sx) > Math.abs(e.touches[0].clientY - sy)) { e.preventDefault(); }
+			}, { passive: false });
+		}());
+		if (tsNowDrag && tsNowDrag.host === hostId) { tsCrossShow(svg, tsNowDrag.x); }
+		else { tsHoverShow(svg, hostId); }
+	}
 	function tsWaitingText(pc) {
 		var why;
 		if (EngCalcs.lpnTimeIsExtended && !effectiveTimesExtended()) {
@@ -39613,10 +39800,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// beside it is. Inside the frame only -- a run whose report starts late has moments the
 		// chart honestly does not cover.
 		now = tsHours(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0);
-		if (now >= xB.min && now <= xB.max) {
-			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
-				class: 'lpn-ts-now' }, svg);
-		}
+		tsNowMark(host, svg, now, X, box, xB, 'line');
 
 		dots = frames.length <= LPN_TS_DOT_MAX;
 		series.forEach(function (s) {
@@ -39643,17 +39827,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			flush();
 			if (!dots) { return; }
 			s.points.forEach(function (q) {
-				var c, ttl;
+				var c;
 				if (q.y === undefined) { return; }
-				c = el('circle', { cx: X(tsHours(q.t)), cy: Y(q.y), r: 2,
-					class: 'lpn-ts-dot', fill: s.color }, svg);
-				// A <title>, not a tooltip of our own: it is the one every browser already has, and
-				// it is where the exact number lives -- the axis is rounded to a step a person
-				// reads, which is the whole point of the step.
-				ttl = el('title', {}, c);
-				ttl.appendChild(document.createTextNode(
-					s.id + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(q.t) : q.t) +
-					'   ' + plainRound(q.y, 2)));
+				// No <title>: the crosshair readout gives the value, and two tips for one value are one too many. The
+				// exact number stays on the dot as data, for the harnesses that read what was plotted.
+				c = el('circle', { cx: X(tsHours(q.t)), cy: Y(q.y), r: 2, class: 'lpn-ts-dot', fill: s.color,
+					'data-reading': s.id + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(q.t) : q.t) + '   ' + plainRound(q.y, 2) }, svg);
 			});
 		});
 		// The measured rings, in their asset's own color, drawn last so a line never hides one.
@@ -39669,12 +39848,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		});
 
+		unit = colorFieldUnitText(group, field);
+		tsNowMark(host, svg, now, X, box, xB, 'hit', function (t, i) {
+			var rows = [];
+			series.forEach(function (s) {
+				var p = s.points[i];
+				if (p && p.y !== undefined) { rows.push({ color: s.color, text: s.id + '  ' + plainRound(p.y, 2) + (unit ? ' ' + unit : '') }); }
+			});
+			return { title: EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(t) : String(t), rows: rows };
+		}, frames.map(function (f) { return f.t; }));
+
 		// Axis titles. The y one is the quantity and its unit, built the way renderColorLegend()
 		// builds its heading -- the same whole label and the same parenthesised unit, so the chart
 		// and the map key name one quantity the same way. THE UNIT IS THE PROJECT'S: every value
 		// above came through colorValueOf(), which converts a solved number into whatever the units
 		// strip currently says, and colorFieldUnitText() is that strip read for this one field.
-		unit = colorFieldUnitText(group, field);
 		tsText(svg, 0, 0, (labelOverride || colorFieldLabel(group, field)) + (unit ? ' (' + unit + ')' : ''),
 			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
 			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
@@ -40706,10 +40894,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			class: 'lpn-profile-frame' }, svg);
 		// Where the transport is parked, as on Time series.
 		now = tsHours(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0);
-		if (now >= xB.min && now <= xB.max) {
-			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
-				class: 'lpn-ts-now' }, svg);
-		}
+		tsNowMark(host, svg, now, X, box, xB, 'line');
 		dots = frames.length <= LPN_TS_DOT_MAX;
 		ttlName = { produced: pc.lpn_sysflow_produced || 'Produced', consumed: pc.lpn_sysflow_consumed || 'Consumed' };
 		['produced', 'consumed'].forEach(function (key) {
@@ -40722,12 +40907,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			if (!dots && pts.length > 1) { return; }
 			pts.forEach(function (p) {
-				var c = el('circle', { cx: X(tsHours(p.t)), cy: Y(p[key]), r: 2, class: 'lpn-ts-dot', fill: color }, svg),
-					ttl = el('title', {}, c);
-				ttl.appendChild(document.createTextNode(ttlName[key] + '   ' +
-					(EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : p.t) + '   ' + plainRound(p[key], 2)));
+				el('circle', { cx: X(tsHours(p.t)), cy: Y(p[key]), r: 2, class: 'lpn-ts-dot', fill: color,
+					'data-reading': ttlName[key] + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : p.t) + '   ' + plainRound(p[key], 2) }, svg);
 			});
 		});
+		tsNowMark(host, svg, now, X, box, xB, 'hit', function (t, i) {
+			var u = unitLabel(resultUnit('flow')), p = pts[i], rows = [];
+			if (p) {
+				['produced', 'consumed'].forEach(function (key) {
+					rows.push({ color: SYSFLOW_COLORS[key], text: ttlName[key] + '  ' + plainRound(p[key], 2) + (u ? ' ' + u : '') });
+				});
+			}
+			return { title: EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(t) : String(t), rows: rows };
+		}, pts.map(function (p) { return p.t; }));
 		// Axis titles: EPANET's "Flow (units)", built from the page's own Flow label and the units
 		// strip, the way the map key and Time series build theirs.
 		unit = unitLabel(resultUnit('flow'));
@@ -45848,7 +46040,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		doc.fittingSets = saved.fittingSets || [];
 		doc.defaultPattern = saved.defaultPattern || null;
 		doc.times = saved.times || null;
-		doc.controls = saved.controls || [];
+		doc.controls = EngCalcs.lpnControlsUpgrade(saved.controls);
 		// A Well that took its pump's ID because its outlet's was another group's takes its controls with it (they are found by the tank and the pump they name).
 		groupIdRenamed.forEach(function (r) {
 			doc.controls.forEach(function (c) { if (c && c.asm === r.from && c.link === r.pump && c.condition && c.condition.node === r.tank) { c.asm = r.to; } });
@@ -48765,7 +48957,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{n}', String(coords.ids.length)));
 		}
 		if (semis) {
-			said.push((pc.lpn_inp_export_flat_label_semicolon || 'Texts ({n}) here contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written whole in the file, and EPANET will read only the part before the semicolon.')
+			said.push((pc.lpn_inp_export_flat_label_semicolon || 'Texts ({n}) in this project contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written in full in the file, and EPANET will read only the part before the semicolon.')
 				.replace('{n}', String(semis.ids.length)));
 		}
 		if (fittings) {
@@ -49398,7 +49590,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// low with every number on screen looking reasonable.
 			defaultPattern: parsed.defaultPattern || null,
 			times: parsed.times || null,
-			controls: parsed.controls || [],
+			controls: parsed.controlItems || parsed.controls || [],
 			// [RULES] as text (Task 248.03). Not modelled, not edited, and no longer thrown away.
 			rules: parsed.rules || [],
 			// EVERY OTHER SECTION THE FILE STATED AND THIS PAGE DOES NOT READ, VERBATIM -- [ENERGY],
@@ -49660,11 +49852,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Comment lines a pattern or a control cannot keep: between the rows of one pattern, on
 			// the end of a pattern row, or above a control that was itself left out. The ids are the
 			// comment lines themselves, which is the only name they have.
-			case 'comments': return pc.lpn_inp_drop_comments || 'These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.';
+			case 'control-comments': return pc.lpn_inp_drop_control_comments || 'These comments at the end of control lines were not imported, because those controls were not imported. Every control that could be imported was.';
+			case 'comments': return pc.lpn_inp_drop_comments || 'These comment lines in the patterns of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern was imported in full.';
+			case 'duplicate-pattern-id': return pc.lpn_inp_drop_dup_pattern || 'These pattern IDs are defined in more than one place in this file. EPANET appends the later multipliers to the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start.';
+			case 'duplicate-curve-id': return pc.lpn_inp_drop_dup_curve || 'These curve IDs are defined in more than one place in this file. EPANET appends the later points to the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start.';
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
-			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
+			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.';
 			case 'pressure-unit': return pc.lpn_inp_drop_pressure_unit || 'This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
 			case 'other-options': return pc.lpn_inp_drop_other_options || 'This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
 			// **THE ONE LOSS ON THE `.net` PATH THAT CANNOT BE CARRIED**, so it is told instead. A
@@ -50556,8 +50751,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} }, { label: pc.lpn_cancel || 'Cancel', fn: cancel }];
 		openDialog(function (body) {
 			function p(t, bold) { var e = document.createElement('p'); e.className = bold ? 'lpn-dlg-p lpn-dlg-strong' : 'lpn-dlg-p'; e.textContent = t; body.appendChild(e); return e; }
-			p(pc.lpn_inpalt_lead || 'This file changes values in the categories below. Choose the alternative that receives the values of each.');
-			p(pc.lpn_inpalt_base_note || 'Every scenario inherits the Base alternative, so choosing it changes them all.');
+			p(pc.lpn_inpalt_lead || 'This file changes values in the categories below. For each category, choose the alternative that receives its values.');
+			p(pc.lpn_inpalt_base_note || 'Every scenario inherits the Base alternative, so choosing it changes the values in every scenario.');
 			cats.forEach(function (cat) {
 				var parent = importAltParent(scn, cat), pr = prior && prior[cat], wrap = document.createElement('div'),
 					opts = [['own', importAltOwnLabel(scn, cat)],
@@ -67918,10 +68113,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// control in the hand is put back under the pointer (setboxKeepPlace()).
 		var sc = setboxScroller(), st = sc ? sc.scrollTop : 0, unclamp = function () {
 			if (sc && sc.scrollTop !== st && sc.scrollHeight - sc.clientHeight >= st) { sc.scrollTop = st; }
-		};
-		if (!held.length) { out = rebuild(); unclamp(); setboxKeepPlace(); return out; }
+		},
+		// The room after the content is sized first, so the position being put back is one the new content can hold.
+		settle = function () { setboxSizeRoom(); unclamp(); setboxKeepPlace(); };
+		if (!held.length) { out = rebuild(); settle(); return out; }
 		setboxKeeping = true;
-		try { out = rebuild(); } finally { setboxKeeping = false; unclamp(); setboxKeepPlace(); }
+		try { out = rebuild(); } finally { setboxKeeping = false; settle(); }
 		held.forEach(function (h) {
 			var el = h.el, twin;
 			if (!box.contains(el)) {
@@ -68066,6 +68263,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// put back after every rebuild and mark for a moment afterwards.
 	var setboxPlace = null;
 	function setboxScroller() { return document.getElementById('lpn_setbox_content'); }
+	// **THE SETTINGS BOX NEVER SHOWS A VIEW WITH NOTHING IN IT** (Tom, 2026-11-14, Libraries, Patterns: *"we should never return to any
+	// view with nothing visible ... if we are trying to remember the user's scroll position, we may have remembered it wrong"*). The
+	// blank room after the content (`#lpn_setbox_content::after`) exists so the last section can reach the top (Tom, 2026-09-04), and was
+	// one whole pane high, so the end of the scroll range was a pane of nothing. It is now the pane's height MINUS the last section's
+	// (never below 0): the last section can still reach the top, and the end of the range IS the top of the last section, so a position at
+	// the end, remembered or reached by dragging, always shows part of it. Recomputed on every rebuild and filter, and whenever the pane
+	// changes size (a resize, a phone turning, the box dragged larger). dev/lpn-spike/box-view-visible-browser-harness.js.
+	var setboxRoomWatch = null;
+	function setboxSizeRoom() {
+		var sc = setboxScroller(), kids, last, room, cs;
+		if (!sc) { return; }
+		if (!setboxRoomWatch && typeof ResizeObserver === 'function') { setboxRoomWatch = new ResizeObserver(setboxSizeRoom); setboxRoomWatch.observe(sc); }
+		if (!sc.clientHeight) { return; }
+		kids = Array.prototype.filter.call(sc.children, function (k) { return k.offsetHeight > 0; });
+		last = kids[kids.length - 1];
+		cs = last ? getComputedStyle(last) : null;
+		room = Math.max(0, sc.clientHeight - (last ? last.getBoundingClientRect().height + (parseFloat(cs.marginBottom) || 0) : 0));
+		sc.style.setProperty('--lpn-setbox-room', Math.round(room) + 'px');
+	}
 	function setboxPin(target) {
 		var sc = setboxScroller(), row, box = setboxEl();
 		if (!sc || !target || !target.getBoundingClientRect || !sc.contains || !sc.contains(target)) { return; }
@@ -68923,6 +69139,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			none.textContent = pc.lpn_settings_no_match || 'No setting mentions that word.';
 			none.style.display = (q && !total) ? 'block' : 'none';
 		}
+		setboxSizeRoom();
 	}
 	// **OPEN, NOT TOGGLE**, for a named section -- the same rule the pane and the menus follow: a
 	// row, or a click on the legend, that names a thing SHOWS that thing. `section` is one of
@@ -71340,26 +71557,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return String((rec && (rec.raw || libControlText(rec))) || '').trim();
 	}
 	function libImportControlUsable(rec) {
-		return !!rec && typeof rec === 'object' && !!libImportControlKey(rec);
+		return !!rec && typeof rec === 'object' && !rec.comment && !!libImportControlKey(rec);
 	}
 	// A RULE, unlike a control, IS named -- `RULE <name>` is the first line of every chunk
 	// lpnRuleSplit() cuts `[RULES]` into -- so it collides on that name the same way a curve
 	// collides on its id. The synthetic `{id, lines}` record below is never written to `doc.rules`
 	// itself; libImportRulesWrite()'s `push` reads only `.lines` back out of it.
-	// A rule travels with ITS OWN description (the comment lines above its RULE line) and without
-	// the next rule's, which lpnRuleSplit() would have handed it -- see libRuleEntries().
+	// A rule travels as its own lines, without the comments around it (each is a row of its own, libRuleItems()).
 	function libImportRuleChunks(lines) {
 		lines = lines || [];
-		return libRuleEntries(lines)
-			.filter(function (e) { return e.name; })
-			.map(function (e) { return { id: e.name, lines: lines.slice(e.descStart, e.end) }; });
+		return libRuleItems(lines)
+			.filter(function (e) { return e.kind === 'rule' || e.kind === 'comment'; })
+			.map(function (e) { return e.kind === 'comment' ? { comment: true, lines: e.lines, gap: e.gap } : { id: e.name, lines: e.lines }; });
 	}
 	function libImportRulesSource(saved) {
 		return libImportRuleChunks(Array.isArray(saved.rules) ? saved.rules : []);
 	}
 	function libImportRulesExisting() { return libImportRuleChunks(libRulesRead()); }
 	function libImportRulesWrite() {
-		return { push: function (clone) { doc.rules = libRulesAppend(libRules(), clone.lines || []); } };
+		return { push: function (clone) {
+			var items = libRuleItems(libRules());
+			items.push({ kind: clone.comment ? 'comment' : 'rule', name: clone.id || '', lines: clone.lines || [], gap: clone.comment ? (clone.gap | 0) : 0 });
+			doc.rules = libRuleItemsText(items);
+		} };
 	}
 	var LIB_IMPORTABLE = {
 		// Dimensionless, and shared with no other page, so patterns carry no unit of their own
@@ -71374,7 +71594,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			read: libFittingSetsRead, write: libFittingSets, units: [] },
 		controls: { from: 'controls', label: 'lpn_library_controls',
 			read: libControlsRead, write: libControls, units: [],
-			keyOf: libImportControlKey, usable: libImportControlUsable },
+			source: function (saved) { return EngCalcs.lpnControlsUpgrade(saved.controls); },
+			keyOf: libImportControlKey, usable: libImportControlUsable,
+			// Two comment rows the import brings together stay two rows (the rules do this in their own write()).
+			after: function (dest) { EngCalcs.lpnControlsSeparate(dest); } },
 		rules: { label: 'lpn_library_rules', units: [],
 			source: libImportRulesSource, read: libImportRulesExisting, write: libImportRulesWrite }
 	};
@@ -71629,20 +71852,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var spec = LIB_IMPORTABLE[kind];
 			if (!spec) { return; }
 			var source = libImportSourceOf(spec, saved),
-				taken = {}, clones = [], added = [], clashed = [];
+				taken = {}, clones = [], added = [], clashed = [], pendingComments = [], nComments = 0, nLeft = 0;
 			spec.read().forEach(function (rec) {
 				if (libImportIsUsable(spec, rec)) { taken[String(libImportKeyOf(spec, rec))] = true; }
 			});
 			source.forEach(function (rec) {
-				if (!libImportIsUsable(spec, rec)) { return; }
+				// A comment row in Controls or Rules travels with the item below it: the comments above a copied item come with it,
+				// and the ones above an item left out stay behind.
+				if (rec && rec.comment) { pendingComments.push(rec); return; }
+				var held = pendingComments;
+				pendingComments = [];
+				// A comment row left behind is counted and said in the receipt, never dropped in silence.
+				if (!libImportIsUsable(spec, rec)) { nLeft += held.length; return; }
 				var id = String(libImportKeyOf(spec, rec)), clone;
-				if (taken[id]) { clashed.push(id); return; }
-				try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { return; }
+				if (taken[id]) { clashed.push(id); nLeft += held.length; return; }
+				try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { nLeft += held.length; return; }
 				taken[id] = true;
+				held.forEach(function (c) { try { clones.push(JSON.parse(JSON.stringify(c))); nComments++; } catch (err) { nLeft++; } });
 				clones.push(clone);
 				added.push(id);
 			});
-			plan.push({ kind: kind, spec: spec, clones: clones, added: added, clashed: clashed });
+			plan.push({ kind: kind, spec: spec, clones: clones, added: added, clashed: clashed, comments: nComments, left: nLeft + pendingComments.length });
 		});
 		if (plan.some(function (p) { return p.clones.length > 0; })) {
 			// ONE snapshot for the whole wizard: the user pressed one button, so one Undo puts the
@@ -71652,6 +71882,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (!p.clones.length) { return; }
 				var dest = p.spec.write();
 				p.clones.forEach(function (clone) { dest.push(clone); });
+				if (p.spec.after) { p.spec.after(dest); }
 			});
 			libCommit();
 			rebuildLibraryBox();
@@ -71677,6 +71908,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (p.added.length) {
 				lines.push((pc.lpn_library_import_added || 'Copied in: {names}')
 					.replace('{names}', p.added.join(', ')));
+			}
+			if (p.comments) {
+				lines.push((pc.lpn_library_import_comments || 'Comment rows copied with the imported items: {n}').replace('{n}', String(p.comments)));
+			}
+			if (p.left) {
+				lines.push((pc.lpn_library_import_comments_left || 'Comment rows left out because the item below each was skipped, or nothing follows them: {n}').replace('{n}', String(p.left)));
 			}
 			if (p.clashed.length) {
 				lines.push((pc.lpn_library_import_conflict || 'Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.')
@@ -72058,7 +72295,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function libControlText(c) {
 		var out;
 		if (c && typeof c.raw === 'string' && c.raw) { return c.raw; }
-		if (!c) { return ''; }
+		if (!c || c.comment) { return ''; }
 		out = 'LINK ' + c.link + ' ' +
 			(c.action && c.action.status ? c.action.status.toUpperCase() : String((c.action || {}).setting));
 		if (!c.condition) { return out; }
@@ -72089,11 +72326,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Pipe types sections build theirs: the word "Description" above a box, one line, trimmed, and
 	// a blank box meaning no description at all. `get` reads what is stored now and `set` writes
 	// the trimmed text ('' to remove); the document is written on `change` only.
-	function libDescField(get, set) {
+	function libDescField(get, set, name) {
 		var pc = EngCalcs.pageConfig || {},
 			field = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
 			desc = descTextarea(),
-			word = pc.lpn_field_desc || 'Description';
+			word = name || pc.lpn_field_desc || 'Description';
 		field.appendChild(libEl('span', 'lpn-lib-fieldname', word));
 		desc.className = 'lpn-lib-wide lpn-lib-desc lpn-desc-ta';
 		desc.value = get();
@@ -72119,15 +72356,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		{ id: 'rules', label: 'lpn_library_rules', tip: 'lpn_library_rules_tip' }
 	];
 	// **A SECTION'S LONG EXPLANATION IS AN ENTRY IN THE USER MANUAL, AND THE HEADING'S `?` OPENS IT** (Tom, round 12: *"send the user to the user manual for long explanations. But we have to land them in the right place."*). Curves, Pipe types and Fittings carry the `?`; its words live once, in the Libraries chapter (lib/GuideChapters.lib.php, ecGuideDefKeys()).
-	var LIB_INTRO = { curves: true, pipetypes: true, fittings: true };
+	// EVERY section carries it (Task 859): Patterns, Curves, Pipe types and Fittings land on their own entry, which ends with the Move tip's sentence
+	// about the order; Controls and Rules both land on the chapter's one entry for them, "Controls and rules in a run", which says how the
+	// order of the list decides a conflict. Both in the same words as the Move tips, so a tap, which cannot hover, can read them.
+	var LIB_TERM = { patterns: 'patterns', curves: 'curves', pipetypes: 'pipetypes', fittings: 'fittings', controls: 'ctl', rules: 'ctl' };
 	function libSectionHead(cur) {
-		var pc = EngCalcs.pageConfig || {}, intro = LIB_INTRO[cur.id], head, btn, label = pc[cur.label] || cur.id;
-		if (!intro) {
-			// Patterns, Controls and Rules: the plain heading they always had, its tip on the heading.
-			head = libEl('h3', 'ec-help', label);
-			if (pc[cur.tip]) { head.title = pc[cur.tip]; }
-			return head;
-		}
+		var pc = EngCalcs.pageConfig || {}, head, btn, label = pc[cur.label] || cur.id;
 		// The heading is plain text. The `?` beside it is a button with no tip (a tap cannot hover): a click or a tap opens
 		// the User Manual at this section's own entry in the Libraries chapter (ecGuideDl() writes `guide-term-<stem>`),
 		// which says the section's introduction in the same words this box used to carry (GuideChapters.lib.php).
@@ -72137,7 +72371,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		btn.className = 'lpn-lib-manual';
 		btn.setAttribute('aria-label', (pc.lpn_help_manual || 'User manual') + ': ' + label);
 		btn.textContent = '?';
-		btn.addEventListener('click', function (e) { e.stopPropagation(); openGuideForBox('lpn_library_box', 'term-lpn_guide_lib_' + cur.id); });
+		btn.addEventListener('click', function (e) { e.stopPropagation(); openGuideForBox('lpn_library_box', 'term-lpn_guide_lib_' + LIB_TERM[cur.id]); });
 		head.appendChild(btn);
 		return head;
 	}
@@ -72154,8 +72388,178 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 	}
 	function setLibrarySection(id) {
+		var content = document.getElementById('lpn_libbox_content');
+		// A different list starts at its top. The position of the one before is no position in this one.
+		if (id !== libSection && content) { content.scrollTop = 0; }
 		libSection = id;
 		rebuildLibraryBox();
+	}
+	// ---- THE ORDER OF A LIBRARY'S ITEMS (Task 859) ------------------------------------
+	//
+	// **THE ORDER IS THE STORED ORDER** (Tom, 2026-11-13: *"the Curves don't seem to sort
+	// alphabetically ... we don't provide a way to change the order"*). Four buttons, Move to top, Move up,
+	// Move down and Move to bottom, act on the SELECTED item of the section on screen: the item whose entry
+	// was last clicked or tabbed into. The array is moved in place, so the order is the one the project saves, the one every
+	// list reads and the one the `.inp` export writes (patterns, curves, controls and rules go out in list order; pipe types and
+	// fittings lists are not in an `.inp` and keep the order in the project file). One move is one Undo step.
+	//
+	// **WHETHER A MOVE CHANGES A RUN** (EPANET 2.2 src/hydraul.c controls() and src/rules.c checkrules(), updateactionlist(),
+	// onactionlist(); js/lpn-native-run.js follows both, and dev/lpn-spike/library-order-harness.js runs both engines on it):
+	// controls are examined in list order and the LAST one to act on a link takes effect; a rule's action stands over an earlier
+	// rule's only when its PRIORITY is strictly higher, so the FIRST of two equal-priority rules takes effect. Patterns, curves,
+	// pipe types and fittings lists are looked up by id, so their order never changes a result. The Libraries chapter of the User
+	// Manual says this in the same words as the tips (lpn_guide_lib_ctl_def), and the `?` of Controls and Rules lands on it.
+	//
+	// **A RULE IS A RUN OF LINES IN ONE FLAT TEXT**, so it is moved as its block (its RULE line through its last line), with the
+	// blank lines before it, and a comment row is an item that moves like any other (libRulesMoved()).
+	//
+	// This is wired from rebuildLibraryBox() after a section is built, not from each section's builder, so the six builders
+	// (and the Curves section another branch is changing) are untouched.
+	var libSel = {};
+	var LIB_ORDER = {
+		patterns: { read: libPatternsRead, write: libPatterns, byId: true, slotted: ['head', 'foot'] },
+		curves: { read: libCurvesRead, write: libCurves, byId: true },
+		pipetypes: { read: libPipeTypesRead, write: libPipeTypes, byId: true },
+		fittings: { read: libFittingSetsRead, write: libFittingSets, byId: true },
+		controls: { read: libControlsRead, write: libControls, byId: false },
+		rules: { byId: false }
+	};
+	var LIB_MOVES = [
+		{ how: 'top', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-top', n, t); }, key: 'lpn_library_move_top', fallback: 'Move to top' },
+		{ how: 'up', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-up', n, t); }, key: 'lpn_pane_manage_cols_up', fallback: 'Move up' },
+		{ how: 'down', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-down', n, t); }, key: 'lpn_pane_manage_cols_down', fallback: 'Move down' },
+		{ how: 'bottom', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-bottom', n, t); }, key: 'lpn_library_move_bottom', fallback: 'Move to bottom' }
+	];
+	// Which project the selection was made in: the same id in another project is not the same item.
+	function libProjKey() { return String((library && library.openId) || ''); }
+	// What a section's order needs to know, worked out ONCE for an action: how many items there are, the first index an item may take, and
+	// for the rules the entries of the flat `[RULES]` text (cutting that text is the costly part, so nothing re-cuts it per question).
+	// A `[RULES]` text can open with lines that are not a rule (no RULE line above them); that block cannot be moved and nothing may be moved
+	// above it, or its lines would become part of the rule that landed there.
+	function libOrderInfo(sec) {
+		var es, first = 0;
+		if (sec !== 'rules') { return { n: LIB_ORDER[sec].read().length, first: 0 }; }
+		es = libRuleItems(libRulesRead());
+		es.forEach(function (it, k) { if (it.kind === 'text') { first = k + 1; } });
+		return { n: es.length, first: first, es: es };
+	}
+	function libOrderSelIndex(sec, info) {
+		var s = libSel[sec], n, a, i;
+		if (!s || s.proj !== libProjKey()) { return -1; }
+		n = (info || libOrderInfo(sec)).n;
+		if (!LIB_ORDER[sec].byId) { return ((s.n === undefined || s.n === n) && s.i >= 0 && s.i < n) ? s.i : -1; }
+		a = LIB_ORDER[sec].read();
+		// The item itself first: a rename changes its id, not which item it is. The id second, for a document an Undo has replaced.
+		i = a.indexOf(s.obj);
+		if (i >= 0) { s.id = String(a[i].id); return i; }
+		for (i = 0; i < a.length; i++) { if (String(a[i].id) === s.id) { s.obj = a[i]; return i; } }
+		return -1;
+	}
+	function libOrderSelect(sec, i, info) {
+		var o = LIB_ORDER[sec], proj = libProjKey();
+		libSel[sec] = o.byId ? { proj: proj, id: String(o.read()[i].id), obj: o.read()[i] } : { proj: proj, i: i, n: (info || libOrderInfo(sec)).n };
+	}
+	// An item with no id (a control, a rule) is selected by its position, which an Undo, an Add, a Delete or an edit that changes how many
+	// rules a text holds has changed: the selection is dropped rather than left on an item the user did not choose.
+	function libSelForgetIndexed() { delete libSel.controls; delete libSel.rules; }
+	function libOrderTarget(how, i, n, first) {
+		return how === 'top' ? first : how === 'bottom' ? n - 1 : how === 'up' ? Math.max(first, i - 1) : Math.min(n - 1, i + 1);
+	}
+	// **WHAT THE FILE KEPT AT A POSITION STAYS AT IT**: a pattern's `head` (a heading above it) and `foot` (what follows the last one). Only the item
+	// itself moves, so a section's trailing comments are never written mid-section after a move and read back as something else. A comment in
+	// Controls or Rules is an item of its own and moves like any other, and the blank lines before an item (`gap`) are the item's: they move with it.
+	function libArrayMove(arr, from, to, slotted) {
+		var slots = slotted ? arr.map(function (x) { var o = {}; slotted.forEach(function (f) { o[f] = x[f]; }); return o; }) : null;
+		arr.splice(to, 0, arr.splice(from, 1)[0]);
+		if (!slots) { return; }
+		arr.forEach(function (x, k) {
+			slotted.forEach(function (f) { if (slots[k][f] === undefined) { delete x[f]; } else { x[f] = slots[k][f]; } });
+		});
+	}
+	// One move of the selected item of `sec`; false when nothing could move (no selection, or already at that end).
+	function libOrderMove(sec, how) {
+		var info = libOrderInfo(sec), i = libOrderSelIndex(sec, info), to, b, sel;
+		if (i < info.first) { return false; }
+		to = libOrderTarget(how, i, info.n, info.first);
+		if (to === i) { return false; }
+		saveUndoSnapshot();
+		if (sec === 'rules') { doc.rules = libRulesMoved(libRulesRead(), i, to, info.es); }
+		else {
+			libArrayMove(LIB_ORDER[sec].write(), i, to, LIB_ORDER[sec].slotted);
+			if (sec === 'controls') { EngCalcs.lpnControlsSeparate(doc.controls); }
+		}
+		// The rules are not counted: their items are cut from the text, and a move can add a blank line between two comment rows.
+		libOrderSelect(sec, to, sec === 'rules' ? { n: undefined } : info);
+		libCommit();
+		rebuildLibraryBox();
+		// The buttons were rebuilt, so the one that was pressed is a new element. Focus returns to it, or to the first one that can
+		// still act when this move took the item to an end, so a keyboard user can keep going.
+		b = document.getElementById('lpn_lib_move_' + how);
+		if (!b || b.disabled) { b = document.querySelector('#lpn_libbox_content .lpn-lib-move:not(:disabled)'); }
+		if (b) { b.focus(); }
+		sel = document.querySelector('#lpn_libbox_content .lpn-lib-entry-sel');
+		if (sel && sel.scrollIntoView) { sel.scrollIntoView({ block: 'nearest' }); }
+		return true;
+	}
+	// The four buttons' enabled state and the selected entry's mark, from the selection, without rebuilding anything.
+	function libOrderRefresh(secEl, sec, info) {
+		var i, n, first, can;
+		info = info || libOrderInfo(sec);
+		i = libOrderSelIndex(sec, info); n = info.n; first = info.first; can = i >= first;
+		Array.prototype.forEach.call(secEl.querySelectorAll('.lpn-lib-entry'), function (en, k) {
+			var on = k === i;
+			en.classList.toggle('lpn-lib-entry-sel', on);
+			if (on) { en.setAttribute('aria-current', 'true'); } else { en.removeAttribute('aria-current'); }
+		});
+		Array.prototype.forEach.call(secEl.querySelectorAll('.lpn-lib-move'), function (b) {
+			var how = b.getAttribute('data-move');
+			b.disabled = !can || ((how === 'top' || how === 'up') ? i <= first : i >= n - 1);
+		});
+	}
+	function libOrderWire(secEl, sec) {
+		var pc = EngCalcs.pageConfig || {}, info = libOrderInfo(sec), n = info.n, entries = secEl.querySelectorAll('.lpn-lib-entry'),
+			adds = Array.prototype.filter.call(secEl.children, function (c) { return c.tagName === 'BUTTON'; }),
+			row, group, tip;
+		if (n < 2 || entries.length !== n) { return; }
+		tip = (pc.lpn_library_move_tip || 'Moves the selected item. Click an item to select it. The order is saved with the project.') + ' ' +
+			(sec === 'controls' ? (pc.lpn_library_move_tip_controls || 'When two controls change the same link at the same time, the control nearer the bottom of the list is the one applied.')
+				: sec === 'rules' ? (pc.lpn_library_move_tip_rules || 'When two rules call for conflicting actions on the same link, the rule with the larger PRIORITY number is applied, and at equal PRIORITY the rule nearer the top of the list is applied.')
+				: (pc.lpn_library_move_tip_none || 'The order does not change a run.'));
+		// The shared box style's own row for a box's buttons: sticky, so the four stay in reach down a long list.
+		row = libEl('div', 'lpn-box-tools lpn-lib-toolrow');
+		secEl.insertBefore(row, adds[0] || entries[0]);
+		adds.forEach(function (b) { row.appendChild(b); });
+		group = libEl('div', 'lpn-lib-order');
+		group.setAttribute('role', 'group');
+		group.setAttribute('aria-label', pc.lpn_library_move_group || 'Move the selected item');
+		LIB_MOVES.forEach(function (m) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.id = 'lpn_lib_move_' + m.how;
+			b.className = 'lpn-lib-move';
+			b.setAttribute('data-move', m.how);
+			m.icon(b, pc[m.key] || m.fallback, tip);
+			// A press does not take the focus from a field being typed in: the field is committed first (its change handler may rebuild
+			// the box, as a rename does), and only then is the item moved, so the first press after typing acts.
+			b.addEventListener('mousedown', function (e) { if (e.preventDefault) { e.preventDefault(); } });
+			b.addEventListener('click', function () {
+				var f = document.activeElement;
+				if (f && f !== b && f.blur && libBoxEl() && libBoxEl().contains(f)) { f.blur(); }
+				libOrderMove(sec, m.how);
+			});
+			group.appendChild(b);
+		});
+		row.appendChild(group);
+		// An entry is selected by pressing or tabbing into anything in it, so the keyboard reaches it as the pointer does.
+		Array.prototype.forEach.call(entries, function (en, k) {
+			function pick() {
+				var now = libOrderInfo(sec);
+				if (libOrderSelIndex(sec, now) !== k) { libOrderSelect(sec, k, now); libOrderRefresh(secEl, sec, now); }
+			}
+			en.addEventListener('mousedown', pick);
+			en.addEventListener('focusin', pick);
+		});
+		libOrderRefresh(secEl, sec, info);
 	}
 	// Rebuilt whole on every open and after every structural change (an add, a delete, a rename),
 	// for the same reason the Settings box is: a box built once and repainted by the paths that
@@ -72178,6 +72582,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else { buildControlSection(sec); }
 		content.appendChild(sec);
 		libSheetFields(sec);
+		libOrderWire(sec, cur.id);
 		initTipsIn(content);
 	}
 	// **THE LIBRARY'S ENTRY FIELDS ARE SHEET ROWS** (round 10b, the sheet-style audit, A7). Each entry builder makes its ID, Description, Curve type and
@@ -74065,7 +74470,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function libInactiveIds(kind) {
 		var out = [];
 		if (kind === 'control') {
-			libControlsRead().forEach(function (c) {
+			EngCalcs.lpnControlsOnly(libControlsRead()).forEach(function (c) {
 				var l = c && c.link !== '' && c.link !== undefined ? linkById(String(c.link)) : null,
 					cond = c && c.condition, n = cond && cond.kind === 'node' ? nodeById(String(cond.node)) : null;
 				if ((l && !linkLive(l)) || (n && !isActive(n))) { out.push(String(c.link)); }
@@ -74088,6 +74493,40 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			? 'These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}'
 			: 'These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}')).replace('{ids}', ids.join(', '))));
 	}
+	// **A COMMENT IS A ROW OF ITS OWN IN CONTROLS AND RULES** (Task 859; Tom, 2026-11-16: *"Yes."*, to making a comment its own row, moved
+	// independently, as in EPANET's editor). Its lines are the file's, each kept with its `;`; the field shows the text without them.
+	function libCommentText(lines) {
+		return EngCalcs.lpnDescText((lines || []).map(function (l) { return String(l).replace(/^\s*;/, ''); }).join('\n'));
+	}
+	function libCommentLines(text) {
+		return String(text || '').split('\n').map(function (l) { return ';' + l; });
+	}
+	// Deleting item `i` of a list that carries `gap` hands its blank lines to the next item, so a heading's separating blank line is not lost with it.
+	function libItemGapPass(all, i) {
+		if (all[i] && all[i].gap && all[i + 1]) { all[i + 1].gap = Math.max(all[i + 1].gap | 0, all[i].gap); }
+	}
+	// One comment row: a Comment field and Delete. `set(text)` stores new text; an emptied comment is deleted, not kept as an empty `;`.
+	function libCommentEntry(host, get, set, remove) {
+		var pc = EngCalcs.pageConfig || {}, entry = libEl('div', 'lpn-lib-entry lpn-lib-comment-entry'),
+			descRow = libEl('div', 'lpn-lib-curve-row lpn-lib-desc-row'), del;
+		descRow.appendChild(libDescField(get, function (t) {
+			if (t) { set(t); return; }
+			remove();
+			libSelForgetIndexed();
+			setTimeout(rebuildLibraryBox, 0);
+		}, pc.lpn_library_comment || 'Comment'));
+		entry.appendChild(descRow);
+		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
+			saveUndoSnapshot();
+			remove();
+			libSelForgetIndexed();
+			libCommit();
+			rebuildLibraryBox();
+		});
+		del.className = 'lpn-lib-del';
+		entry.appendChild(del);
+		host.appendChild(entry);
+	}
 	function buildControlSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libControlsRead();
 		libInactiveNote(host, 'control');
@@ -74105,6 +74544,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// to reach the engine.
 			libControls().push(read.ok ? read.rec
 				: { link: '', raw: text, action: {}, condition: null, text: {} });
+			libSelForgetIndexed();
+			libCommit();
+			rebuildLibraryBox();
+		}));
+		host.appendChild(libButton(pc.lpn_library_comment_add || 'Add a comment', function () {
+			saveUndoSnapshot();
+			// After another comment, a blank line keeps it a row of its own: consecutive comment lines are one row.
+			libControls().push({ comment: true, lines: [';'] });
+			EngCalcs.lpnControlsSeparate(libControls());
+			libSelForgetIndexed();
 			libCommit();
 			rebuildLibraryBox();
 		}));
@@ -74113,6 +74562,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return;
 		}
 		list.forEach(function (ctl, i) {
+			if (ctl.comment) {
+				libCommentEntry(host, function () { return libCommentText(ctl.lines); }, function (t) {
+					ctl.lines = libCommentLines(t);
+				}, function () {
+					var all = libControls();
+					libItemGapPass(all, i);
+					doc.controls = EngCalcs.lpnControlsSeparate(all.filter(function (c, k) { return k !== i; }));
+				});
+				return;
+			}
 			// A well's own control: shown as the sentence, read-only, with the well named. It is changed in the well's Properties box.
 			if (ctl && ctl.asm) {
 				var own = libEl('div', 'lpn-lib-entry lpn-lib-owned');
@@ -74165,39 +74624,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				libControls()[i].raw = box.value.trim();
 				// The DESCRIPTION is not part of the sentence and survives a rewrite of it, with
 				// where it sits in the file. The record above is new, so it is carried across.
-				['head', 'note', 'noteSrc', 'noteAt', 'tail', 'foot'].forEach(function (k) {
+				['note', 'noteAt', 'tok', 'gap'].forEach(function (k) {
 					if (ctl[k] !== undefined) { libControls()[i][k] = ctl[k]; }
 				});
 				ctl = libControls()[i];
 				libCommit();
 			});
-			// The description on its own line ABOVE the sentence, which is where it sits in the
-			// file: a `;comment` line over the control (see readControlNote() in js/lpn-inp.js).
+			// The description is the `;comment` after the sentence, on its own line in the file. A comment
+			// on its own line above is a row of the list (libCommentEntry()), never this.
 			descRow.appendChild(libDescField(function () { return ctl.note || ''; }, function (t) {
-				if (t) { ctl.note = t; } else { delete ctl.note; delete ctl.noteAt; }
-				// The file's own comment lines no longer say what the document says; the curve's
-				// `src` rule. Where the comment sat (`noteAt`) is kept.
-				delete ctl.noteSrc;
+				if (t) { ctl.note = t; ctl.noteAt = 'end'; } else { delete ctl.note; delete ctl.noteAt; }
+				if (ctl.tok) { delete ctl.tok.note; if (!Object.keys(ctl.tok).length) { delete ctl.tok; } }
 			}));
 			entry.appendChild(descRow);
 			headRow.appendChild(box);
 			entry.appendChild(headRow);
 			entry.appendChild(verdict);
 			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
-				var all = libControls(), gone = all[i], next = all[i + 1], prev = all[i - 1];
+				var all = libControls();
 				saveUndoSnapshot();
-				// **A HEADING OR A TRAILING COMMENT BLOCK IS NOT THE CONTROL'S, AND STAYS.** The
-				// heading above it passes to the control below; the block after the last control
-				// passes to the one above. Only its own description goes with it.
-				if (gone && Array.isArray(gone.head) && gone.head.length) {
-					if (next) { next.head = gone.head.concat(next.head || []); }
-					else if (prev) { prev.foot = (prev.foot || []).concat(gone.head); }
-				}
-				if (gone && Array.isArray(gone.foot) && gone.foot.length) {
-					if (prev) { prev.foot = (prev.foot || []).concat(gone.foot); }
-					else if (next) { next.head = gone.foot.concat(next.head || []); }
-				}
-				doc.controls = all.filter(function (c, k) { return k !== i; });
+				libItemGapPass(all, i);
+				doc.controls = EngCalcs.lpnControlsSeparate(all.filter(function (c, k) { return k !== i; }));
+				libSelForgetIndexed();
 				libCommit();
 				rebuildLibraryBox();
 			});
@@ -74232,61 +74680,64 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function libRuleChunks() {
 		return EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(libRulesRead()) : [];
 	}
-	// **EVERY RULE AS POSITIONS IN THE FLAT `[RULES]` TEXT**, which is what lets one rule's body or
-	// description be rewritten and every other line put back untouched. For each chunk
-	// lpnRuleSplit() cuts that has something in it besides blank lines and comments:
-	//
-	//   start..end   the lines a user is meant to SEE in the box -- the chunk without the blank
-	//                lines and comments that have run on after it (lpnRuleSplit's `trailing`).
-	//   descStart    where its DESCRIPTION begins: the whole-line comments directly above its RULE
-	//                line, with no blank line between. They sit at the end of the chunk before (or
-	//                in the preamble), so the split alone gives them to the wrong rule; that is why
-	//                this walks the text rather than the chunks. EPANET has no rule description, and
-	//                this is the same placement its GUI keeps verbatim and a pattern's uses.
-	//
-	// A preamble of comments alone is not a rule and is not listed.
-	function libRuleIsComment(line) { return /^\s*;/.test(String(line)); }
-	function libRuleEntries(lines) {
-		var out = [], at = 0;
+	// **THE FLAT `[RULES]` TEXT AS ITEMS, AND BACK, LOSING NOTHING.** An item is a rule (its RULE line through its last line: what a
+	// user is meant to SEE in the box), a comment (a run of whole-line comments, a row of its own, Task 859), or `text` (lines before
+	// the first RULE line that are neither, which are not a rule and stay where they are). `gap` is the count of blank lines directly
+	// before the item. EPANET has no description for a rule, and a comment above one is its own item, not the rule's.
+	function libRuleItems(lines) {
+		var out = [], at = 0, gap = 0, free = [];
+		// The lines between two rules (a rule's trailing comments and blanks, and any non-rule chunk) are cut into runs by the one cutter
+		// the Controls comment rows use.
+		function flush() {
+			var sc = EngCalcs.lpnInpLineRuns(free, function (l) { return /^\s*;/.test(l) ? 'comment' : 'text'; });
+			sc.runs.forEach(function (r) { out.push({ kind: r.kind, name: '', lines: r.lines, gap: r.gap }); });
+			gap = sc.gap; free = [];
+		}
 		(EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(lines) : []).forEach(function (chunk) {
-			var start = at, end = at + chunk.lines.length - (chunk.trailing || 0), d = start;
+			var end = at + chunk.lines.length - (chunk.trailing || 0);
+			if (chunk.name) {
+				flush();
+				out.push({ kind: 'rule', name: chunk.name, lines: lines.slice(at, end).map(String), gap: gap });
+				gap = 0;
+			} else { free = free.concat(lines.slice(at, end)); }
+			free = free.concat(lines.slice(end, at + chunk.lines.length));
 			at += chunk.lines.length;
-			if (end <= start) { return; }
-			if (chunk.name) { while (d > 0 && libRuleIsComment(lines[d - 1])) { d--; } }
-			out.push({ name: chunk.name, descStart: d, start: start, end: end });
+		});
+		flush();
+		if (out.length) { out[0].gap = 0; }
+		return out;
+	}
+	function libRuleItemsText(items) {
+		var out = [];
+		items.forEach(function (it, k) {
+			var g, n = EngCalcs.lpnGapBefore(it.gap, k && items[k - 1].kind === 'comment', it.kind === 'comment');
+			for (g = 0; k && g < n; g++) { out.push(''); }
+			it.lines.forEach(function (l) { out.push(l); });
 		});
 		return out;
 	}
-	function libRuleBody(lines, e) { return lines.slice(e.start, e.end); }
-	function libRuleDesc(lines, e) {
-		return EngCalcs.lpnInpDescFromLines(lines.slice(e.descStart, e.start));
-	}
-	// The whole `[RULES]` text with lines [from, to) replaced by `put`.
-	function libRulesSplice(from, to, put) {
-		var lines = libRulesRead();
-		return lines.slice(0, from).concat(put || [], lines.slice(to));
-	}
-	// **DELETING RULE `i` TAKES THE RULE AND ITS OWN DESCRIPTION, AND NOTHING ELSE.** A heading a
-	// blank line separates from it stays exactly where it is, and so does the next rule's
-	// description. One of the two blank lines that would then stand together goes too, so deleting
-	// rules one by one does not leave a growing gap.
-	function libRulesWithout(i) {
-		var lines = libRulesRead(), e = libRuleEntries(lines)[i], out;
-		if (!e) { return lines.slice(); }
-		out = lines.slice(0, e.descStart).concat(lines.slice(e.end));
-		if (e.descStart < out.length && !String(out[e.descStart]).trim()
-				&& (e.descStart === 0 || !String(out[e.descStart - 1]).trim())) {
-			out.splice(e.descStart, 1);
+	// Item `i` of the current text, or null: every handler asks again by index, because an edit that does not rebuild the box moves
+	// everything after it.
+	function libRuleItemAt(i) { return libRuleItems(libRulesRead())[i] || null; }
+	// The text with item `i` replaced by `put` (an array of lines), or removed when `put` is null; a removed item passes its blank
+	// lines to the next, so a heading's separation is not lost with it.
+	function libRulesWith(i, put) {
+		var items = libRuleItems(libRulesRead());
+		if (!items[i]) { return libRulesRead().slice(); }
+		if (put) { items[i].lines = put; }
+		else {
+			libItemGapPass(items, i);
+			items.splice(i, 1);
 		}
-		while (out.length && !String(out[out.length - 1]).trim()) { out.pop(); }
-		return out;
+		return libRuleItemsText(items);
 	}
-	// Rule lines appended after the text already there. **A BLANK LINE GOES BETWEEN WHEN THAT TEXT
-	// ENDS IN A COMMENT**: otherwise those comments would stand directly above the new RULE line and
-	// read as its description, merged with the description it brings.
-	function libRulesAppend(lines, more) {
-		var last = lines.length ? String(lines[lines.length - 1]) : '';
-		return lines.concat(libRuleIsComment(last) ? [''] : [], more || []);
+	// Rule `from` moved to position `to`. The items are permuted, each with the blank lines before it, so no line is
+	// dropped or changed (a blank line is added only where two comment rows would otherwise meet).
+	function libRulesMoved(lines, from, to, items) {
+		var its = items || libRuleItems(lines);
+		if (from === to || !its[from] || !its[to]) { return lines.slice(); }
+		its.splice(to, 0, its.splice(from, 1)[0]);
+		return libRuleItemsText(its);
 	}
 	// What a rule in the box means right now: an { ok, block, missing } verdict, where `missing` is
 	// the id of an element the rule names and this network does not have. The identical three-state
@@ -74303,7 +74754,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return { ok: true, block: block };
 	}
 	function buildRuleSection(host) {
-		var pc = EngCalcs.pageConfig || {}, chunks = libRuleChunks(), entries = libRuleEntries(libRulesRead());
+		var pc = EngCalcs.pageConfig || {}, chunks = libRuleChunks(), entries = libRuleItems(libRulesRead());
 		host.appendChild(libButton(pc.lpn_library_rule_add || 'Add a rule', function () {
 			// **THE STARTER RULE IS BUILT FROM THIS NETWORK**, exactly as the starter control
 			// sentence is, so the box opens on something already true rather than on a template
@@ -74315,12 +74766,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			while (used['R' + n]) { n++; }
 			name = 'R' + n;
 			saveUndoSnapshot();
-			doc.rules = libRulesAppend(libRules(), [
+			doc.rules = libRules().concat([
 				'RULE ' + name,
 				'IF TANK ' + (tank ? tank.id : '1') + ' LEVEL ABOVE 0',
 				'THEN ' + (pump && pump.type === 'pump' ? 'PUMP' : 'LINK') + ' ' +
 					(pump ? pump.id : '1') + ' STATUS IS CLOSED'
 			]);
+			libSelForgetIndexed();
+			libCommit();
+			rebuildLibraryBox();
+		}));
+		host.appendChild(libButton(pc.lpn_library_comment_add || 'Add a comment', function () {
+			saveUndoSnapshot();
+			doc.rules = libRules().concat(entries.length && entries[entries.length - 1].kind === 'comment' ? ['', ';'] : [';']);
+			libSelForgetIndexed();
 			libCommit();
 			rebuildLibraryBox();
 		}));
@@ -74329,37 +74788,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
 		}
-		// Each handler asks for the positions AGAIN, by the entry's index, rather than closing over
-		// the ones this render measured: an edit that does not rebuild the box (a description, a
-		// body) moves every line after it, and a stale position would rewrite the wrong lines.
-		function now(i) { return libRuleEntries(libRulesRead())[i]; }
+		// Each handler asks for the item AGAIN, by its index, rather than closing over the one this render measured: an edit that
+		// does not rebuild the box (a comment, a body) moves every line after it.
 		entries.forEach(function (e, i) {
-			var entry = libEl('div', 'lpn-lib-entry'),
-				lines = libRulesRead(),
-				box = document.createElement('textarea'),
-				verdict = libEl('div', 'lpn-lib-verdict ec-help'),
-				descRow, del;
-			// The description on its own line ABOVE the rule, which is where it sits in the file:
-			// the `;comment` lines directly over its RULE line. Only a named rule has one -- text
-			// before the first RULE line is not a rule, and a comment written above it would read
-			// back as part of it.
-			if (e.name) {
-				descRow = libEl('div', 'lpn-lib-curve-row lpn-lib-desc-row');
-				descRow.appendChild(libDescField(function () {
-					var cur = now(i);
-					return cur ? libRuleDesc(libRulesRead(), cur) : '';
-				}, function (t) {
-					var cur = now(i);
-					if (!cur) { return; }
-					// Several comment lines become the one line the box shows: the curve's `src` rule.
-					// A line break goes on that one line as "\P", as everywhere in an .inp.
-					doc.rules = libRulesSplice(cur.descStart, cur.start, t ? [';' + EngCalcs.lpnDescInline(t)] : []);
-				}));
-				entry.appendChild(descRow);
+			var entry, box, verdict, del;
+			if (e.kind === 'comment') {
+				libCommentEntry(host, function () { var cur = libRuleItemAt(i); return cur ? libCommentText(cur.lines) : ''; }, function (t) {
+					doc.rules = libRulesWith(i, libCommentLines(t));
+				}, function () { doc.rules = libRulesWith(i, null); });
+				return;
 			}
+			entry = libEl('div', 'lpn-lib-entry');
+			box = document.createElement('textarea');
+			verdict = libEl('div', 'lpn-lib-verdict ec-help');
 			box.className = 'lpn-lib-wide';
-			box.rows = Math.max(3, Math.min(10, e.end - e.start));
-			box.value = libRuleBody(lines, e).join('\n');
+			box.rows = Math.max(3, Math.min(10, e.lines.length));
+			box.value = e.lines.join('\n');
 			box.setAttribute('aria-label', pc.lpn_library_rules || 'Rules');
 			if (pc.lpn_library_rule_tip) { helpTip(box, pc.lpn_library_rule_tip); }
 			// The WHOLE verdict string is the tip target, not the glyph -- the suite's rule, and here
@@ -74380,19 +74824,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// one thing an editor must never do. It stays on the document and goes back into the
 				// file verbatim, and modelRules() is what leaves it out of the engine input -- so it
 				// is visibly there, plainly marked as not understood, and inert.
-				var cur = now(i);
-				if (!cur) { return; }
+				if (!libRuleItemAt(i)) { return; }
 				saveUndoSnapshot();
-				doc.rules = libRulesSplice(cur.start, cur.end, String(box.value).split(/\r?\n/));
+				doc.rules = libRulesWith(i, String(box.value).split(/\r?\n/));
 				libCommit();
+				// A text that now holds more or fewer items than this box has entries (a RULE line typed in, or the text emptied): the entries
+				// here are stale, so the box is built again, and the selection by position with them.
+				if (libRuleItems(libRulesRead()).length !== entries.length) { libSelForgetIndexed(); rebuildLibraryBox(); }
 			});
 			entry.appendChild(box);
 			entry.appendChild(verdict);
 			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
-				// The rule and its own description -- never a heading, never the next rule's.
-				if (!libRuleEntries(libRulesRead())[i]) { return; }
+				// The rule only: a comment is a row of its own.
+				if (!libRuleItemAt(i)) { return; }
 				saveUndoSnapshot();
-				doc.rules = libRulesWithout(i);
+				doc.rules = libRulesWith(i, null);
+				libSelForgetIndexed();
 				libCommit();
 				rebuildLibraryBox();
 			});
@@ -75710,13 +76157,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else { old = null; }
 		return { name: name, old: old };
 	}
-	// Push override upward is always asked, through the page's own dialog, naming where it goes; the
+	// Move this override up is always asked, through the page's own dialog, naming where it goes; the
 	// sentence about other scenarios is added when some change. `go` runs after the undo snapshot is taken.
 	function askPushOverride(dest, n, go) {
 		var pc = EngCalcs.pageConfig || {}, text = dest.old === null
-			? (pc.lpn_ovm_push_ask || 'Push override upward to {target}?').replace('{target}', dest.name)
-			: (pc.lpn_ovm_push_ask_cur || 'Push override upward? Current value in {target}: {old}.').replace('{target}', dest.name).replace('{old}', dest.old);
-		if (n) { text += (pc.lpn_ovm_push_others || ' Scenarios that inherit it change ({n} total).').replace('{n}', String(n)); }
+			? (pc.lpn_ovm_push_ask || 'Move this override up to {target}?').replace('{target}', dest.name)
+			: (pc.lpn_ovm_push_ask_cur || 'Move this override up? Current value in {target}: {old}.').replace('{target}', dest.name).replace('{old}', dest.old);
+		if (n) { text += (pc.lpn_ovm_push_others || ' The {n} scenarios that inherit it will change.').replace('{n}', String(n)); }
 		askDialog({ kind: 'confirm', text: text }, function (yes) {
 			if (!yes) { return; }
 			saveUndoSnapshot();
@@ -75815,7 +76262,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The orange up arrow over the dot (Task 855): move this override into the parent scenario.
 		pushProps = (o.on && !baseHere && pushTarget(o.el, o.props)) ? pushableProps(o.el, o.props) : [];
 		if (pushProps.length) {
-			g.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Push override upward', function () {
+			g.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Move this override up', function () {
 				var now = pushableProps(o.el, o.props), vals = pushValuesOf(o.el, now);
 				askPushOverride(pushDestination(o.el, now, vals, ((/\(([^()]+)\)\s*\??\s*$/.exec(String(start.textContent || '').replace(/\s+/g, ' ')) || [])[1]) || ''), pushOtherScenarios(o.el, o.props).length, function () {
 					pushOverrideUp(o.el, now, vals);
@@ -77202,7 +77649,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// Every control that names `oldId` in the given role follows the rename, record and text alike.
 	function renameInControls(role, oldId, newId) {
-		(doc.controls || []).forEach(function (c) {
+		EngCalcs.lpnControlsOnly(doc.controls).forEach(function (c) {
 			if (!c) { return; }
 			if (role === 'link' && c.link === oldId) {
 				c.link = newId;
@@ -80625,6 +81072,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Unconditional, exactly as every library edit calls it: rebuildLibraryBox() returns at its
 		// first line when the box is not in the page, so a project undone with the box closed costs
 		// nothing. It is buildDom()'s opposite number for the three lists the drawing never shows.
+		libSelForgetIndexed();
 		rebuildLibraryBox();
 		// **AND THE TABLE UNDER THE MAP, FOR THE SAME REASON** (ROADMAP Task 689). A table edit is
 		// now undoable from inside the table, so the pane is a place a person watches an undo
@@ -81940,7 +82388,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (issue.code === 'well-no-curve') { return (pc.lpn_diag_well_no_curve || 'These wells need a drawdown curve and a pump head curve. Choose both in the Properties box of each well:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'gpv-curve-order') { return (pc.lpn_diag_gpv_curve_order || 'The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:') + ' ' + issue.ids.join(', '); }
 		// A [RULES] block EPANET would refuse to read, named by rule in both engines (Task 733).
-		if (issue.code === 'rules-refused') { return (pc.lpn_diag_rules_refused || 'EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'rules-refused') { return (pc.lpn_diag_rules_refused || 'EPANET does not accept these rules. A clause in each is not valid for the element it refers to, or gives a value that cannot be read. Correct or delete them:') + ' ' + issue.ids.join(', '); }
 		// The rest of what EPANET refuses in a period, named in both engines, and the built-in solver's own stop (Task 733).
 		if (issue.code === 'control-refused') { return (pc.lpn_diag_control_refused || 'EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'rule-step-refused') { return pc.lpn_diag_rule_step_refused || 'Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.'; }
@@ -81952,10 +82400,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (issue.code === 'builtin-stopped') {
 			return typeof issue.t === 'number' && EngCalcs.lpnTimeElapsedText
 				? (pc.lpn_diag_builtin_stopped_at || 'The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.').replace('{time}', EngCalcs.lpnTimeElapsedText(issue.t))
-				: (pc.lpn_diag_builtin_stopped || 'The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.');
+				: (pc.lpn_diag_builtin_stopped || 'The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting in Settings, Calculation, Solver.');
 		}
 		if (issue.code === 'builtin-error') { return (pc.lpn_diag_builtin_error || 'An error occurred in the built-in solver: {message}').replace('{message}', String(issue.message || '')); }
 		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
+		if (issue.code === 'pda-pressure-gap') {
+			var gapU = 'lpn_u_pressure', gapN = Number(toDisplay(EngCalcs.EPANET_PDA_MIN_GAP, gapU).toPrecision(3));
+			return (pc.lpn_diag_pda_pressure_gap || 'EPANET does not accept these pressure-driven demand limits: Required pressure must exceed Minimum pressure by at least {limit}.')
+				.replace('{limit}', gapN + ' ' + unitLabel(gapU));
+		}
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
@@ -91371,12 +91824,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// split/join, not .replace(): a pipe id may hold `$&`, which .replace() takes for a pattern of its own, and
 			// the id goes in LAST so that an id holding the text `{velocity}` is not filled a second time.
 			parts.push((extended && typeof p.t === 'number'
-				? (pc.lpn_velocity_warn || '⚠ Pipe {id} velocity is {velocity} at {time}.').split('{time}').join(dsTimeText(p.t))
+				? (pc.lpn_velocity_warn || '⚠ Pipe {id} velocity is {velocity} at {time}, above the limit.').split('{time}').join(dsTimeText(p.t))
 				: (pc.lpn_velocity_warn_steady || '⚠ Pipe {id} velocity is {velocity}.'))
 				.split('{velocity}').join(ffQty(p.v, 'lpn_u_velocity')).split('{id}').join(p.id));
 			more = peaks.length - 1;
 			if (more > 0) {
-				parts.push((pc.lpn_velocity_warn_more || '⚠ And more pipes ({n}) above {limit}.')
+				parts.push((pc.lpn_velocity_warn_more || '⚠ Other pipes above {limit}: {n}.')
 					.split('{n}').join(String(more)).split('{limit}').join(ffQty(limit, 'lpn_u_velocity')));
 			}
 		}
@@ -91488,16 +91941,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return true;
 		}
 		var manningNote = noteOnce('manning-constant-differs');
-		// **THE MINOR-LOSS GRAVITY NOTE IS NOT SHOWN, AND THAT IS TOM'S OWN CALL** (2026-09-18:
-		// *"We can't keep showing the gravity message forever. It's just noise. If anything, put
-		// it in settings in the tip for the choice of whether to use the built-in solver when
-		// possible."*). The difference it reported is real and is still REPORTED BY THE ENGINE --
-		// `minor-loss-gravity-differs` is still raised in js/lpn-epanet.js and two harnesses still
-		// assert it -- but a sentence about a rounding in the last digits of a minor loss, on
-		// screen after every solve that has one k value in it, buys the reader nothing and costs
-		// them the attention the notes that DO matter need. Its substance moved to
-		// `lpn_settings_engine_native_tip`, beside the choice it is actually about, where somebody
-		// wondering why two engines disagree will go looking for it.
+		// There is no minor-loss gravity note: the built-in solver uses EPANET's own minor-loss constant, so the two engines agree.
 		// LEADS the status bar, ahead of every other note, because everything after it is a remark
 		// about numbers this sentence says not to trust. Logged under the same diagnostic code the
 		// discard path uses: to a user it is the same dead end, reached with something on screen.

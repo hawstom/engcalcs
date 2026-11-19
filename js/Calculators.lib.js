@@ -491,6 +491,21 @@ function ecWatchTitleWrites() {
 	});
 	EngCalcs._tipObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['title'], subtree: true });
 }
+// **ONE TIP AT A TIME** (Perry, 2026-11-14: a control's own long tip, opened by clicking into it, stayed up while the pointer went to a
+// button and opened that button's tip over it). A field keeps its tip while it has focus, which is deliberate, and nothing ever told it
+// that another tip had taken the screen. The one tip showing is remembered, and whichever tip is about to show closes it. An explanation
+// glyph's tip is a card the reader opened on purpose and is left to its own close.
+var ecTipShowing = null;
+function ecHideOtherTips(e) {
+	var el = ecTipShowing, t;
+	if (e.target && e.target.classList && e.target.classList.contains('ec-explain-host')) { return; }
+	if (el && el !== e.target) {
+		t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
+		if (t && t.tip && t.tip.classList && t.tip.classList.contains('show')) { t.hide(); }
+	}
+	ecTipShowing = e.target;
+}
+function ecForgetShownTip(e) { if (ecTipShowing === e.target) { ecTipShowing = null; } }
 EngCalcs._tipDelegated = false;
 EngCalcs.wireTipDelegation = function () {
 	if (EngCalcs._tipDelegated || !document.addEventListener) { return; }
@@ -498,6 +513,8 @@ EngCalcs.wireTipDelegation = function () {
 	ecWatchTitleWrites();
 	document.addEventListener('pointerover', ecArmDelegatedTip, true);
 	document.addEventListener('focusin', ecArmDelegatedTip, true);
+	document.addEventListener('show.bs.tooltip', ecHideOtherTips, true);
+	document.addEventListener('hidden.bs.tooltip', ecForgetShownTip, true);
 };
 EngCalcs.wireTipDelegation();
 

@@ -7,13 +7,14 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**86 open tasks.** Next (100): 5 · Soon (75): 13 · Someday (50): 32 · Maybe (25): 17 · Parked (5): 19
+**87 open tasks.** Next (100): 6 · Soon (75): 13 · Someday (50): 32 · Maybe (25): 17 · Parked (5): 19
 
-## 100 — Next (5)
+## 100 — Next (6)
 
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
+- Task 859 — Libraries: Move to top, up, down and bottom buttons.
 - Task 861 — A chooser when one click hits several elements.
 - Task 863 — Slim the run transport; step the run on the graph.
 
@@ -114,5 +115,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-79 of 86 titles are within 4–12 words. `!` marks the rest;
+80 of 87 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

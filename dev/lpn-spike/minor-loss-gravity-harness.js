@@ -15,7 +15,8 @@
 // ANSWER: friction is not involved. Ours reproduces EPANET's own 4.727 US equation to ~1e-15, and
 // EPANET is ~1e-5 LOW against that same equation, from its rounded 28.317 L/s per cfs. The whole
 // visible difference is the minor-loss term, where g is the entire coefficient: EPANET's g is
-// 32.2 ft/s^2 and ours is standard gravity. We do not adopt 32.2 -- see js/lpn-epanet.js.
+// 32.2 ft/s^2 and ours was standard gravity. 2026-11-18: ours is now EPANET's own 0.02517
+// (EngCalcs.EPANET_G_MINOR), so the two agree and this harness holds that.
 
 const path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
@@ -76,26 +77,22 @@ function usFrictionLoss(q) {
 		const V = Q / (Math.PI * D * D / 4);
 		const mn = nat[10] - nat[0], me = epa[10] - epa[0];
 		const gOurs = 10 * V * V / (2 * mn), gEpa = 10 * V * V / (2 * me);
-		ok('our implied g is the suite’s EngCalcs.G', Math.abs(gOurs - EngCalcs.G) < 1e-6,
-			gOurs.toFixed(6) + ' vs ' + EngCalcs.G);
-		ok('...and EngCalcs.G is standard gravity', Math.abs(EngCalcs.G - 9.80665) < 1e-12,
-			String(EngCalcs.G));
+		ok('our implied g is EPANET\u2019s minor-loss g, 8 * 0.3048 / (pi^2 * 0.02517)',
+			Math.abs(gOurs - EngCalcs.EPANET_G_MINOR) < 1e-6,
+			gOurs.toFixed(6) + ' vs ' + EngCalcs.EPANET_G_MINOR);
 		// 32.2 ft/s^2 is 9.814560; EPANET's unit rounding puts the implied value a little above it.
-		ok('EPANET’s implied g is 32.2 ft/s^2', Math.abs(gEpa - 32.2 * 0.3048) < 0.002,
+		ok('EPANET\u2019s implied g is about 32.2 ft/s^2', Math.abs(gEpa - 32.2 * 0.3048) < 0.002,
 			gEpa.toFixed(6) + ' vs ' + (32.2 * 0.3048).toFixed(6));
 		const rel = mn / me - 1;
-		ok('so our minor losses are ~0.08% larger, and that is the whole story',
-			rel > 5e-4 && rel < 1.5e-3, 'ours/EPANET - 1 = ' + rel.toExponential(3));
+		ok('and our minor loss equals EPANET\u2019s to 2e-5 (was 9e-4 with standard gravity)',
+			Math.abs(rel) < 2e-5, 'ours/EPANET - 1 = ' + rel.toExponential(3));
 	}
 
-	console.log('\n--- and the user is told, but only when there is a minor loss to tell about ---');
+	console.log('\n--- and nothing is said about it, because there is nothing to say ---');
 	{
 		const withK = EngCalcs.lpnToInp(model(2)).warnings.map(w => w.code);
-		const without = EngCalcs.lpnToInp(model(0)).warnings.map(w => w.code);
-		ok('a network with minor losses declares the difference',
-			withK.indexOf('minor-loss-gravity-differs') >= 0, withK.join(',') || '(none)');
-		ok('...and one without them says nothing',
-			without.indexOf('minor-loss-gravity-differs') < 0, without.join(',') || '(none)');
+		ok('a network with minor losses declares no gravity difference',
+			withK.indexOf('minor-loss-gravity-differs') < 0, withK.join(',') || '(none)');
 	}
 
 	console.log(fails ? '\n' + fails + ' FAILURES' : '\nall minor-loss gravity assertions passed');

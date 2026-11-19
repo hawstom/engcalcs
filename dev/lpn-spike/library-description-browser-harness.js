@@ -2,15 +2,16 @@
 // EXPORT AND RE-IMPORT. Real Chromium, the real page, real typing.
 //   node dev/lpn-spike/library-description-browser-harness.js   (takes the browser lock itself)
 //
-// Tom, 2026-10-14: "Let's add Description to the Library Patterns, Controls, and Rules." The gallery
-// Net1 (patterns, controls and two rules):
-//   1. each of the three sections shows a field headed with the Curves section's own word;
+// Tom, 2026-10-14: "Let's add Description to the Library Patterns, Controls, and Rules." Tom, 2026-11-16: a comment in Controls
+// and Rules is a row of its own, so a Description stays on patterns and on a control (the comment after its sentence). The
+// gallery Net1 (patterns, controls and two rules):
+//   1. Patterns and Controls show a field headed with the Curves section's own word;
 //   2. a description typed into each one is still there after the autosave and a reload;
-//   3. File > Export writes each as a `;` line directly above the thing it describes;
-//   4. that file, opened again, shows the same three descriptions;
+//   3. File > Export writes a pattern's as a `;` line directly above it and a control's after its sentence;
+//   4. that file, opened again, shows the same two descriptions;
 //   5. ?lang=es heads the field with the Spanish word for it;
-//   6. on a file whose [CONTROLS] and [RULES] open with a heading, a blank line, then a
-//      description, the heading is not the first one's Description and survives deleting it.
+//   6. on a file whose [CONTROLS] and [RULES] open with a heading, a blank line, then a comment, each comment is a row of its
+//      own, no control or rule takes one as its Description, and deleting the first control or rule leaves every comment.
 // The .inp placement rules themselves are library-description-inp-harness.js's.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -155,7 +156,7 @@ async function main() {
 		const word = await a.lang('lpn_field_desc');
 
 		console.log('\n--- 1. type a description in each of the three sections ---');
-		for (const sec of ['patterns', 'controls', 'rules']) {
+		for (const sec of ['patterns', 'controls']) {
 			await openLib(sec);
 			const before = await firstDesc();
 			ok(sec + ': the first entry has a Description field headed "' + word + '"',
@@ -176,7 +177,7 @@ async function main() {
 		await a.reload();
 		await dismiss();
 		await a.settle(1500);
-		for (const sec of ['patterns', 'controls', 'rules']) {
+		for (const sec of ['patterns', 'controls']) {
 			await openLib(sec);
 			const d = await firstDesc();
 			ok(sec + ': after the reload the description reads "' + DESC[sec] + '"', !!d && d.value === DESC[sec], JSON.stringify(d));
@@ -190,18 +191,15 @@ async function main() {
 		const pr = P1.findIndex((l) => !/^\s*;/.test(l));
 		ok('[PATTERNS]: the description line sits directly above the pattern\'s first row (under EPA\'s column heading)',
 			pr > 0 && P1[pr - 1] === ';' + DESC.patterns, JSON.stringify(P1.slice(0, pr + 1)));
-		ok('[CONTROLS] starts with the description line, then the control',
-			C1[0] === ';' + DESC.controls && /^LINK\s/i.test(C1[1] || ''), JSON.stringify(C1.slice(0, 2)));
-		const ri = R1.findIndex((l) => /^\s*RULE\s/i.test(l));
-		ok('[RULES] has the description directly above the first RULE line',
-			ri > 0 && R1[ri - 1] === ';' + DESC.rules, JSON.stringify(R1.slice(0, ri + 1)));
+		ok('[CONTROLS] writes the control\'s description after its sentence',
+			/^LINK\s.*\s;Harness control description$/i.test(C1[0] || ''), JSON.stringify(C1.slice(0, 2)));
 
 		console.log('\n--- 4. that file, opened again ---');
 		await a.page.setInputFiles('#lpn_inp_file', { name: 'libdesc-roundtrip.inp', mimeType: 'text/plain', buffer: Buffer.from(inp) });
 		await a.settle(1500);
 		await closeDialogs();
 		await a.settle(500);
-		for (const sec of ['patterns', 'controls', 'rules']) {
+		for (const sec of ['patterns', 'controls']) {
 			await openLib(sec);
 			const d = await firstDesc();
 			ok(sec + ': the re-imported file shows "' + DESC[sec] + '"', !!d && d.value === DESC[sec], JSON.stringify(d));
@@ -212,35 +210,39 @@ async function main() {
 			JSON.stringify([P1, C1, R1]));
 		await closeLib();
 
-		console.log('\n--- 6. a heading is never a description, and never deleted with what it heads ---');
+		console.log('\n--- 6. a comment is a row of its own, never a description, and never deleted with what it sits by ---');
 		const HEADED = fs.readFileSync(path.join(__dirname, 'reference', 'Net1.inp'), 'utf8')
 			.replace(/\[CONTROLS\][^\[]*/i, '[CONTROLS]\n;Controls heading\n\n;Open below 110\nLINK 9 OPEN IF NODE 2 BELOW 110\nLINK 9 CLOSED IF NODE 2 ABOVE 140\n\n')
 			.replace(/\[RULES\][^\[]*/i, '[RULES]\n;Rules section heading\n\n;desc R1\nRULE R1\nIF TANK 2 LEVEL ABOVE 140\nTHEN PUMP 9 STATUS IS CLOSED\n\n;desc R2\nRULE R2\nIF TANK 2 LEVEL BELOW 110\nTHEN PUMP 9 STATUS IS OPEN\n\n');
 		await a.page.setInputFiles('#lpn_inp_file', { name: 'libdesc-headed.inp', mimeType: 'text/plain', buffer: Buffer.from(HEADED) });
 		await a.settle(1500);
 		await closeDialogs();
+		const kinds = () => P(() => Array.prototype.map.call(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry'),
+			(e) => e.classList.contains('lpn-lib-comment-entry') ? 'C:' + e.querySelector('textarea').value : 'x:' + (e.querySelector('textarea:not(.lpn-lib-desc), input[type=text]') || { value: '' }).value.split('\n')[0]));
 		await openLib('rules');
-		const r1 = await firstDesc();
-		ok('rule R1\'s Description is "desc R1", not the section heading', !!r1 && r1.value === 'desc R1', JSON.stringify(r1));
+		const rk = await kinds();
+		ok('Rules: the heading, "desc R1", RULE R1, "desc R2" and RULE R2 are five rows, and no rule has a Description field',
+			JSON.stringify(rk) === JSON.stringify(['C:Rules section heading', 'C:desc R1', 'x:RULE R1', 'C:desc R2', 'x:RULE R2']), JSON.stringify(rk));
 		await openLib('controls');
-		const c1 = await firstDesc();
-		ok('control 1\'s Description is "Open below 110", not the heading a blank line separates', !!c1 && c1.value === 'Open below 110', JSON.stringify(c1));
+		const ck = await kinds();
+		ok('Controls: the heading, "Open below 110" and the two controls are four rows',
+			JSON.stringify(ck) === JSON.stringify(['C:Controls heading', 'C:Open below 110', 'x:LINK 9 OPEN IF NODE 2 BELOW 110', 'x:LINK 9 CLOSED IF NODE 2 ABOVE 140']), JSON.stringify(ck));
 		// Delete the first rule and the first control with the real Delete buttons.
 		for (const sec of ['rules', 'controls']) {
 			await openLib(sec);
 			await P(() => {
-				document.querySelector('#lpn_libbox_content .lpn-lib-entry button.lpn-lib-del')
-					.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+				const e = Array.prototype.filter.call(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry'), (x) => !x.classList.contains('lpn-lib-comment-entry'))[0];
+				e.querySelector('button.lpn-lib-del').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
 			});
 			await a.settle(400);
 		}
 		await closeLib();
 		const hx = await exportInp();
 		const HR = section(hx, 'RULES'), HC = section(hx, 'CONTROLS');
-		ok('after deleting R1 the rules heading is still there, above R2 and its description',
-			JSON.stringify(HR.slice(0, 3)) === JSON.stringify([';Rules section heading', ';desc R2', 'RULE R2']) && !HR.some((l) => /R1/.test(l)), JSON.stringify(HR));
-		ok('after deleting control 1 the controls heading is still there, above control 2',
-			JSON.stringify(HC) === JSON.stringify([';Controls heading', 'LINK 9 CLOSED IF NODE 2 ABOVE 140']), JSON.stringify(HC));
+		ok('after deleting R1 the heading and both comments are still there, above R2',
+			JSON.stringify(HR.slice(0, 4)) === JSON.stringify([';Rules section heading', ';desc R1', ';desc R2', 'RULE R2']) && !HR.some((l) => /R1\b/.test(l.replace(/^;desc R1$/, ''))), JSON.stringify(HR));
+		ok('after deleting control 1 both comments are still there, above control 2',
+			JSON.stringify(HC) === JSON.stringify([';Controls heading', ';Open below 110', 'LINK 9 CLOSED IF NODE 2 ABOVE 140']), JSON.stringify(HC));
 
 		console.log('\n--- 5. ?lang=es ---');
 		const b = await Session.open(browser, NAME + '-es', { viewport: { width: 1400, height: 900 } });
@@ -253,7 +255,7 @@ async function main() {
 		await b.menuClick(await b.lang('lpn_library_menu'), 'project');
 		await b.page.waitForSelector('#lpn_library_box', { state: 'visible' });
 		const esWord = await b.lang('lpn_field_desc');
-		for (const sec of ['patterns', 'controls', 'rules']) {
+		for (const sec of ['patterns', 'controls']) {
 			await b.page.evaluate((s) => {
 				document.getElementById('lpn_libbox_link_' + s)
 					.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));

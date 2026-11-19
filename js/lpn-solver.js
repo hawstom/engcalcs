@@ -26,7 +26,6 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	? require('./PipeHydraulics.lib.js')
 	: (EngCalcs || {});
 
-EngCalcs.lpnG = EngCalcs.G;
 
 // Guard against the zero-flow singularity.
 //
@@ -567,6 +566,10 @@ EngCalcs.lpnLinkK = function (link) {
 	return link.k || 0;
 };
 
+// EPANET's smallest accepted Required-minus-Minimum pressure (input1.c MINPDIFF = 0.1), in the unit of the file
+// it reads, which for this page's export is metres of head.
+EngCalcs.EPANET_PDA_MIN_GAP = 0.1;
+
 // Structural checks, run BEFORE the solve, never by watching it fail.
 //
 // Each returns a distinct machine-readable code so the UI can say something
@@ -677,6 +680,11 @@ EngCalcs.lpnDiagnose = function (model, options) {
 		var hy = model.hydraulics, mn = typeof hy.minPressure === 'number' ? hy.minPressure : 0;
 		if (typeof hy.reqPressure === 'number' && hy.reqPressure <= mn) {
 			issues.push({ code: 'pda-pressures', ids: [] });
+		} else if (typeof hy.reqPressure === 'number' && hy.reqPressure - mn < EngCalcs.EPANET_PDA_MIN_GAP - 1e-9) {
+			// EPANET refuses Required minus Minimum pressure under 0.1 (input1.c adjustdata(), error 208), in the units of
+			// the file it reads. The page's export is always LPS and metres, so the gap is measured in metres here: the
+			// 0.1 psi EPANET writes as its own default is 0.07 m and is refused. Never rounded up for the user.
+			issues.push({ code: 'pda-pressure-gap', ids: [] });
 		}
 	}
 
@@ -800,7 +808,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		qMin = EngCalcs.lpnQMin,
 		gradMin = EngCalcs.lpnGradMin,
 		emitterExp = model.emitterExponent || 0.5,
-		g = EngCalcs.lpnG,
+		g = EngCalcs.EPANET_G_MINOR,
 		nodes = model.nodes,
 		links = model.links,
 		byId = {},
@@ -1937,7 +1945,7 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		m,
 		kEff,
 		vs,
-		g = EngCalcs.lpnG;
+		g = EngCalcs.EPANET_G_MINOR;
 
 	// **SPECIFIC GRAVITY TURNS A HEAD INTO A PRESSURE, AND NOTHING ELSE** (Task 553). Every head in
 	// this solver is a head OF THE FLUID -- the energy equation does not care what the fluid weighs,
@@ -1959,7 +1967,8 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			pressures[model.nodes[i].id] = (model.nodes[i].head - EngCalcs.lpnPressureDatum(model.nodes[i])) * sg;
 			// **AS EPANET REPORTS IT** (Task 733, slice 7): EPANET keeps a reservoir's total head in its
 			// elevation, so its pressure is 0 whatever ground the page draws it on. Both settings show the
-			// same row.
+			// same row. A reservoir on a head PATTERN is the one exception, and lpnSolve is a single instant
+			// that never sees a pattern: js/lpn-native-run.js frameOf() sets head less base head there.
 			if (model.nodes[i].type === 'reservoir') { pressures[model.nodes[i].id] = 0; }
 		}
 	}

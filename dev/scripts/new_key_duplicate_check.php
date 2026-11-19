@@ -38,6 +38,7 @@ $allow = [
     'lpn_tool_add_well'        => 'Well is a different tool from Pump: the well with its reservoir, drawdown valve, pump node and discharge node (Task 822)',
     'lpn_tool_add_welltank'    => 'Well with tank is a different tool from Well: a well, a tee and a tank at three points the user gives (Task 822)',
     'lpn_tool_add_pumpplus'    => 'Pump+ is a different tool from Pump: the pump with its two nodes (Task 822); the plus is the point',
+    'lpn_inp_dup_and'          => 'conjunction joining line numbers in a list; lpn_find_q_and is the Find query keyword',
 ];
 
 function nkd_norm($s) {

@@ -2905,6 +2905,12 @@
 	},
 	"controls": [
 		{
+			"comment": true,
+			"lines": [
+				";Lake source operates only part of the day"
+			]
+		},
+		{
 			"link": "10",
 			"raw": "Link 10 OPEN AT TIME 1",
 			"action": {
@@ -2931,6 +2937,14 @@
 			"text": {
 				"time": "15"
 			}
+		},
+		{
+			"comment": true,
+			"lines": [
+				";Pump 335 controlled by level in Tank 1",
+				";When pump is closed, bypass pipe is opened"
+			],
+			"gap": 1
 		},
 		{
 			"link": "335",

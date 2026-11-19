@@ -82,8 +82,8 @@ const { parseReport } = require('./net3-report.js');
 	check((doc.patterns || []).length === parsed.patterns.length && doc.patterns.length >= 2,
 		`the document holds the file's ${parsed.patterns.length} patterns`,
 		String((doc.patterns || []).length));
-	check((doc.controls || []).length === 6, 'and its 6 controls',
-		String((doc.controls || []).length));
+	check((doc.controls || []).filter((c) => !c.comment).length === 6, 'and its 6 controls (and the comment rows between them)',
+		String((doc.controls || []).filter((c) => !c.comment).length));
 	check(!!doc.times && doc.times.duration === 86400,
 		'and a 24 hour duration', doc.times && String(doc.times.duration));
 
@@ -95,7 +95,7 @@ const { parseReport } = require('./net3-report.js');
 	check(bp.every((p) => ptsOf(back, p).length === 3),
 		'a save and an open keeps every curve point', bp.map((p) => ptsOf(back, p).length).join('/'));
 	check((back.patterns || []).length === (doc.patterns || []).length, '...and every pattern');
-	check((back.controls || []).length === 6, '...and every control');
+	check((back.controls || []).filter((c) => !c.comment).length === 6 && back.controls.length === doc.controls.length, '...and every control and comment row');
 	check(back.times && back.times.duration === 86400, '...and the clock');
 
 	// ---- 3. RUN WHAT CAME BACK, and compare with EPA ----
