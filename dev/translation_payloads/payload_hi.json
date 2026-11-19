@@ -2,7 +2,7 @@
     "meta": {
         "language": "hi",
         "expected_key_count": 3383,
-        "delta_key_count": 7,
+        "delta_key_count": 6,
         "english_changed_key_count": 5,
         "exempt_key_count": 51,
         "exempt_keys": [
@@ -86,7 +86,6 @@
     "keys_to_translate": {
         "lpn_inp_dup_comma": ", ",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_about_source": "Source code",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_quality_diffusivity": "Diffusivity",
@@ -95,7 +94,6 @@
     "keys": {
         "lpn_inp_dup_comma": ", ",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_about_source": "Source code",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_quality_diffusivity": "Diffusivity",
@@ -120,7 +118,7 @@
         },
         "lpn_inp_drop_quality_options": {
             "reason": "english_changed",
-            "current_value": "इस फ़ाइल में EPANET जल गुणवत्ता विकल्प हैं: Quality विकल्प, जो जल गुणवत्ता विश्लेषण का प्रकार बताता है, और रसायन से जुड़ी दो सेटिंग्स, Diffusivity और Quality tolerance। तीनों रखी और उपयोग की जाती हैं। जल आयु, स्रोत अनुरेखण और रसायन विश्लेषण, हर एक की यहाँ गणना होती है, और रसायन विश्लेषण की गणना होने पर दोनों रसायन सेटिंग्स का उपयोग होता है। EPANET फ़ाइल सहेजने पर इन सबको वापस लिखा जाता है।",
+            "current_value": "इस फ़ाइल में EPANET जल गुणवत्ता विकल्प हैं: Quality विकल्प, जो जल गुणवत्ता विश्लेषण का प्रकार बताता है, और रसायन से जुड़ी दो सेटिंग्स, विसरणशीलता और गुणवत्ता सहनशीलता। तीनों रखी और उपयोग की जाती हैं। जल आयु, स्रोत अनुरेखण और रसायन विश्लेषण, हर एक की यहाँ गणना होती है, और रसायन विश्लेषण की गणना होने पर दोनों रसायन सेटिंग्स का उपयोग होता है। EPANET फ़ाइल सहेजने पर इन सबको वापस लिखा जाता है।",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_inp_drop_comments",
@@ -131,22 +129,6 @@
                     "key": "lpn_inp_drop_file_options",
                     "value": "यह फ़ाइल एक सहायक फ़ाइल का हवाला देती है: मैप, जिसमें निर्देशांक होते हैं, या हाइड्रॉलिक्स, जिसमें पहले से निकाली गई हाइड्रॉलिक्स होती है। यह पृष्ठ इनमें से कोई भी नहीं खोल सकता, इसलिए ये पंक्तियाँ जैसी हैं वैसी ही रखी जाती हैं और यदि आप EPANET फ़ाइल सहेजते हैं तो वापस लिखी जाती हैं।",
                     "english": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file."
-                }
-            }
-        },
-        "lpn_about_source": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_about_credits",
-                    "value": "श्रेय",
-                    "english": "Credits"
-                },
-                "next_translated": {
-                    "key": "lpn_help_welcome",
-                    "value": "स्वागत पृष्ठ",
-                    "english": "Welcome page"
                 }
             }
         },

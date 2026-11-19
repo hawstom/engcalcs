@@ -2,7 +2,7 @@
     "meta": {
         "language": "am",
         "expected_key_count": 3383,
-        "delta_key_count": 6,
+        "delta_key_count": 5,
         "english_changed_key_count": 5,
         "exempt_key_count": 43,
         "exempt_keys": [
@@ -77,7 +77,6 @@
     "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ፍሰት\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ነባሪ\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.",
     "keys_to_translate": {
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_about_source": "Source code",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_quality_diffusivity": "Diffusivity",
@@ -85,7 +84,6 @@
     },
     "keys": {
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_about_source": "Source code",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_quality_diffusivity": "Diffusivity",
@@ -105,22 +103,6 @@
                     "key": "lpn_inp_drop_file_options",
                     "value": "ይህ ፋይል ተጨማሪ ፋይል ይጠቅሳል፦ መጋጠሚያዎችን የያዘ Map፣ ወይም አስቀድሞ የተሰላ ሃይድሮሊክስ የያዘ Hydraulics። ይህ ገጽ የትኛውንም መክፈት ስለማይችል፣ መስመሮቹ እንዳሉ ይያዛሉ፣ የEPANET ፋይል ካስቀመጡም ይመለሳሉ።",
                     "english": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file."
-                }
-            }
-        },
-        "lpn_about_source": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_about_credits",
-                    "value": "ምስጋና",
-                    "english": "Credits"
-                },
-                "next_translated": {
-                    "key": "lpn_help_welcome",
-                    "value": "የእንኳን ደህና መጣህ ገጽ",
-                    "english": "Welcome page"
                 }
             }
         },

@@ -2578,6 +2578,7 @@ $ec_lang['lpn_storage_unreadable']='خوندي نه شوه. دا پروژه د �
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='مننه';
+$ec_lang['lpn_about_source']='د سرچینې کوډ';
 $ec_lang['lpn_help_welcome']='د هرکلي پاڼه';
 $ec_lang['lpn_about_license']='د GNU عمومي عامه جواز v3.0 یا وروسته لاندې جواز لري.';
 $ec_lang['lpn_about_dedication']='ته د تل لپاره ګران او عزیز یې، له هیڅ شي نه باید ووېرېږې، او ته هر څه نه خرابوې.';

@@ -2,7 +2,7 @@
     "meta": {
         "language": "km",
         "expected_key_count": 3383,
-        "delta_key_count": 7,
+        "delta_key_count": 6,
         "english_changed_key_count": 5,
         "exempt_key_count": 40,
         "exempt_keys": [
@@ -75,7 +75,6 @@
     "keys_to_translate": {
         "lpn_inp_dup_comma": ", ",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_about_source": "Source code",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_quality_diffusivity": "Diffusivity",
@@ -84,7 +83,6 @@
     "keys": {
         "lpn_inp_dup_comma": ", ",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_about_source": "Source code",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_quality_diffusivity": "Diffusivity",
@@ -120,22 +118,6 @@
                     "key": "lpn_inp_drop_file_options",
                     "value": "ឯកសារនេះយោងទៅឯកសារជំនួយមួយ៖ Map ដែលផ្ទុកកូអរដោនេ ឬ Hydraulics ដែលផ្ទុកលទ្ធផលធារាសាស្ត្រដែលបានគណនារួច។ ទំព័រនេះមិនអាចបើកឯកសារទាំងពីរប្រភេទនេះទេ ដូច្នេះបន្ទាត់ទាំងនោះត្រូវបានរក្សាទុកដដែល ហើយត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។",
                     "english": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file."
-                }
-            }
-        },
-        "lpn_about_source": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_about_credits",
-                    "value": "កិត្តិយស",
-                    "english": "Credits"
-                },
-                "next_translated": {
-                    "key": "lpn_help_welcome",
-                    "value": "ទំព័រស្វាគមន៍",
-                    "english": "Welcome page"
                 }
             }
         },

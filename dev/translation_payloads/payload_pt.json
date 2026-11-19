@@ -2,7 +2,7 @@
     "meta": {
         "language": "pt",
         "expected_key_count": 3383,
-        "delta_key_count": 7,
+        "delta_key_count": 6,
         "english_changed_key_count": 5,
         "exempt_key_count": 68,
         "exempt_keys": [
@@ -103,7 +103,6 @@
     "keys_to_translate": {
         "lpn_inp_dup_comma": ", ",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_about_source": "Source code",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_quality_diffusivity": "Diffusivity",
@@ -112,7 +111,6 @@
     "keys": {
         "lpn_inp_dup_comma": ", ",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_about_source": "Source code",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_quality_diffusivity": "Diffusivity",
@@ -151,22 +149,6 @@
                 }
             }
         },
-        "lpn_about_source": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_about_credits",
-                    "value": "Créditos",
-                    "english": "Credits"
-                },
-                "next_translated": {
-                    "key": "lpn_help_welcome",
-                    "value": "Página de boas-vindas",
-                    "english": "Welcome page"
-                }
-            }
-        },
         "lpn_settings_viscosity": {
             "reason": "english_changed",
             "current_value": "Viscosidade",
@@ -178,19 +160,19 @@
                 },
                 "next_translated": {
                     "key": "lpn_settings_viscosity_tip",
-                    "value": "O EPANET lê um valor acima de 0,001 como a razão entre a viscosidade do fluido e a da água a 20 graus Celsius, e um valor de 0,001 ou menos como a própria viscosidade cinemática, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Só altera a resposta pelo método de Darcy-Weisbach.",
+                    "value": "O EPANET lê um valor acima de 0,001 como a razão em relação à viscosidade da água a 20 graus Celsius, e um valor de 0,001 ou menos como a própria viscosidade cinemática, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Só altera a resposta pelo método de Darcy-Weisbach.",
                     "english": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method."
                 }
             },
             "tip": {
                 "key": "lpn_settings_viscosity_tip",
                 "english": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
-                "value": "O EPANET lê um valor acima de 0,001 como a razão entre a viscosidade do fluido e a da água a 20 graus Celsius, e um valor de 0,001 ou menos como a própria viscosidade cinemática, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Só altera a resposta pelo método de Darcy-Weisbach."
+                "value": "O EPANET lê um valor acima de 0,001 como a razão em relação à viscosidade da água a 20 graus Celsius, e um valor de 0,001 ou menos como a própria viscosidade cinemática, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Só altera a resposta pelo método de Darcy-Weisbach."
             }
         },
         "lpn_settings_viscosity_tip": {
             "reason": "english_changed",
-            "current_value": "O EPANET lê um valor acima de 0,001 como a razão entre a viscosidade do fluido e a da água a 20 graus Celsius, e um valor de 0,001 ou menos como a própria viscosidade cinemática, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Só altera a resposta pelo método de Darcy-Weisbach.",
+            "current_value": "O EPANET lê um valor acima de 0,001 como a razão em relação à viscosidade da água a 20 graus Celsius, e um valor de 0,001 ou menos como a própria viscosidade cinemática, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Só altera a resposta pelo método de Darcy-Weisbach.",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_settings_viscosity",
@@ -220,19 +202,19 @@
                 },
                 "next_translated": {
                     "key": "lpn_quality_diffusivity_tip",
-                    "value": "O EPANET lê um valor acima de 0,0001 como a razão entre a difusividade e a do cloro na água, e um valor de 0,0001 ou menos como a própria difusividade, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Em branco usa o padrão do EPANET, 1,0.",
+                    "value": "O EPANET lê um valor acima de 0,0001 como a razão em relação à difusividade do cloro na água, e um valor de 0,0001 ou menos como a própria difusividade, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Em branco usa o padrão do EPANET, 1,0.",
                     "english": "EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²\/s for US flow units and m²\/s for SI flow units. Blank uses the EPANET default of 1.0."
                 }
             },
             "tip": {
                 "key": "lpn_quality_diffusivity_tip",
                 "english": "EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²\/s for US flow units and m²\/s for SI flow units. Blank uses the EPANET default of 1.0.",
-                "value": "O EPANET lê um valor acima de 0,0001 como a razão entre a difusividade e a do cloro na água, e um valor de 0,0001 ou menos como a própria difusividade, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Em branco usa o padrão do EPANET, 1,0."
+                "value": "O EPANET lê um valor acima de 0,0001 como a razão em relação à difusividade do cloro na água, e um valor de 0,0001 ou menos como a própria difusividade, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Em branco usa o padrão do EPANET, 1,0."
             }
         },
         "lpn_quality_diffusivity_tip": {
             "reason": "english_changed",
-            "current_value": "O EPANET lê um valor acima de 0,0001 como a razão entre a difusividade e a do cloro na água, e um valor de 0,0001 ou menos como a própria difusividade, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Em branco usa o padrão do EPANET, 1,0.",
+            "current_value": "O EPANET lê um valor acima de 0,0001 como a razão em relação à difusividade do cloro na água, e um valor de 0,0001 ou menos como a própria difusividade, em ft²\/s para unidades de vazão dos EUA e em m²\/s para unidades de vazão do SI. Em branco usa o padrão do EPANET, 1,0.",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_quality_diffusivity",

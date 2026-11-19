@@ -2,7 +2,7 @@
     "meta": {
         "language": "hr",
         "expected_key_count": 3383,
-        "delta_key_count": 7,
+        "delta_key_count": 6,
         "english_changed_key_count": 5,
         "exempt_key_count": 50,
         "exempt_keys": [
@@ -85,7 +85,6 @@
     "keys_to_translate": {
         "lpn_inp_dup_comma": ", ",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_about_source": "Source code",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_quality_diffusivity": "Diffusivity",
@@ -94,7 +93,6 @@
     "keys": {
         "lpn_inp_dup_comma": ", ",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_about_source": "Source code",
         "lpn_settings_viscosity": "Viscosity",
         "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_quality_diffusivity": "Diffusivity",
@@ -119,7 +117,7 @@
         },
         "lpn_inp_drop_quality_options": {
             "reason": "english_changed",
-            "current_value": "Ova datoteka navodi EPANET opcije kvalitete vode: opciju Quality, koja određuje vrstu analize kvalitete vode, te dvije postavke koje idu uz kemikaliju, Diffusivity i Quality tolerance. Sve tri su zadržane i koriste se. Starost vode, praćenje izvora i analiza kemikalije svaka se ovdje izračunava, a dvije postavke kemikalije koriste se kad se izračunava analiza kemikalije. Sve se zapisuju natrag ako spremite EPANET datoteku.",
+            "current_value": "Ova datoteka navodi EPANET opcije kvalitete vode: opciju Kvaliteta vode, koja određuje vrstu analize kvalitete vode, te dvije postavke koje idu uz kemikaliju, Difuzivnost i Tolerancija kakvoće. Sve tri su zadržane i koriste se. Starost vode, praćenje izvora i analiza kemikalije svaka se ovdje izračunava, a dvije postavke kemikalije koriste se kad se izračunava analiza kemikalije. Sve se zapisuju natrag ako spremite EPANET datoteku.",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_inp_drop_comments",
@@ -130,22 +128,6 @@
                     "key": "lpn_inp_drop_file_options",
                     "value": "Ova datoteka upućuje na pomoćnu datoteku: Map, koja sadrži koordinate, ili Hydraulics, koja sadrži već izračunatu hidrauliku. Ova stranica ne može otvoriti nijednu od njih, pa se retci zadržavaju kakvi jesu i zapisuju natrag ako spremite EPANET datoteku.",
                     "english": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file."
-                }
-            }
-        },
-        "lpn_about_source": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_about_credits",
-                    "value": "Zasluge",
-                    "english": "Credits"
-                },
-                "next_translated": {
-                    "key": "lpn_help_welcome",
-                    "value": "Stranica dobrodošlice",
-                    "english": "Welcome page"
                 }
             }
         },

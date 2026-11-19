@@ -2578,6 +2578,7 @@ $ec_lang['lpn_storage_unreadable']='সংরক্ষণ করা হয়ন
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='কৃতজ্ঞতা';
+$ec_lang['lpn_about_source']='সোর্স কোড';
 $ec_lang['lpn_help_welcome']='স্বাগত পাতা';
 $ec_lang['lpn_about_license']='GNU General Public License v3.0 বা পরবর্তী সংস্করণের অধীনে লাইসেন্সপ্রাপ্ত।';
 $ec_lang['lpn_about_dedication']='তুমি চিরকাল ভালোবাসার ও আদরের, তোমার ভয় পাওয়ার কিছু নেই, আর তুমি সবকিছু নষ্ট করে ফেলছ না।';

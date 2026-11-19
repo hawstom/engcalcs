@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-11-01",
-    "count": 3382,
+    "count": 3383,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -6715,6 +6715,13 @@
                 "lpn_notes_color_def"
             ],
             "reason": "Resynced in all 26 languages by sprint 1118 (2026-11-18)"
+        },
+        {
+            "date": "2026-11-19",
+            "keys": [
+                "lpn_about_source"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         }
     ],
     "hashes": {
@@ -6947,6 +6954,7 @@
         "lpn_about_credits": "bfac50d6424b5166c3ee2808c85ae7c139b5182f",
         "lpn_about_dedication": "c3f5d7d9b6039a55d9eb30982b87a9aba5aec4e5",
         "lpn_about_license": "4af04a4c7d9b35a6fcbd325fbb041853fced2ba9",
+        "lpn_about_source": "22a35fbebff47762d94faae1d7babdf97b0736bf",
         "lpn_ago_days": "c752c6dea2f93583c2da965c3b0ac6a837aa088d",
         "lpn_ago_hours": "bc7107f4a791a1034616e2c069ba6e03643fedaa",
         "lpn_ago_minutes": "5bac86d4ed544f09d349c91c624aa7241b3b56d4",
@@ -11017,6 +11025,10 @@
         "lpn_about_license": {
             "words": 10,
             "ends_sentence": true
+        },
+        "lpn_about_source": {
+            "words": 2,
+            "ends_sentence": false
         },
         "lpn_ago_days": {
             "words": 2,
