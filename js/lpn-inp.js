@@ -3651,6 +3651,7 @@
 			});
 			// Statistic goes out only when the project states one (Task 735): the file's own word
 			// while it still means the stored value.
+			if (!timeKeysOnly && expTimes.ruleStep > 0) { timeRows.push(row(['Rule Timestep', EngCalcs.lpnTimeText(expTimes, 'ruleStep', expTimes.ruleStep)])); }
 			var statText = !timeKeysOnly && EngCalcs.lpnStatisticText ? EngCalcs.lpnStatisticText(expTimes) : null;
 			if (statText) { timeRows.push(row(['Statistic', statText])); }
 		}

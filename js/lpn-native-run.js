@@ -497,7 +497,8 @@
 		model.nodes.forEach(function (n) { nodeTypeOf[String(n.id)] = n.type; });
 		if (model.rules && model.rules.length) {
 			rules = parseRules(model, nodeTypeOf, linkOfId).rules;
-			ruleStep = Math.min(Math.floor(hydStep / 10), hydStep);   // input1.c adjustdata()
+			// input1.c adjustdata(): a tenth of the hydraulic step unless the file states one, and never more than the hydraulic step.
+			ruleStep = Math.min(times.ruleStep > 0 ? Math.floor(times.ruleStep) : Math.floor(hydStep / 10), hydStep);
 		}
 
 		function mult(patId, time) {
@@ -862,10 +863,7 @@
 		}
 		// the emitter's outflow at a junction, m3/s (hydcoeffs.c emitter coefficient: Ke (h - El)^(1/n))
 		function emitterOut(n) {
-			var dh;
-			if (!(n.emitter > 0)) { return 0; }
-			dh = res.heads[n.id] - (n.elev || 0);
-			return (dh < 0 ? -1 : 1) * n.emitter * Math.pow(Math.abs(dh), model.emitterExponent || 0.5);
+			return EC.lpnEmitterFlow(n.emitter, res.heads[n.id] - (n.elev || 0), model.emitterExponent || 0.5);
 		}
 		function demandOut(n, id) {   // the delivered consumer demand, m3/s (EPANET's DemandFlow)
 			return res.demands && typeof res.demands[id] === 'number' ? res.demands[id] - emitterOut(n) : (n.demand || 0);
@@ -1907,7 +1905,7 @@
 			x = n.demand || 0;
 			if (res.demands && res.demands[String(n.id)] !== undefined) { d[String(n.id)] = Math.fround(res.demands[String(n.id)] * 1000 / LPS_PER_CFS); return; }   // pressure-driven: what was delivered, emitter included
 			// hydraul.c: a junction's NodeDemand is its demand plus what its emitter discharges.
-			if (n.emitter > 0) { x += n.emitter * Math.pow(Math.max((res.heads[n.id] || 0) - (n.elev || 0), 0), exp); }
+			x += EC.lpnEmitterFlow(n.emitter, (res.heads[n.id] || 0) - (n.elev || 0), exp);
 			d[String(n.id)] = Math.fround(x * 1000 / LPS_PER_CFS);
 		});
 		if (withHyd) {
@@ -2591,7 +2589,7 @@
 			if (n.type === 'tank') { f.levels[n.id] = ((res.heads[n.id] || 0) - (n.elev || 0)); }
 			// EN_DEMAND is the demand plus what the junction's emitter discharges (hydraul.c NodeDemand), as lpnSolve's pressure-driven res.demands already is.
 			f.demands[n.id] = n.type === 'junction' ? (res.demands && res.demands[n.id] !== undefined ? res.demands[n.id]
-				: (n.demand || 0) + (n.emitter > 0 ? n.emitter * Math.pow(Math.max((res.heads[n.id] || 0) - (n.elev || 0), 0), model.emitterExponent || 0.5) : 0)) : 0;
+				: (n.demand || 0) + EC.lpnEmitterFlow(n.emitter, (res.heads[n.id] || 0) - (n.elev || 0), model.emitterExponent || 0.5)) : 0;
 		});
 		// A reservoir's pressure is its head less its elevation (epanet.c EN_PRESSURE), and EPANET's elevation for a reservoir is its
 		// BASE head: 0 on a steady head, head less base head when a head pattern moves it. lpnSolve answers 0 always.
@@ -2618,6 +2616,20 @@
 		// reads OPEN when it is OPEN (a stated SPEED 0); one a control or a pattern set to 0 is CLOSED.
 		model.links.forEach(function (l, k) {
 			f.statuses[l.id] = ls[k].s <= CLOSED ? 'closed' : 'open';
+		});
+		// What EPANET reports beside the flows (EN_TANKVOLUME m3, EN_SETTING, EN_EMITTERFLOW m3/s), so a period can be audited against it:
+		// a tank's volume, a pump's speed, a valve's setting (PRV, PSV, PBV metres of head; FCV m3/s; TCV unitless; a setting
+		// that is MISSING reads 0, epanet.c getlinkvalue), and a junction's emitter discharge.
+		f.volumes = {}; f.pumpSettings = {}; f.valveSettings = {}; f.emitterFlows = {};
+		tanks.forEach(function (tk) { f.volumes[tk.id] = tk.V * FT3; });
+		model.links.forEach(function (l, k) {
+			var st = ls[k];
+			if (st.kind === 'pump') { f.pumpSettings[l.id] = st.k; }
+			if (st.kind === 'valve' && st.vt !== 'GPV') { f.valveSettings[l.id] = st.k === MISSING ? 0 : st.k; }
+		});
+		cur.forEach(function (n) {
+			if (n.type !== 'junction') { return; }
+			f.emitterFlows[n.id] = EC.lpnEmitterFlow(n.emitter, (res.heads[n.id] || 0) - (n.elev || 0), model.emitterExponent || 0.5);
 		});
 		return f;
 	}

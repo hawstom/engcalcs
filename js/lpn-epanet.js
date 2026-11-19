@@ -707,6 +707,10 @@
 			if (time.times.qualityStep > 0) {
 				timeRows.push(' Quality Timestep  ' + EngCalcs.lpnFormatTime(time.times.qualityStep));
 			}
+			// The rule time step, only where the document states one (EPANET's default is a tenth of the hydraulic step).
+			if (time.times.ruleStep > 0) {
+				timeRows.push(' Rule Timestep  ' + EngCalcs.lpnFormatTime(time.times.ruleStep));
+			}
 		}
 
 		// **THE WATER-QUALITY ANALYSIS, ALL THREE OF WHICH THIS PAGE NOW WORKS OUT.**
