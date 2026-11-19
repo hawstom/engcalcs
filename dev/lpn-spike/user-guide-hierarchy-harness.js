@@ -92,6 +92,10 @@ async function english(browser, Session) {
 	ok('About holds no "How it is solved"', about.indexOf(enString('lpn_notes_1_term')) < 0);
 	ok('...and no "What it does not do"', about.indexOf(enString('lpn_notes_2_term')) < 0);
 	ok('...but still its licence and credits', about.indexOf(enString('lpn_about_license')) >= 0 && about.indexOf(enString('lpn_about_credits')) >= 0);
+	const src = await page.evaluate(() => { const a = document.getElementById('lpn_about_source'); return a ? { href: a.href, text: a.textContent } : null; });
+	ok('...and a Source code link to the repository', !!src && src.href === 'https://github.com/hawstom/engcalcs' && src.text === enString('lpn_about_source'), JSON.stringify(src));
+	const build = await page.evaluate(() => { const a = document.querySelector('#lpn_about_popup .lpn-about-build a'); return a ? { href: a.href, text: a.textContent } : null; });
+	ok('...and the build\'s commit id links to that commit', !!build && /^[0-9a-f]{7,40}$/.test(build.text) && build.href === 'https://github.com/hawstom/engcalcs/commit/' + build.text, JSON.stringify(build));
 	const notes2 = enString('lpn_notes_2_def');
 	ok('"What it does not do" no longer begins with the water quality sentence', !/^Water quality is modeled/.test(notes2) && /^Surge and water hammer/.test(notes2), notes2.slice(0, 50));
 

@@ -2578,6 +2578,7 @@ $ec_lang['lpn_storage_unreadable']='Не сохранено. Не удалось
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='Благодарности';
+$ec_lang['lpn_about_source']='Исходный код';
 $ec_lang['lpn_help_welcome']='Страница приветствия';
 $ec_lang['lpn_about_license']='Распространяется по лицензии GNU General Public License версии 3.0 или более поздней.';
 $ec_lang['lpn_about_dedication']='Ты любим и дорог навсегда, тебе нечего бояться, и ты не разрушаешь всё.';
@@ -5368,7 +5369,7 @@ $ec_lang['lpn_settings_color_ramp_node_tip']='Задаёт цвета узлов
 $ec_lang['lpn_time_epanet_fallback']='Не удалось загрузить решатель EPANET, поэтому эту сеть рассчитал встроенный решатель.';
 $ec_lang['lpn_time_epanet_fallback_why']='Эту сеть рассчитал встроенный решатель, потому что решатель EPANET использовать не удалось. {reason}';
 $ec_lang['lpn_settings_solver']='Решатель';
-$ec_lang['lpn_quality_diffusivity']='Диффузия';
+$ec_lang['lpn_quality_diffusivity']='Коэффициент диффузии';
 $ec_lang['lpn_quality_diffusivity_tip']='EPANET читает значение больше 0,0001 как отношение к коэффициенту диффузии хлора в воде, а значение 0,0001 и меньше — как сам коэффициент диффузии, в ft²/s для американских единиц расхода и в m²/s для единиц расхода СИ. Пустое значение означает значение EPANET по умолчанию, равное 1,0.';
 $ec_lang['lpn_library_import_comments']='Строк комментариев, скопированных вместе с импортированными элементами: {n}';
 $ec_lang['lpn_library_import_comments_left']='Строк комментариев, пропущенных, потому что элемент под каждой из них был пропущен или после них ничего нет: {n}';

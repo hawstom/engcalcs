@@ -1940,9 +1940,15 @@ echoHeader("EngCalcsApp", $html_title,
         // already resolves per host through ecAppBrandCurrent()) is the one function both links
         // must share. ?>
 		<p><a href="<?=htmlspecialchars(ecAppSiteUrl(), ENT_QUOTES, 'UTF-8')?>credits.html" target="_blank" rel="noopener"><?=$ec_lang['lpn_about_credits']?></a></p>
+<?php   // **THE SOURCE IS ONE CLICK FROM ABOUT** (Tom, 2026-11-18: *"I don't see a prominent link to the source
+        // code. Why doesn't the commit id in Help, About have a link?"*). The licence above promises the source;
+        // this line and the build's commit id are the two doors to it. ?>
+		<p><a id="lpn_about_source" href="https://github.com/hawstom/engcalcs" target="_blank" rel="noopener"><?=$ec_lang['lpn_about_source']?></a></p>
 <?php   $ec_build = ecDeployIdentity();
         if ($ec_build['date'] !== '' || $ec_build['sha'] !== '') : ?>
-		<p class="lpn-about-build"><?=htmlspecialchars(trim($ec_build['date'] . ' · ' . $ec_build['sha']))?></p>
+		<p class="lpn-about-build"><?php
+            echo htmlspecialchars($ec_build['date'] !== '' && $ec_build['sha'] !== '' ? $ec_build['date'] . ' · ' : $ec_build['date']);
+            if ($ec_build['sha'] !== '') : ?><a href="https://github.com/hawstom/engcalcs/commit/<?=htmlspecialchars($ec_build['sha'])?>" target="_blank" rel="noopener"><?=htmlspecialchars($ec_build['sha'])?></a><?php endif; ?></p>
 <?php   endif; ?>
 	</div>
 </div>

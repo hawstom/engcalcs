@@ -13,9 +13,16 @@
 // Compared: head, pressure, demand (and emitter flow, deficit under PDA), tank level, link flow, velocity,
 // headloss, status, water quality, and pump energy (native vs the engine's own binary energy block).
 // For a file that came from an .inp, RAW on the ORIGINAL file is also compared with RAW on our export (heads).
-// Pump and valve SETTINGS and tank VOLUME are read from RAW but NOT compared: neither frame carries them.
+// Second pass (eps-settings-tanks audit): the native frame also carries tank VOLUME, pump SPEED (EN_SETTING), valve SETTING and
+// EMITTER flow (EN_EMITTERFLOW); all four are compared at every reporting time, beside the link status. fixtures in
+// dev/lpn-spike/fixtures/eps-audit/*.inp are picked up with the other .inp files under dev/.
 // TOLERANCE (engineering, stated): head, level, pressure, headloss 1 mm; flow, demand 2e-6 m3/s or 1e-5 of the
-// largest flow; velocity 1e-5 m/s + 1e-5 relative; quality 1e-3 relative with a floor of 1e-3 of its range.
+// largest flow; velocity judged as the FLOW it implies (v x pipe area) against the same flow tolerance (2nd audit: a fixed 1e-5 m/s
+// flagged 40 mm pipes whose flow agreed to 1e-7 m3/s); quality 1e-3 relative with a floor of 1e-3 of its range.
+// Tank volume 1 mm of level times the tank's plan area (its curve's mean area for a volume curve); emitter flow as flow; pump speed
+// and valve setting 1e-6 absolute (they are copied from a pattern or a control, never solved: any real difference is a logic
+// difference). EPANET's own convergence tolerances are Htol 0.0005 ft (0.15 mm) and Qtol 0.0001 cfs; 1 mm is 6.6 Htol and the
+// solver is run at accuracy 1e-5, so a difference above it is not solver noise.
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -87,7 +94,8 @@ async function rawRun(inp, model, times, withQuality) {
 	const ni = {}, li = {};
 	ids.forEach((id) => { ni[id] = p.getNodeIndex(id); });
 	lids.forEach((id) => { li[id] = p.getLinkIndex(id); });
-	const frames = {}, order = [];
+	const frames = {}, order = [], setScale = {};
+	model.links.forEach((l) => { if (l.type === 'valve' && String(l.valveType).toUpperCase() === 'FCV') { setScale[l.id] = 1 / 1000; } });
 	const get = (f, key, f2) => f2;
 	p.openH(); p.initH(1);
 	for (;;) {
@@ -105,6 +113,7 @@ async function rawRun(inp, model, times, withQuality) {
 				f.flows[id] = p.getLinkValue(li[id], L_FLOW) / 1000; f.vel[id] = p.getLinkValue(li[id], L_VEL);
 				f.hl[id] = p.getLinkValue(li[id], L_HL); f.st[id] = p.getLinkValue(li[id], L_STATUS) > 0 ? 'open' : 'closed';
 				f.set[id] = p.getLinkValue(li[id], L_SETTING);
+				if (setScale[id]) { f.set[id] *= setScale[id]; }
 			});
 			frames[t] = f; order.push(t);
 		}
@@ -134,7 +143,7 @@ function note(w, d, at, ref, floor) { if (d > w.v) { w.v = d; w.at = at; w.rel =
 // Compare engine frames `a` (frame array with SI maps) with RAW `r`; returns worst per quantity.
 function compare(model, a, r, label) {
 	const out = { label, frames: a.length, rawFrames: r.order.length, sameTimes: a.length === r.order.length && a.every((f, i) => f.t === r.order[i]),
-		w: { head: W(), pressure: W(), demand: W(), emitter: W(), level: W(), flow: W(), velocity: W(), headloss: W(), quality: W(), linkQuality: W(), deficit: W() },
+		w: { head: W(), pressure: W(), demand: W(), emitter: W(), level: W(), flow: W(), velocity: W(), headloss: W(), quality: W(), linkQuality: W(), deficit: W(), volume: W(), pumpSetting: W(), valveSetting: W() },
 		statusDiff: 0, firstStatusT: null, firstStatusAt: '', exceed: [] };
 	let qMax = 0, qlMax = 0, qlMin = Infinity;
 	r.order.forEach((t) => { model.links.forEach((l) => { qMax = Math.max(qMax, Math.abs(r.frames[t].flows[l.id])); }); });
@@ -147,19 +156,25 @@ function compare(model, a, r, label) {
 			if (f.pressures && f.pressures[n.id] !== undefined) { note(out.w.pressure, Math.abs(f.pressures[n.id] - g.pressures[n.id]), at(n.id)); }
 			if (f.demands && f.demands[n.id] !== undefined) { note(out.w.demand, Math.abs(f.demands[n.id] - g.demands[n.id]), at(n.id), g.demands[n.id], 1e-6); }
 			if (n.type === 'tank' && f.levels && f.levels[n.id] !== undefined) { note(out.w.level, Math.abs(f.levels[n.id] - g.levels[n.id]), at(n.id)); }
+			if (f.emitterFlows && f.emitterFlows[n.id] !== undefined && n.type === 'junction') { note(out.w.emitter, Math.abs(f.emitterFlows[n.id] - g.emit[n.id]), at(n.id)); }
+			if (f.volumes && f.volumes[n.id] !== undefined && g.vol[n.id] !== undefined) { note(out.w.volume, Math.abs(f.volumes[n.id] - g.vol[n.id]), at(n.id)); }
 			if (f.demandDeficits && f.demandDeficits[n.id] !== undefined) { note(out.w.deficit, Math.abs(f.demandDeficits[n.id] - g.deficit[n.id]), at(n.id)); }
 			if (f.qualities && f.qualities[n.id] !== undefined && g.qual[n.id] !== undefined) { note(out.w.quality, Math.abs(f.qualities[n.id] - g.qual[n.id]), at(n.id), g.qual[n.id], 0); }
 		});
 		model.links.forEach((l) => {
 			if (f.flows[l.id] !== undefined) { note(out.w.flow, Math.abs(f.flows[l.id] - g.flows[l.id]), at(l.id)); }
-			if (f.velocities && f.velocities[l.id] !== undefined) { note(out.w.velocity, Math.abs(f.velocities[l.id] - g.vel[l.id]), at(l.id), g.vel[l.id], 1e-3); }
+			if (f.velocities && f.velocities[l.id] !== undefined) { note(out.w.velocity, Math.abs(f.velocities[l.id] - g.vel[l.id]) * Math.PI * l.diameter * l.diameter / 4, at(l.id)); }
 			if (f.headlosses && f.headlosses[l.id] !== undefined) { note(out.w.headloss, Math.abs(f.headlosses[l.id] - g.hl[l.id]), at(l.id)); }
 			if (f.linkQualities && f.linkQualities[l.id] !== undefined && g.lqual[l.id] !== undefined) { note(out.w.linkQuality, Math.abs(f.linkQualities[l.id] - g.lqual[l.id]), at(l.id), g.lqual[l.id], 0); }
+			if (f.pumpSettings && f.pumpSettings[l.id] !== undefined) { note(out.w.pumpSetting, Math.abs(f.pumpSettings[l.id] - g.set[l.id]), at(l.id)); }
+			if (f.valveSettings && f.valveSettings[l.id] !== undefined) { note(out.w.valveSetting, Math.abs(f.valveSettings[l.id] - g.set[l.id]), at(l.id)); }
 			if (f.statuses && f.statuses[l.id] !== g.st[l.id]) { out.statusDiff++; if (out.firstStatusT === null || f.t < out.firstStatusT) { out.firstStatusT = f.t; out.firstStatusAt = l.id + ' ' + g.st[l.id] + '(raw) vs ' + f.statuses[l.id]; } }
 		});
 	});
 	out.tolQ = tolQ;
-	const lim = { head: TOL.head, pressure: TOL.pressure, level: TOL.level, headloss: TOL.headloss, velocity: TOL.velocity, flow: tolQ, demand: tolQ, emitter: tolQ, deficit: tolQ };
+	const lim = { head: TOL.head, pressure: TOL.pressure, level: TOL.level, headloss: TOL.headloss, velocity: tolQ, flow: tolQ, demand: tolQ, emitter: tolQ, deficit: tolQ, pumpSetting: 1e-6, valveSetting: 1e-6 };
+	let tolVol = 0; model.nodes.forEach((n) => { if (n.type === 'tank') { tolVol = Math.max(tolVol, 1e-3 * (Array.isArray(n.volCurveSI) && n.volCurveSI.length > 1 ? (n.volCurveSI[n.volCurveSI.length - 1][1] - n.volCurveSI[0][1]) / Math.max(n.volCurveSI[n.volCurveSI.length - 1][0] - n.volCurveSI[0][0], 1e-9) : Math.PI * n.diameter * n.diameter / 4)); } });
+	out.tolVol = tolVol; lim.volume = tolVol;
 	Object.keys(lim).forEach((k) => { if (out.w[k].v > lim[k]) { out.exceed.push(k); } });
 	['quality', 'linkQuality'].forEach((k) => {
 		let rng = 0; r.order.forEach((t) => { const m = k === 'quality' ? r.frames[t].qual : r.frames[t].lqual; Object.keys(m).forEach((id) => { rng = Math.max(rng, Math.abs(m[id])); }); });
@@ -176,6 +191,7 @@ function line(c) {
 	return `  ${c.label.padEnd(7)} frames ${c.frames}/${c.rawFrames}${c.sameTimes ? '' : ' TIMES DIFFER'} head ${fmt(c.w.head)} press ${fmt(c.w.pressure)} dem ${fmt(c.w.demand)} lvl ${fmt(c.w.level)} flow ${fmt(c.w.flow)} (tol ${c.tolQ.toExponential(0)}) vel ${fmt(c.w.velocity)} hl ${fmt(c.w.headloss)}` +
 		(c.w.quality.range !== undefined && c.w.quality.range > 0 ? ` qual ${fmt(c.w.quality)} lqual ${fmt(c.w.linkQuality)} (range ${c.w.quality.range.toPrecision(3)})` : '') +
 		(c.w.deficit.v ? ` deficit ${fmt(c.w.deficit)}` : '') +
+		(c.w.volume.v ? ` vol ${fmt(c.w.volume)} (tol ${c.tolVol.toExponential(0)})` : '') + (c.w.emitter.v ? ` emit ${fmt(c.w.emitter)}` : '') + (c.w.pumpSetting.v ? ` speed ${fmt(c.w.pumpSetting)}` : '') + (c.w.valveSetting.v ? ` vset ${fmt(c.w.valveSetting)}` : '') +
 		` status diffs ${c.statusDiff}${c.firstStatusT !== null ? ' first t=' + c.firstStatusT / 3600 + 'h ' + c.firstStatusAt : ''}` +
 		(c.exceed.length ? '  >>> EXCEEDS: ' + c.exceed.join(',') : '');
 }
@@ -215,7 +231,7 @@ function line(c) {
 				L.applySaved(saved);
 			}
 			EC.lpnTimeArrived();
-			const model = L.currentModel();
+			const model = L.currentModel(); if (process.env.EPS_AUDIT_LINK) { console.log(JSON.stringify(model.links.filter((l) => l.id === process.env.EPS_AUDIT_LINK))); }
 			if (!model || !model.nodes || !model.nodes.length) { skipped.push(s.name + ': empty model'); continue; }
 			model.hydraulics = Object.assign({}, model.hydraulics || {}, { accuracy: 1e-5 });
 			const times = Object.assign({}, EC.lpnTimesDefaults(), (model.time && model.time.times) || {});
@@ -234,12 +250,34 @@ function line(c) {
 				skipped.push(s.name + ': EPANET refuses the .inp the page exports for it (' + e.message + '). Page bridge ok=' + br0.ok + (br0.ok ? '' : ' ' + JSON.stringify(br0.issues || br0.error || '').slice(0, 160)) + '; built-in ok=' + nt0.ok + '; lpnDiagnose=' + diag);
 				continue;
 			}
+			// what the run exercised, so a fixture that stops exercising its feature is seen (dev/lpn-spike/eps-audit-fixtures-harness.js)
+			res.cover = (function () {
+				const c = { minEmit: 0, maxEmit: 0, tankVolSpan: 0, pumpSettings: 0, valveSettings: 0, statusChanges: 0, pumpStops: 0 };
+				const sets = {}, vsets = {}, last = {};
+				raw.order.forEach((t) => {
+					const g = raw.frames[t];
+					model.nodes.forEach((n) => { if (n.type === 'junction') { c.minEmit = Math.min(c.minEmit, g.emit[n.id]); c.maxEmit = Math.max(c.maxEmit, g.emit[n.id]); } });
+					model.links.forEach((l) => {
+						if (l.type === 'pump') { sets[l.id + ':' + g.set[l.id].toFixed(6)] = 1; if (g.st[l.id] === 'closed') { c.pumpStops++; } }
+						if (l.type === 'valve') { vsets[l.id + ':' + g.set[l.id].toFixed(6)] = 1; }
+						if (last[l.id] !== undefined && last[l.id] !== g.st[l.id]) { c.statusChanges++; }
+						last[l.id] = g.st[l.id];
+					});
+				});
+				model.nodes.forEach((n) => {
+					if (n.type !== 'tank') { return; }
+					const v = raw.order.map((t) => raw.frames[t].vol[n.id]).filter((x) => x !== undefined);
+					if (v.length) { c.tankVolSpan = Math.max(c.tankVolSpan, Math.max.apply(null, v) - Math.min.apply(null, v)); }
+				});
+				c.pumpSettings = Object.keys(sets).length; c.valveSettings = Object.keys(vsets).length;
+				return c;
+			})();
 			// the ORIGINAL file against our export, heads (only a file that came from an .inp)
 			if (s.inp) {
 				try {
 					const parsed = EC.lpnInpParse(text), orig = await rawRun(text, model, times, false);
 					let d = 0, at = ''; const sh = parsed.scale.head;
-					orig.order.forEach((t) => { if (!raw.frames[t]) { d = Infinity; at = 'time ' + t; return; } model.nodes.forEach((n) => { const x = Math.abs(orig.frames[t].heads[n.id] * sh - raw.frames[t].heads[n.id]); if (x > d) { d = x; at = n.id + '@' + t / 3600 + 'h'; } }); });
+					orig.order.forEach((t) => { if (!raw.frames[t]) { d = Infinity; at = 'time ' + t; return; } model.nodes.forEach((n) => { const x = Math.abs(orig.frames[t].heads[n.id] * sh - raw.frames[t].heads[n.id]); if (x > d) { d = x; at = n.id + '@' + t / 3600 + 'h'; } if (process.env.EPS_AUDIT_ORIG && x > 1e-4) { console.log('  orig-vs-export ' + n.id + '@' + t / 3600 + 'h ' + x.toExponential(2)); } }); });
 					res.origVsExport = { head: d, at, frames: orig.order.length, exportFrames: raw.order.length };
 				} catch (e) { res.notes.push('original-file raw run: ' + e.message); }
 			}
