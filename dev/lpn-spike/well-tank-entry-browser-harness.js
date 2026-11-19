@@ -242,15 +242,19 @@ async function runForm(browser, Session, form) {
 	// Where a scenario keeps a node value: its own overrides, or its Physical alternative (the scenario's Basic mode decides).
 	const heldBy = (prop0) => {
 		const prop = prop0;
-		const names = prop === '_level' ? ['_level', 'level'] : [prop];   // an override is keyed by the property (level), the node by its stored key (_level)
+		const names = prop === '_level' ? ['_level', 'level', 'tankLevel', 'initLevel', 'initialLevel'] : [prop];   // an override is keyed by the property (level), the node by its stored key (_level)
 		const o = (scn.overrides || {})['n:T1'];
 		for (const k of names) { if (o && Object.prototype.hasOwnProperty.call(o, k)) { return o[k]; } }
-		const alt = (doc.alternatives || []).filter((x) => x.id === ((scn.alternatives || {}).physical))[0];
-		const v = alt && alt.values && alt.values['n:T1'];
-		for (const k of names) { if (v && Object.prototype.hasOwnProperty.call(v, k)) { return v[k]; } }
+		// Elevations and the depth limits are Physical; the initial depth is an Initial conditions value: any alternative this scenario names may hold it.
+		const ids = Object.keys(scn.alternatives || {}).map((c) => scn.alternatives[c]);
+		for (const alt of (doc.alternatives || []).filter((x) => ids.indexOf(x.id) >= 0)) {
+			const v = alt.values && alt.values['n:T1'];
+			for (const k of names) { if (v && Object.prototype.hasOwnProperty.call(v, k)) { return v[k]; } }
+		}
 		return undefined;
 	};
 	tank = doc.nodes.find((n) => n.id === 'T1');
+	console.log('        scenario holds: ' + JSON.stringify([(scn.overrides || {})['n:T1'], (doc.alternatives || []).filter((x) => Object.keys(scn.alternatives || {}).map((c) => scn.alternatives[c]).indexOf(x.id) >= 0).map((x) => [x.category, x.values && x.values['n:T1']])]));
 	INPUTS.forEach((i) => {
 		const want = i[3] === 'overflow' ? i[2] : +i[2];
 		const was = i[3] === 'overflow' ? i[1] : +i[1];
