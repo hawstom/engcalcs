@@ -75,6 +75,9 @@ async function graphTabs(a) {
 			}
 			return { none: true, count: withTitle.length };
 		}, chart);
+		// The time series has no dot tips: the hover readout replaces them (feat/graph-scrub, e95a5991d; Tom:
+		// "I love it"). What the one-style rule still owes it is that no native <title> sits in the chart.
+		if (tab === 'timeseries') { ok(tab + ': the chart carries no <title> of its own (the hover readout replaces dot tips)', !!pos && pos.count === 0, String(pos && pos.count)); continue; }
 		ok(tab + ': the chart has dots carrying a <title> (found ' + (pos && pos.count) + ')', !!pos && pos.count > 3);
 		if (!pos || pos.none) { ok(tab + ': a titled dot can be reached by the pointer', false); continue; }
 		await page.mouse.move(2, 2);
