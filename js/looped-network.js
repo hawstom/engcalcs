@@ -10614,11 +10614,29 @@ var EngCalcs = EngCalcs || {};
 				if (d > far || d >= bestPx || !hitIsVisible(nodeEls[n.id].circle) || nodeInkDistPx(n, cx, cy, r) !== 0) { continue; }
 				best = n; bestPx = d;
 			}
-			return best ? nodeEls[best.id].circle : hit;
+			if (best) { return nodeEls[best.id].circle; }
+			// **ON NO INK AT ALL, THE NODE WHOSE INK IS NEAREST, NOT THE ONE WHOSE BAND HAPPENED TO BE HIT** (Tom, 2026-11-18:
+			// zoomed far out "I get either reservoir River or junction 61"). A reservoir keeps its size on the screen while a
+			// junction and a pump shrink to a few px beneath it, so the reservoir's band (its silhouette stroked wide) lies over
+			// the whole cluster and took every press, junction 61 two px away or not.
+			return nearestNodeByInk(cx, cy, hn, r, hit);
 		}
 		if (!nodeOutranks(hit)) { return hit; }
 		n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX);
 		return (n && nodeEls[n.id]) ? nodeEls[n.id].circle : hit;
+	}
+	// Of the nodes whose centre is within a finger's reach of a press that is on no node's ink, the one whose drawn ink is
+	// nearest (the hit node's own distance counts, and it keeps a tie). Reports the node's circle, else `hit`.
+	function nearestNodeByInk(cx, cy, hn, rect, hit) {
+		var w = screenToWorld(cx, cy), best = hn, bestD = nodeInkDistPx(hn, cx, cy, rect), i, n, d, ink;
+		for (i = 0; i < doc.nodes.length; i++) {
+			n = doc.nodes[i];
+			if (n === hn || !nodeEls[n.id] || !nodeEls[n.id].circle) { continue; }
+			if (Math.hypot(nodeDrawX(n) - w.x, nodeDrawY(n) - w.y) * state.s > TOUCH_REACH_PX || !hitIsVisible(nodeEls[n.id].circle)) { continue; }
+			ink = nodeInkDistPx(n, cx, cy, rect);
+			if (ink < bestD) { best = n; bestD = ink; }
+		}
+		return (best && nodeEls[best.id] && nodeEls[best.id].circle) || hit;
 	}
 	function nearestNodeNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;
