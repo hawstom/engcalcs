@@ -25,14 +25,6 @@ const ids = (list) => list.map((c) => c.kind + ':' + c.id);
 function same(name, got, want) { ok(name, JSON.stringify(got) === JSON.stringify(want), 'got ' + JSON.stringify(got)); }
 const pick = (items, x, y, o) => ids(Geom.pickSymbols(items, x, y, o));
 
-console.log('\n--- a finger is a disc ---');
-same('a point on one dot, a second dot 12 px off: the point rule gives no box', pick([dot('A', 0, 0), dot('B', 12, 0)], 0, 0), []);
-same('...with a disc the point still rules while it is on ink: no box', pick([dot('A', 0, 0), dot('B', 12, 0)], 1, 0, { disc: 24 }), []);
-same('...a point on no ink, a 24 px disc touching both: the box, the nearer first', pick([dot('A', 0, 0), dot('B', 12, 0)], 8, 12, { disc: 24 }), ['node:B', 'node:A']);
-same('...a disc that reaches only one dot: no box', pick([dot('A', 0, 0), dot('B', 40, 0)], 1, 0, { disc: 24 }), []);
-same('...a press on bare map with a disc touching two dots: the box, nearest first', pick([dot('A', 0, 0), dot('B', 20, 0)], 14, 0, { disc: 24 }), ['node:B', 'node:A']);
-same('...the disc is measured to the ink, not the centre: a dot 28 px off (radius 4, stroke 0.6) is within 24', pick([dot('A', 0, 0), dot('B', 28, 0)], 14, 12, { disc: 24 }), ['node:A', 'node:B']);
-
 console.log('\n--- the ordinary click stays ordinary ---');
 same('one dot', pick([dot('A', 0, 0)], 0, 0), []);
 same('bare map', pick([dot('A', 0, 0)], 50, 50), []);

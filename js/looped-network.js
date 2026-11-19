@@ -61203,9 +61203,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **AT MOST PICK_MAX_ROWS (6) ROWS** (*"a list of more than about 4 to 5 elements is not
 	// helpful"*): the symbol nearest the press and those truly coincident with it first, then the
 	// nearest others that overlap it, by distance from the press. A mouse press is a point.
-	// **A FINGER'S POINT ON INK IS READ AS A MOUSE'S; ON NO INK IT IS A DISC OF TOUCH_REACH_PX** (Tom,
-	// 2026-11-18, of Pump 335 beside Junctions 60 and 61 on a phone: *"I repeatedly select N60 or N61"*): one
-	// glyph under the point is selected (touchNodeOver), and off all ink the box lists every symbol the disc touches. Geom.pickSymbols() is the rule, pure and in screen pixels; pickItemsNear() hands it
+	// **A FINGER'S POINT ON INK IS READ AS A MOUSE'S** (Tom, 2026-11-18, of Pump 335 beside Junctions 60 and
+	// 61 on a phone: *"I repeatedly select N60 or N61"*): one glyph under the point is selected (touchNodeOver)
+	// though a node is within reach, and two inks open the box. Off all ink the finger's reach is the old one. Geom.pickSymbols() is the rule, pure and in screen pixels; pickItemsNear() hands it
 	// the drawn extents, from the draw code's own size helpers. pickCandidatesAt() is the one door;
 	// an assembly group would map the list it returns (members to one row) and nothing else here
 	// would change. `dev/lpn-spike/pick-chooser-zoom-browser-harness.js` counts it on Net3.
@@ -61334,12 +61334,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The reach is the pickbox's own, unchanged: a finger's 24 px, a mouse's half the node band.
 	function pickCandidatesAt(cx, cy, touch, first) {
 		var reach = touch ? TOUCH_REACH_PX : LPN_NODE_HIT_PX / 2;
-		// A finger's press is read as the mouse's is while the point is on ink. On no ink it is a disc of the
-		// finger's reach: a node within that reach already wins its press (touchNodeOver), so two or more
-		// symbols touched by the disc ask which, nearest first.
-		var items = pickItemsNear(cx, cy, reach);
-		// `first` (what a plain press hits) leads only while the point is on ink; off ink the nearest does.
-		return Geom.pickSymbols(items, cx, cy, touch ? { cap: PICK_MAX_ROWS, disc: TOUCH_REACH_PX, first: Geom.pickInkHits(items, cx, cy).length ? first : null } : { cap: PICK_MAX_ROWS, first: first });
+		return Geom.pickSymbols(pickItemsNear(cx, cy, reach), cx, cy, { cap: PICK_MAX_ROWS, first: first });
 	}
 	// "Junction J1", "Pump 9", "Shape S1", "Text" and its first words. The type word is the one the toolbar uses.
 	function pickRowLabel(c) {

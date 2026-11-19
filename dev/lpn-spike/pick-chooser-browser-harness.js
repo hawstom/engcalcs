@@ -455,8 +455,7 @@ async function main() {
 		const nearP6 = { x: tp2.x, y: tp2.y + 15 };
 		await t.closeProps();
 		await tap(nearP6);
-		ok('a finger on pipe P6, 15 px from the pile (on no symbol), opens the box of the junctions its disc touches, J6 and J7, and no pipe', J(await t.rows()) === J(['Junction J6', 'Junction J7']), J([await t.rows(), nearP6]));
-		await T.page.keyboard.press('Escape'); await T.settle(200);
+		ok('a finger on pipe P6, 15 px from the pile (on no symbol), opens no box: the plain tap decides', !(await t.chooserOpen()), J([await t.rows(), nearP6]));
 		await t.closeProps();
 		// E3. a long press that dismisses the box opens no context menu (review item 3).
 		await tap(tpile);

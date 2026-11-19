@@ -943,8 +943,7 @@ EngCalcs.lpnGeom = (function () {
 	//      nearest the press, FIRST AND NEVER CUT, then items whose anchor is
 	//      within `coincident` px of its, then the rest of the ink set, then the hidden ones; each by
 	//      distance from the press, then rank, then id in natural order. At most `cap` (6) rows.
-	// opts: cap (6), coincident (1), first ({kind, id}), disc (0: the press is a point; a finger passes its
-	// disc's radius in px, used ONLY when the point is on no ink: the ink set is then every item the disc touches).
+	// opts: cap (6), coincident (1), first ({kind, id}).
 	//
 	// **A PUMP'S OR VALVE'S SYMBOL IS A SYMBOL** (Tom, 2026-11-16). Its item carries `parts`, the convex
 	// pieces of its drawn silhouette (a pump's casing and tail, a valve's two triangles), so the empty
@@ -1030,12 +1029,9 @@ EngCalcs.lpnGeom = (function () {
 		});
 		return b;
 	}
-	// Does the item's drawn ink hold the point, or, with `disc` (a finger's radius, px), come within that of it?
-	function pickInInk(m, x, y, disc) {
-		var ink = PICK_SHAPE_INK + (disc || 0);
-		if (m.outline) { return pointToPolylineDistance(pickOutlinePts(m.outline), x, y) <= ink; }
-		if (!disc) { return pickPartHas(pickPartsOf(m), x, y); }
-		return pickPartsOf(m).some(function (p) { return pickPartDist(p, x, y) <= disc; });
+	function pickInInk(m, x, y) {
+		if (m.outline) { return pointToPolylineDistance(pickOutlinePts(m.outline), x, y) <= PICK_SHAPE_INK; }
+		return pickPartHas(pickPartsOf(m), x, y);
 	}
 	// Paint order, bottom to top (the page's own layers): Shapes, pump and valve symbols, nodes, Texts; within a
 	// layer the later item in the list is on top (the caller hands nodes and links in the order it drew them).
@@ -1082,8 +1078,6 @@ EngCalcs.lpnGeom = (function () {
 		// A line is never an item, whoever hands it in: an open polyline (a point and a closed outline are not lines).
 		items = items.filter(function (m) { return !(m.outline && m.outline.pts.length > 1 && !m.outline.closed); });
 		items.forEach(function (m) { if (!m.soft && pickInInk(m, x, y)) { inkSet.push(m); } });
-		// A finger's disc counts only where the point itself is on no ink: a point on ink is what the mouse rule reads.
-		if (!inkSet.length && o.disc) { items.forEach(function (m) { if (!m.soft && pickInInk(m, x, y, o.disc)) { inkSet.push(m); } }); }
 		if (!inkSet.length) { return []; }
 		infos = pickInfos(items);
 		primary = inkSet.filter(function (m) { return o.first && m.kind === o.first.kind && m.id === o.first.id; })[0] || inkSet.map(entry).sort(order)[0].m;
