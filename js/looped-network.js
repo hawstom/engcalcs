@@ -62127,7 +62127,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var n = 0;
 		// `dec`, when given, is the Decimals the visitor chose in the unit question: every converted
 		// input is rounded to that many places by roundToStep(), the one rounding of this page.
-		function rnd(v) { return typeof dec === 'number' ? roundToStep(v, Math.pow(10, -dec)) : v; }
+		// No Decimals asked: the product is tidied to 12 significant figures so binary noise
+		// (609.5999999999999) is not stored, and the one shared path gives File > Convert as the same.
+		// k = 1 is the counting call, which must change nothing.
+		function rnd(v) {
+			if (typeof dec === 'number') { return roundToStep(v, Math.pow(10, -dec)); }
+			return (k === 1 || !isFinite(v)) ? v : Number(v.toPrecision(12));
+		}
 		function conv(obj, prop) {
 			if (!obj || typeof obj[prop] !== 'number') { return; }
 			obj[prop] = rnd(obj[prop] * k);
@@ -62314,7 +62320,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			body.appendChild(list);
 			// BLANK MEANS NO ROUNDING (Tom: "give them what they request"): the map-label display
 			// precision is not a request, so it is never the default. A typed number is obeyed exactly.
-			inp.type = 'number'; inp.min = '0'; inp.max = '8'; inp.step = '1';
+			inp.type = 'number'; inp.min = '0'; inp.max = '12'; inp.step = '1';
 			inp.value = '';
 			row.className = 'lpn-unit-decimals';
 			inp.setAttribute('data-decimals-for', u.name);
@@ -62332,7 +62338,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		for (i = 0; i < fields.length; i++) {
 			if (fields[i].name !== name) { continue; }
 			v = parseInt(fields[i].input.value, 10);
-			return (isFinite(v) && v >= 0) ? Math.min(v, 8) : undefined;   // blank: no rounding
+			return (isFinite(v) && v >= 0) ? Math.min(v, 12) : undefined;   // blank: no rounding
 		}
 		return undefined;
 	}

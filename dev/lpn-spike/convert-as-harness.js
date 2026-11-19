@@ -154,6 +154,7 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		ok('reservoir head converted and rounded to the nearest 0.01', n(R.id)._head === 76.32, n(R.id)._head);
 		ok('elevation converted (it is not one of the four rounded fields)', near(n(A.id).elev, 30.48, 1e-9), n(A.id).elev);
 		ok('pipe length converted', near(l(p2.id)._length, 365.76, 1e-9), l(p2.id)._length);
+		ok('unrounded converted numbers carry no binary noise', String(l(p2.id)._length) === '365.76' && String(l(p1.id)._length) === '304.8', l(p1.id)._length + ', ' + l(p2.id)._length);
 		// A local grid's coordinates are in its length unit (Task 693), so they rescale with it.
 		ok('the grid coordinates rescale with the length unit',
 			near(L.outwardX(n(A.id).x), 304.8, 1e-9) && near(L.outwardX(n(B.id).x), 609.6, 1e-9),

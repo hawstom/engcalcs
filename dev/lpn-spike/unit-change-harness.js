@@ -374,6 +374,21 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 		ok(label, Math.abs(got - want) <= 1e-9 * want, String(got));
 	}
 	exact('', 150 / 25.4, '150 mm to in with blank Decimals is 5.905511811...');
+	exact(10, 5.9055118110, '150 mm to in at typed Decimals 10 is obeyed (not clamped to 8)');
+	// Blank Decimals stores no binary noise: 14 in and 24 in to mm are 355.6 and 609.6, not 355.59999999999997.
+	{
+		L.reset(); L.setCanvas(800, 600);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_roughness: 'mm', lpn_u_volume: 'ft3' });
+		L.remember();
+		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0), k = L.addNode('junction', 200, 0);
+		const p1 = L.addLink('pipe', r.id, j.id), p2 = L.addLink('pipe', j.id, k.id);
+		p1.diameter = undefined; p2.diameter = undefined; L.setProp(p1, 'diameter', 14); L.setProp(p2, 'diameter', 24); L.buildDom();
+		pickUnit('lpn_u_diameter', 'mm');
+		setDecimals('');
+		press('Convert');
+		const ds = L.getDoc().links.map(x => String(x._diameter)).join();
+		ok('14 in and 24 in to mm with blank Decimals store 355.6 and 609.6', ds === '355.6,609.6', ds);
+	}
 	{
 		L.reset(); L.setCanvas(800, 600);
 		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_roughness: 'mm' });
