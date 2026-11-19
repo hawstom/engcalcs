@@ -96,6 +96,7 @@ function escape() {
 	(global.document._listeners.keydown || []).slice().forEach(function (fn) { if (!ev.stopped) { fn(ev); } });
 }
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const near = (x, y) => typeof x === 'number' && typeof y === 'number' && Math.abs(x - y) < 1e-6 * Math.max(1, Math.abs(y));
 function walk(root, fn) { (function go(e) { if (!e) { return; } fn(e); (e.children || e.childNodes || []).forEach(go); }(root)); }
 function boxLabels() {
 	const out = [];
@@ -671,6 +672,16 @@ console.log('\n--- 10. the open-air Well with tank: the tank\'s inputs are the W
 	type(inputOf(row('Minimum volume')), '3'); L.openPopup('W1', 10, 10);
 	type(inputOf(row('Can overflow')), 'YES');
 	ok('what is typed on the Well lands on the tank, in Base', tk.elev === 140 && tk.bottomElev === 138 && tk._level === 2 && tk.minLevel === 0.5 && tk.maxLevel === 4 && tk.tankDiameter === 8 && tk.minVolume === 3 && tk.overflow === 'YES', snap());
+	{
+		// Round 14 audit: the model a solve is built from carries every typed value, and the solve's head for the tank stands on them.
+		const mt = L.currentModel().nodes.filter((n) => n.id === a.tank)[0] || {};
+		console.log('        model tank: ' + JSON.stringify(mt));
+		const ft = L.toSI(1, 'lpn_u_elevhead');
+		ok('the solver\'s tank carries the typed minimum and maximum depth, diameter, minimum volume and overflow', near(mt.minLevel, 0.5 * ft) && near(mt.maxLevel, 4 * ft) && near(mt.diameter, 8 * L.toSI(1, 'lpn_u_length')) && mt.minVolume > 0 && !!mt.overflow, JSON.stringify(mt));
+		const r = EC.lpnSolve(L.currentModel());
+		const head = r && r.heads ? r.heads[a.tank] : undefined;
+		ok('and the steady solve holds the tank at its base plus its initial depth (138 + 2 in the display unit)', typeof head === 'number' && near(head, (138 + 2) * ft), String(head));
+	}
 	ok('a typed tank elevation ends its following of the Well (the tee still follows)', !a.tankFollow && !!a.teeFollow);
 	L.openPopup(a.tank, 10, 10);
 	ok('and the tank\'s box shows them read-only', labelEls().some((e) => txt(e).indexOf('Maximum depth') === 0 && /4/.test(txt(e)) && !inputOf(e)) && labelEls().some((e) => txt(e).indexOf('Minimum volume') === 0 && /3/.test(txt(e))));
