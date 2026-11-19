@@ -3467,6 +3467,24 @@
                     "noun": 1
                 }
             }
+        ],
+        "lpn_guide_prop_virtual_def": [
+            {
+                "key": "lpn_tool_add_virtual",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_length",
+                "bold": 1
+            },
+            {
+                "key": "lpn_popup_boxtitle",
+                "bold": 1
+            },
+            {
+                "key": "lpn_field_virtual_length0",
+                "bold": 1
+            }
         ]
     }
 }
