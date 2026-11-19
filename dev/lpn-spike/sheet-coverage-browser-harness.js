@@ -64,7 +64,7 @@ function inspect(spec) {
 		names.forEach((n) => { const k = Math.round(R(n).right); xs[k] = (xs[k] || 0) + 1; });
 		const cellX = +Object.keys(xs).sort((a, b) => xs[b] - xs[a])[0];
 		Array.from(root.querySelectorAll('button')).filter(vis).forEach((b) => {
-			if (b.closest('.lpn-grow, table, .lpn-popover-x, .lpn-corner-btn, .lpn-setbox-title, .lpn-box-tools, .lpn-report-tools, .lpn-ff-buttons:not(:has(> .lpn-ff-run, > .lpn-ff-stopbtn)), .lpn-gsplit, .lpn-gfull, .lpn-gtext, .lpn-pane-goto, .lpn-lib-note, .lpn-lib-nav, #lpn_libbox_index, .lpn-setbox-index, .lpn-gtitle-id')) { return; }
+			if (b.closest('.lpn-grow, table, .lpn-popover-x, .lpn-corner-btn, .lpn-setbox-title, .lpn-box-tools, .lpn-report-tools, .lpn-ff-buttons:not(:has(> .lpn-ff-run, > .lpn-ff-stopbtn)), .lpn-gsplit, .lpn-gfull, .lpn-gtext, .lpn-pane-goto, .lpn-lib-note, .lpn-lib-manual, .lpn-lib-nav, #lpn_libbox_index, .lpn-setbox-index, .lpn-gtitle-id')) { return; }
 			if (R(b).left >= cellX - 2) { out.oneCol.push('button ' + (b.id || b.textContent.trim().slice(0, 20)) + '@' + Math.round(R(b).left - cellX)); }
 		});
 	}
@@ -143,8 +143,9 @@ async function main() {
 			}
 			for (const sec of ['controls', 'rules']) {
 				await a.page.click('#lpn_libbox_link_' + sec); await a.settle(500);
-				const n = await a.page.evaluate(() => ({ entries: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry').length, splits: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry .lpn-gsplit').length }));
-				ok('libraries ' + sec + ': every entry has a draggable divider', n.entries >= 1 && n.splits >= n.entries, JSON.stringify(n));
+				const n = await a.page.evaluate(() => ({ entries: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry:not(.lpn-lib-comment-entry)').length,   // a comment is a row of its own, one text box, no Label column (1d092e4c1)
+					 rowed: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry:not(.lpn-lib-comment-entry):has(.lpn-grow)').length, splits: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry .lpn-gsplit').length }));
+				ok('libraries ' + sec + ': every entry has a draggable divider', n.entries >= 1 && n.splits >= n.rowed, JSON.stringify(n));   // a rule is one text box with no Label column (its Description is a comment row of its own now); an entry that has Label rows has the divider
 			}
 			await close('lpn_library_box');
 			// Scenario manager: the Scenario column's names do not wrap, as every selector beside them does not.

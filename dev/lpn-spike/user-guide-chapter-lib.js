@@ -41,7 +41,8 @@ function esString(key) {
 	return m ? m[1].replace(/\\'/g, "'").replace(/\\\\/g, '\\') : enString(key);
 }
 // Markup out, entities out, white space single: what a reader of the entry sees.
-const plain = (html) => String(html).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+// A tag becomes a space, so a bold label's edges ("<strong>Head</strong>, ") must not leave one before its punctuation.
+const plain = (html) => String(html).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').replace(/ ([,.:;)])/g, '$1').replace(/\( /g, '(').trim();
 
 // Every key in `quotes` ({chapterKey: [langKey, ...]}) has its English value written in that chapter.
 function checkQuotes(quotes) {
