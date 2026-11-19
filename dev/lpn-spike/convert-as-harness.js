@@ -146,11 +146,10 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			L.unitKey('lpn_u_flow') === 'lps' && L.unitKey('lpn_u_diameter') === 'mm');
 		const n = (id) => d.nodes.filter((x) => x.id === id)[0];
 		const l = (id) => d.links.filter((x) => x.id === id)[0];
-		// The one rounding (roundToStep) never leaves fewer than 4 significant figures, so a step of 1 or 0.1
-		// is overruled where it would: 8 in is 203.2 mm and 120 gpm is 7.571 L/s.
-		ok('diameter converted, rounded to the nearest 1 but kept to 4 significant figures', l(p1.id)._diameter === 203.2 && l(p2.id)._diameter === 152.4,
+		// The one rounding (roundToStep) gives exactly the step chosen: 8 in is 203 mm and 120 gpm is 7.6 L/s.
+		ok('diameter converted, rounded to the nearest 1', l(p1.id)._diameter === 203 && l(p2.id)._diameter === 152,
 			l(p1.id)._diameter + ', ' + l(p2.id)._diameter);
-		ok('demand converted, rounded to the nearest 0.1 but kept to 4 significant figures', n(A.id)._demand === 7.571 && n(B.id)._demand === 5.047,
+		ok('demand converted, rounded to the nearest 0.1', n(A.id)._demand === 7.6 && n(B.id)._demand === 5,
 			n(A.id)._demand + ', ' + n(B.id)._demand);
 		ok('reservoir head converted and rounded to the nearest 0.01', n(R.id)._head === 76.32, n(R.id)._head);
 		ok('elevation converted (it is not one of the four rounded fields)', near(n(A.id).elev, 30.48, 1e-9), n(A.id).elev);

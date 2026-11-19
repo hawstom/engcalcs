@@ -51282,12 +51282,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Nearest `step`, then written with no more decimals than the step has, so 0.1 gives 12.3 and
 	// not 12.299999999999999.
 	// **THE ONE ROUNDING OF A CONVERTED NUMBER** (the strip's Decimals and Convert as's steps both come
-	// here, so the two doors give the same document). A step that would leave fewer than four
-	// significant figures (150 mm as 6 in is 1.6% off) is overruled: the value is kept to four.
+	// here, so the two doors give the same document). Exactly what the user chose, nothing more
+	// (Tom: "we must give them what they request"): 150 mm as inches is 6 at Decimals 0, 5.91 at 2.
 	function roundToStep(v, step) {
-		var d = Math.max(0, -Math.floor(Math.log10(step) + 1e-9)), r = +(Math.round(v / step) * step).toFixed(d);
-		if (v !== 0 && isFinite(v) && Math.abs(r - v) > Math.abs(v) * 5e-4) { return +v.toPrecision(4); }
-		return r;
+		var d = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+		return +(Math.round(v / step) * step).toFixed(d);
 	}
 	// **ONLY WHAT THIS CONVERSION REWROTE.** A number whose unit did not change is the user's as
 	// typed, and rounding it would be a second edit nobody asked for.
@@ -62127,8 +62126,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function convertUnitValues(name, k, dec) {
 		var n = 0;
 		// `dec`, when given, is the Decimals the visitor chose in the unit question: every converted
-		// input is rounded to that many places by roundToStep(), the one rounding of this page, which
-		// never leaves a number under four significant figures.
+		// input is rounded to that many places by roundToStep(), the one rounding of this page.
 		function rnd(v) { return typeof dec === 'number' ? roundToStep(v, Math.pow(10, -dec)) : v; }
 		function conv(obj, prop) {
 			if (!obj || typeof obj[prop] !== 'number') { return; }

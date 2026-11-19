@@ -273,7 +273,7 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	pickUnit('lpn_u_length', 'm');
 	setDecimals(0);
 	press('Convert');
-	ok('Length: Decimals 0 never leaves fewer than 4 significant figures (216.4)', L.getDoc().links[0]._length === 216.4, String(L.getDoc().links[0]._length));
+	ok('Length: Decimals 0 rounds to exactly 0 places (710 ft -> 216)', L.getDoc().links[0]._length === 216, String(L.getDoc().links[0]._length));
 	L.undo();
 	pickUnit('lpn_u_length', 'm');
 	setDecimals(4);
@@ -333,45 +333,32 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	pickUnit('lpn_u_volume', 'gal');
 	press('Cancel');
 	ok('Volume: Cancel leaves the unit as it was', L.unitKey('lpn_u_volume') === 'ft3' && T().minVolume === 20000);
-	// A small number never rounds to zero silently.
+	// Exactly the Decimals asked for, even when that gives zero.
 	T().minVolume = 0.0004;
 	pickUnit('lpn_u_volume', 'gal');
 	setDecimals(0);
 	press('Convert');
-	ok('a nonzero number the rounding would zero is kept to 4 significant figures', T().minVolume > 0, String(T().minVolume));
+	ok('Volume: Decimals 0 rounds exactly (0.0004 ft3 -> 0 gal)', T().minVolume === 0, String(T().minVolume));
 }
 
-// ---- 7. Rounding never costs accuracy (code review: 150 mm as 6 in is 1.6% off) ----------------------
+// ---- 7. Rounding is exactly the Decimals chosen --------------------------------------------------
 {
-	console.log('\n--- accuracy under the default Decimals ---');
-	function one(name, to, mk, read, want) {
+	console.log('\n--- exact Decimals ---');
+	function one(dec, want) {
 		L.reset(); L.setCanvas(800, 600);
 		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'mm', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'lps', lpn_u_roughness: 'mm', lpn_u_volume: 'ft3' });
 		L.remember();
-		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0), t = L.addNode('tank', 200, 0);
+		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0);
 		const pipe = L.addLink('pipe', r.id, j.id);
-		mk(j, pipe, t); L.buildDom();
-		pickUnit(name, to);
+		pipe.diameter = undefined; L.setProp(pipe, 'diameter', 150); L.buildDom();
+		pickUnit('lpn_u_diameter', 'in');
+		setDecimals(dec);
 		press('Convert');
-		const got = read(L.getDoc());
-		ok(name + ' -> ' + to + ' within 0.05% of the exact value', Math.abs(got - want) <= 5e-4 * Math.abs(want), got + ' against ' + want);
+		ok('150 mm to in at Decimals ' + dec + ' is ' + want, L.getDoc().links[0]._diameter === want, String(L.getDoc().links[0]._diameter));
+		L.undo();
+		ok('Undo restores 150 mm', L.getDoc().links[0]._diameter === 150 && L.unitKey('lpn_u_diameter') === 'mm', L.getDoc().links[0]._diameter + ' ' + L.unitKey('lpn_u_diameter'));
 	}
-	one('lpn_u_diameter', 'in', (j, p) => { p.diameter = undefined; L.setProp(p, 'diameter', 150); }, (d) => d.links[0]._diameter, 150 / 25.4);
-	one('lpn_u_flow', 'gpm', (j) => { L.setProp(j, 'demand', 0.02); }, (d) => d.nodes[1]._demand, 0.02 / 0.0630901964);
-	one('lpn_u_volume', 'acft', (j, p, t) => { L.setProp(t, 'minVolume', 1000); }, (d) => d.nodes[2].minVolume, 1000 / 43560);
-	// Darcy-Weisbach roughness, 2 mm in millimeters to feet (0.0066 ft, not 0.01).
-	{
-		L.reset(); L.setCanvas(800, 600);
-		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_roughness: 'mm' });
-		L.remember();
-		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0), p = L.addLink('pipe', r.id, j.id);
-		L.getSettings().method = 'dw';
-		L.setProp(p, 'roughness', 2); L.buildDom();
-		pickUnit('lpn_u_roughness', 'ft');
-		press('Convert');
-		const got = L.getDoc().links[0]._roughness;
-		ok('Darcy-Weisbach roughness 2 mm -> ft within 0.05%', Math.abs(got - 2 / 304.8) <= 5e-4 * 2 / 304.8, String(got));
-	}
+	one(0, 6); one(2, 5.91);
 }
 
 // ---- 8. Enter after a keyboard unit change keeps (code review: Convert was the focused button) ------
