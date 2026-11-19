@@ -34,6 +34,7 @@ function mkEl(tag, svgNS) {
     // harness would have reported a multi-line label moving when the real page leaves its rows
     // behind. A createTextNode() result already carries nodeType 3 below.
     nodeType: 1,
+    clientLeft: 0, clientTop: 0,   // a real element has a border width (0 here); the pick code adds it to the client box
     // Whether this element was made through createElementNS, so cloneNode() below can make a clone
     // of the same kind rather than quietly turning an SVG node into an HTML one.
     _svg: !!svgNS,
