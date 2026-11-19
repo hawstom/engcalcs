@@ -1310,8 +1310,10 @@
 				return st;
 			}
 			// valvedata() starts a valve ACTIVE at its setting; inithyd() unsets the setting of one
-			// stated Closed (or Open), which is what makes it FIXED.
-			if (l.status === 'closed') { st.s = CLOSED; st.k = MISSING; }
+			// stated Closed (or Open), which is what makes it FIXED. A PRV, PSV or FCV stated Open (`valveFixed`, from the file's
+			// [STATUS]) starts OPEN with no setting; a control or rule can still give it one.
+			if (l.status !== 'closed' && l.valveFixed === 'open' && (st.vt === 'PRV' || st.vt === 'PSV' || st.vt === 'FCV')) { st.s = OPEN; st.k = MISSING; }
+			else if (l.status === 'closed') { st.s = CLOSED; st.k = MISSING; }
 			else { st.s = ACTIVE; st.k = l.setting || 0; }
 			return st;
 		}

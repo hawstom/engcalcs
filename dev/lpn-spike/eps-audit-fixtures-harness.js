@@ -1,7 +1,7 @@
 // THE BUILT-IN SOLVER AGAINST EPANET'S OWN ENGINE ON THE SETTINGS-AND-TANKS FIXTURES (EPS audit 2, 2026-11-18). Run with:
 //   node dev/lpn-spike/eps-audit-fixtures-harness.js
 //
-// Five small networks in dev/lpn-spike/fixtures/eps-audit/ (tanks, pumps, pumps2, valves, emitters) are each run
+// Small networks in dev/lpn-spike/fixtures/eps-audit/ (tanks, pumps, pumps2, valves, valves2, valves3, emitters, emitters2 with a demand multiplier and pattern start, emitters-pda) are each run
 // through eps-audit-vs-epanet.js, which compares the built-in loop and the page's EPANET bridge with the engine driven
 // directly at every reporting time: heads, pressures, demands, tank level and VOLUME, flows, headloss, link status, pump
 // SPEED, valve SETTING and EMITTER flow. Every comparison must stay inside the audit's tolerance, the original file and
@@ -20,7 +20,11 @@ const NEEDS = {
 	pumps: (c) => c.pumpSettings >= 6 && c.pumpStops > 0 && c.statusChanges > 0,
 	pumps2: (c) => c.pumpSettings >= 3 && c.pumpStops > 0 && c.statusChanges > 4,
 	valves: (c) => c.valveSettings >= 8 && c.statusChanges > 4,
-	emitters: (c) => c.minEmit < -1e-3 && c.maxEmit > 1e-3
+	valves2: (c) => c.valveSettings >= 8 && c.statusChanges > 3,
+	valves3: (c) => c.valveSettings >= 2,
+	emitters: (c) => c.minEmit < -1e-3 && c.maxEmit > 1e-3,
+	emitters2: (c) => c.minEmit < -1e-3 && c.maxEmit > 1e-3,
+	'emitters-pda': (c) => c.minEmit < -1e-3 && c.maxEmit > 1e-3
 };
 Object.keys(NEEDS).forEach((name) => {
 	const rel = 'dev/lpn-spike/fixtures/eps-audit/' + name + '.inp', jf = path.join(os.tmpdir(), 'epsfix-' + process.pid + '-' + name + '.json');

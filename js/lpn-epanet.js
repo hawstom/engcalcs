@@ -521,6 +521,7 @@
 				// the eighth token on its own row. A closed valve is stated in [STATUS] instead,
 				// which is why that section exists below and did not before.
 				if (link.status === 'closed') { statuses.push(' ' + link.id + '  Closed'); }
+				else if (link.valveFixed === 'open') { statuses.push(' ' + link.id + '  Open'); }
 			} else if (link.type === 'pump') {
 				// **UNDER `eps` THE CURVE IS THE UNSCALED ONE AND THE SPEED IS NAMED BESIDE IT**
 				// (Task 248.02). EPANET applies SPEED and its PATTERN to the curve itself, so
@@ -1322,7 +1323,7 @@
 			// number beside it MEANS. Pushing a new
 			// type through a setter is not possible anyway: EPANET fixes a link's type when the
 			// file is read.
-			parts.push('l' + l.id + '\u0001' + l.type + '\u0001' + l.from + '\u0001' + l.to +
+			parts.push('l' + l.id + '\u0001' + l.type + '\u0001' + l.from + '\u0001' + l.to + '\u0001' + (l.valveFixed || '') +
 				'\u0001' + (isCurvedPump(l) ? 'c' : 'p') +
 				// **HOW MANY POINTS A PUMP'S CURVE HAS IS A TOPOLOGY FACT** (Task 586). EPANET
 				// decides what KIND of pump curve it is holding -- a fitted power law or a

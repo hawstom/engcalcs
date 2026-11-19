@@ -1405,8 +1405,14 @@
 			var sl = linkIndex[r[0]];
 			if (!sl) { continue; }
 			var sv = (r[1] || '').toUpperCase();
-			if (sv === 'CLOSED') { sl.status = 'closed'; }
-			else if (sv === 'OPEN') { sl.status = 'open'; }
+			if (sv === 'CLOSED') { sl.status = 'closed'; sl.fixedOpen = false; }
+			// A valve stated OPEN is FIXED open to EPANET (input3.c: its setting is unset), so it never regulates and is its plain
+			// minor loss. The page keeps that as `fixedOpen`, written back by both exporters and run by both engines. A TCV is left
+			// out: its stated minor loss is not carried (EngCalcs.lpnLinkK), so a fixed-open TCV stays a known difference.
+			else if (sv === 'OPEN') {
+				sl.status = 'open';
+				if (sl.type === 'valve' && /^(PRV|PSV|FCV|PBV)$/.test(String(sl.valveType).toUpperCase())) { sl.fixedOpen = true; }
+			}
 			else if (sl.type === 'valve' && r[1] !== '' && isFinite(+r[1])) {
 				// A NUMBER here is a SETTING, not a status, and for a valve that is a value this
 				// page can hold -- so it is applied rather than reported as a loss. It is in the
@@ -1415,6 +1421,7 @@
 				// which this page has no element for, so that case still falls through to the
 				// report below.
 				sl.setting = +r[1];
+				sl.fixedOpen = false;
 				mergeTok(sl, 'setting', r[1], sl.setting);
 			}
 			else { drop('link-setting', [r[0]], r[1], 'link'); }
@@ -3335,6 +3342,7 @@
 					vt === 'TCV' ? '0' : n(PLAIN, lk, '_k', eff(lk, 'k') || 0)]) + descOf(lk));
 				// A valve row has no status column; a closed one is stated in [STATUS].
 				if (status === 'Closed') { statuses.push(row([lk.id, 'Closed'])); }
+				else if (lk.valveOpen && vt !== 'TCV' && vt !== 'GPV') { statuses.push(row([lk.id, 'Open'])); }
 			} else if (lk.type === 'pump') {
 				// **A PUMP NAMES A LIBRARY CURVE** (Task 586). The reference goes through the
 				// resolver seam, because it is overridable (Tom, 2026-09-05: *"Scenario pump
