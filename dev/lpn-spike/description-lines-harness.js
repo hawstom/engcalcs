@@ -125,7 +125,7 @@ ok('R1 tank T1 pipe P1 valve V1 read their continuation',
 	&& link('P1').desc === '1962 main\nreplaced 2019' && link('V1').desc === 'Vault 14\nnorth side');
 ok('pattern note', byId(a.doc.patterns, 'PA').note === 'Morning peak\nsecond line of it', J(byId(a.doc.patterns, 'PA').note));
 ok('curve note', byId(a.doc.curves, 'C1').note === 'Pump 10\nrated 2019', J(byId(a.doc.curves, 'C1').note));
-ok('control note', a.doc.controls[0].note === 'Fill the tank\nand no more', J(a.doc.controls[0].note));
+ok('a comment above a control is a row of its own, lines kept as the file stated them', a.doc.controls[0].comment === true && J(a.doc.controls[0].lines) === J([';Fill the tank', ';|and no more']), J(a.doc.controls[0]));
 ok('nothing about the ;| lines is reported lost', !(a.parsed.dropped || []).some((d) => d.code === 'comments'), J(a.parsed.dropped));
 
 const out = EngCalcs.lpnExportInp(a.doc);
@@ -133,12 +133,12 @@ ok('it exports', out.ok === true, J(out.error));
 const Jn = lines(out.inp, 'JUNCTIONS').filter(Boolean);
 ok('J2 is written whole on its row, "\\P" for each line break',
 	Jn.some((l) => /^\s*J2\s/.test(l) && l.endsWith('\t;First line\\PSecond line\\P\\PThird paragraph')), J(Jn));
-ok('no ;| line is written anywhere', !out.inp.split(/\r?\n/).some((l) => /^\s*;\|/.test(l)));
+ok('no ;| line is written outside [CONTROLS], where a comment row keeps the file\'s own lines', !out.inp.replace(/\[CONTROLS\][^\[]*/, '').split(/\r?\n/).some((l) => /^\s*;\|/.test(l)));
 ok('J1 single line written exactly as before', Jn.some((l) => /^\s*J1\s+100(\.0+)?\s+.*\t;Corner of Elm and Main$/.test(l) || /\t;Corner of Elm and Main$/.test(l)), J(Jn));
 ok('the pattern writes one comment line above its rows',
 	J(lines(out.inp, 'PATTERNS').filter(Boolean).slice(0, 2).map((l) => l.replace(/\s+/g, ' '))) === J([';Morning peak\\Psecond line of it', ' PA 1 2 3']), J(lines(out.inp, 'PATTERNS')));
 ok('the curve writes one type line above its rows', (() => { const c = lines(out.inp, 'CURVES').filter(Boolean); return c[0] === ';PUMP: Pump 10\\Prated 2019' && /^\s*C1\s/.test(c[1]); })(), J(lines(out.inp, 'CURVES')));
-ok('the control writes one line above it', (() => { const c = lines(out.inp, 'CONTROLS').filter(Boolean); return c[0] === ';Fill the tank\\Pand no more' && /^LINK P1/.test(c[1]); })(), J(lines(out.inp, 'CONTROLS')));
+ok('the comment row above the control is written back as it was', (() => { const c = lines(out.inp, 'CONTROLS').filter(Boolean); return c[0] === ';Fill the tank' && c[1] === ';|and no more' && /^LINK P1/.test(c[2]); })(), J(lines(out.inp, 'CONTROLS')));
 const b = importText(out.inp, 'lines.inp');
 const dump = (d) => J({ n: d.nodes.map((x) => [x.id, x.desc]), l: d.links.map((x) => [x.id, x.desc]),
 	p: d.patterns.map((x) => [x.id, x.note]), c: d.curves.map((x) => [x.id, x.note]), k: d.controls.map((x) => x.note) });
@@ -202,9 +202,9 @@ const SRC2 = [
 	ok('"\\\\P" is a typed backslash-P', byId(d.nodes, 'J3').desc === 'Share is \\Public\\docs', J(byId(d.nodes, 'J3').desc));
 	ok('a backslash with no P is text', byId(d.nodes, 'J4').desc === 'C:\\temp, no marker');
 	ok('two markers are a blank line', byId(d.links, 'P1').desc === '1962 main\n\nreplaced 2019', J(byId(d.links, 'P1').desc));
-	ok('pattern, curve, control above and control trailing', byId(d.patterns, 'PA').note === 'Morning peak\nweekdays'
-		&& byId(d.curves, 'C1').note === 'Pump 10\nrated 2019' && d.controls[0].note === 'Fill the tank\nand no more'
-		&& d.controls[1].note === 'close it\nat night', J([byId(d.curves, 'C1').note, d.controls.map((c) => c.note)]));
+	ok('pattern, curve, control comment row and control trailing', byId(d.patterns, 'PA').note === 'Morning peak\nweekdays'
+		&& byId(d.curves, 'C1').note === 'Pump 10\nrated 2019' && d.controls[0].comment && d.controls[0].lines[0] === ';Fill the tank\\Pand no more'
+		&& d.controls[2].note === 'close it\nat night', J([byId(d.curves, 'C1').note, d.controls.map((c) => c.note)]));
 	const o = EngCalcs.lpnExportInp(d).inp, has = (l) => o.split(/\r?\n/).some((x) => x.replace(/\s+$/, '').endsWith(l));
 	ok('J1, J3, J4 and P1 written back character for character', has('\t;Corner of Elm\\Pand Main') && has('\t;Share is \\\\Public\\docs')
 		&& has('\t;C:\\temp, no marker') && has('\t;1962 main\\P\\Preplaced 2019'), J(lines(o, 'JUNCTIONS')));
@@ -214,7 +214,7 @@ const SRC2 = [
 	{ const o2 = EngCalcs.lpnExportInp(importText(o, 'p.inp').doc).inp, a1 = o.split('\n'), a2 = o2.split('\n'), at = a1.findIndex((l, k) => l !== a2[k]);
 		ok('a second round trip is stable', o2 === o, at + ': ' + J(a1[at]) + ' vs ' + J(a2[at])); }
 	byId(d.nodes, 'J1').desc = 'Corner of Elm\nand Main Street';
-	d.controls[1].note = 'close it\nat night\nalways';
+	d.controls[2].note = 'close it\nat night\nalways';
 	{ const o3 = EngCalcs.lpnExportInp(d).inp, h3 = (l) => o3.split(/\r?\n/).some((x) => x.replace(/\s+$/, '').endsWith(l));
 		ok('once edited, it goes out in the new spelling', h3('\t;Corner of Elm\\Pand Main Street') && h3('ABOVE 90 ;close it\\Pat night\\Palways')
 			&& h3('\t;1962 main\\P\\Preplaced 2019'), J(lines(o3, 'JUNCTIONS'))); }
@@ -228,13 +228,13 @@ console.log('\n3. A description typed on the page (with paragraphs) exports and 
 	byId(doc.links, 'P2').desc = 'one line only';
 	doc.patterns[0].note = 'Edited\nlines';
 	byId(doc.nodes, 'J1').desc = 'Typed C:\\Pumps\nand a second line';
-	doc.controls[0].note = 'One\nTwo';
+	doc.controls[1].note = 'One\nTwo'; doc.controls[1].noteAt = 'end';
 	const o = EngCalcs.lpnExportInp(doc).inp;
 	ok('J3 is written on its row with the markers', o.indexOf('\t;Meter vault\\P\\PKey at the office\\P  indented\n') > 0, J(lines(o, 'JUNCTIONS')));
 	ok('a typed backslash-P is written with one more backslash', o.indexOf('\t;Typed C:\\\\Pumps\\Pand a second line') > 0);
 	const r = importText(o, 'edited.inp').doc;
 	ok('...and reads back as typed', byId(r.nodes, 'J1').desc === 'Typed C:\\Pumps\nand a second line', J(byId(r.nodes, 'J1').desc));
-	ok('an edited control note goes out on one line', lines(o, 'CONTROLS').filter(Boolean)[0] === ';One\\PTwo' && r.controls[0].note === 'One\nTwo', J(lines(o, 'CONTROLS')));
+	ok('an edited control note goes out on its line, on one line', lines(o, 'CONTROLS').filter(Boolean)[2] === 'LINK P1 OPEN IF NODE T1 BELOW 5 ;One\\PTwo' && r.controls[1].note === 'One\nTwo', J(lines(o, 'CONTROLS')));
 	ok('J3 comes back with its paragraphs and indent', byId(r.nodes, 'J3').desc === 'Meter vault\n\nKey at the office\n  indented', J(byId(r.nodes, 'J3').desc));
 	ok('P2 one line stays one line', byId(r.links, 'P2').desc === 'one line only');
 	ok('the pattern edit', r.patterns[0].note === 'Edited\nlines');

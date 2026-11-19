@@ -302,7 +302,7 @@
 				return String((c && c.link) || (c && c.raw) || '').trim() ||
 					String((c && c.text && c.text.raw) || '?');
 			};
-		((doc && doc.controls) || []).forEach(function (c) {
+		EC.lpnControlsOnly(doc && doc.controls).forEach(function (c) {
 			var out, cond = c && c.condition;
 			if (!cond) { note('control-unreadable', nameOf(c)); return; }
 			if (liveLinks && !liveLinks[String(c.link)]) { note('control-dangling', nameOf(c)); return; }
@@ -567,17 +567,17 @@
 			runRefusedWhy: pageConfig.lpn_engine_refused_why || 'EPANET solver message: {message}',
 			// A run EPANET started and could not finish (Tom, 2026-10-14: a tank emptied, the
 			// junctions it fed lost their only source, Error 110 at 7:24). "Did not start" was false.
-			runStoppedKept: pageConfig.lpn_time_run_stopped_kept || 'The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.',
+			runStoppedKept: pageConfig.lpn_time_run_stopped_kept || 'The EPANET run stopped at {time}. Results are shown up to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.',
 			statStopped: pageConfig.lpn_time_stat_stopped || '{statistic} not shown: the run stopped before the end of the period.',
 			stoppedNoQuality: pageConfig.lpn_time_stopped_no_quality || 'No water quality results were computed, because the quality analysis starts after the hydraulic run ends.',
 			// Which link EPANET had just closed at the stop, and why, from its own report (R-402).
 			runCutOff: pageConfig.lpn_time_run_cut_off || 'EPANET had closed {link} and then could not solve for {nodes}.',
 			runCutOffFull: pageConfig.lpn_time_run_cut_off_full || 'Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.',
 			runCutOffEmpty: pageConfig.lpn_time_run_cut_off_empty || 'Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.',
-			runStopped: pageConfig.lpn_time_run_stopped || 'The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.',
+			runStopped: pageConfig.lpn_time_run_stopped || 'The EPANET run failed at {time}, so it has no results. The Solver (run) report says why.',
 			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. They show the network at {time} only, with every tank at its initial level.',
 			runReport: pageConfig.lpn_time_run_report || 'Solver (run) report',
-			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.',
+			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to calculate, and "Recalculate automatically" is checked, so it calculates after every change. To stop that and show the Calculate button, clear "Recalculate automatically" in Settings, Calculation, Solver.',
 			close: pageConfig.lpn_close || 'Close',
 			// **THE REPORT IS THE ONE PLACE A REFUSAL NAMES ITS OWN LINE**, so getting it out of the
 			// page has to be one press (Tom, 2026-09-04, having just had to retype one by hand: *"A

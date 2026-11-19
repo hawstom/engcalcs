@@ -79,8 +79,8 @@ const FT = 0.3048, H = 3600;
 	const first = ids[ids.length - 1];
 	ok('steady: only the fastest pipe is named, "⚠ Pipe X velocity is N ft/sec.", with no time',
 		text.indexOf('⚠ Pipe ' + first + ' velocity is ' + (11 + ids.length - 1) + ' ft/sec.') === 0 && !/ at \d/.test(text), text.slice(0, 80));
-	ok('...exactly one pipe sentence, then one count line: "⚠ And more pipes (n) above 10 ft/sec." with n = the others',
-		(text.match(/⚠ Pipe /g) || []).length === 1 && text.endsWith(' ⚠ And more pipes (' + (ids.length - 1) + ') above 10 ft/sec.'), text);
+	ok('...exactly one pipe sentence, then one count line: "⚠ Other pipes above 10 ft/sec: n." with n = the others',
+		(text.match(/⚠ Pipe /g) || []).length === 1 && text.endsWith(' ⚠ Other pipes above 10 ft/sec: ' + (ids.length - 1) + '.'), text);
 	const one = L.velocityNote({ velocities: { [ids[0]]: 12 * FT } });
 	ok('a single pipe over the limit: its sentence and no count line', one === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec.', one);
 	ok('nothing passes 10 ft/s: nothing is said', L.velocityNote({ velocities: { [ids[0]]: 9.9 * FT } }) === '');
@@ -96,13 +96,13 @@ const FT = 0.3048, H = 3600;
 	const S = L.getSettings();
 	ok('blank is the default for the unit: 10 ft/sec in US units', S.velocityLimit === undefined && L.velocityLimitDefaultText() === '10 ft/sec', L.velocityLimitDefaultText());
 	ok('default limit: the 12 and 11 ft/s pipes are over, the worst named, one other counted',
-		L.velocityNote({ velocities: v }) === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec. ⚠ And more pipes (1) above 10 ft/sec.', L.velocityNote({ velocities: v }));
+		L.velocityNote({ velocities: v }) === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec. ⚠ Other pipes above 10 ft/sec: 1.', L.velocityNote({ velocities: v }));
 	S.velocityLimit = 11.5;
 	ok('a changed limit changes the warning: at 11.5 only the 12 ft/s pipe, and no count line',
 		L.velocityNote({ velocities: v }) === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec.', L.velocityNote({ velocities: v }));
 	S.velocityLimit = 8;
 	ok('...and at 8 the 9 ft/s pipe joins the count, which names the limit as set',
-		L.velocityNote({ velocities: v }) === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec. ⚠ And more pipes (2) above 8 ft/sec.', L.velocityNote({ velocities: v }));
+		L.velocityNote({ velocities: v }) === '⚠ Pipe ' + ids[0] + ' velocity is 12 ft/sec. ⚠ Other pipes above 8 ft/sec: 2.', L.velocityNote({ velocities: v }));
 	S.velocityLimit = 0;
 	ok('zero means no warning', L.velocityNote({ velocities: { [ids[0]]: 99 * FT } }) === '');
 
@@ -125,7 +125,7 @@ const FT = 0.3048, H = 3600;
 	const st = L.velocityNote({ velocities: sv });
 	console.log('   ' + st);
 	ok('SI: 3.5 m/s named, the 3.2 counted, the 2.9 not; the limit is stated as 3.05 m/s',
-		/^⚠ Pipe .* velocity is 3\.5 m\/s\. ⚠ And more pipes \(1\) above 3\.05 m\/s\.$/.test(st), st);
+		/^⚠ Pipe .* velocity is 3\.5 m\/s\. ⚠ Other pipes above 3\.05 m\/s: 1\.$/.test(st), st);
 	L.getSettings().velocityLimit = 3.3;
 	ok('SI: a typed 3.3 means 3.3 m/s', /^⚠ Pipe \S+ velocity is 3\.5 m\/s\.$/.test(L.velocityNote({ velocities: sv })), L.velocityNote({ velocities: sv }));
 	// a unit change reinterprets, never converts; the Destructive path rewrites it
@@ -186,7 +186,7 @@ const FT = 0.3048, H = 3600;
 	let tok = { run: 1 }, frames = [{ t: 0, velocities: { [pipeId]: 11 * FT } }, { t: 3600, velocities: { [pipeId]: 13 * FT } }];
 	EC.lpnTimeRunToken = () => tok; EC.lpnTimeRunFrames = () => frames;
 	const a = L.velocityNote({ velocities: {} });
-	ok('an extended run names the pipe at its peak and its time', a === '⚠ Pipe ' + pipeId + ' velocity is 13 ft/sec at 1:00.', a);
+	ok('an extended run names the pipe at its peak and its time', a === '⚠ Pipe ' + pipeId + ' velocity is 13 ft/sec at 1:00, above the limit.', a);
 	frames = [{ t: 0, velocities: { [pipeId]: 15 * FT } }];
 	ok('the same run is not re-scanned (the snapshot stands)', L.velocityNote({ velocities: {} }) === a);
 	tok = { run: 2 };

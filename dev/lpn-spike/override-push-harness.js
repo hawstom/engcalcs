@@ -1,5 +1,5 @@
 // PUSH OVERRIDE UPWARD (Task 855, Tom 2026-11-06: "an orange upward arrow/triangle above the override
-// clearing circle ... 'Push override upward', meaning that the override is cleared in the current
+// clearing circle ... 'Move this override up', meaning that the override is cleared in the current
 // alternative and entered in its parent."). Run:
 //   node dev/lpn-spike/override-push-harness.js
 //
@@ -116,7 +116,7 @@ function arrowIn(id, e, p, labelText) {
 L.switchScenario(A1.id);
 const up = arrowIn(A1.id, m, 'elev');
 report(!!up, 'the arrow is drawn on an overridden value in a scenario with a parent');
-report(up && up.title === 'Push override upward', 'its tip is "Push override upward"', up && up.title);
+report(up && up.title === 'Move this override up', 'its tip is "Move this override up"', up && up.title);
 report(up && up.getAttribute('role') === 'button', 'it is a button (click and tap)');
 report(!arrowIn(A2.id, m, 'elev'), 'no arrow on an inherited value');
 report(!arrowIn(L.baseId(), m, 'elev'), 'no arrow in Base');
@@ -128,7 +128,7 @@ global.window = global.window || {};
 global.window.lpnDialogAnswerer = (req) => { asked = req; return answer; };
 L.switchScenario(A1.id);
 click(arrowIn(A1.id, m, 'elev'));
-report(asked && asked.kind === 'confirm' && /\(1 total\)/.test(asked.text) && /^Push override upward(?: to A\?|\? Current value in A: )/.test(asked.text), 'the question names the destination (A) and, as siblings inherit it, the count', asked && asked.text);
+report(asked && asked.kind === 'confirm' && /1 scenarios that inherit/.test(asked.text) && /^Move this override up(?: to A\?|\? Current value in A: )/.test(asked.text), 'the question names the destination (A) and, as siblings inherit it, the count', asked && asked.text);
 fresh();
 report(has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 200, 'No: nothing changes');
 answer = true; asked = null;
@@ -144,7 +144,7 @@ L.switchScenario(A1.id);
 asked = null; answer = true;
 click(arrowIn(A1.id, m, 'elev'));
 fresh();
-report(asked && !/total/.test(asked.text) && /^Push override upward(?: to A\?|\? Current value in A: )/.test(asked.text), 'with no other scenario changing it is still asked, with no count', asked && asked.text);
+report(asked && !/scenarios that inherit/.test(asked.text) && /^Move this override up(?: to A\?|\? Current value in A: )/.test(asked.text), 'with no other scenario changing it is still asked, with no count', asked && asked.text);
 report(asked && /Current value in [^:]+: 200\./.test(asked.text), 'and says what it replaces', asked && asked.text);
 report(!has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 333, 'Yes: pushed');
 L.undo(); fresh();
@@ -162,7 +162,7 @@ L.switchScenario(C1.id);
 asked = null; answer = true;
 click(arrowIn(C1.id, n, 'elev'));
 fresh();
-report(asked && /^Push override upward(?: to Base\?|\? Current value in Base: )/.test(asked.text), 'order case: the question names Base', asked && asked.text);
+report(asked && /^Move this override up(?: to Base\?|\? Current value in Base: )/.test(asked.text), 'order case: the question names Base', asked && asked.text);
 report(asked && /Current value in [^:]+: 100\./.test(asked.text), 'order case: Base\'s own value is named as replaced', asked && asked.text);
 report(L.baseValue(n, 'elev') === 640 && val(P.id, n, 'elev') === 50 && !has(C1.id, n, 'elev') && val(C1.id, n, 'elev') === 640,
 	'order case: Base gets 640, P keeps its own 50, C1 reads 640', L.baseValue(n, 'elev') + ',' + val(P.id, n, 'elev') + ',' + val(C1.id, n, 'elev'));

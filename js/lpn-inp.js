@@ -478,19 +478,16 @@
 					pendingCurveCont = { more: [], raw: [] };
 				}
 			}
-			// **A DESCRIPTION IN [PATTERNS], [CONTROLS] AND [RULES] IS A WHOLE-LINE COMMENT ABOVE
-			// THE THING IT DESCRIBES.** For a pattern that is EPANET's own rule: the toolkit keeps
-			// the whole-line comment directly before a pattern's first row as its Comment, in
-			// [PATTERNS] and [CURVES] only (input2.c, `LineComment`, which a blank line clears;
-			// input3.c patterndata()), and writes it back as `;<comment>` on the line above
-			// (inpfile.c). EPANET has no description for a control or a rule; its GUI keeps both
-			// sections as the file's own lines, comments in place (Uimport.pas ReadControlData /
-			// ReadRuleData, Uexport.pas ExportControls), and Net3's controls carry three. So the
-			// comment lines above a control are read as its description and written back above
-			// it, and a comment line in [RULES] is carried with the rule text it sits in.
+			// **A PATTERN'S DESCRIPTION IS THE WHOLE-LINE COMMENT DIRECTLY ABOVE IT.** That is EPANET's
+			// own rule: the toolkit keeps the whole-line comment directly before a pattern's first row as
+			// its Comment, in [PATTERNS] and [CURVES] only (input2.c, `LineComment`, which a blank line
+			// clears; input3.c patterndata()), and writes it back as `;<comment>` on the line above
+			// (inpfile.c). EPANET has no description for a control or a rule; its GUI keeps both sections
+			// as the file's own lines, comments in place (Uimport.pas ReadControlData / ReadRuleData,
+			// Uexport.pas ExportControls), so a comment in [CONTROLS] or [RULES] is a row of its own in the
+			// Libraries list and describes nothing by position (Task 859).
 			// Every comment AND every blank line is kept here, because a blank line is what tells a
-			// heading from a description: only the comments DIRECTLY above a row describe it, and
-			// a block separated from it by a blank line is a heading, kept and written back in place.
+			// pattern's heading from its description, and is the `gap` a control or comment row remembers.
 			if (!line.trim() && (section === 'PATTERNS' || section === 'CONTROLS')) {
 				pendingRaw.push(semi >= 0 ? lines[i].replace(/\s+$/, '') : '');
 				continue;
@@ -547,8 +544,10 @@
 				if (pendingCurveType) { toks.typeLine = pendingCurveType; pendingCurveType = null; }
 				pendingCurveCont = { more: [], raw: [] };
 			}
+			if (section === 'PATTERNS' || section === 'CURVES') { toks.line = i + 1; }
 			if (section === 'PATTERNS' || section === 'CONTROLS') {
-				if (pendingRaw.some(function (l) { return l.trim(); })) { toks.preLines = pendingRaw; }
+				// A control keeps its blank lines even with no comment among them (`gap`, below).
+				if (pendingRaw.length && (section === 'CONTROLS' || pendingRaw.some(function (l) { return l.trim(); }))) { toks.preLines = pendingRaw; }
 				pendingRaw = [];
 			}
 			if (!rawSections[section]) { rawSections[section] = []; }
@@ -791,9 +790,9 @@
 		}
 
 		var patterns = [], patternIndex = {}, times = null, controls = [];
-		// Comment lines in [PATTERNS] and [CONTROLS] that no pattern or control can keep, by
-		// section. Reported at the end as one `comments` difference each.
-		var lostComments = { PATTERNS: [], CONTROLS: [] };
+		// Comment lines in [PATTERNS] that no pattern can keep (the controls' are lostCtlComments below).
+		// Reported at the end as one `comments` difference.
+		var lostPatternComments = [];
 		rows = rawSections.PATTERNS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
@@ -826,13 +825,13 @@
 				if (runStart && pat.multipliers.length === 0 && EngCalcs.lpnInpHasComment(psp.head)) {
 					pat.head = psp.head;
 				} else {
-					lostComments.PATTERNS = lostComments.PATTERNS.concat(psp.head);
+					lostPatternComments = lostPatternComments.concat(psp.head);
 				}
-				if (pnote) { lostComments.PATTERNS = lostComments.PATTERNS.concat(psp.desc); }
+				if (pnote) { lostPatternComments = lostPatternComments.concat(psp.desc); }
 			}
 			// A trailing comment on a pattern row means nothing to EPANET (input2.c replaces it
 			// with the line comment in [PATTERNS]) and has nowhere to go in six-per-line rows.
-			if (EngCalcs.lpnDescText(r.cmt)) { lostComments.PATTERNS.push(';' + r.cmt); }
+			if (EngCalcs.lpnDescText(r.cmt)) { lostPatternComments.push(';' + r.cmt); }
 			for (var pj = 1; pj < r.length; pj++) {
 				var pv = parseFloat(r[pj]);
 				if (!isFinite(pv)) { continue; }
@@ -843,6 +842,35 @@
 				pat.multipliers.push(pv);
 			}
 		}
+
+		// **THE SAME PATTERN OR CURVE ID IN TWO SEPARATE PLACES** (Task 859). Only a hand-edited file
+		// does it. EPANET finds the pattern or curve by ID (input3.c patterndata(), curvedata():
+		// `findpattern()`, `findcurve()`) and appends the later rows to the first object, so the two
+		// runs are ONE pattern or curve; this reader does the same (patternIndex, curveRecord), and
+		// the report says so. Each entry reads "Pattern PAT1 (lines 12 and 40)": the id and the first line of each run.
+		function duplicateRuns(sectionRows, entryKey, entryFallback) {
+			var pcf = EngCalcs.pageConfig || {};
+			function say(lines) {
+				var n = lines.length, and = pcf.lpn_inp_dup_and || ' and ', comma = pcf.lpn_inp_dup_comma || ', ';
+				return n < 2 ? lines.join('') : lines.slice(0, n - 1).join(comma) + and + lines[n - 1];
+			}
+			var runs = {}, order = [], prev = null, k, row;
+			for (k = 0; k < sectionRows.length; k++) {
+				row = sectionRows[k];
+				if (!row[0]) { continue; }
+				if (row[0] !== prev) {
+					if (!runs[row[0]]) { runs[row[0]] = []; order.push(row[0]); }
+					runs[row[0]].push(row.line);
+				}
+				prev = row[0];
+			}
+			return order.filter(function (id) { return runs[id].length > 1; })
+				.map(function (id) { return (pcf[entryKey] || entryFallback).replace('{id}', id).replace('{lines}', say(runs[id])); });
+		}
+		var dupPatterns = duplicateRuns(rawSections.PATTERNS || [], 'lpn_inp_dup_pattern_entry', 'Pattern {id} (lines {lines})'),
+			dupCurves = duplicateRuns(rawSections.CURVES || [], 'lpn_inp_dup_curve_entry', 'Curve {id} (lines {lines})');
+		if (dupPatterns.length) { drop('duplicate-pattern-id', dupPatterns); }
+		if (dupCurves.length) { drop('duplicate-curve-id', dupCurves); }
 
 		// [TIMES] values are DURATIONS AND CLOCK TIMES, not plain numbers -- `24:00` is 86400
 		// seconds and parseFloat says 24 -- so mergeTok cannot hold their text and they keep their
@@ -898,42 +926,6 @@
 			}
 			return el;
 		}
-		// **A CONTROL'S DESCRIPTION** is the whole-line comments above it, back to the control
-		// before (see the [PATTERNS]/[CONTROLS]/[RULES] note in the line loop for why EPANET leaves
-		// this to us). Several lines read as one description joined by spaces, and their own text
-		// is kept in `noteSrc` so an unedited control writes them back line for line, the curve's
-		// `src` rule. With no comment above, a trailing `;comment` on the control's own line is its
-		// description and goes back on that line (`noteAt: 'end'`); with both, the trailing one is
-		// kept as `tail` and written back where it was.
-		//
-		// **ONLY THE COMMENTS DIRECTLY ABOVE IT.** A comment block a blank line separates from the
-		// control is a heading over what follows: it is kept as `head`, verbatim and blank lines
-		// included, and written back above the control -- never read as its description.
-		function readControlNote(ctl, r) {
-			var sp = EngCalcs.lpnInpSplitPre(r.preLines, false), note,
-				trail = EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(r.cmt));
-			note = EngCalcs.lpnInpDescFromLines(sp.desc);
-			if (!note) { sp.head = sp.head.concat(sp.desc); sp.desc = []; }
-			if (EngCalcs.lpnInpHasComment(sp.head)) { ctl.head = sp.head; }
-			if (note) {
-				ctl.note = note;
-				// Kept verbatim unless it is the `;|` layout of an early Task 806 build, which goes back
-				// out as one line (lpnDescText()).
-				if ((sp.desc.length !== 1 || sp.desc[0] !== ';' + note)
-						&& !sp.desc.some(function (l) { return /^\s*;\|/.test(l); })) { ctl.noteSrc = sp.desc; }
-				if (trail) { ctl.tail = trail; EngCalcs.lpnDescTokSet(ctl, 'tail', r.cmt, trail); }
-			} else if (trail) {
-				ctl.note = trail;
-				ctl.noteAt = 'end';
-				EngCalcs.lpnDescTokSet(ctl, 'note', r.cmt, trail);
-			}
-		}
-		// A control that is not kept takes its comments with it, and the report says so.
-		function loseCtlPre(r) {
-			lostComments.CONTROLS = lostComments.CONTROLS.concat(r.preLines || []);
-			if (EngCalcs.lpnDescText(r.cmt)) { lostComments.CONTROLS.push(';' + r.cmt); }
-		}
-
 		// ---- nodes ----
 		var nodes = [], nodeIndex = {};
 		function addNode(n) { nodes.push(n); nodeIndex[n.id] = n; return n; }
@@ -1446,43 +1438,75 @@
 		//
 		// A control naming a link or a node the file does not contain is reported, not dropped in
 		// silence and not repaired -- the same treatment a dangling link gets.
-		rows = rawSections.CONTROLS || [];
-		if (haveClock) {
-			for (i = 0; i < rows.length; i++) {
-				var parsedCtl = EngCalcs.lpnParseControl(rows[i]);
-				if (!parsedCtl.ok) { drop('controls', [], parsedCtl.raw + ' (' + parsedCtl.error + ')'); loseCtlPre(rows[i]); continue; }
-				var ctl = parsedCtl.control, cLink = linkIndex[ctl.link];
-				if (!cLink) { drop('controls', [ctl.link], ctl.raw + ' (link not in file)', 'link'); loseCtlPre(rows[i]); continue; }
-				if (ctl.action.setting !== undefined) {
-					ctl.action.settingUnit = cLink.type === 'valve'
-						? valveSettingUnit((cLink.valveType || '').toUpperCase())
-						: null;
-				}
-				if (ctl.condition.kind === 'node') {
-					var cNode = nodeIndex[ctl.condition.node];
-					if (!cNode) { drop('controls', [ctl.condition.node], ctl.raw + ' (node not in file)', 'node'); loseCtlPre(rows[i]); continue; }
-					// 'head' and 'press' are keys of `scale` below, so a caller wanting SI
-					// multiplies by scale[unit] and never re-derives which is which.
-					ctl.condition.unit = cNode.type === 'junction' ? 'press' : 'head';
-				}
-				readControlNote(ctl, rows[i]);
-				controls.push(ctl);
-			}
+		// **A COMMENT IN [CONTROLS] IS A ROW OF ITS OWN** (Task 859; Tom, 2026-11-16, after Net3's
+		// `;Lake source operates only part of the day`, which sits over two controls: *"Yes."* to making
+		// each comment independent, as in EPANET's editor). A run of whole-line comments becomes one
+		// `{ comment: true, lines }` item in the list, in the order the file states, and nothing guesses
+		// which control it describes. `gap` is the count of blank lines the file had just before an item,
+		// so an unedited section goes back out character for character. A control's own Description is
+		// only a `;comment` trailing its line.
+		var ctlItems = [];
+		function pushCommentRows(lines, keepTrailingGap) {
+			var sc = EngCalcs.lpnInpCommentRows(lines);
+			sc.rows.forEach(function (cr) { ctlItems.push(cr); });
+			return keepTrailingGap ? sc.gap : 0;
 		}
-		// **WHAT FOLLOWS THE LAST PATTERN OR CONTROL** stays with it as `foot`, written back after
-		// it; with nothing to stay with, it is reported.
-		[['PATTERNS', patterns], ['CONTROLS', controls]].forEach(function (pair) {
-			var foot = sectionFoot[pair[0]], last = pair[1][pair[1].length - 1];
+		rows = rawSections.CONTROLS || [];
+		// A control not kept leaves its end-of-line comment reported and its blank lines to the next row, so nothing vanishes silently.
+		var carryGap = 0, lostCtlComments = [];
+		function ctlNotKept(r, gap) {
+			if (EngCalcs.lpnDescText(r.cmt)) { lostCtlComments.push(';' + r.cmt); }
+			carryGap = Math.max(carryGap, gap || 0);
+		}
+		for (i = 0; i < rows.length; i++) {
+			if (!haveClock) { lostCtlComments = lostCtlComments.concat(rows[i].preLines || []); if (EngCalcs.lpnDescText(rows[i].cmt)) { lostCtlComments.push(';' + rows[i].cmt); } continue; }
+			var firstNew = ctlItems.length;
+			var ctlGap = pushCommentRows(rows[i].preLines || [], true);
+			if (carryGap && ctlItems.length > firstNew) { ctlItems[firstNew].gap = Math.max(ctlItems[firstNew].gap || 0, carryGap); carryGap = 0; }
+			var parsedCtl = EngCalcs.lpnParseControl(rows[i]);
+			if (!parsedCtl.ok) { drop('controls', [], parsedCtl.raw + ' (' + parsedCtl.error + ')'); ctlNotKept(rows[i], ctlGap); continue; }
+			var ctl = parsedCtl.control, cLink = linkIndex[ctl.link];
+			if (!cLink) { drop('controls', [ctl.link], ctl.raw + ' (link not in file)', 'link'); ctlNotKept(rows[i], ctlGap); continue; }
+			if (ctl.action.setting !== undefined) {
+				ctl.action.settingUnit = cLink.type === 'valve'
+					? valveSettingUnit((cLink.valveType || '').toUpperCase())
+					: null;
+			}
+			if (ctl.condition.kind === 'node') {
+				var cNode = nodeIndex[ctl.condition.node];
+				if (!cNode) { drop('controls', [ctl.condition.node], ctl.raw + ' (node not in file)', 'node'); ctlNotKept(rows[i], ctlGap); continue; }
+				// 'head' and 'press' are keys of `scale` below, so a caller wanting SI
+				// multiplies by scale[unit] and never re-derives which is which.
+				ctl.condition.unit = cNode.type === 'junction' ? 'press' : 'head';
+			}
+			var trail = EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(rows[i].cmt));
+			if (trail) { ctl.note = trail; ctl.noteAt = 'end'; EngCalcs.lpnDescTokSet(ctl, 'note', rows[i].cmt, trail); }
+			ctlGap = Math.max(ctlGap, carryGap); carryGap = 0;
+			if (ctlGap) { ctl.gap = ctlGap; }
+			ctlItems.push(ctl);
+		}
+		if (sectionFoot.CONTROLS) {
+			if (haveClock) { pushCommentRows(sectionFoot.CONTROLS, false); }
+			else { lostCtlComments = lostCtlComments.concat(sectionFoot.CONTROLS); }
+		}
+		if (ctlItems.length) { delete ctlItems[0].gap; }
+		controls = EngCalcs.lpnControlsOnly(ctlItems);
+		// **WHAT FOLLOWS THE LAST PATTERN** stays with it as `foot`, written back after it.
+		(function () {
+			var foot = sectionFoot.PATTERNS, last = patterns[patterns.length - 1];
 			if (!foot) { return; }
 			while (foot.length && !foot[0].trim()) { foot.shift(); }
 			while (foot.length && !foot[foot.length - 1].trim()) { foot.pop(); }
-			if (last && (pair[0] === 'PATTERNS' || haveClock)) { last.foot = foot; }
-			else { lostComments[pair[0]] = lostComments[pair[0]].concat(foot); }
-		});
-		['PATTERNS', 'CONTROLS'].forEach(function (sec) {
-			var lost = lostComments[sec].filter(function (l) { return EngCalcs.lpnDescText(String(l).replace(/^\s*;/, '')); });
-			if (lost.length) { drop('comments', lost.map(function (l) { return l.trim(); }), sec); }
-		});
+			if (last) { last.foot = foot; }
+			else { lostPatternComments = lostPatternComments.concat(foot); }
+		})();
+		// A comment line this page has no place for is reported, never dropped in silence (blank ones carry no words).
+		function reportLost(list, code, sec) {
+			var lost = list.filter(function (l) { return EngCalcs.lpnDescText(String(l).replace(/^\s*;/, '')); });
+			if (lost.length) { drop(code, lost.map(function (l) { return l.trim(); }), sec); }
+		}
+		reportLost(lostPatternComments, 'comments', 'PATTERNS');
+		reportLost(lostCtlComments, 'control-comments', 'CONTROLS');
 
 		// ---- geometry ----
 		rows = rawSections.COORDINATES || [];
@@ -1714,6 +1738,8 @@
 			defaultPattern: defaultPattern,
 			times: times,
 			controls: controls,
+			// The controls and the comment rows between them, in the file's order (Task 859); what a document keeps.
+			controlItems: ctlItems,
 			nodes: nodes,
 			links: links,
 			labels: labels,
@@ -2388,6 +2414,114 @@
 			out.desc = out.desc.slice(g);
 		}
 		return out;
+	};
+	/**
+	 * A run of the file's own lines (whole-line comments and blank lines, as the reader keeps them)
+	 * cut into comment rows: each run of consecutive comment lines is one `{ comment: true, lines,
+	 * gap }`, `gap` being the blank lines directly before it. `gap` of the result is the blank lines
+	 * left after the last comment, for the item that follows. Nothing is added or lost.
+	 */
+	EngCalcs.lpnInpCommentRows = function (lines) {
+		var sc = EngCalcs.lpnInpLineRuns(lines, function () { return 'comment'; });
+		return { rows: sc.runs.map(function (r) {
+			var row = { comment: true, lines: r.lines };
+			if (r.gap) { row.gap = r.gap; }
+			return row;
+		}), gap: sc.gap };
+	};
+	/**
+	 * THE ONE CUTTER OF A RUN OF LINES INTO ITEMS (comment rows of Controls and Rules, and the non-rule text of Rules). `kindOf(line)` names
+	 * what a non-blank line is; consecutive lines of one kind are one run `{ kind, lines, gap }`, `gap` being the blank lines directly before
+	 * it (0 when none). A blank line ends a run. `gap` of the result is the blank lines after the last run. Nothing is added or lost.
+	 */
+	EngCalcs.lpnInpLineRuns = function (lines, kindOf) {
+		var runs = [], gap = 0, open = null, kind;
+		(lines || []).forEach(function (l) {
+			l = String(l);
+			if (!l.trim()) { gap++; open = null; return; }
+			kind = kindOf(l);
+			if (open && open.kind === kind) { open.lines.push(l); return; }
+			open = { kind: kind, lines: [l], gap: gap };
+			runs.push(open); gap = 0;
+		});
+		return { runs: runs, gap: gap };
+	};
+	/**
+	 * The blank lines to write before an item that had `gap` of them: two comment rows never meet without at least one, because consecutive
+	 * comment lines read back as ONE row. The one place that rule is written.
+	 */
+	EngCalcs.lpnGapBefore = function (gap, prevIsComment, isComment) {
+		return (prevIsComment && isComment) ? Math.max(gap | 0, 1) : (gap | 0);
+	};
+	/**
+	 * A list of controls (or of any items with `comment` and `gap`) after an edit has brought two comment rows together: the later one takes a
+	 * blank line, so the memory holds what the `.inp` will say and the two never read back as one. Comment rows stay where they are when the item
+	 * beside them is deleted or moved (a comment is a row of its own, so it is never deleted with a neighbour). Returns the list.
+	 */
+	EngCalcs.lpnControlsSeparate = function (list) {
+		(list || []).forEach(function (c, k) {
+			if (k && c && c.comment && list[k - 1] && list[k - 1].comment) { c.gap = EngCalcs.lpnGapBefore(c.gap, true, true); }
+		});
+		return list;
+	};
+	/**
+	 * A project saved before comments were rows of their own holds a control's description above it
+	 * (`note` with no `noteAt`, and `noteSrc`), a heading (`head`), a trailing block (`foot`) and a
+	 * `tail` comment. Those become comment rows in the same places. A control's own `note` is now only
+	 * ever the comment trailing its line, which is why it always carries `noteAt: 'end'`. A list that holds none of them is returned as it is.
+	 */
+	EngCalcs.lpnControlsUpgrade = function (list) {
+		var old = false, out = [], carry = 0;
+		(list || []).forEach(function (c) {
+			if (c && !c.comment && (c.head || c.foot || c.noteSrc || c.tail || (c.note && c.noteAt !== 'end'))) { old = true; }
+		});
+		if (!old) { return list || []; }
+		function rows(lines) {
+			var sc = EngCalcs.lpnInpCommentRows(lines);
+			sc.rows.forEach(function (r) { out.push(r); });
+			return sc.gap;
+		}
+		list.forEach(function (c) {
+			var lines = [], note, above, src, k, tailRows = null, tailText;
+			if (!c || c.comment) {
+				// Blank lines a foot left over belong to the comment row that follows it.
+				c = c && Object.assign({}, c);
+				if (c && carry) { c.gap = Math.max(c.gap | 0, carry); carry = 0; }
+				out.push(c);
+				return;
+			}
+			for (k = 0; k < carry; k++) { lines.push(''); }
+			carry = 0;
+			lines = lines.concat(Array.isArray(c.head) ? c.head : []);
+			note = EngCalcs.lpnDescText(c.note);
+			above = !!note && c.noteAt !== 'end';
+			if (above) {
+				src = Array.isArray(c.noteSrc) && EngCalcs.lpnInpDescFromLines(c.noteSrc) === note
+					? c.noteSrc : [';' + EngCalcs.lpnDescInline(note)];
+				lines = lines.concat(src);
+			}
+			c = Object.assign({}, c);
+			if (c.tok) { c.tok = Object.assign({}, c.tok); }
+			delete c.head; delete c.noteSrc;
+			if (above) {
+				delete c.note;
+				if (c.tok) { delete c.tok.note; }
+			}
+			// The `tail` becomes the trailing note; when the control already has one it is kept as a comment row after the control. Never dropped.
+			tailText = EngCalcs.lpnDescText(c.tail);
+			if (tailText && !c.note) { c.note = tailText; c.noteAt = 'end'; if (c.tok && c.tok.tail !== undefined) { c.tok.note = c.tok.tail; } }
+			else if (tailText) { tailRows = [';' + EngCalcs.lpnDescInline(tailText)]; }
+			delete c.tail;
+			if (c.tok) { delete c.tok.tail; if (!Object.keys(c.tok).length) { delete c.tok; } }
+			k = rows(lines);
+			if (k) { c.gap = k; }
+			out.push(c);
+			if (tailRows) { rows(tailRows); }
+			if (Array.isArray(c.foot)) { carry = rows(c.foot); }
+			delete c.foot;
+		});
+		if (out.length) { delete out[0].gap; }
+		return EngCalcs.lpnControlsSeparate(out);
 	};
 	EngCalcs.lpnInpHasComment = function (lines) {
 		return (lines || []).some(function (l) { return /^\s*;/.test(String(l)); });
@@ -3431,35 +3565,38 @@
 		// **EXCEPT ONE NAMING AN ASSET THIS SCENARIO LEAVES OUT** (Task 781): EPANET rejects a file
 		// whose control names a link or node it does not contain, so the line is not written and the
 		// difference says which.
-		// **ITS DESCRIPTION GOES BACK WHERE IT CAME FROM**: the comment lines above it, verbatim
-		// while they still say the description (`noteSrc`), else one `;` line; or on the control's
-		// own line when it was a trailing comment there. See readControlNote() in the reader.
+		// **A COMMENT ROW GOES BACK AS ITS OWN LINES, AND A CONTROL'S DESCRIPTION ON ITS OWN LINE**, each
+		// after the blank lines (`gap`) the file had before it.
 		var offControls = [];
+		// A skipped control hands its blank lines to the next row written, and two comment rows never meet without one
+		// (consecutive comment lines read back as ONE row).
+		var prevWasComment = false, carryGapOut = 0;
+		function gapLines(item) {
+			var g = EngCalcs.lpnGapBefore(Math.max(item.gap | 0, carryGapOut), prevWasComment, !!item.comment);
+			carryGapOut = 0;
+			prevWasComment = !!item.comment;
+			if (!controlRows.length) { return; }
+			for (var k = 0; k < g; k++) { controlRows.push(''); }
+		}
 		(doc.controls || []).forEach(function (ctl) {
-			var note, src, line, cn;
+			var note, line, cn;
+			if (ctl && ctl.comment && Array.isArray(ctl.lines)) {
+				gapLines(ctl);
+				ctl.lines.forEach(function (l) { controlRows.push(String(l)); });
+				return;
+			}
 			if (!ctl || !ctl.raw) { return; }
 			cn = ctl.condition && ctl.condition.kind === 'node' ? ctl.condition.node : null;
 			if ((ctl.link !== undefined && ctl.link !== null && offLink[ctl.link]) || (cn !== null && omitted[cn])) {
 				offControls.push(String(ctl.raw).trim());
+				carryGapOut = Math.max(carryGapOut, ctl.gap | 0);
 				return;
 			}
 			note = EngCalcs.lpnDescText(ctl.note);
 			line = ctl.raw;
-			// A heading the file stated above it, blank line and all (readControlNote()).
-			if (Array.isArray(ctl.head)) { ctl.head.forEach(function (l) { controlRows.push(String(l)); }); }
-			if (note && ctl.noteAt === 'end') {
-				line += ' ;' + EngCalcs.lpnDescInlineOf(ctl, 'note', note);
-			} else if (note) {
-				src = Array.isArray(ctl.noteSrc) ? ctl.noteSrc : null;
-				if (src && EngCalcs.lpnInpDescFromLines(src) === note) {
-					src.forEach(function (s) { controlRows.push(String(s)); });
-				} else {
-					controlRows.push(';' + EngCalcs.lpnDescInline(note));
-				}
-			}
-			if (ctl.tail && ctl.noteAt !== 'end') { line += ' ;' + EngCalcs.lpnDescInlineOf(ctl, 'tail', ctl.tail); }
+			if (note) { line += ' ;' + EngCalcs.lpnDescInlineOf(ctl, 'note', note); }
+			gapLines(ctl);
 			controlRows.push(line);
-			if (Array.isArray(ctl.foot)) { ctl.foot.forEach(function (l) { controlRows.push(String(l)); }); }
 		});
 		if (offControls.length) { diff('inactive-control', offControls); }
 		// The same for a [RULES] block (EngCalcs.lpnRuleBlocks() reads the ids it names). Only when a
@@ -3467,10 +3604,20 @@
 		// as the text it came in as.
 		var ruleLines = doc.rules || [], offRules = [];
 		if (ruleLines.length && (Object.keys(offLink).length || Object.keys(omitted).length)) {
-			var keptRules = [];
-			EngCalcs.lpnRuleBlocks(ruleLines).forEach(function (b) {
-				var off = b.nodes.some(function (id) { return omitted[id]; }) || b.links.some(function (id) { return offLink[id]; });
-				if (off) { offRules.push(b.name || '?'); } else { keptRules = keptRules.concat(b.lines); }
+			// Only a rule's own lines go; the comments and blank lines around it stay (they are rows of their own), and two comment
+			// rows the removal brings together get a blank line between them, so they read back as two.
+			var keptRules = [], removed = false;
+			function isCom(l) { return /^\s*;/.test(String(l)); }
+			(EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(ruleLines) : []).forEach(function (c) {
+				var body = c.lines.slice(0, c.lines.length - (c.trailing || 0)), tail = c.lines.slice(body.length), blk, off = false;
+				if (c.name) {
+					blk = EngCalcs.lpnRuleBlocks(body)[0];
+					off = !!blk && (blk.nodes.some(function (id) { return omitted[id]; }) || blk.links.some(function (id) { return offLink[id]; }));
+				}
+				if (off) { offRules.push(c.name || '?'); removed = true; } else { keptRules = keptRules.concat(body); removed = removed && !body.length; }
+				if (tail.length && removed && keptRules.length) { for (var bl = EngCalcs.lpnGapBefore(0, isCom(keptRules[keptRules.length - 1]), isCom(tail[0])); bl > 0; bl--) { keptRules.push(''); } }
+				if (tail.length) { removed = false; }
+				keptRules = keptRules.concat(tail);
 			});
 			if (offRules.length) { diff('inactive-rule', offRules); ruleLines = keptRules; }
 		}

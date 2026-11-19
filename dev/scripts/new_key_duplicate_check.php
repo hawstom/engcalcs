@@ -34,6 +34,7 @@ $allow = [
     'lpn_inpup_i_controls'     => 'lowercase noun inside a sentence, not a heading',
     'lpn_dxfnet_held_custom' => 'lowercase noun in a list of what a DXF cannot hold, not a heading',
     'lpn_inpup_i_rules'        => 'lowercase noun inside a sentence, not a heading',
+    'lpn_inp_dup_and'          => 'conjunction joining line numbers in a list; lpn_find_q_and is the Find query keyword',
 ];
 
 function nkd_norm($s) {

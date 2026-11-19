@@ -4965,6 +4965,13 @@ OBSERVED (re-verify; real Chromium, master bff7bd03e vs branch, identical scale 
 - Leaders through a label/node: no net regression; leader starting inside own end symbol (short pipes) 1-7 per view, 0 on master (by design).
 NOT DONE: mutation test of harnesses; builder's own harnesses; Tom's window; light/dark.
 
+## 2026-11-13 feat/library-order (c15ce4678..448c70096), Task 859
+OBSERVED (re-verify; real Chromium, branch worktree vs master 947d5ad31; probes in scratchpad p1-p4.js, cmp.js; pictures _panel/www/img/library-order/perry-*.png):
+- Buttons present and working in all six sections (Net1; Patterns/Curves/Pipe types/Fittings show none until 2+ items). Click selects (blue bar); top/up/down/bottom move; one Ctrl+Z per move; Ctrl+Y redoes; selection follows an item by id. Phone 420 px: row fits (buttons 31x23 px), sticky row holds while scrolling, touch tap selects and moves.
+- LEAK check: entry HTML after Add / typing / Delete identical master vs branch in all six sections (0 differences); entries sit 6 px lower when the tool row shows; Add button stays visible on scroll (sticky) where master's scrolls away. No console errors, no new dialogs.
+- DEFECT (OBSERVED): renaming the selected item's ID (type, then blur or press a Move button) loses the selection: buttons go grey, and a Move pressed straight after typing is swallowed (the box rebuilds under the click). Curves, Patterns checked; touch and mouse.
+- UX note: the first view is four grey buttons with no visible cue to select; the only hint is the hover tip (it does show on a disabled button). Tap targets 31x23 px.
+- library-order-harness.js 159 checks pass (it extracts the real functions). NOT DONE: mutation test, saved-on-master file opened literally (verified by diff: no load/serialize code touched, and Net1's list order identical on both trees), .inp export byte-exactness re-run, Tom's own window, light/dark.
 
 ## 2026-11-11 feat/contour-controls (d563be90d), Task 858
 OBSERVED (re-verify; real Chromium, Net3, master 27710ab0f vs branch; probes in scratchpad q/):
@@ -5027,3 +5034,21 @@ OBSERVED (re-verify; real Chromium via the branch's own env.js server, Net1 well
 - Old fixture (dev/lpn-spike/assembly-before-round8.lwn, not fixtures/) opens with W1R/W1V/W1D/W1/W1P, tank well W2 with L5/J3/L6/T1; Explode+Undo ok. Pump+ and Valve+: headings Junction/Pump|Valve/Junction, Explode and Undo ok. .inp export of a Well and a Well with tank carries ID= TEE= TANK= PIPES=; reimport gives the same IDs, headings, flows, pressures.
 - Symbol tint equals reservoir and tank (same class, one colour). Phone 390x844: box fits, no sideways scroll, Well label hidden at the opening view.
 - NOT DONE: scenario in the browser (my New-scenario click made no scenario), Tables and Find renames, rename refusal wording (the harness answers dialogs, a plain junction shows none either), builder's harness mutation test, light/dark.
+
+## 2026-11-16 feat/library-order round 5 (c5ae4391a), Task 859: comment rows, bold labels
+OBSERVED (re-verify; real Chromium via the branch's env.js server, Net3 gallery example, scratchpad s2.js/s3.js/cmp.php):
+- Five browser harnesses run alone: user-guide-library 50 pass, library-description-browser all passed, import-export-menu 60/60, table-export-dialog 81/81, box-view-visible all passed. inp-export 4497 and inp-roundtrip-net3 pass.
+- Net3 Controls: 2 comment rows + 6 control rows; comment rows have a plain "Comment" label, no Understood tick, no bordered input. Move top/up/down/bottom each work on a comment row; Add a comment appends an empty row; Delete works. Export of the untouched example: [CONTROLS] lines identical to reference Net3.inp, one blank line at the end where the reference has two (section order differs).
+- After moving a comment, its old blank line stays at the old list position (blank between Link 10 OPEN and CLOSED), not with the comment.
+- Bold in the Controls ? entry: weight 700, inside the entry, no sideways scroll, in en, es, ar, he. Bold words differ from the language file's label strings in 14 files: add-label differs in ar bg bn cs fa km my ps pt tr ur; time label differs in he my ps ru uk ur. In ar, bg, cs the button itself reads "rule" (Add a rule) while the bold says "control".
+- No "EPANET engine only" claim in lib/ or guide text; only a code comment in js/looped-network.js.
+- NOT DONE: other 22 languages visually, Arabic glyphs (headless font lacks them, boxes only), phone, import-from-another-project path, harness mutation tests.
+
+## 2026-11-18 feat/library-order round 6 (88e42e506), Task 859: manual bold everywhere, comment rows, import receipt
+OBSERVED (re-verify; real Chromium via the branch's env.js server, Net3 example, scratchpad p6-p10.js):
+- check_all --fast: only payload freshness fails (expected). guide-bold-labels 846 pass, library-order 249 pass, library-import pass.
+- Net3 Controls: add a comment, type, move up with the Move buttons: it lands between controls, export writes a blank line before it. Delete the control between two comments: both stay as two rows with one blank line between. Autosave+reload, .inp export and re-import: same rows, identical [CONTROLS] text. Net3 has no rules (rules not walked in the browser).
+- Library import (Net3.lwn into Net3): receipt line "Comment rows not copied in, because the item below each was not copied, or none follows: 2" sits ABOVE the Skipped line; hard to parse.
+- Manual: 16 of 18 box entries carry bold (700), no sideways scroll; Demand categories and Screenshot box none. Entry text read from the language file with <strong> marked, not every sentence rendered.
+- DEFECT (OBSERVED, text): Scenarios example table header half bold (Highest velocity, No. of overrides, Time (hr) bold; Lowest pressure, Scenario, Junction, Pressure (psi), Link, Velocity (ft/sec), Demand multiplier plain). Contour box entry: "Interval and Labels" plain beside bold Show contour lines, and Labels bold earlier in same entry. "(see **Replace and Undo**)" bolds a manual heading, not a screen label. Controls/Rules/Patterns/Curves/Fittings first cells plain beside bold "Pipe types". Undo, Cancel, Stop, Copy, Delete, Replace(verb) plain throughout. Settings section list: Calculation/Credits plain, Symbology/Map/Page bold.
+- NOT DONE: ten entries opened through each ? button and looked at; Rules comment rows in the browser; phone; other languages; mutation test.
