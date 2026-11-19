@@ -5044,3 +5044,9 @@ OBSERVED (re-verify; real Chromium via env.js server, probes in scratchpad p/: s
 - Beside ink (2 to 30 px) mouse and touch: selects NOTHING on the branch AND on master 8100 (Net3 Junction 601). Not a regression; contradicts "the nearest thing".
 - 1 px fix: screenToWorld() and worldToScreen() still omit svg.clientLeft/Top; only picking, snip, map rect use it.
 - NOT DONE: mutation test of the harnesses; phone fixture; light/dark; other zooms than 0/4/8; 12 and 20 notches.
+
+## 2026-11-18 feat/pick-chooser round 7 (32a927688), Task 861: finger's exact point on ink
+OBSERVED (re-verify; real Chromium via env.js server, scratchpad perry2.js: taps on Pump 335's free ink, then 3/6/9/12 px off it, at 0/2/4/6/8 notches, phone 390x844 touch and PC):
+- Branch harnesses pick-chooser-zoom (54) and pick-chooser-browser (153) pass. Phone taps ON Pump 335's ink select the pump at every notch 0-8 (the one overlap point with N61 at 8 notches opens the box, correct).
+- Pump 335 is 13x18 px at the opening view, 9x12 at 4 notches, 6x8 at 8 notches (N60-N61 9 px apart). Phone tap 3 px OFF the ink: pump up to 2 notches, N61 from 4 notches (off3), River/N60/N61/601 at 6 px+. So the fix helps only a finger that lands exactly on the glyph; a 3 px miss still selects N61 at 4+ notches. PC: no tap off ink selects a node.
+- NOT DONE: Tank 1 four notches, Lake, test project HJ by own probe (relied on harnesses); mutation test; light/dark.
