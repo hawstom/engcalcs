@@ -2562,6 +2562,7 @@ $ec_lang['lpn_storage_unreadable']='Nije spremljeno. Ovaj se projekt nije mogao 
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='Zasluge';
+$ec_lang['lpn_about_source']='Izvorni kôd';
 $ec_lang['lpn_help_welcome']='Stranica dobrodošlice';
 $ec_lang['lpn_about_license']='Licencirano prema GNU General Public License v3.0 ili novijoj.';
 $ec_lang['lpn_about_dedication']='Voljen si i cijenjen zauvijek, nemaš se čega bojati i ne uništavaš sve.';
@@ -5333,7 +5334,7 @@ $ec_lang['lpn_inp_dup_curve_entry']='Krivulja {id} (retci {lines})';
 $ec_lang['lpn_inp_dup_and']=' i ';
 $ec_lang['lpn_inp_dup_comma']=', ';
 $ec_lang['lpn_inp_drop_control_comments']='Ovi komentari na kraju redaka kontrola nisu uvezeni, jer te kontrole nisu uvezene. Svaka kontrola koja se mogla uvesti uvezena je.';
-$ec_lang['lpn_inp_drop_quality_options']='Ova datoteka navodi EPANET opcije kvalitete vode: opciju Quality, koja određuje vrstu analize kvalitete vode, te dvije postavke koje idu uz kemikaliju, Diffusivity i Quality tolerance. Sve tri su zadržane i koriste se. Starost vode, praćenje izvora i analiza kemikalije svaka se ovdje izračunava, a dvije postavke kemikalije koriste se kad se izračunava analiza kemikalije. Sve se zapisuju natrag ako spremite EPANET datoteku.';
+$ec_lang['lpn_inp_drop_quality_options']='Ova datoteka navodi EPANET opcije kvalitete vode: opciju Kvaliteta vode, koja određuje vrstu analize kvalitete vode, te dvije postavke koje idu uz kemikaliju, Difuzivnost i Tolerancija kakvoće. Sve tri su zadržane i koriste se. Starost vode, praćenje izvora i analiza kemikalije svaka se ovdje izračunava, a dvije postavke kemikalije koriste se kad se izračunava analiza kemikalije. Sve se zapisuju natrag ako spremite EPANET datoteku.';
 $ec_lang['lpn_inpalt_lead']='Ova datoteka mijenja vrijednosti u kategorijama u nastavku. Za svaku kategoriju odaberite alternativu koja prima njezine vrijednosti.';
 $ec_lang['lpn_inpalt_base_note']='Svaki scenarij nasljeđuje alternativu Baza, pa njezin odabir mijenja vrijednosti u svakom scenariju.';
 $ec_lang['lpn_inpalt_heading']='Alternativa za {category}';

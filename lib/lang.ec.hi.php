@@ -2562,6 +2562,7 @@ $ec_lang['lpn_storage_unreadable']='सहेजा नहीं गया। �
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='श्रेय';
+$ec_lang['lpn_about_source']='स्रोत कोड';
 $ec_lang['lpn_help_welcome']='स्वागत पृष्ठ';
 $ec_lang['lpn_about_license']='GNU General Public License v3.0 या बाद के संस्करण के अंतर्गत लाइसेंस प्राप्त।';
 $ec_lang['lpn_about_dedication']='आप हमेशा के लिए प्यार किए जाते हैं और संजोए जाते हैं, आपको डरने की कोई ज़रूरत नहीं, और आप सब कुछ बर्बाद नहीं कर रहे हैं।';
@@ -5333,7 +5334,7 @@ $ec_lang['lpn_inp_dup_curve_entry']='कर्व {id} (पंक्तिया
 $ec_lang['lpn_inp_dup_and']=' और ';
 $ec_lang['lpn_inp_dup_comma']=', ';
 $ec_lang['lpn_inp_drop_control_comments']='नियंत्रण पंक्तियों के अंत की ये टिप्पणियाँ आयात नहीं की गईं, क्योंकि वे नियंत्रण आयात नहीं किए गए थे। जो भी नियंत्रण आयात हो सकता था, वह आयात हुआ।';
-$ec_lang['lpn_inp_drop_quality_options']='इस फ़ाइल में EPANET जल गुणवत्ता विकल्प हैं: Quality विकल्प, जो जल गुणवत्ता विश्लेषण का प्रकार बताता है, और रसायन से जुड़ी दो सेटिंग्स, Diffusivity और Quality tolerance। तीनों रखी और उपयोग की जाती हैं। जल आयु, स्रोत अनुरेखण और रसायन विश्लेषण, हर एक की यहाँ गणना होती है, और रसायन विश्लेषण की गणना होने पर दोनों रसायन सेटिंग्स का उपयोग होता है। EPANET फ़ाइल सहेजने पर इन सबको वापस लिखा जाता है।';
+$ec_lang['lpn_inp_drop_quality_options']='इस फ़ाइल में EPANET जल गुणवत्ता विकल्प हैं: Quality विकल्प, जो जल गुणवत्ता विश्लेषण का प्रकार बताता है, और रसायन से जुड़ी दो सेटिंग्स, विसरणशीलता और गुणवत्ता सहनशीलता। तीनों रखी और उपयोग की जाती हैं। जल आयु, स्रोत अनुरेखण और रसायन विश्लेषण, हर एक की यहाँ गणना होती है, और रसायन विश्लेषण की गणना होने पर दोनों रसायन सेटिंग्स का उपयोग होता है। EPANET फ़ाइल सहेजने पर इन सबको वापस लिखा जाता है।';
 $ec_lang['lpn_inpalt_lead']='यह फ़ाइल नीचे की श्रेणियों में मान बदलती है। हर श्रेणी के लिए वह ऑल्टरनेटिव चुनें जो उसके मान प्राप्त करेगा।';
 $ec_lang['lpn_inpalt_base_note']='हर परिदृश्य आधार ऑल्टरनेटिव को इनहेरिट करता है, इसलिए उसे चुनने से हर परिदृश्य के मान बदल जाते हैं।';
 $ec_lang['lpn_inpalt_heading']='{category} के लिए ऑल्टरनेटिव';

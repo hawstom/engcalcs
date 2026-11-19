@@ -2562,6 +2562,7 @@ $ec_lang['lpn_storage_unreadable']='لم يُحفظ. تعذّرت قراءة ه�
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='شكر وتقدير';
+$ec_lang['lpn_about_source']='الشيفرة المصدرية';
 $ec_lang['lpn_help_welcome']='صفحة الترحيب';
 $ec_lang['lpn_about_license']='مرخّص بموجب رخصة GNU العمومية العامة الإصدار 3.0 أو أحدث.';
 $ec_lang['lpn_about_dedication']='أنت محبوب وعزيز إلى الأبد، ولا شيء تخشاه، وأنت لا تُفسد كل شيء.';

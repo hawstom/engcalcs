@@ -2562,6 +2562,7 @@ $ec_lang['lpn_storage_unreadable']='לא נשמר. לא ניתן היה לקרו
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='קרדיטים';
+$ec_lang['lpn_about_source']='קוד מקור';
 $ec_lang['lpn_help_welcome']='עמוד ברוכים הבאים';
 $ec_lang['lpn_about_license']='מופץ תחת רישיון GNU הציבורי הכללי גרסה 3.0 ומעלה.';
 $ec_lang['lpn_about_dedication']='אתה אהוב ויקר לנצח, אין לך ממה לפחד, ואתה לא הורס הכול.';
@@ -5333,7 +5334,7 @@ $ec_lang['lpn_inp_dup_curve_entry']='עקומה {id} (שורות {lines})';
 $ec_lang['lpn_inp_dup_and']=' ו-';
 $ec_lang['lpn_inp_dup_comma']=', ';
 $ec_lang['lpn_inp_drop_control_comments']='הערות אלה בסוף שורות בקרה לא יובאו, מפני שהבקרות עצמן לא יובאו. כל בקרה שאפשר היה לייבא יובאה.';
-$ec_lang['lpn_inp_drop_quality_options']='קובץ זה קובע אפשרויות איכות מים של EPANET: אפשרות האיכות, הקובעת את סוג ניתוח איכות המים, ושתי הגדרות הנלוות לחומר כימי, מְפִיצוּת וסבילות איכות. כל שלוש נשמרות ומשמשות. גיל מים, מעקב מקור וניתוח חומר כימי מחושבים כאן, וההגדרות הכימיות משמשות כשמחושב ניתוח חומר כימי. כולן נכתבות בחזרה אם תשמרו קובץ EPANET.';
+$ec_lang['lpn_inp_drop_quality_options']='קובץ זה קובע אפשרויות איכות מים של EPANET: אפשרות האיכות, הקובעת את סוג ניתוח איכות המים, ושתי הגדרות הנלוות לחומר כימי, דיפוזיביות וסבילות איכות. כל שלוש נשמרות ומשמשות. גיל מים, מעקב מקור וניתוח חומר כימי מחושבים כאן, וההגדרות הכימיות משמשות כשמחושב ניתוח חומר כימי. כולן נכתבות בחזרה אם תשמרו קובץ EPANET.';
 $ec_lang['lpn_inpalt_lead']='קובץ זה משנה ערכים בקטגוריות שלהלן. בכל קטגוריה, בחרו את החלופה שמקבלת את הערכים שלה.';
 $ec_lang['lpn_inpalt_base_note']='כל תרחיש יורש את חלופת הבסיס, ולכן בחירה בה משנה את הערכים בכל תרחיש.';
 $ec_lang['lpn_inpalt_heading']='חלופה עבור {category}';
@@ -5353,8 +5354,8 @@ $ec_lang['lpn_settings_color_ramp_node_tip']='קובע את צבעי הצמתי�
 $ec_lang['lpn_time_epanet_fallback']='פותר EPANET לא נטען, ולכן הפותר המובנה הריץ רשת זו.';
 $ec_lang['lpn_time_epanet_fallback_why']='הפותר המובנה הריץ רשת זו, מפני שלא ניתן היה להשתמש בפותר EPANET. {reason}';
 $ec_lang['lpn_settings_solver']='פותר';
-$ec_lang['lpn_quality_diffusivity']='מְפִיצוּת';
-$ec_lang['lpn_quality_diffusivity_tip']='EPANET קורא ערך הגדול מ-0.0001 כיחס למְפִיצוּת הכלור במים, וערך של 0.0001 או פחות כמְפִיצוּת עצמה, ב-ft²/s ביחידות ספיקה אמריקאיות וב-m²/s ביחידות ספיקה מטריות. ריק משתמש בברירת המחדל של EPANET, 1.0.';
+$ec_lang['lpn_quality_diffusivity']='דיפוזיביות';
+$ec_lang['lpn_quality_diffusivity_tip']='EPANET קורא ערך הגדול מ-0.0001 כיחס לדיפוזיביות הכלור במים, וערך של 0.0001 או פחות כדיפוזיביות עצמה, ב-ft²/s ביחידות ספיקה אמריקאיות וב-m²/s ביחידות ספיקה מטריות. ריק משתמש בברירת המחדל של EPANET, 1.0.';
 $ec_lang['lpn_library_import_comments']='שורות הערה שהועתקו עם הפריטים שיובאו: {n}';
 $ec_lang['lpn_library_import_comments_left']='שורות הערה שהושמטו מפני שהפריט שמתחתיהן דולג, או שאין אחריהן דבר: {n}';
 $ec_lang['lpn_inp_export_flat_label_semicolon']='טקסטים ({n}) בפרויקט זה מכילים נקודה-פסיק, ו-EPANET חותך טקסט בנקודה-פסיק הראשונה. כל אחד נכתב בקובץ במלואו, ו-EPANET יקרא רק את החלק שלפני הנקודה-פסיק.';
