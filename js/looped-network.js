@@ -10583,60 +10583,44 @@ var EngCalcs = EngCalcs || {};
 	// the desktop design. The ONE KNOB is still one knob -- reachPx(e) answers per press for both
 	// hands at every call site -- it is the PRECEDENCE that a finger gets and a pointer does not.
 	function touchNodeOver(cx, cy, hit) {
-		var n, hn, best = null, bestPx = Infinity, i, d, w, r, far, ink, pick;
+		var ink, pick;
 		// What a node never outranks (a vertex handle, a meter, a grip, ...) is kept before anything is measured.
 		if (hit && !(hit.dataset && hit.dataset.node !== undefined) && !nodeOutranks(hit)) { return hit; }
 		// A node's or pipe's data label over a symbol is read as it always was (the node outranks it, else it stays).
 		ink = hit && hit.dataset && (hit.dataset.nodelbl !== undefined || hit.dataset.linklbl !== undefined) ? [] : Geom.pickInkHits(pickItemsNear(cx, cy, 0), cx, cy);
 		// A finger whose POINT is on exactly one symbol's drawn ink (a pump or valve glyph, a Text, a Shape, a node)
-		// meant that symbol, whatever node is within reach. Two inks are the chooser's. The point is all this needs.
+		// meant that symbol, whatever node is within reach.
 		if (ink.length === 1) {
-			pick = ink[0].kind === 'node' ? (nodeEls[ink[0].id] && nodeEls[ink[0].id].circle)
-				: ink[0].kind === 'link' ? (linkEls[ink[0].id] && linkEls[ink[0].id].symbolHit)
-				: ink[0].kind === 'label' ? (labelEls[ink[0].id] && labelEls[ink[0].id].text)
-				: (shapeEls[ink[0].id] && shapeEls[ink[0].id].g);
+			pick = inkElement(ink[0]);
 			if (pick) { return pick; }
 		}
-		if (hit && hit.dataset && hit.dataset.node !== undefined) {
-			// A node's band was hit. Where the press is on that node's own ink it stays; where it is not
-			// but IS on another node's ink (a band drawn on top of a neighbour's centre), the finger
-			// meant the one under it, the nearest centre if several.
-			hn = nodeById(hit.dataset.node);
-			r = svg.getBoundingClientRect();
-			if (!hn || nodeInkDistPx(hn, cx, cy, r) === 0) { return hit; }
-			w = screenToWorld(cx, cy);
-			// Only a node whose centre is within the largest symbol of the press can have ink under it.
-			far = Math.max(nodeSymbolSize({ type: 'tank' }).w, nodeSymbolSize({ type: 'reservoir' }).w, 2 * JUNCTION_R * symbolFactor());
-			for (i = 0; i < doc.nodes.length; i++) {
-				n = doc.nodes[i];
-				if (!nodeEls[n.id] || !nodeEls[n.id].circle) { continue; }
-				d = Math.hypot(nodeDrawX(n) - w.x, nodeDrawY(n) - w.y);
-				if (d > far || d >= bestPx || !hitIsVisible(nodeEls[n.id].circle) || nodeInkDistPx(n, cx, cy, r) !== 0) { continue; }
-				best = n; bestPx = d;
-			}
-			if (best) { return nodeEls[best.id].circle; }
-			// **ON NO INK AT ALL, THE NODE WHOSE INK IS NEAREST, NOT THE ONE WHOSE BAND HAPPENED TO BE HIT** (Tom, 2026-11-18:
-			// zoomed far out "I get either reservoir River or junction 61"). A reservoir keeps its size on the screen while a
-			// junction and a pump shrink to a few px beneath it, so the reservoir's band (its silhouette stroked wide) lies over
-			// the whole cluster and took every press, junction 61 two px away or not.
-			return nearestNodeByInk(cx, cy, hn, r, hit);
-		}
-		if (!nodeOutranks(hit)) { return hit; }
-		n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX);
-		return (n && nodeEls[n.id]) ? nodeEls[n.id].circle : hit;
+		// Two or more inks are the chooser's: whatever was hit goes on to pickPressAt(), which reads the point itself.
+		if (ink.length > 1) { return hit; }
+		// **ON NO INK AT ALL, THE SYMBOL WHOSE INK IS NEAREST, WHICHEVER BAND WAS HIT** (Tom, 2026-11-18: zoomed far out "I get
+		// either reservoir River or junction 61"). A reservoir keeps its size on the screen while a junction and a pump shrink to a
+		// few px beneath it, so its band lay over the whole cluster and took every press. One rule for a node band, a pipe's halo and
+		// bare map alike, so the outcome does not depend on which band is on top.
+		return nearestInkNearScreen(cx, cy, TOUCH_REACH_PX) || hit;
 	}
-	// Of the nodes whose centre is within a finger's reach of a press that is on no node's ink, the one whose drawn ink is
-	// nearest (the hit node's own distance counts, and it keeps a tie). Reports the node's circle, else `hit`.
-	function nearestNodeByInk(cx, cy, hn, rect, hit) {
-		var w = screenToWorld(cx, cy), best = hn, bestD = nodeInkDistPx(hn, cx, cy, rect), i, n, d, ink;
-		for (i = 0; i < doc.nodes.length; i++) {
-			n = doc.nodes[i];
-			if (n === hn || !nodeEls[n.id] || !nodeEls[n.id].circle) { continue; }
-			if (Math.hypot(nodeDrawX(n) - w.x, nodeDrawY(n) - w.y) * state.s > TOUCH_REACH_PX || !hitIsVisible(nodeEls[n.id].circle)) { continue; }
-			ink = nodeInkDistPx(n, cx, cy, rect);
-			if (ink < bestD) { best = n; bestD = ink; }
+	// The element a picked ink item stands for (the one a plain press on it would hit), or null.
+	function inkElement(m) {
+		return m.kind === 'node' ? (nodeEls[m.id] && nodeEls[m.id].circle)
+			: m.kind === 'link' ? (linkEls[m.id] && linkEls[m.id].symbolHit)
+			: m.kind === 'label' ? (labelEls[m.id] && labelEls[m.id].text)
+			: (shapeEls[m.id] && shapeEls[m.id].g);
+	}
+	// The node or pump/valve symbol whose drawn ink is nearest the press, within `reach` px of it, as its element; null when none
+	// (a node wins a tie). pickItemsNear() bounds the candidates by the press, the reach and the largest symbol, so a tank or
+	// reservoir whose ink is nearest is eligible however far its centre is.
+	function nearestInkNearScreen(cx, cy, reach) {
+		var items = pickItemsNear(cx, cy, reach), best = null, bestD = reach, i, m, d;
+		for (i = 0; i < items.length; i++) {
+			m = items[i];
+			if (m.soft || (m.kind !== 'node' && m.kind !== 'link') || !inkElement(m)) { continue; }
+			d = Geom.pickExtentDistance(m, cx, cy);
+			if (d < bestD || (d === bestD && best && m.kind === 'node' && best.kind !== 'node') || (!best && d <= bestD)) { best = m; bestD = d; }
 		}
-		return (best && nodeEls[best.id] && nodeEls[best.id].circle) || hit;
+		return best ? inkElement(best) : null;
 	}
 	function nearestNodeNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;

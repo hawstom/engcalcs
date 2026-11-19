@@ -17,7 +17,7 @@
 //      opening view and 4 and 8 notches out; a tap on a lone junction far from anything selects it with no box; a tap on
 //      Tank 1 at 4 notches out gives its box;
 //   B4. phone 412 x 915 at 2.6x, 12 notches out (the cluster is a few px across): a tap on the ink of Pump 335 and a junction
-//      opens the box; a tap on no ink beside Junction 61 selects the junction, not the reservoir whose band lies over the cluster.
+//      opens the box; a tap on no ink beside Junction 61 selects the junction, and one beside the pump's glyph selects the pump, not the reservoir whose band lies over the cluster.
 // The cases built by hand are in pick-chooser-browser-harness.js.
 //
 //   node dev/lpn-spike/pick-chooser-zoom-browser-harness.js   (takes the browser lock itself)
@@ -394,39 +394,70 @@ async function main() {
 		await zoomOut(X, 12);
 		const xRows = () => X.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => b.textContent.trim()));
 		const xSel = () => X.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas .lpn-selected')).map((e) => e.dataset.node ? 'n' + e.dataset.node : (e.dataset.link !== undefined ? 'l' + e.dataset.link : (e.nextElementSibling && e.nextElementSibling.dataset.link !== undefined ? 'l' + e.nextElementSibling.dataset.link : 'x'))).sort().join(','));
+		// A known-empty map point, far from every node and glyph (the browser answers the bare svg): the deselect tap goes there.
+		const empty = await X.page.evaluate(() => {
+			const cv = document.getElementById('lpn_canvas'), r = cv.getBoundingClientRect(), pts = Array.from(document.querySelectorAll('#lpn_canvas [data-node], #lpn_canvas path.lpn-link-symbol-hit')).map((e) => e.getBoundingClientRect());
+			for (let x = r.left + 12; x < r.right - 12; x += 12) { for (let y = r.top + 12; y < r.bottom - 12; y += 12) {
+				const t = document.elementFromPoint(x, y);
+				if ((t === cv || (t && t.id === 'lpn_canvas')) && pts.every((b) => x < b.left - 60 || x > b.right + 60 || y < b.top - 60 || y > b.bottom + 60)) { return { x, y }; }
+			} }
+			return null;
+		});
+		ok('(the page has a known-empty map point for the deselect tap)', !!empty, JSON.stringify(empty));
 		const xTap = async (x, y) => {
 			await X.page.touchscreen.tap(x, y); await X.settle(450);
 			const out = { rows: await xRows(), sel: await xSel() };
 			await X.page.evaluate(() => { document.querySelectorAll('.lpn-pane-ctxmenu').forEach((m) => m.remove()); const c = document.getElementById('lpn_popup_close'); if (c) { c.click(); } });
-			await X.page.touchscreen.tap(4, 905); await X.settle(250);
+			// Deselect with Escape (a tap on bare map does not clear a selection) and require the known-empty point to be bare map again,
+			// so no box or popup is left over the cluster.
+			await X.page.keyboard.press('Escape'); await X.settle(300);
+			out.clear = (await xSel()) === '' && (await xRows()).length === 0 && await X.page.evaluate((e) => { const t = document.elementFromPoint(e.x, e.y); return !!t && t.id === 'lpn_canvas'; }, empty);
 			return out;
 		};
 		// The cluster's own ink, read from the drawing: the pump glyph's fill and each junction disc, at 0.5 px.
 		const cl = await X.page.evaluate(() => {
 			const g = document.querySelector('#lpn_canvas path.lpn-link-symbol-hit[data-link="335"]'), P = g.ownerSVGElement.createSVGPoint(), gm = g.getScreenCTM().inverse(), gb = g.getBoundingClientRect();
 			const disc = (id) => { const b = document.querySelector('#lpn_canvas circle.lpn-node[data-node="' + id + '"]').getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2, r: b.width / 2 }; };
-			const d60 = disc('60'), d61 = disc('61'), pump = [], over = [];
+			const d60 = disc('60'), d61 = disc('61'), pump = [], over = [], rv = document.querySelector('#lpn_canvas path.lpn-node-hit[data-node="River"]').getBoundingClientRect();
+			const inPump = (x, y) => { P.x = x; P.y = y; return g.isPointInFill(P.matrixTransform(gm)); };
 			for (let x = gb.left - 1; x <= gb.right + 1; x += 0.5) { for (let y = gb.top - 1; y <= gb.bottom + 1; y += 0.5) {
-				P.x = x; P.y = y;
-				if (!g.isPointInFill(P.matrixTransform(gm))) { continue; }
+				if (!inPump(x, y)) { continue; }
 				pump.push({ x, y });
 				const i60 = Math.hypot(x - d60.x, y - d60.y) < d60.r + 0.4, i61 = Math.hypot(x - d61.x, y - d61.y) < d61.r + 0.4;
 				if (i60 || i61) { over.push({ x, y, n: i60 ? '60' : '61' }); }
 			} }
-			return { d60, d61, w: gb.width, h: gb.height, pump: pump.length, over };
+			// A point 0.6 to 1.2 px off the pump's ink, off both dots' ink, nearer the pump than either dot, below the reservoir's drawing
+			// (its tip is the bottom of its box), and where the browser's hit is the reservoir's band.
+			const nearPump = (x, y) => { let m = Infinity; for (let a = 0; a < 16; a++) { for (const rr of [0.4, 0.8, 1.2, 1.6, 2.0]) { if (inPump(x + rr * Math.cos(a * Math.PI / 8), y + rr * Math.sin(a * Math.PI / 8))) { m = Math.min(m, rr); } } } return m; };
+			let beside = null;
+			for (let x = gb.left - 3; x <= gb.right + 3; x += 0.25) { for (let y = Math.max(gb.top - 3, rv.bottom + 0.3); y <= gb.bottom + 3; y += 0.25) {
+				const m = nearPump(x, y), t = document.elementFromPoint(x, y), dd = (d) => Math.hypot(x - d.x, y - d.y) - d.r - 0.6;
+				if (!inPump(x, y) && m <= 1.2 && dd(d60) > m + 0.5 && dd(d61) > m + 0.5 && t && t.dataset && t.dataset.node === 'River' && (!beside || m < beside.m)) { beside = { x, y, m }; }
+			} }
+			return { d60, d61, w: gb.width, h: gb.height, pump: pump.length, over, beside, rvBottom: rv.bottom,
+				hitAtJ61: (() => { const t = document.elementFromPoint(d61.x + 1.5, d61.y + 2); return t && t.dataset ? (t.dataset.node || '') : ''; })(),
+				fillAtJ61: inPump(d61.x + 1.5, d61.y + 2) };
 		});
 		ok('12 notches out: Pump 335 is a few px across (' + cl.w.toFixed(1) + ' x ' + cl.h.toFixed(1) + ') and its ink overlaps a junction dot somewhere', cl.w < 8 && cl.over.length > 0, JSON.stringify({ w: cl.w, h: cl.h, over: cl.over.length }));
 		for (const n of ['60', '61']) {
 			const pts = cl.over.filter((o) => o.n === n);
+			ok('...Pump 335 and Junction ' + n + ' have ink in common', pts.length > 0, String(pts.length));
 			if (!pts.length) { continue; }
 			const o = pts[Math.floor(pts.length / 2)], res = await xTap(o.x, o.y);
-			ok('...a tap on the ink of Pump 335 and Junction ' + n + ' opens the box of the two', res.rows.includes('Pump 335') && res.rows.includes('Junction ' + n), JSON.stringify([res, o]));
+			ok('...a tap on the ink of Pump 335 and Junction ' + n + ' opens the box of the two', res.rows.includes('Pump 335') && res.rows.includes('Junction ' + n) && res.clear, JSON.stringify([res, o]));
 		}
 		// A press on no ink, a few px from Junction 61 and under the reservoir's tip: the reservoir's band lies over the cluster,
 		// but the nearest drawn thing is the junction, so a finger meant it.
+		ok('...2 px below Junction 61 is no ink (not the pump, outside the dot, below the reservoir) and the browser hit is the reservoir band', !cl.fillAtJ61 && cl.d61.y + 2 > cl.rvBottom && cl.hitAtJ61 === 'River', JSON.stringify([cl.fillAtJ61, cl.hitAtJ61, cl.rvBottom]));
 		{
 			const res = await xTap(cl.d61.x + 1.5, cl.d61.y + 2);
-			ok('...a tap on no ink 2 px below Junction 61 selects Junction 61, not the reservoir whose band it falls in', res.rows.length === 0 && res.sel === 'n61', JSON.stringify([res, cl.d61]));
+			ok('...a tap on no ink 2 px below Junction 61 selects Junction 61, not the reservoir whose band it falls in', res.rows.length === 0 && res.sel === 'n61' && res.clear, JSON.stringify([res, cl.d61]));
+		}
+		// Tom's "I can't select Pump 335": a press on no ink just beside the pump's glyph, inside the reservoir's band, is the pump's.
+		ok('...a point 1 px beside Pump 335\'s glyph, off every ink, nearer the pump than either dot, under the reservoir\'s band, exists', !!cl.beside, JSON.stringify(cl.beside));
+		if (cl.beside) {
+			const res = await xTap(cl.beside.x, cl.beside.y);
+			ok('...a tap there selects Pump 335, with no box', res.rows.length === 0 && res.sel === 'l335' && res.clear, JSON.stringify([res, cl.beside]));
 		}
 		await X.page.close();
 
