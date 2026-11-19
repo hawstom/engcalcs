@@ -1,0 +1,562 @@
+{
+    "sprint": "1118-wave0",
+    "description": "Wave 0 adversarial English pass over the 110 keys of the 174 that wave0_keyset.php --new-and-changed leaves for review whose words are new or unchanged-since-baseline (the other 64 differ from the English at the drift baseline by bold tags only and were skipped). Each was read in its call-site context where the string alone was unclear. Every entry is open with a PROPOSED rewrite; nothing was written to lib/lang.ec.en.php. The other keys read one way only.",
+    "entries": [
+        {
+            "key": "lpn_wtg_export_t_offline",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"to load its template and the database and EPANET engines\": \"the database and EPANET engines\" parses as one group (database engines and EPANET engines) or as three things.",
+            "readings": [
+                "load the template, the database engine, and the EPANET engine",
+                "load the template, the database, and the EPANET engines"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). The export needs a connection to this site the first time, to load its template, the database engine, and the EPANET engine. Check the connection and try again."
+        },
+        {
+            "key": "lpn_wtg_export_t_head_pattern",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"names a head pattern\": \"names\" reads as gives the name of, or calls; a reference is stated, never named.",
+            "readings": [
+                "the reservoir is called by a pattern's name",
+                "the reservoir refers to a head pattern by its ID"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Reservoir {id} states a head pattern that this project does not define."
+        },
+        {
+            "key": "lpn_wtg_export_t_vol_missing",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"names a volume curve\": same \"names\" for a stated reference.",
+            "readings": [
+                "the tank is given a curve's name",
+                "the tank refers to a volume curve by its ID"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Tank {id} states a volume curve that this project does not define."
+        },
+        {
+            "key": "lpn_inp_drop_quality_options",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"the Quality option, which names the kind of water quality analysis\": \"names\" for what a setting states; \"a chemical is run\" mixes a substance with an analysis run.",
+            "readings": [
+                "the option calls the analysis by name",
+                "the option states which analysis is chosen",
+                "a chemical is run as a program, or as a substance"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file."
+        },
+        {
+            "key": "lpn_export_table_scn_keeps",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"All holds one sheet for each scenario\": \"All\" reads as a determiner (all of it holds), not as the name of a choice; \"holds\" is unclear.",
+            "readings": [
+                "the choice named All puts one sheet per scenario in the file",
+                "everything holds a sheet for each scenario"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). With All chosen, the file holds one sheet for each scenario. Parent scenarios, alternatives, and inheritance are not in the file."
+        },
+        {
+            "key": "lpn_settings_color_node_field_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Colors the nodes by this property\": \"Colors\" is read as the plural noun (a label), not the verb.",
+            "readings": [
+                "the colors of the nodes come from this property",
+                "paints the nodes according to this property"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Sets the node colors from this property. The contour plot uses the same property."
+        },
+        {
+            "key": "lpn_settings_color_ramp_node_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Colors the nodes, the contour plot and its key\": \"Colors\" as noun or verb; \"key\" is read as a keyboard key or an answer key, not the color legend.",
+            "readings": [
+                "the colors of the nodes, the plot and its legend",
+                "paints the nodes, the plot and a keyboard key"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Sets the colors of the nodes, the contour plot, and the color key (the legend of colors)."
+        },
+        {
+            "key": "lpn_contour_follows",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Follows project ... settings\": \"follows\" is read as comes after in time or order, or as obeys.",
+            "readings": [
+                "comes after the project settings",
+                "uses whatever the project settings say"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Uses the project \"{link}\" settings."
+        },
+        {
+            "key": "lpn_guide_text_contour_box",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"it leaves the node colors\": \"leaves\" reads as departs from or removes; \"how far the color reaches\" reads as stretches to.",
+            "readings": [
+                "Show plot removes the node colors",
+                "Show plot leaves the node colors unchanged",
+                "reach as physical stretching"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Replace \"it leaves the node colors\" with \"the node colors stay as they are\", and \"how far the color reaches from each pipe\" with \"how far from each pipe the color extends\"."
+        },
+        {
+            "key": "lpn_time_run_stopped_kept",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Results run to {solved}\": \"run\" is the verb to run a simulation, a noun, and the verb to extend; \"stopped\" does not say whether the person pressed Stop or EPANET failed.",
+            "readings": [
+                "results are a run that goes to {solved}",
+                "results extend up to {solved}",
+                "the person stopped the run"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). The EPANET run stopped at {time}. Results are shown up to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why."
+        },
+        {
+            "key": "lpn_time_run_stopped",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"The EPANET run stopped\": stopped by the person or by a failure; \"it has no results\": it = the run.",
+            "readings": [
+                "the person pressed Stop",
+                "EPANET failed with an error"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). The EPANET run failed at {time}, so it has no results. The Solver (run) report says why."
+        },
+        {
+            "key": "lpn_ovm_push_ask",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Push override upward\": \"override\" is read as a verb, \"push\" as a physical push, \"upward\" as up the screen or list.",
+            "readings": [
+                "push (verb) the override up a list",
+                "move the override to the parent scenario"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Move this override to its parent, {target}?"
+        },
+        {
+            "key": "lpn_ovm_push_ask_cur",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Same \"Push override upward\" reading.",
+            "readings": [
+                "push the override up a list",
+                "move the override to the parent"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Move this override to its parent? Current value in {target}: {old}."
+        },
+        {
+            "key": "lpn_ovm_push_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Same \"Push override upward\" reading; imperative with no object.",
+            "readings": [
+                "push a list item up",
+                "move this override to the parent"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Move this override to its parent"
+        },
+        {
+            "key": "lpn_ovm_push_others",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Scenarios that inherit it change\": \"change\" intransitive; when, and \"({n} total)\" counts what.",
+            "readings": [
+                "the scenarios will change",
+                "the scenarios change now",
+                "n counts all scenarios or only those that inherit it"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). The {n} scenarios that inherit it will change."
+        },
+        {
+            "key": "lpn_inpalt_more",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"and others ({n})\": others of what (scenarios or alternatives).",
+            "readings": [
+                "n more alternatives",
+                "n more scenarios"
+            ],
+            "disposition": "dismissed",
+            "resolution": "the \"others ({n})\" form is the house workaround for plurals (no plural rules mechanism), kept deliberately."
+        },
+        {
+            "key": "lpn_inpalt_base_note",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"choosing it changes them all\": \"them\" is the scenarios, the alternatives, or the values.",
+            "readings": [
+                "every scenario changes",
+                "every value changes"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Every scenario inherits the Base alternative, so choosing it changes the values in every scenario."
+        },
+        {
+            "key": "lpn_inpalt_lead",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"the alternative that receives the values of each\": \"each\" is a category or a value.",
+            "readings": [
+                "each category",
+                "each value"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). This file changes values in the categories below. For each category, choose the alternative that receives its values."
+        },
+        {
+            "key": "lpn_run_menu_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Unnecessary when ... is on\": subject elided; \"is on\" for a checkbox (Check/clear); \"When Recalculate is off\" names a different word.",
+            "readings": [
+                "the menu row is unnecessary",
+                "running is unnecessary"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Runs the simulation. Not needed while \"Recalculate automatically\" is checked in Settings, Calculation, Solver. When it is cleared, a Calculate button appears on the toolbar."
+        },
+        {
+            "key": "lpn_time_run_slow",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"turn off\", \"get a Calculate button back\", \"it is set to recalculate\": a checkbox is cleared, and \"back\" assumes the person knew the button.",
+            "readings": [
+                "turn off a device",
+                "clear a checkbox"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). This network took {secs} s to calculate, and \"Recalculate automatically\" is checked, so it calculates after every change. To stop that and show the Calculate button, clear \"Recalculate automatically\" in Settings, Calculation, Solver."
+        },
+        {
+            "key": "lpn_library_move_tip_controls",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"the control lower in the list takes effect\": \"lower\" is smaller or nearer the bottom; \"control\" is a control statement or the act of controlling.",
+            "readings": [
+                "the control nearer the end of the list is applied",
+                "the control with a lower number is applied"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). When two controls change the same link at the same time, the control nearer the bottom of the list is the one applied."
+        },
+        {
+            "key": "lpn_library_move_tip_rules",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"higher PRIORITY\" and \"higher in the list\": \"higher\" is larger in number or nearer the top.",
+            "readings": [
+                "larger PRIORITY number",
+                "nearer the top of the list"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). When two rules call for conflicting actions on the same link, the rule with the larger PRIORITY number is applied, and at equal PRIORITY the rule nearer the top of the list is applied."
+        },
+        {
+            "key": "lpn_library_move_top",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Move to top\": top of what.",
+            "readings": [
+                "top of the list",
+                "top of the screen"
+            ],
+            "disposition": "dismissed",
+            "resolution": "a button in the list it moves within; the context supplies \"of list\", and short labels are kept short."
+        },
+        {
+            "key": "lpn_library_move_bottom",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Move to bottom\": bottom of what.",
+            "readings": [
+                "bottom of the list",
+                "bottom of the screen"
+            ],
+            "disposition": "dismissed",
+            "resolution": "as lpn_library_move_top."
+        },
+        {
+            "key": "lpn_library_comment_add",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Add a comment\": a comment as a remark by a reader, a note on the library, or a ;comment line in the EPANET file.",
+            "readings": [
+                "a discussion remark",
+                "a comment line kept in the file"
+            ],
+            "disposition": "dismissed",
+            "resolution": "parallels \"Add a control\" and \"Add a rule\" on the same toolbar; \"comment\" here is the noun."
+        },
+        {
+            "key": "lpn_library_comment",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Comment\": noun or verb (to comment).",
+            "readings": [
+                "a remark",
+                "to comment"
+            ],
+            "disposition": "dismissed",
+            "resolution": "a row heading among rows; \"Comment\" is the noun."
+        },
+        {
+            "key": "lpn_library_import_comments",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Comment rows copied in with them: {n}\": \"them\" has no referent; \"copied in\" is a phrasal verb.",
+            "readings": [
+                "them = the libraries",
+                "them = the items imported"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Comment rows copied with the imported items: {n}"
+        },
+        {
+            "key": "lpn_inp_drop_dup_pattern",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"EPANET adds the later multipliers after the first\": \"adds\" reads as arithmetic (sums).",
+            "readings": [
+                "EPANET sums the multipliers",
+                "EPANET appends the later multipliers to the first"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). These pattern IDs are defined in more than one place in this file. EPANET appends the later multipliers to the first, so each is one pattern, and this page reads it the same way. Each entry gives the lines where its multipliers start."
+        },
+        {
+            "key": "lpn_inp_drop_dup_curve",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Same \"adds the later points after the first\".",
+            "readings": [
+                "EPANET sums the points",
+                "EPANET appends the later points"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). These curve IDs are defined in more than one place in this file. EPANET appends the later points to the first, so each is one curve, and this page reads it the same way. Each entry gives the lines where its points start."
+        },
+        {
+            "key": "lpn_inp_dup_and",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\" and \" joins a list of three or more as \"12, 40 and 55\", missing the serial comma the house style requires; the spaces are significant and a translator may trim them.",
+            "readings": [
+                "a joiner for exactly two",
+                "the last joiner of a longer list"
+            ],
+            "disposition": "dismissed",
+            "resolution": "dismissed as a wording change; the serial-comma join in duplicateRuns() is recorded as a code defect for the orchestrator."
+        },
+        {
+            "key": "lpn_diag_rules_refused",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"a clause is not valid for the element it names or states a value that cannot be read\": whether \"names\" and \"states\" both belong to the clause; \"names\" for a reference.",
+            "readings": [
+                "the element or the value is invalid",
+                "the clause names an element, or the rule states a value"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). EPANET does not accept these rules. A clause in each is not valid for the element it refers to, or gives a value that cannot be read. Correct or delete them:"
+        },
+        {
+            "key": "lpn_diag_builtin_stopped",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"change the setting under Calculation, Solver in Settings\": the path order is backward.",
+            "readings": [
+                "Settings contains Calculation, Solver",
+                "Calculation, Solver contains a Settings"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting in Settings, Calculation, Solver."
+        },
+        {
+            "key": "lpn_velocity_warn_more",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"And more pipes ({n}) above {limit}\": a fragment; n of what.",
+            "readings": [
+                "n additional pipes are above the limit",
+                "n is the total"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Other pipes above {limit}: {n}."
+        },
+        {
+            "key": "lpn_velocity_warn",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Pipe {id} velocity is {velocity} at {time}\": the sentence states a fact with no reason for the warning.",
+            "readings": [
+                "a plain report of velocity",
+                "a warning that it exceeds the limit"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). ⚠ Pipe {id} velocity is {velocity} at {time}, above the limit."
+        },
+        {
+            "key": "lpn_settings_velocity_limit_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"the fastest pipe\": fastest reads as the pipe that was built or ran first; \"turns the warning off\".",
+            "readings": [
+                "fastest = highest velocity",
+                "fastest = quickest to build"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). The velocity above which a run reports the pipe with the highest velocity and how many other pipes also exceed it. Blank uses the default. Zero stops the warning."
+        },
+        {
+            "key": "lpn_field_tank_minvol_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"a volume curve overrides it\": override is the scenario override term; \"in the length unit cubed\".",
+            "readings": [
+                "a scenario override applies",
+                "the curve takes precedence"
+            ],
+            "disposition": "dismissed",
+            "resolution": "dismissed here: this tip is rewritten on feat/volume-unit in Tom's 2026-11-18 words (\"0 uses the tank diameter and minimum depth\"); the rest of the proposal goes to that branch."
+        },
+        {
+            "key": "lpn_field_tank_overflow_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Yes lets a full tank spill\": Yes and No are option names, read as an adverb or answer; \"uses it\" has no referent.",
+            "readings": [
+                "Yes the answer",
+                "the option Yes"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Choose Yes to let a full tank spill what it cannot hold, so the pipe into it stays open. Choose No to close the pipe into a full tank. Only an extended period simulation uses this setting."
+        },
+        {
+            "key": "lpn_ex_elm_street_desc",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"solved for fire flow on top of maximum day demand\": \"on top of\" reads as above, over, or additional; \"drawn over a site plan\" as covering.",
+            "readings": [
+                "fire flow in addition to maximum day demand",
+                "a position above"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow in addition to the maximum day demand, at one moment in time, drawn on a site plan. Gallons per minute, with feet and inches."
+        },
+        {
+            "key": "lpn_wtg_export_no_pump_curve",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"A power pump or another multiple-point curve is not written\": a power pump is not a curve.",
+            "readings": [
+                "a power pump and a multiple-point curve are not written",
+                "a power pump is a kind of curve"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). This network cannot be written: pumps {ids} have no three-point or one-point head curve. A power pump, or a head curve with any other number of points, is not written."
+        },
+        {
+            "key": "lpn_wtg_export_extract",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Extract both files\": extract data vs unzip.",
+            "readings": [
+                "extract information",
+                "unzip an archive"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Unzip the .zip into one folder, then open the .wtg file."
+        },
+        {
+            "key": "lpn_wtg_export_t_integrity",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"failed their own check\": whose check; \"offered\" is the offer to download.",
+            "readings": [
+                "the files failed a check of their own",
+                "the files were not offered for sale"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). The files failed an integrity check after they were written, so they were not offered for download."
+        },
+        {
+            "key": "lpn_wtg_export_lost_controls_pressure",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"as the fixed clock times at which EPANET switched it\": \"switched\" reads as turned on or off, or changed over; \"it\" the link or the control.",
+            "readings": [
+                "the link was opened or closed",
+                "the control was turned on and off"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which the EPANET run opened or closed the link."
+        },
+        {
+            "key": "lpn_wtg_export_t_layout",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"does not match the layout this export writes\": layout reads as page layout.",
+            "readings": [
+                "page layout",
+                "file structure"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). The export template does not match the structure of the files this export writes."
+        },
+        {
+            "key": "lpn_result_msx_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"species\" is the biological or chemistry-textbook word; a translator may render the biological sense.",
+            "readings": [
+                "a living species",
+                "a chemical substance in the model"
+            ],
+            "disposition": "dismissed",
+            "resolution": "\"EPANET-MSX species\" sits beside its own name in the tip, and MSX documentation is the reference translators use; not added to terms.md without Tom."
+        },
+        {
+            "key": "u_millifeet",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"millifeet\" is a coined unit (0.001 ft, not a standard unit); a translator may render it as a standard unit or a word for thousandths.",
+            "readings": [
+                "a thousandth of a foot",
+                "a typographic or mining unit"
+            ],
+            "disposition": "dismissed",
+            "resolution": "a literal SI-style prefix on a unit name; translators render milli plus foot."
+        },
+        {
+            "key": "lpn_inp_export_flat_label_semicolon",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Texts ({n}) here contain a semicolon\": \"here\" is this project, this file, or this place; \"written whole\" is unclear.",
+            "readings": [
+                "here = in the project",
+                "here = on this screen"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten (orchestrator, 2026-11-18). Texts ({n}) in this project contain a semicolon, and EPANET cuts a Text at its first semicolon. Each is written in full in the file, and EPANET will read only the part before the semicolon."
+        }
+    ]
+}

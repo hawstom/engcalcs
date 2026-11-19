@@ -1,6 +1,7 @@
 // RESTART AND END ON THE RUN TRANSPORT, AND NO PLAYER IN STEADY STATE (Tom, 2026-10-05): a tester
 // asked for Restart and End; Tom: "tight real estate... Maybe the buttons can be smaller" and
 // "Maybe the EPS controls can disappear for steady state. Many users never do EPS." Real Chromium.
+// THE TIME SERIES CHART READS AND SETS THE TIME (Tom, 2026-11-17): hover crosshair and readout, click or tap, drag, by mouse and finger.
 //   node dev/lpn-spike/transport-ends-browser-harness.js
 // DO NOT PREFIX THIS WITH `flock`: it takes /tmp/engcalcs-browser.lock itself.
 //
@@ -120,6 +121,426 @@ async function main() {
 		ok('phone 390: all five buttons are shown', ICONS.every((i) => r.btns[i]));
 		ok('phone 390: the page does not scroll sideways', !r.docOverflow);
 		await s.context.close().catch(() => {});
+
+		// ---- THE CHART READS AND SETS THE TIME (Tom, 2026-11-17): thin line, hover crosshair, click or tap, drag ----
+		// Mouse on a desktop; then a finger (touch pointer events through the DevTools protocol) on a window that has
+		// touch, so `touch-action` has to be right or the browser takes the gesture for a scroll.
+		for (const touch of [false, true]) {
+			s = await Session.open(browser, 'A', { viewport: { width: 1400, height: 900 }, hasTouch: touch });
+			await s.goto('Looped-Network.php');
+			await s.settle(1200);
+			await s.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await openNet1(s);
+			await s.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+			await s.waitFor(() => s.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 120000);
+			const bb = await (await s.page.$('.lpn-node-hit[data-node="10"]')).boundingBox();
+			await s.page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2);
+			await s.settle(500);
+			await s.toolbarClick(await s.lang('lpn_pane_toggle'));
+			await s.settle(500);
+			await s.page.evaluate(() => document.getElementById('lpn_pane_tab_timeseries').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(800);
+			await s.page.evaluate(() => document.getElementById('lpn_ts_add').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(600);
+			const tag = touch ? 'finger' : 'mouse';
+			const cdp = touch ? await s.context.newCDPSession(s.page) : null;
+			const tp = (type, pts) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts });
+			const geoOn = (q) => s.page.evaluate((q) => {
+				const h = document.querySelector(q + ' .lpn-ts-now'), f = document.querySelector(q + ' .lpn-profile-frame');
+				if (!h || !f) { return null; }
+				const a = h.getBoundingClientRect(), b = f.getBoundingClientRect();
+				const xb = document.querySelector(q + ' svg')._tsNow.xB;
+				return { x: a.left + a.width / 2, y: b.top + b.height / 2, top: b.top, left: b.left, right: b.right, xmax: xb.max * 3600, now: EngCalcs.lpnTimeNow() };
+			}, q);
+			const geo = () => geoOn('#lpn_ts_chart');
+			const crossOn = (q) => s.page.evaluate((q) => {
+				const c = document.querySelector(q + ' .lpn-ts-cross');
+				return c ? { text: c.textContent, line: c.querySelector('.lpn-ts-cross-line').getBoundingClientRect().left, now: EngCalcs.lpnTimeNow() } : null;
+			}, q);
+			// press-and-hold helpers: a click or tap, and a drag along y from x0 to x1 (steps as given)
+			const tapAt = async (x, y) => { if (!touch) { await s.page.mouse.click(x, y); } else { await tp('touchStart', [{ x, y }]); await tp('touchEnd', []); } };
+			const dragTo = async (x0, y, x1, n, endIt) => {
+				if (!touch) {
+					await s.page.mouse.move(x0, y); await s.page.mouse.down();
+					for (let k = 1; k <= n; k++) { await s.page.mouse.move(x0 + (x1 - x0) * k / n, y); await s.settle(50); }
+					if (endIt !== false) { await s.page.mouse.up(); }
+				} else {
+					await tp('touchStart', [{ x: x0, y }]);
+					for (let k = 1; k <= n; k++) { await tp('touchMove', [{ x: x0 + (x1 - x0) * k / n, y }]); await s.settle(50); }
+					if (endIt !== false) { await tp('touchEnd', []); }
+				}
+			};
+			let g = await geo();
+			ok(tag + ': there is a time line, and no triangle, knob or wide handle', !!g && await s.page.evaluate(() =>
+				!document.querySelector('#lpn_ts_chart .lpn-ts-now-knob, #lpn_ts_chart .lpn-ts-now-hit, #lpn_ts_chart .lpn-ts-plot-hit, #lpn_ts_chart polygon')));
+			// What a visitor sees at 0:00, where the line lies on the chart's left frame (Tom, 2026-11-17: "I don't see a time line").
+			const seen = await s.page.evaluate(() => {
+				const q = (c) => document.querySelector('#lpn_ts_chart ' + c);
+				const line = q('.lpn-ts-now'), halo = q('.lpn-ts-now-halo'), fr = q('.lpn-profile-frame');
+				if (!line || !fr) { return null; }
+				const fb = fr.getBoundingClientRect(), lb = line.getBoundingClientRect(), cs = getComputedStyle(line), fs = getComputedStyle(fr), hs = halo && getComputedStyle(halo);
+				return { lw: parseFloat(cs.strokeWidth), fw: parseFloat(fs.strokeWidth), lc: cs.stroke, fc: fs.stroke, hc: hs && hs.stroke, lx: lb.left + lb.width / 2, fl: fb.left, lt: lb.top, ft: fb.top, now: EngCalcs.lpnTimeNow() };
+			});
+			ok(tag + ': at 0:00 the line is thin, in a chrome colour, and not the frame (another colour, standing above its top edge, on a halo)',
+				!!seen && seen.now === 0 && seen.lw <= 2 && seen.lc !== seen.fc && seen.lt < seen.ft - 2 && !!seen.hc && seen.hc !== seen.lc, JSON.stringify(seen));
+			ok(tag + ': ...and it lies on the left edge of the plot, which is where 0:00 is', !!seen && Math.abs(seen.lx - seen.fl) < 1.5);
+			const mapText = () => s.page.evaluate(() => document.getElementById('lpn_canvas').textContent.replace(/\s+/g, ' '));
+			const frames = await s.page.evaluate(() => EngCalcs.lpnTimeRunFrames().map((f) => f.t));
+			const stepPx = (g.right - g.left) / Math.max(1, g.xmax / (frames[1] - frames[0]));
+			const xOf = (t) => g.left + (g.right - g.left) * t / g.xmax;
+			const py = g.y + 15;
+			// ---- hover (mouse): a crosshair and a readout, and nothing changes ----
+			if (!touch) {
+				const mapBefore0 = await mapText();
+				await s.page.mouse.move(xOf(frames[5]) + 2, py);
+				await s.settle(300);
+				const cr = await crossOn('#lpn_ts_chart');
+				ok('mouse: hovering the plot draws a crosshair on the nearest reporting time', !!cr && Math.abs(cr.line - xOf(frames[5])) <= 2, JSON.stringify(cr && { line: cr.line, want: xOf(frames[5]) }));
+				ok('mouse: ...the readout gives the time and the series value there', !!cr && cr.text.indexOf(await s.page.evaluate((t) => EngCalcs.lpnFormatTime(t), frames[5])) >= 0 && /10\s+-?[\d.]+/.test(cr.text), cr && cr.text);
+				ok('mouse: ...and the run, the time selector and the map did not change', !!cr && cr.now === 0 && (await mapText()) === mapBefore0 && (await s.page.evaluate(() => +document.getElementById('lpn_time_step').value)) === 0);
+				await s.page.mouse.move(g.right + 60, py);
+				await s.settle(200);
+				ok('mouse: leaving the plot removes the crosshair', !(await crossOn('#lpn_ts_chart')));
+			}
+			// ---- a click or tap sets the nearest reporting time ----
+			await tapAt(xOf(frames[6]) + 3, py);
+			await s.settle(600);
+			let after = await geo();
+			ok(tag + ': a ' + (touch ? 'tap' : 'click') + ' on the plot sets the run to the nearest reporting time', after.now === frames[6], after.now + ' vs ' + frames[6]);
+			ok(tag + ': ...and the time selector on the toolbar shows it', (await s.page.evaluate(() => +document.getElementById('lpn_time_step').value)) === 6);
+			// ---- a drag scrubs; map and selector follow ----
+			await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, frames[0]);
+			await s.settle(600);
+			g = await geo();
+			const mapBefore = await mapText();
+			const aimX = g.left + (g.right - g.left) * 0.75;
+			await dragTo(xOf(frames[2]), py, aimX, 12, false);
+			// while the pointer is still down the readout shows (a phone has no hover)
+			const down = await crossOn('#lpn_ts_chart');
+			ok(tag + ': while the ' + (touch ? 'finger' : 'button') + ' is down the readout shows', !!down && /\d/.test(down.text), down && down.text);
+			if (!touch) { await s.page.mouse.up(); } else { await tp('touchEnd', []); }
+			await s.settle(800);
+			after = await geo();
+			const sel = await s.page.evaluate(() => +document.getElementById('lpn_time_step').value);
+			ok(tag + ': dragging along the plot moved the run to a later step', after.now > frames[2], frames[2] + ' -> ' + after.now);
+			ok(tag + ': ...and the map shows different results (its labels changed)', (await mapText()) !== mapBefore);
+			ok(tag + ': ...and it is exactly a reporting step, shown on the selector', frames.indexOf(after.now) >= 0 && frames[sel] === after.now, 'selector ' + sel);
+			ok(tag + ': ...and the line sits under where the pointer was released (within half a step)', Math.abs(after.x - aimX) <= stepPx / 2 + 2, 'aim ' + Math.round(aimX) + ', step ' + stepPx.toFixed(1) + 'px, at ' + Math.round(after.x));
+			if (touch) { ok('finger: the readout goes when the finger lifts', !(await crossOn('#lpn_ts_chart'))); }
+			// A drag may begin on the line itself or anywhere else on the plot.
+			await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, frames[8]);
+			await s.settle(500);
+			// Dragging off either end clamps to the first and the last step.
+			for (const [name, xTo, want] of [['left', g.left - 80, frames[0]], ['right', g.right + 80, frames[frames.length - 1]]]) {
+				const gg = await geo();
+				await dragTo(gg.x, py, xTo, 8);
+				await s.settle(500);
+				ok(tag + ': a drag off the ' + name + ' end clamps to the ' + (name === 'right' ? 'last' : 'first') + ' step', (await geo()).now === want, (await geo()).now + ' vs ' + want);
+			}
+			// A press while the run is playing stops the playback, or the next tick moves the line from under the pointer.
+			if (!touch) {
+				await s.page.evaluate(() => { EngCalcs.lpnTimeGoTo(0); });
+				await s.page.click('#lpn_toolbar_run button[data-icon="play"], #lpn_toolbar_run button[data-icon="pause"]');
+				await s.settle(300);
+				const pg = await geo();
+				await s.page.mouse.move(pg.x + 200, py);
+				await s.page.mouse.down();
+				await s.settle(150);
+				const playingAfterPress = await s.page.evaluate(() => document.querySelector('#lpn_toolbar_run .lpn-transport-btn[aria-pressed]').getAttribute('aria-pressed'));
+				await s.page.mouse.up();
+				ok(tag + ': pressing the plot while playing stops the playback', playingAfterPress === 'false', playingAfterPress);
+			}
+			// ---- the same behaviour on the other charts that carry the line ----
+			// The Properties box builds a NEW chart container on every redraw, so the drag has to find the live one
+			// (Perry, 2026-11-15: it stayed at 0:00). Then a graph bubble on the map.
+			const behaveOn = async (sel, name) => {
+				await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, frames[0]);
+				await s.settle(700);
+				await s.page.evaluate((q) => { const e = document.querySelector(q + ' .lpn-ts-now'); if (e) { e.scrollIntoView({ block: 'center' }); } }, sel);
+				await s.settle(300);
+				const g2 = await geoOn(sel);
+				ok(tag + ': ' + name + ' draws a time line', !!g2);
+				if (!g2) { return; }
+				const px2 = g2.left + (g2.right - g2.left) * 0.3, py2 = g2.y + 10;
+				await tapAt(px2, py2);
+				await s.settle(700);
+				const g2b = await geoOn(sel);
+				ok(tag + ': a ' + (touch ? 'tap' : 'click') + ' in ' + name + ' sets a reporting time', g2b && g2b.now > 0 && frames.indexOf(g2b.now) >= 0, String(g2b && g2b.now));
+				await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, frames[0]);
+				await s.settle(700);
+				const g2c = await geoOn(sel);
+				const ax = g2c.left + (g2c.right - g2c.left) * 0.6;
+				await dragTo(g2c.x + 20, py2, ax, 12);
+				await s.settle(800);
+				const g3 = await geoOn(sel);
+				ok(tag + ': dragging in ' + name + ' steps the run to a reporting step', g3 && g3.now > g2c.now && frames.indexOf(g3.now) >= 0, g2c.now + ' -> ' + (g3 && g3.now));
+				if (!touch) {
+					await s.page.mouse.move(g3.left + 40, g3.y + 12);
+					await s.settle(300);
+					ok(tag + ': hovering ' + name + ' shows the readout', !!(await crossOn(sel)));
+					await s.page.mouse.move(5, 5);
+				}
+			};
+			await behaveOn('#lpn_pgraph_chart', 'the Properties box graph');
+			await s.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c && c.offsetParent) { c.click(); } });
+			await s.settle(300);
+			if (!touch) {
+				const pt = await s.page.evaluate(() => { const r = document.querySelector('#lpn_canvas [data-node="10"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+				await s.page.mouse.click(pt.x, pt.y, { button: 'right' });
+				await s.settle(400);
+				const lbl = await s.lang('lpn_tsb_menu');
+				await s.page.evaluate((l) => { Array.from(document.querySelectorAll('.lpn-pane-ctxmenu button')).filter((x) => x.textContent.trim() === l)[0].click(); }, lbl);
+				await s.settle(800);
+				await behaveOn('.lpn-tsb .lpn-tsb-chart', 'a graph bubble on the map');
+				// A chart under a graph bubble draws no crosshair of its own while the pointer is over the pane's chart
+				// and the run plays (every step redraws both).
+				const gh = await geo();
+				await s.page.mouse.move(gh.left + (gh.right - gh.left) * 0.2, gh.y + 10);
+				await s.settle(300);
+				await s.page.evaluate(() => { EngCalcs.lpnTimeGoTo(0); });
+				await s.page.click('#lpn_toolbar_run button[data-icon="play"]');
+				await s.page.mouse.move(gh.left + (gh.right - gh.left) * 0.2 + 1, gh.y + 10);
+				await s.settle(1800);
+				const both = await s.page.evaluate(() => ({ pane: !!document.querySelector('#lpn_ts_chart .lpn-ts-cross'), bubble: document.querySelectorAll('.lpn-tsb .lpn-tsb-chart .lpn-ts-cross').length, now: EngCalcs.lpnTimeNow() }));
+				await s.page.click('#lpn_toolbar_run button[data-icon="pause"]');
+				ok(tag + ': during playback the bubble chart draws no crosshair of its own, and the pane chart keeps its own', both.now > 0 && both.pane && both.bubble === 0, JSON.stringify(both));
+				await s.page.mouse.move(5, 5);
+			}
+			// The Flow balance chart: the same hover readout, click and drag.
+			if (!await s.page.evaluate(() => { const t = document.getElementById('lpn_pane_tab_sysflow'); return !!t; })) { ok(tag + ': there is a Flow balance tab', false); }
+			else {
+				await s.page.evaluate(() => document.getElementById('lpn_pane_tab_sysflow').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+				await s.settle(900);
+				await behaveOn('#lpn_sysflow_chart', 'the Flow balance chart');
+				ok(tag + ': the Flow balance chart has no dot tips (the readout carries the value)', await s.page.evaluate(() => document.querySelectorAll('#lpn_sysflow_chart .lpn-ts-dot title, #lpn_ts_chart .lpn-ts-dot title').length === 0));
+			}
+			ok(tag + ': no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
+			await s.context.close().catch(() => {});
+		}
+
+		// ---- A PHONE: a vertical swipe on the Properties box graph scrolls the box; a sideways one scrubs ----
+		{
+			s = await Session.open(browser, 'A', { viewport: { width: 390, height: 844 }, hasTouch: true });
+			await s.goto('Looped-Network.php');
+			await s.settle(1200);
+			await s.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await openNet1(s);
+			await s.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+			await s.waitFor(() => s.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 120000);
+			const bb = await (await s.page.$('.lpn-node-hit[data-node="10"]')).boundingBox();
+			await s.page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2);
+			await s.settle(900);
+			const frames = await s.page.evaluate(() => EngCalcs.lpnTimeRunFrames().map((f) => f.t));
+			await s.page.evaluate(() => { const e = document.querySelector('#lpn_pgraph_chart .lpn-ts-now'); if (e) { e.scrollIntoView({ block: 'center' }); } });
+			await s.settle(400);
+			const cdp = await s.context.newCDPSession(s.page);
+			const tp = (type, pts) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts });
+			const pg = () => s.page.evaluate(() => {
+				const h = document.querySelector('#lpn_pgraph_chart .lpn-ts-now'), f = document.querySelector('#lpn_pgraph_chart .lpn-profile-frame');
+				if (!h || !f) { return null; }
+				let sc = f.parentElement; while (sc && sc.scrollHeight <= sc.clientHeight + 1) { sc = sc.parentElement; }
+				const b = f.getBoundingClientRect();
+				return { left: b.left, right: b.right, top: b.top, h: b.height, scroll: sc ? sc.scrollTop : -1, now: EngCalcs.lpnTimeNow(), vh: window.innerHeight };
+			});
+			let p0 = await pg();
+			ok('phone: the Properties box graph draws a thin time line', !!p0);
+			if (p0) {
+				// The graph in view and mid-box: a vertical swipe from the middle of the plot.
+				const x = p0.left + (p0.right - p0.left) * 0.5, y0 = Math.min(p0.top + p0.h * 0.5, p0.vh - 20);
+				const sc0 = p0.scroll;
+				await tp('touchStart', [{ x, y: y0 }]);
+				for (let k = 1; k <= 10; k++) { await tp('touchMove', [{ x: x + (k % 2), y: y0 + k * 8 }]); await s.settle(30); }
+				await tp('touchEnd', []);
+				await s.settle(500);
+				const p1 = await pg();
+				ok('phone: a vertical swipe on the plot scrolls the box', p1 && (p1.scroll !== sc0 || Math.abs(p1.top - p0.top) > 5), 'scroll ' + sc0 + ' -> ' + (p1 && p1.scroll) + ', top ' + Math.round(p0.top) + ' -> ' + Math.round(p1 && p1.top));
+				ok('phone: ...and it set no time', p1 && p1.now === 0, String(p1 && p1.now));
+				const p2 = await pg(), y1 = Math.min(p2.top + p2.h * 0.5, p2.vh - 20), xs = p2.left + (p2.right - p2.left) * 0.1, xe = p2.left + (p2.right - p2.left) * 0.8;
+				await tp('touchStart', [{ x: xs, y: y1 }]);
+				for (let k = 1; k <= 12; k++) { await tp('touchMove', [{ x: xs + (xe - xs) * k / 12, y: y1 }]); await s.settle(50); }
+				const mid = await s.page.evaluate(() => { const c = document.querySelector('#lpn_pgraph_chart .lpn-ts-cross'); return c ? c.textContent : null; });
+				await tp('touchEnd', []);
+				await s.settle(600);
+				const p3 = await pg();
+				ok('phone: a sideways drag on the plot scrubs the run, and the readout shows while the finger is down', p3 && p3.now > 0 && frames.indexOf(p3.now) >= 0 && !!mid, (p3 && p3.now) + ' readout ' + mid);
+				ok('phone: ...and the page itself did not move sideways', await s.page.evaluate(() => window.scrollX === 0 && document.documentElement.scrollWidth <= window.innerWidth));
+			}
+			ok('phone: no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
+			await s.context.close().catch(() => {});
+		}
+
+		// ---- THE CHART SNAPS TO ITS OWN FRAMES: Recalculate off, then a changed Report step (the run drawn is the old one) ----
+		{
+			s = await Session.open(browser, 'A', { viewport: { width: 1400, height: 900 } });
+			await s.goto('Looped-Network.php');
+			await s.settle(1200);
+			await s.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await openNet1(s);
+			await s.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+			await s.waitFor(() => s.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 120000);
+			const frames = await s.page.evaluate(() => EngCalcs.lpnTimeRunFrames().map((f) => f.t));
+			const bb3 = await (await s.page.$('.lpn-node-hit[data-node="10"]')).boundingBox();
+			await s.page.mouse.click(bb3.x + bb3.width / 2, bb3.y + bb3.height / 2);
+			await s.settle(500);
+			await s.toolbarClick(await s.lang('lpn_pane_toggle'));
+			await s.settle(500);
+			await s.page.evaluate(() => document.getElementById('lpn_pane_tab_timeseries').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(800);
+			await s.page.evaluate(() => document.getElementById('lpn_ts_add').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(600);
+			await s.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c && c.offsetParent) { c.click(); } });
+			await s.toolbarClick(await s.lang('lpn_tool_settings'));
+			await s.settle(600);
+			await s.page.evaluate(() => {
+				const rows = Array.from(document.querySelectorAll('[data-lpn-setting]')).filter((r) => r.getAttribute('data-lpn-setting') === '[["settings","autoRun"]]');
+				const box = rows[0].querySelector('input[type=checkbox]'); box.checked = false; box.dispatchEvent(new Event('change', { bubbles: true }));
+			});
+			await s.page.evaluate(() => {
+				const row = Array.from(document.querySelectorAll('#lpn_set_time_fields .lpn-time-row')).filter((r) => JSON.parse(r.getAttribute('data-lpn-setting'))[0][1] === 'reportStep')[0];
+				const inp = row.querySelector('input'); inp.value = '0:30'; inp.dispatchEvent(new Event('change', { bubbles: true }));
+			});
+			await s.settle(800);
+			const kept = await s.page.evaluate(() => ({ n: EngCalcs.lpnTimeRunFrames().length, stops: EngCalcs.lpnTimeStops().length }));
+			ok('snap: with Recalculate off the old run is kept while the Report step changed (the transport now offers more stops than the run has frames)', kept.n === frames.length && kept.stops > frames.length, JSON.stringify(kept));
+			const sg = await s.page.evaluate(() => { const f = document.querySelector('#lpn_ts_chart .lpn-profile-frame').getBoundingClientRect(); return { l: f.left, r: f.right, y: f.top + f.height / 2 + 10 }; });
+			const seenT = new Set();
+			for (let k = 0; k < 30; k++) {
+				await s.page.mouse.move(sg.l + 3 + (sg.r - sg.l) * 0.4 * k / 29, sg.y);
+				const at = await s.page.evaluate(() => { const v = document.querySelector('#lpn_ts_chart svg'); return v ? v._tsCrossAt : null; });
+				if (at !== null && at !== undefined) { seenT.add(at); }
+			}
+			ok('snap: hovering reaches only plotted times', seenT.size > 3 && Array.from(seenT).every((t) => frames.indexOf(t) >= 0), Array.from(seenT).join(','));
+			await s.page.mouse.click(sg.l + (sg.r - sg.l) * 0.123, sg.y);
+			await s.settle(600);
+			const nowT = await s.page.evaluate(() => EngCalcs.lpnTimeNow());
+			ok('snap: a click sets a plotted time, never one between frames', frames.indexOf(nowT) >= 0, String(nowT));
+			ok('snap: no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
+			await s.context.close().catch(() => {});
+		}
+
+		// ---- A SMALL GRAPH WITH MANY SERIES: the readout stays inside the frame ----
+		{
+			s = await Session.open(browser, 'A', { viewport: { width: 1400, height: 900 } });
+			await s.goto('Looped-Network.php');
+			await s.settle(1200);
+			await s.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await openNet1(s);
+			await s.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+			await s.waitFor(() => s.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 120000);
+			await s.toolbarClick(await s.lang('lpn_pane_toggle'));
+			await s.settle(500);
+			await s.page.evaluate(() => document.getElementById('lpn_pane_tab_timeseries').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(800);
+			for (const id of ['10', '11', '12', '13', '22']) {
+				const b4 = await (await s.page.$('.lpn-node-hit[data-node="' + id + '"]')).boundingBox();
+				await s.page.mouse.click(b4.x + b4.width / 2, b4.y + b4.height / 2);
+				await s.settle(400);
+				await s.page.evaluate(() => document.getElementById('lpn_ts_add').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+				await s.settle(400);
+				await s.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c && c.offsetParent) { c.click(); } });
+				await s.settle(200);
+			}
+			// Now make the window small: the pane's chart shrinks with it.
+			await s.page.setViewportSize({ width: 1000, height: 480 });
+			await s.settle(900);
+			const nSeries = await s.page.evaluate(() => document.querySelectorAll('#lpn_ts_chart polyline.lpn-ts-line').length);
+			const fr4 = await s.page.evaluate(() => { const f = document.querySelector('#lpn_ts_chart .lpn-profile-frame').getBoundingClientRect(); return { l: f.left, r: f.right, y: f.top + f.height / 2, h: f.height }; });
+			console.log('   small chart: ' + nSeries + ' series, plot ' + Math.round(fr4.h) + ' px high');
+			ok('small: five series are plotted on a short chart', nSeries >= 5 && fr4.h > 20 && fr4.h < 140, nSeries + ' series, ' + Math.round(fr4.h));
+			for (const f of [0.05, 0.5, 0.97]) {
+				await s.page.mouse.move(fr4.l + (fr4.r - fr4.l) * f, fr4.y);
+				await s.settle(250);
+				const inside = await s.page.evaluate(() => {
+					const bg = document.querySelector('#lpn_ts_chart .lpn-ts-read-bg'), fr = document.querySelector('#lpn_ts_chart .lpn-profile-frame');
+					if (!bg) { return null; }
+					const a = bg.getBoundingClientRect(), b = fr.getBoundingClientRect();
+					return { ok: a.top >= b.top - 0.5 && a.bottom <= b.bottom + 0.5 && a.left >= b.left - 0.5 && a.right <= b.right + 0.5, a: [a.left, a.top, a.right, a.bottom].map(Math.round), b: [b.left, b.top, b.right, b.bottom].map(Math.round) };
+				});
+				ok('small: the readout lies inside the plot frame at ' + Math.round(f * 100) + '% across', !!inside && inside.ok, JSON.stringify(inside));
+			}
+			ok('small: no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
+			await s.context.close().catch(() => {});
+		}
+
+		// ---- DENSE CHART (about 1 px a step) AND A STATISTIC SHOWING ----
+		{
+			s = await Session.open(browser, 'A', { viewport: { width: 1400, height: 900 } });
+			await s.goto('Looped-Network.php');
+			await s.settle(1200);
+			await s.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await openNet1(s);
+			await s.toolbarClick(await s.lang('lpn_tool_settings'));
+			await s.settle(600);
+			const setTime = (key, text) => s.page.evaluate(([k, t]) => {
+				const row = Array.from(document.querySelectorAll('#lpn_set_time_fields .lpn-time-row')).filter((r) => JSON.parse(r.getAttribute('data-lpn-setting'))[0][1] === k)[0];
+				const inp = row.querySelector('input'); inp.value = t; inp.dispatchEvent(new Event('change', { bubbles: true }));
+			}, [key, text]);
+			await setTime('duration', '12:00');
+			await setTime('hydraulicStep', '0:01');
+			await setTime('reportStep', '0:01');
+			await s.settle(500);
+			await s.page.evaluate(() => { const sel = document.getElementById('lpn_set_time_statistic'); sel.value = 'MAXIMUM'; sel.dispatchEvent(new Event('change', { bubbles: true })); });
+			await s.settle(300);
+			await s.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+			await s.waitFor(() => s.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 600), 'dense EPS frames', 240000);
+			const bb2 = await (await s.page.$('.lpn-node-hit[data-node="10"]')).boundingBox();
+			await s.page.mouse.click(bb2.x + bb2.width / 2, bb2.y + bb2.height / 2);
+			await s.settle(500);
+			await s.toolbarClick(await s.lang('lpn_pane_toggle'));
+			await s.settle(500);
+			await s.page.evaluate(() => document.getElementById('lpn_pane_tab_timeseries').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(800);
+			await s.page.evaluate(() => document.getElementById('lpn_ts_add').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await s.settle(600);
+			await s.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c && c.offsetParent) { c.click(); } });
+			await s.settle(300);
+			const stops = await s.page.evaluate(() => EngCalcs.lpnTimeStops());
+			const mid = stops[Math.floor(stops.length / 2)];
+			await s.page.evaluate((t) => { EngCalcs.lpnTimeGoTo(t); }, mid);
+			await s.settle(700);
+			const dg = () => s.page.evaluate(() => {
+				const h = document.querySelector('#lpn_ts_chart .lpn-ts-now'), f = document.querySelector('#lpn_ts_chart .lpn-profile-frame');
+				const a = h.getBoundingClientRect(), b = f.getBoundingClientRect();
+				return { x: a.left + a.width / 2, y: b.top + b.height / 2 + 12, w: b.width, now: EngCalcs.lpnTimeNow(), n: EngCalcs.lpnTimeStops().length };
+			});
+			let d = await dg();
+			console.log('   dense chart: ' + (d.w / d.n).toFixed(2) + ' px a step, ' + d.n + ' steps');
+			ok('dense: the chart is about a pixel a step or less', d.w / d.n <= 2, (d.w / d.n).toFixed(2));
+			await s.page.mouse.click(d.x + 8, d.y);
+			await s.settle(500);
+			const c8 = (await dg()).now;
+			ok('dense: a click 8 px right of the line sets a stop to its right (within 8 steps)', stops.indexOf(c8) > stops.indexOf(mid) && stops.indexOf(c8) - stops.indexOf(mid) <= 10, mid + ' -> ' + c8);
+			// A lost button release must not leave the chart following the pointer.
+			d = await dg();
+			await s.page.mouse.move(d.x, d.y);
+			await s.page.mouse.down();
+			await s.page.mouse.move(d.x + 60, d.y);
+			await s.settle(300);
+			const dragged = (await dg()).now;
+			ok('dense: a real drag moves the run (to a stop of the transport)', dragged !== c8 && stops.indexOf(dragged) >= 0, c8 + ' -> ' + dragged);
+			await s.page.evaluate(() => { window.dispatchEvent(new Event('blur')); });
+			await s.page.mouse.move(d.x + 200, d.y);
+			await s.settle(300);
+			ok('dense: after the window loses focus, moving the pointer does not scrub', (await dg()).now === dragged);
+			await s.page.mouse.up();
+			// A click on the plot while a Statistic is showing takes the run to a time and leaves the Statistic.
+			await s.page.evaluate(() => {
+				const sel = document.getElementById('lpn_time_step'); sel.value = 'stat'; sel.dispatchEvent(new Event('change', { bubbles: true }));
+			});
+			await s.settle(600);
+			const statOn = () => s.page.evaluate(() => !!EngCalcs.lpnTimeStatisticLabel());
+			ok('dense: the Statistic is showing', await statOn());
+			d = await dg();
+			await s.page.mouse.move(d.x - 100, d.y);
+			await s.settle(300);
+			ok('dense: hovering with a Statistic showing changes nothing', await statOn());
+			// (left of the line: the floating Settings box lies over the plot's right part)
+			await s.page.mouse.click(d.x - 100, d.y);
+			await s.settle(2500);
+			ok('dense: a click on the plot then sets a time (the Statistic is left)', !(await statOn()));
+			ok('dense: no uncaught page errors', s.errors.length === 0, s.errors.join('\n'));
+			await s.context.close().catch(() => {});
+		}
 
 		// ---- right to left ----
 		s = await Session.open(browser, 'A', { viewport: { width: 1400, height: 900 }, locale: 'ar' });

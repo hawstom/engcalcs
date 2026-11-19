@@ -42,6 +42,15 @@
  * retires the worry. The count is what made the bug visible in one glance -- print what you
  * compared, always.
  *
+ * ONE ALLOWANCE, FOR BOLD. A translation whose ONLY difference from English is missing <strong></strong>
+ * pairs, on a key whose English has CHANGED since the translation was synced (detect_english_drift.php's
+ * --json list, asked of that script, not recomputed here), is printed as a pending-sprint NOTE with a
+ * count and is not a finding. Added 2026-11-17 when the User Manual's interface labels went bold in
+ * English (Task 859): the absence of bold hides no content, and the drift list already sends the key to
+ * the next sprint, so failing 26 files for it would only force a markup edit the sprint makes anyway.
+ * Any other tag or placeholder difference on the same key still fails, and so does a missing <strong>
+ * on a key whose English has NOT changed since the sync.
+ *
  * Usage:  php dev/scripts/lang_tag_parity_check.php [--lang=es,fr] [--strict]
  *         --strict makes it exit non-zero. Default is advisory, because the first run over a corpus
  *         this old is a survey rather than a gate.
@@ -101,6 +110,10 @@ function placeholders($s) {
 
 $findings = [];
 $checked = 0;
+$boldPending = [];
+// The keys whose English changed since the last sync: asked of the drift script, which owns that comparison.
+$driftChanged = json_decode((string)shell_exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg(__DIR__ . '/detect_english_drift.php') . ' --json 2>/dev/null'), true);
+$driftChanged = is_array($driftChanged) ? array_flip($driftChanged) : [];
 
 foreach ($langs as $lang) {
     $path = "$LIB/lang.ec.$lang.php";
@@ -136,7 +149,13 @@ foreach ($langs as $lang) {
             $findings[] = [$lang, $key, 'tag-parity',
                 'LOST ' . ($aBr - $bBr) . ' <br> (English asks for ' . $aBr . ', has ' . $bBr . ')'];
         }
-        if ($a !== $b) {
+        // Missing bold only: with the <strong> tags set aside the two are the same, and the translation has fewer of them.
+        $notBold = function ($t) { return $t !== '<strong>' && $t !== '</strong>'; };
+        $nBold = function (array $tags) use ($notBold) { return count($tags) - count(array_filter($tags, $notBold)); };
+        $missingBoldOnly = $a !== $b && array_values(array_filter($a, $notBold)) === array_values(array_filter($b, $notBold)) && $nBold($b) < $nBold($a);
+        if ($missingBoldOnly && isset($driftChanged[$key])) {
+            $boldPending[$lang][$key] = true;
+        } elseif ($a !== $b) {
             $lost  = array_diff($a, $b);
             $extra = array_diff($b, $a);
             $bits = [];
@@ -186,5 +205,9 @@ if ($findings) {
     echo "Run with --verbose for one line per language.\n";
 }
 
+if ($boldPending) {
+    $cells = 0; foreach ($boldPending as $keys) { $cells += count($keys); }
+    printf("NOTE: %d translated string(s) in %d language(s) lack only the <strong> bold English now has, on keys whose English has changed since the sync; the next translation sprint adds it (pending, not a finding).\n", $cells, count($boldPending));
+}
 if (!$findings) { echo "PASS: every translated string carries the same markup as its English source.\n"; }
 exit($strict && $findings ? 1 : 0);

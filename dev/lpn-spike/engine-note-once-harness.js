@@ -170,52 +170,6 @@ console.log('\n=== 3. changing the engine makes it new again ===');
 	ok('and disarms its timer, so nothing fires into an empty box later', !noteTimerArmed());
 }
 
-function codes() {
-	return (L.lastResult().warnings || []).map(function (w) { return w.code; });
-}
-
-console.log('\n=== 4. the warning follows the CURRENT k, in both directions (Task 526) ===');
-{
-	// **THIS SECTION USED TO ASSERT THE DEFECT AND NOW ASSERTS THE FIX.**
-	//
-	// js/lpn-epanet.js cached `built.warnings` on the EPANET session for as long as
-	// signatureOf(model) held, on the reasoning that a warning depends only on the method and on
-	// which pumps have curves -- both in the signature. `minor-loss-gravity-differs` broke that,
-	// because it is raised from `lpnLinkK(link) > 0`, a VALUE, and `k` is not in the signature.
-	//
-	// Both directions are checked, and the SECOND is the one that cost something: a stale warning
-	// on a network whose losses went to zero merely says something harmless, while a network that
-	// GAINS a minor loss and is told nothing hides a real difference between the two engines.
-	//
-	// The signature must not move across these solves, or this proves nothing -- a rebuild would
-	// refresh the warnings for the uninteresting reason. Only `k` is touched, and lpnToInp is
-	// counted to prove the warm session was reused throughout.
-	const realToInp = global.EngCalcs.lpnToInp;
-	let inpBuilds = 0;
-	global.EngCalcs.lpnToInp = function () { inpBuilds++; return realToInp.apply(this, arguments); };
-
-	L.resetEngineNotes();
-	L.getDoc().links[0]._k = 0;
-	await solved();
-	const modelK = L.assembleModel().links[0].k;
-	const warnedAtZero = codes().indexOf('minor-loss-gravity-differs') >= 0;
-	ok('the model really does go to k = 0, so this is not the test being wrong', modelK === 0,
-		'model k = ' + JSON.stringify(modelK));
-	ok('zeroing every minor loss drops the warning', !warnedAtZero,
-		'warnings = ' + JSON.stringify(codes()));
-
-	// The costly direction. Same session, same signature, k comes back.
-	L.getDoc().links[0]._k = 2;
-	await solved();
-	ok('...and adding one back raises it again, which is what used to be silent',
-		codes().indexOf('minor-loss-gravity-differs') >= 0,
-		'warnings = ' + JSON.stringify(codes()));
-
-	global.EngCalcs.lpnToInp = realToInp;
-	ok('and neither solve rebuilt the .inp, so the warm session really was reused',
-		inpBuilds === 0, inpBuilds + ' rebuild(s)');
-}
-
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);
 

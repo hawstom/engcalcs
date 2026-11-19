@@ -384,6 +384,13 @@
 	// already does for a [VALVES] row and a [STATUS] override; there is no second convention here.
 
 	/**
+	 * THE CONTROLS OF A LIST THAT ALSO HOLDS COMMENT ROWS (Task 859). `doc.controls` keeps the file's whole-line comments as rows of their
+	 * own (`{ comment: true, lines }`) between the controls; a reader that means CONTROLS asks through this and never tests `.comment` itself.
+	 */
+	EC.lpnControlsOnly = function (list) {
+		return (list || []).filter(function (c) { return !(c && c.comment); });
+	};
+	/**
 	 * Parse one [CONTROLS] line into a record. Returns { ok: false, error, raw } rather than
 	 * throwing, so an importer can report the line verbatim and keep the rest of the file -- which
 	 * is the module contract js/lpn-inp.js is built on.

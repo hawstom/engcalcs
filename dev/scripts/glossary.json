@@ -5344,9 +5344,12 @@
             "definition": "",
             "symbol": "",
             "context": "",
-            "translation_notes": "",
+            "translation_notes": "Sprint 1118 (2026-11-18): ar, bg and cs had rendered \"Add a control\" as \"Add a rule\"; each now keeps a distinct word for control and for rule (ar ضابط/قاعدة, bg управление/правило, cs řízení/pravidlo), from the shipped Libraries labels.",
             "translations": {
-                "en": "control"
+                "en": "control",
+                "ar": "ضابط",
+                "bg": "управление",
+                "cs": "řízení"
             },
             "source": "dev/terms.md",
             "uniqueness_group": 4
@@ -5358,9 +5361,12 @@
             "definition": "",
             "symbol": "",
             "context": "",
-            "translation_notes": "",
+            "translation_notes": "Sprint 1118 (2026-11-18): ar, bg and cs had rendered \"Add a control\" as \"Add a rule\"; each now keeps a distinct word for control and for rule (ar ضابط/قاعدة, bg управление/правило, cs řízení/pravidlo), from the shipped Libraries labels.",
             "translations": {
-                "en": "rule"
+                "en": "rule",
+                "ar": "قاعدة",
+                "bg": "правило",
+                "cs": "pravidlo"
             },
             "source": "dev/terms.md",
             "uniqueness_group": 4
