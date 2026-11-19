@@ -5052,3 +5052,22 @@ OBSERVED (re-verify; real Chromium via the branch's env.js server, Net3 example,
 - Manual: 16 of 18 box entries carry bold (700), no sideways scroll; Demand categories and Screenshot box none. Entry text read from the language file with <strong> marked, not every sentence rendered.
 - DEFECT (OBSERVED, text): Scenarios example table header half bold (Highest velocity, No. of overrides, Time (hr) bold; Lowest pressure, Scenario, Junction, Pressure (psi), Link, Velocity (ft/sec), Demand multiplier plain). Contour box entry: "Interval and Labels" plain beside bold Show contour lines, and Labels bold earlier in same entry. "(see **Replace and Undo**)" bolds a manual heading, not a screen label. Controls/Rules/Patterns/Curves/Fittings first cells plain beside bold "Pipe types". Undo, Cancel, Stop, Copy, Delete, Replace(verb) plain throughout. Settings section list: Calculation/Credits plain, Symbology/Map/Page bold.
 - NOT DONE: ten entries opened through each ? button and looked at; Rules comment rows in the browser; phone; other languages; mutation test.
+
+## 2026-11-16 feat/graph-scrub (976263e31), Task 863 second half
+OBSERVED (re-verify; real Chromium, Net1 EPS 25 frames to 24 h, desktop 1400x900 mouse, 390x844 touch, ?lang=ar):
+- Drag on the Time series line steps to stops (0 -> 54000 = selector 15:00), clamps both ends, click on or beside the line moves nothing, Play stops on press, a blur ends a drag; touch on the phone the same; no page scroll. Cursor over the line is ew-resize. Transport buttons/selects: markup, rects and styles identical to master (8100) at 1400 and 390. Builder's harness: all ok, including bubble and Properties graph.
+- Floating Properties box covers the bottom-pane chart in the middle (line at 15:00 is under it: elementFromPoint gives the box graph's svg). A toast at the right edge covered the line at 24:00. On the phone the box covers the whole pane, so its own graph is the handle.
+- Stray: lpn-time.js has an orphan doc comment ("A press on the graph's time line takes the clock in hand") above lpnTimeStops.
+- NOT DONE: Net3 (examples list matched but result looked like Net1; not distinguished), system-flow chart alone, mutation test, how the line looks in the pane, dark theme.
+
+## 2026-11-17 feat/graph-scrub round 2 (16c0c032d, cda4057ae), Perry
+
+- OBSERVED (Chromium, 1366x768 mouse, Net1 EPS, junction 10, bottom Time series): at 0:00 a solid blue knob and blue line show on the left frame; mouse press-drag on the plot (not on the line) moves the run (to 7:00), the map labels change and the toolbar time selector agrees; Step forward moves the line one step; plain click on plot and on a dot moves nothing, the dot's hover tip still shows; dark theme line is a lighter blue, visible. check_all --fast exit 0.
+- OBSERVED (390 wide, touch): in the Properties box chart a finger on the line or knob seeks; a finger on the plot away from the line seeks nothing and the pane scrolls (scrollTop 14 to 0); tap moves nothing.
+- OBSERVED: at 1366x768 the floating Properties box and the "Reporting time steps" notice cover the middle of the bottom chart; plot drags must start left of x~640.
+- SPECULATION: a shared scratchpad path let a sibling agent overwrite my fast.log; use a unique filename.
+
+## 2026-11-18 feat/graph-scrub round 3 (Task 863)
+- OBSERVED: transport-ends-browser-harness passes (46 ok). Own drive, real Chromium, Net1 EPS, Junction 10: thin blue time line (1.5px, token colour) visible at 0:00 on the left plot edge in the bottom pane and on the phone Properties graph; hover shows crosshair + time/value readout and changes nothing; click set 15:00, drag scrubbed; phone tap and sideways drag set time, readout shown with finger down; no page errors.
+- OBSERVED: the run-finished Calculate dialog sits over the right of the bottom graph on first run (pre-existing, not this branch).
+- Not checked: how it feels under a real finger; pixel look beyond screenshots.

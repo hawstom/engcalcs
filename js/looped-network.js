@@ -39131,6 +39131,193 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// reads; the label is then the transport's own format, so the axis and the scrubber say the same
 	// thing about the same moment.
 	function tsHours(t) { return (t || 0) / 3600; }
+	// **THE CHART READS AND SETS THE TIME, THE WAY A MODERN CHART DOES** (Tom, 2026-11-17: "Most modern
+	// applications find a more intuitive way to do this without a triangle and a heavy line"). The current time
+	// is a thin line, no handle. A pointer over the plot draws a light crosshair on the nearest reporting time
+	// with a small readout (the time, and each series' value then); nothing changes until the reader acts. A
+	// click or tap sets the run to that reporting time; a press and drag scrubs it. On touch the readout shows
+	// while the finger is down, because a phone has no hover, and a vertical swipe still scrolls the box.
+	// The seek is EngCalcs.lpnTimeGoTo(), which Back, Forward and the time selector end in too.
+	//
+	// **A PRESS THAT DOES NOT TRAVEL SETS THE TIME AT RELEASE; A DRAG SEEKS ONCE IT HAS TRAVELLED TS_NOW_SLOP px**,
+	// so a finger that turns into a vertical scroll (pointercancel) has set nothing.
+	//
+	// **THE CHART IS REDRAWN ON EVERY STEP, SO THE DRAG LIVES ON THE DOCUMENT**, not on the svg that was pressed:
+	// that svg is replaced under the pointer by the redraw this very seek causes. The drawing's numbers ride on
+	// the svg (svg._tsNow), at every move the live svg is found again in the chart's container (by id when it
+	// has one: the Properties box builds a new container each time), and the redraw puts the crosshair back.
+	// Nothing here outlives the drag but tsHover, the mouse's last position, which a redraw checks against the
+	// new svg's own rectangle.
+	var TS_NOW_SLOP = 3, TS_READ_ROWS = 8, tsNowDrag = null, tsHover = null;
+	function tsNowLiveSvg(d) {
+		var host = typeof d.host === 'string' ? document.getElementById(d.host) : d.host, all, i;
+		if (!host) { return null; }
+		all = host.querySelectorAll('svg');
+		for (i = 0; i < all.length; i++) { if (all[i]._tsNow && all[i].isConnected) { return all[i]; } }
+		return null;
+	}
+	// The plotted reporting time nearest the pointer: from the chart's OWN frame times (c.times, kept per draw), not the
+	// transport's current settings, which a Report step changed with Recalculate off no longer describe the run drawn.
+	function tsNearestStop(svg, clientX) {
+		var c = svg._tsNow, tm = c && c.times, p, hrs, best = -1, i, ctm = svg.getScreenCTM && svg.getScreenCTM(), pt;
+		if (!c || !tm || !tm.length || !ctm) { return null; }
+		pt = svg.createSVGPoint(); pt.x = clientX; pt.y = 0;
+		p = pt.matrixTransform(ctm.inverse());
+		hrs = c.xB.min + (p.x - c.box.left) / (c.box.width || 1) * (c.xB.max - c.xB.min);
+		for (i = 0; i < tm.length; i++) {
+			if (tsHours(tm[i]) < c.xB.min - 1e-9 || tsHours(tm[i]) > c.xB.max + 1e-9) { continue; }
+			if (best < 0 || Math.abs(tsHours(tm[i]) - hrs) < Math.abs(tsHours(tm[best]) - hrs)) { best = i; }
+		}
+		return best < 0 ? null : { i: best, t: tm[best], x: c.box.left + (tsHours(tm[best]) - c.xB.min) / ((c.xB.max - c.xB.min) || 1) * c.box.width };
+	}
+	function tsCrossHide(svg) {
+		var g = svg && svg.querySelector('.lpn-ts-cross');
+		if (g) { svg.removeChild(g); }
+	}
+	// The crosshair and its readout, drawn last in the svg so nothing covers them, and never taking a pointer.
+	function tsCrossShow(svg, clientX) {
+		var c = svg._tsNow, s = tsNearestStop(svg, clientX), g, rd, rows, lines, w = 0, h, x0, i, t, sw = 10, pad = 4, lh = 12, n;
+		tsCrossHide(svg);
+		if (!s) { return; }
+		g = el('g', { class: 'lpn-ts-cross' }, svg);
+		svg._tsCrossAt = s.t;
+		el('line', { x1: s.x, y1: c.box.top, x2: s.x, y2: c.box.top + c.box.height, class: 'lpn-ts-cross-line' }, g);
+		rd = c.readout ? c.readout(s.t, s.i) : null;
+		rows = rd && rd.rows ? rd.rows : [];
+		// Lines that fit in the frame below the readout's 4 px offset: the title, the rows, and a "+k" line when rows are cut.
+		n = Math.floor((c.box.height - 8 - 2 * pad) / lh);
+		n = rows.length > TS_READ_ROWS || rows.length + 1 > n ? Math.max(0, Math.min(TS_READ_ROWS, n - 2)) : rows.length;
+		lines = [{ text: rd && rd.title ? rd.title : (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(s.t) : String(s.t)) }]
+			.concat(rows.slice(0, n));
+		if (rows.length > n) { lines.push({ text: '+' + (rows.length - n) }); }
+		el('rect', { class: 'lpn-ts-read-bg', rx: 3 }, g);
+		lines.forEach(function (ln, k) {
+			if (ln.color) { el('circle', { cx: pad + 4, cy: pad + (k + 1) * lh - 4, r: 3, fill: ln.color, class: 'lpn-ts-read-swatch' }, g); }
+			t = tsText(g, pad + (ln.color ? sw : 0), pad + (k + 1) * lh - 3, ln.text, { class: 'lpn-profile-tick lpn-ts-read-text' });
+			try { w = Math.max(w, t.getComputedTextLength() + (ln.color ? sw : 0)); } catch (e) { w = Math.max(w, ln.text.length * 6); }
+		});
+		w += 2 * pad; h = lines.length * lh + 2 * pad;
+		x0 = s.x + 8;
+		if (x0 + w > c.box.left + c.box.width) { x0 = s.x - 8 - w; }
+		if (x0 + w > c.box.left + c.box.width) { x0 = c.box.left + c.box.width - w; }
+		x0 = Math.max(c.box.left, x0);
+		g.querySelector('.lpn-ts-read-bg').setAttribute('width', w);
+		g.querySelector('.lpn-ts-read-bg').setAttribute('height', h);
+		for (i = 1; i < g.childNodes.length; i++) {
+			g.childNodes[i].setAttribute('transform', 'translate(' + x0 + ',' + (c.box.top + 4) + ')');
+		}
+	}
+	function tsNowSeek(clientX) {
+		var svg = tsNowDrag && tsNowLiveSvg(tsNowDrag), s;
+		if (!svg || !EngCalcs.lpnTimeGoTo) { return; }
+		s = tsNearestStop(svg, clientX);
+		if (!s || s.t === tsNowDrag.last) { return; }
+		tsNowDrag.last = s.t;
+		EngCalcs.lpnTimeGoTo(s.t);
+	}
+	function tsNowEnd(e) {
+		var svg;
+		if (!tsNowDrag || (e && e.pointerId !== undefined && e.pointerId !== tsNowDrag.id)) { return; }
+		document.removeEventListener('pointermove', tsNowMove, true);
+		document.removeEventListener('pointerup', tsNowUp, true);
+		document.removeEventListener('pointercancel', tsNowEnd, true);
+		window.removeEventListener('blur', tsNowEnd);
+		svg = tsNowLiveSvg(tsNowDrag);
+		// A finger's readout goes with the finger; a mouse's stays while it is over the plot.
+		if (tsNowDrag.touch) { tsHover = null; tsCrossHide(svg); }
+		tsNowDrag = null;
+	}
+	function tsNowUp(e) {
+		if (!tsNowDrag || e.pointerId !== tsNowDrag.id) { return; }
+		if (!tsNowDrag.moved && e.type === 'pointerup') { tsNowSeek(e.clientX); }
+		if (!tsNowDrag.touch) { tsHover = { host: tsNowDrag.host, x: e.clientX, y: e.clientY }; }
+		tsNowEnd(e);
+		if (tsHover) { tsHoverShow(tsNowLiveSvg({ host: tsHover.host }), tsHover.host); }
+	}
+	function tsNowMove(e) {
+		if (!tsNowDrag || e.pointerId !== tsNowDrag.id) { return; }
+		// A pointerup that never arrived (released outside the window, or over a frame) must not leave the
+		// chart following a pointer with no button down.
+		if (e.pointerType === 'mouse' && e.buttons === 0) { tsNowEnd(null); return; }
+		tsNowDrag.x = e.clientX;
+		if (!tsNowDrag.moved) {
+			if (Math.abs(e.clientX - tsNowDrag.x0) < TS_NOW_SLOP) { return; }
+			tsNowDrag.moved = true;
+		}
+		// The seek redraws the chart, and the redraw puts the crosshair back (tsNowMark 'hit'), once.
+		tsNowSeek(e.clientX);
+	}
+	// Put a mouse's crosshair back on a chart that was just redrawn under it, if the pointer is still over its plot.
+	function tsHoverShow(svg, hostId) {
+		var r, c;
+		if (!svg || !tsHover || tsHover.host !== hostId) { return; }
+		c = svg._tsNow; r = svg.getBoundingClientRect();
+		if (!c || tsHover.x < r.left || tsHover.x > r.right || tsHover.y < r.top || tsHover.y > r.bottom) { return; }
+		tsCrossShow(svg, tsHover.x);
+	}
+	// **THE CURRENT TIME: ONE THIN LINE IN THE ACCENT COLOUR, NO HANDLE, ONE HELPER FOR EVERY CHART THAT CARRIES THE
+	// TRANSPORT'S TIME.** It reaches a few px above the frame and rests on a paper halo, so at 0:00, where it
+	// lies on the chart's left frame, it is still seen (Tom, 2026-11-17: "I don't see a time line").
+	// Called twice per chart: 'line' under the series, 'hit' last, which takes the pointer and carries `readout`,
+	// the chart's own function from a reporting time to {title, rows: [{color, text}]}.
+	function tsNowMark(host, svg, now, X, box, xB, part, readout, times) {
+		var x, hostId = host.id || host;
+		if (part === 'line') {
+			svg._tsNow = { box: box, xB: xB };
+			svg.setAttribute('class', svg.getAttribute('class') + ' lpn-ts-scrub');
+			if (now < xB.min || now > xB.max) { return; }
+			x = X(now);
+			el('line', { x1: x, y1: box.top - 4, x2: x, y2: box.top + box.height, class: 'lpn-ts-now-halo' }, svg);
+			el('line', { x1: x, y1: box.top - 4, x2: x, y2: box.top + box.height, class: 'lpn-ts-now' }, svg);
+			return;
+		}
+		svg._tsNow.readout = readout;
+		svg._tsNow.times = times;
+		function inPlot(e) {
+			var m = svg.getScreenCTM(), pt, p;
+			if (!m) { return false; }
+			pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+			p = pt.matrixTransform(m.inverse());
+			return p.x >= box.left && p.x <= box.left + box.width && p.y >= box.top && p.y <= box.top + box.height;
+		}
+		svg.addEventListener('pointermove', function (e) {
+			var near;
+			if (e.pointerType === 'touch' || tsNowDrag) { return; }
+			if (!inPlot(e)) { tsHover = null; tsCrossHide(svg); return; }
+			tsHover = { host: hostId, x: e.clientX, y: e.clientY };
+			// Nothing to redraw while the pointer stays nearest the same reporting time.
+			near = tsNearestStop(svg, e.clientX);
+			if (near && svg._tsCrossAt === near.t && svg.querySelector('.lpn-ts-cross')) { return; }
+			tsCrossShow(svg, e.clientX);
+		});
+		svg.addEventListener('pointerleave', function (e) {
+			if (tsNowDrag || e.pointerType === 'touch') { return; }
+			tsHover = null; tsCrossHide(svg);
+		});
+		svg.addEventListener('pointerdown', function (e) {
+			if ((e.button !== undefined && e.button > 0) || !inPlot(e)) { return; }
+			tsNowEnd(null);
+			if (EngCalcs.lpnTimePause) { EngCalcs.lpnTimePause(); }
+			tsNowDrag = { id: e.pointerId, host: hostId, x0: e.clientX, x: e.clientX, moved: false, touch: e.pointerType === 'touch',
+				last: (EngCalcs.lpnTimeStatisticLabel && EngCalcs.lpnTimeStatisticLabel()) ? null : EngCalcs.lpnTimeNow() };
+			document.addEventListener('pointermove', tsNowMove, true);
+			document.addEventListener('pointerup', tsNowUp, true);
+			document.addEventListener('pointercancel', tsNowEnd, true);
+			window.addEventListener('blur', tsNowEnd);
+			tsCrossShow(svg, e.clientX);
+		});
+		// A finger moving mostly sideways is a scrub, not the page's swipe-back or a pane scroll; `touch-action: pan-y`
+		// on the svg says the same to browsers that honour it.
+		(function () {
+			var sx = 0, sy = 0;
+			svg.addEventListener('touchstart', function (e) { if (e.touches.length) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; } }, { passive: true });
+			svg.addEventListener('touchmove', function (e) {
+				if (e.touches.length && e.cancelable && Math.abs(e.touches[0].clientX - sx) > Math.abs(e.touches[0].clientY - sy)) { e.preventDefault(); }
+			}, { passive: false });
+		}());
+		if (tsNowDrag && tsNowDrag.host === hostId) { tsCrossShow(svg, tsNowDrag.x); }
+		else { tsHoverShow(svg, hostId); }
+	}
 	function tsWaitingText(pc) {
 		var why;
 		if (EngCalcs.lpnTimeIsExtended && !effectiveTimesExtended()) {
@@ -39311,10 +39498,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// beside it is. Inside the frame only -- a run whose report starts late has moments the
 		// chart honestly does not cover.
 		now = tsHours(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0);
-		if (now >= xB.min && now <= xB.max) {
-			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
-				class: 'lpn-ts-now' }, svg);
-		}
+		tsNowMark(host, svg, now, X, box, xB, 'line');
 
 		dots = frames.length <= LPN_TS_DOT_MAX;
 		series.forEach(function (s) {
@@ -39341,17 +39525,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			flush();
 			if (!dots) { return; }
 			s.points.forEach(function (q) {
-				var c, ttl;
+				var c;
 				if (q.y === undefined) { return; }
-				c = el('circle', { cx: X(tsHours(q.t)), cy: Y(q.y), r: 2,
-					class: 'lpn-ts-dot', fill: s.color }, svg);
-				// A <title>, not a tooltip of our own: it is the one every browser already has, and
-				// it is where the exact number lives -- the axis is rounded to a step a person
-				// reads, which is the whole point of the step.
-				ttl = el('title', {}, c);
-				ttl.appendChild(document.createTextNode(
-					s.id + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(q.t) : q.t) +
-					'   ' + plainRound(q.y, 2)));
+				// No <title>: the crosshair readout gives the value, and two tips for one value are one too many. The
+				// exact number stays on the dot as data, for the harnesses that read what was plotted.
+				c = el('circle', { cx: X(tsHours(q.t)), cy: Y(q.y), r: 2, class: 'lpn-ts-dot', fill: s.color,
+					'data-reading': s.id + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(q.t) : q.t) + '   ' + plainRound(q.y, 2) }, svg);
 			});
 		});
 		// The measured rings, in their asset's own color, drawn last so a line never hides one.
@@ -39367,12 +39546,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		});
 
+		unit = colorFieldUnitText(group, field);
+		tsNowMark(host, svg, now, X, box, xB, 'hit', function (t, i) {
+			var rows = [];
+			series.forEach(function (s) {
+				var p = s.points[i];
+				if (p && p.y !== undefined) { rows.push({ color: s.color, text: s.id + '  ' + plainRound(p.y, 2) + (unit ? ' ' + unit : '') }); }
+			});
+			return { title: EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(t) : String(t), rows: rows };
+		}, frames.map(function (f) { return f.t; }));
+
 		// Axis titles. The y one is the quantity and its unit, built the way renderColorLegend()
 		// builds its heading -- the same whole label and the same parenthesised unit, so the chart
 		// and the map key name one quantity the same way. THE UNIT IS THE PROJECT'S: every value
 		// above came through colorValueOf(), which converts a solved number into whatever the units
 		// strip currently says, and colorFieldUnitText() is that strip read for this one field.
-		unit = colorFieldUnitText(group, field);
 		tsText(svg, 0, 0, (labelOverride || colorFieldLabel(group, field)) + (unit ? ' (' + unit + ')' : ''),
 			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
 			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
@@ -40343,10 +40531,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			class: 'lpn-profile-frame' }, svg);
 		// Where the transport is parked, as on Time series.
 		now = tsHours(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0);
-		if (now >= xB.min && now <= xB.max) {
-			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
-				class: 'lpn-ts-now' }, svg);
-		}
+		tsNowMark(host, svg, now, X, box, xB, 'line');
 		dots = frames.length <= LPN_TS_DOT_MAX;
 		ttlName = { produced: pc.lpn_sysflow_produced || 'Produced', consumed: pc.lpn_sysflow_consumed || 'Consumed' };
 		['produced', 'consumed'].forEach(function (key) {
@@ -40359,12 +40544,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			if (!dots && pts.length > 1) { return; }
 			pts.forEach(function (p) {
-				var c = el('circle', { cx: X(tsHours(p.t)), cy: Y(p[key]), r: 2, class: 'lpn-ts-dot', fill: color }, svg),
-					ttl = el('title', {}, c);
-				ttl.appendChild(document.createTextNode(ttlName[key] + '   ' +
-					(EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : p.t) + '   ' + plainRound(p[key], 2)));
+				el('circle', { cx: X(tsHours(p.t)), cy: Y(p[key]), r: 2, class: 'lpn-ts-dot', fill: color,
+					'data-reading': ttlName[key] + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : p.t) + '   ' + plainRound(p[key], 2) }, svg);
 			});
 		});
+		tsNowMark(host, svg, now, X, box, xB, 'hit', function (t, i) {
+			var u = unitLabel(resultUnit('flow')), p = pts[i], rows = [];
+			if (p) {
+				['produced', 'consumed'].forEach(function (key) {
+					rows.push({ color: SYSFLOW_COLORS[key], text: ttlName[key] + '  ' + plainRound(p[key], 2) + (u ? ' ' + u : '') });
+				});
+			}
+			return { title: EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(t) : String(t), rows: rows };
+		}, pts.map(function (p) { return p.t; }));
 		// Axis titles: EPANET's "Flow (units)", built from the page's own Flow label and the units
 		// strip, the way the map key and Time series build theirs.
 		unit = unitLabel(resultUnit('flow'));

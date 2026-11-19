@@ -3556,7 +3556,13 @@ html[dir="rtl"] .lpn-lib-entry-sel { box-shadow: inset -3px 0 0 var(--ec-select)
 .lpn-profile-chip:hover, .lpn-profile-chip:focus { background: var(--ec-gray-eaeaea); border-color: var(--ec-gray-888); }
 .lpn-ts-line { fill: none; stroke-width: 1.5; stroke-linejoin: round; }
 .lpn-ts-dot { stroke: none; }
-.lpn-ts-now { stroke: var(--ec-gray-888); stroke-width: 1; stroke-dasharray: 3, 3; }
+.lpn-ts-now { stroke: var(--ec-accent); stroke-width: 1.5; pointer-events: none; }
+.lpn-ts-now-halo { stroke: var(--ec-bg); stroke-width: 4; pointer-events: none; }
+.lpn-ts-scrub { cursor: crosshair; touch-action: pan-y; -webkit-user-select: none; user-select: none; }
+.lpn-ts-cross { pointer-events: none; }
+.lpn-ts-cross-line { stroke: var(--ec-gray-888); stroke-width: 1; }
+.lpn-ts-read-swatch { stroke: none; }
+.lpn-ts-read-bg { fill: var(--ec-bg); fill-opacity: .92; stroke: var(--ec-border); stroke-width: 1; }
 .lpn-ts-pick { font: inherit; font-size: .95em; max-width: 12em; }
 .lpn-ts-swatch {
 	display: inline-block; width: 1.1em; height: 0; margin-right: .35em;

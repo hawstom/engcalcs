@@ -7453,9 +7453,17 @@ html[dir="rtl"] .lpn-lib-entry-sel { box-shadow: inset -3px 0 0 var(--ec-select)
    is still changed in one place. */
 .lpn-ts-line { fill: none; stroke-width: 1.5; stroke-linejoin: round; }
 .lpn-ts-dot { stroke: none; }
-/* Where the transport is parked. Dashed and grey on purpose: it is the one mark on the chart that
-   is not a reading, so it must not read as a series. */
-.lpn-ts-now { stroke: var(--ec-gray-888); stroke-width: 1; stroke-dasharray: 3, 3; }
+/* Where the transport is parked: the one mark on the chart that is not a reading. A thin accent line on a paper halo,
+   because a grey dashed line lay on the frame at 0:00 and was not seen (Tom, 2026-11-17). No handle. */
+.lpn-ts-now { stroke: var(--ec-accent); stroke-width: 1.5; pointer-events: none; }
+.lpn-ts-now-halo { stroke: var(--ec-bg); stroke-width: 4; pointer-events: none; }
+/* The chart reads and sets the time: a light crosshair on the nearest reporting time under the pointer, and a small
+   readout. A vertical swipe still scrolls the box (pan-y); a horizontal drag is the scrub. */
+.lpn-ts-scrub { cursor: crosshair; touch-action: pan-y; -webkit-user-select: none; user-select: none; }
+.lpn-ts-cross { pointer-events: none; }
+.lpn-ts-cross-line { stroke: var(--ec-gray-888); stroke-width: 1; }
+.lpn-ts-read-swatch { stroke: none; }
+.lpn-ts-read-bg { fill: var(--ec-bg); fill-opacity: .92; stroke: var(--ec-border); stroke-width: 1; }
 /* The two pull-downs sit on the control row's baseline with the chips and the buttons, so they take
    the row's own type size rather than the browser's default form size. */
 .lpn-ts-pick { font: inherit; font-size: .95em; max-width: 12em; }
