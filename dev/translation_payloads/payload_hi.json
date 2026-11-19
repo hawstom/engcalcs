@@ -2,8 +2,8 @@
     "meta": {
         "language": "hi",
         "expected_key_count": 3383,
-        "delta_key_count": 6,
-        "english_changed_key_count": 5,
+        "delta_key_count": 1,
+        "english_changed_key_count": 0,
         "exempt_key_count": 51,
         "exempt_keys": [
             "u_imgd",
@@ -82,22 +82,12 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: प्रवाह\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: डिफ़ॉल्ट\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.",
+    "glossary": "No glossary term is used by the strings in this batch.",
     "keys_to_translate": {
-        "lpn_inp_dup_comma": ", ",
-        "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_settings_viscosity": "Viscosity",
-        "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
-        "lpn_quality_diffusivity": "Diffusivity",
-        "lpn_quality_diffusivity_tip": "EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²\/s for US flow units and m²\/s for SI flow units. Blank uses the EPANET default of 1.0."
+        "lpn_inp_dup_comma": ", "
     },
     "keys": {
-        "lpn_inp_dup_comma": ", ",
-        "lpn_inp_drop_quality_options": "This file states EPANET water quality options: the Quality option, which states the kind of water quality analysis, and two settings that go with a chemical, Diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical analysis are each computed here, and the two chemical settings are used when a chemical analysis is computed. All of them are written back if you save an EPANET file.",
-        "lpn_settings_viscosity": "Viscosity",
-        "lpn_settings_viscosity_tip": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
-        "lpn_quality_diffusivity": "Diffusivity",
-        "lpn_quality_diffusivity_tip": "EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²\/s for US flow units and m²\/s for SI flow units. Blank uses the EPANET default of 1.0."
+        "lpn_inp_dup_comma": ", "
     },
     "key_context": {
         "lpn_inp_dup_comma": {
@@ -115,111 +105,9 @@
                     "english": "These comments at the end of control lines were not imported, because those controls were not imported. Every control that could be imported was."
                 }
             }
-        },
-        "lpn_inp_drop_quality_options": {
-            "reason": "english_changed",
-            "current_value": "इस फ़ाइल में EPANET जल गुणवत्ता विकल्प हैं: Quality विकल्प, जो जल गुणवत्ता विश्लेषण का प्रकार बताता है, और रसायन से जुड़ी दो सेटिंग्स, विसरणशीलता और गुणवत्ता सहनशीलता। तीनों रखी और उपयोग की जाती हैं। जल आयु, स्रोत अनुरेखण और रसायन विश्लेषण, हर एक की यहाँ गणना होती है, और रसायन विश्लेषण की गणना होने पर दोनों रसायन सेटिंग्स का उपयोग होता है। EPANET फ़ाइल सहेजने पर इन सबको वापस लिखा जाता है।",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_inp_drop_comments",
-                    "value": "इस फ़ाइल के पैटर्न में आई ये टिप्पणी पंक्तियाँ आयात नहीं की गईं, क्योंकि इस पृष्ठ में उन्हें रखने की कोई जगह नहीं है (उदाहरण के लिए, किसी एक पैटर्न की पंक्तियों के बीच की टिप्पणियाँ)। हर पैटर्न पूरी तरह आयात किया गया।",
-                    "english": "These comment lines in the patterns of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern was imported in full."
-                },
-                "next_translated": {
-                    "key": "lpn_inp_drop_file_options",
-                    "value": "यह फ़ाइल एक सहायक फ़ाइल का हवाला देती है: मैप, जिसमें निर्देशांक होते हैं, या हाइड्रॉलिक्स, जिसमें पहले से निकाली गई हाइड्रॉलिक्स होती है। यह पृष्ठ इनमें से कोई भी नहीं खोल सकता, इसलिए ये पंक्तियाँ जैसी हैं वैसी ही रखी जाती हैं और यदि आप EPANET फ़ाइल सहेजते हैं तो वापस लिखी जाती हैं।",
-                    "english": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file."
-                }
-            }
-        },
-        "lpn_settings_viscosity": {
-            "reason": "english_changed",
-            "current_value": "श्यानता",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_specific_gravity",
-                    "value": "विशिष्ट गुरुत्व",
-                    "english": "Specific gravity"
-                },
-                "next_translated": {
-                    "key": "lpn_settings_viscosity_tip",
-                    "value": "EPANET 0.001 से ऊपर के मान को 20 डिग्री सेल्सियस पर पानी की श्यानता के अनुपात के रूप में पढ़ता है, और 0.001 या उससे कम के मान को स्वयं शुद्धगतिक श्यानता के रूप में, US प्रवाह इकाइयों के लिए ft²\/s में और SI प्रवाह इकाइयों के लिए m²\/s में। यह केवल डार्सी-वाइसबाख विधि में उत्तर बदलता है।",
-                    "english": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method."
-                }
-            },
-            "tip": {
-                "key": "lpn_settings_viscosity_tip",
-                "english": "EPANET reads a value above 0.001 as a ratio to the viscosity of water at 20 degrees Celsius, and a value of 0.001 or less as the kinematic viscosity itself, in ft²\/s for US flow units and m²\/s for SI flow units. It only changes the answer under the Darcy-Weisbach method.",
-                "value": "EPANET 0.001 से ऊपर के मान को 20 डिग्री सेल्सियस पर पानी की श्यानता के अनुपात के रूप में पढ़ता है, और 0.001 या उससे कम के मान को स्वयं शुद्धगतिक श्यानता के रूप में, US प्रवाह इकाइयों के लिए ft²\/s में और SI प्रवाह इकाइयों के लिए m²\/s में। यह केवल डार्सी-वाइसबाख विधि में उत्तर बदलता है।"
-            }
-        },
-        "lpn_settings_viscosity_tip": {
-            "reason": "english_changed",
-            "current_value": "EPANET 0.001 से ऊपर के मान को 20 डिग्री सेल्सियस पर पानी की श्यानता के अनुपात के रूप में पढ़ता है, और 0.001 या उससे कम के मान को स्वयं शुद्धगतिक श्यानता के रूप में, US प्रवाह इकाइयों के लिए ft²\/s में और SI प्रवाह इकाइयों के लिए m²\/s में। यह केवल डार्सी-वाइसबाख विधि में उत्तर बदलता है।",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_viscosity",
-                    "value": "श्यानता",
-                    "english": "Viscosity"
-                },
-                "next_translated": {
-                    "key": "lpn_settings_trials",
-                    "value": "अधिकतम ट्रायल",
-                    "english": "Maximum trials"
-                }
-            },
-            "label": {
-                "key": "lpn_settings_viscosity",
-                "english": "Viscosity",
-                "value": "श्यानता"
-            }
-        },
-        "lpn_quality_diffusivity": {
-            "reason": "english_changed",
-            "current_value": "विसरणशीलता",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_tolerance_tip",
-                    "value": "वह सांद्रता अंतर जिससे कम होने पर EPANET जल के दो सटे हुए हिस्सों को एक मानता है। खाली छोड़ने पर EPANET का डिफ़ॉल्ट 0.01 उपयोग होता है।",
-                    "english": "Concentration difference below which EPANET treats two adjoining parcels of water as one. Blank uses the EPANET default of 0.01."
-                },
-                "next_translated": {
-                    "key": "lpn_quality_diffusivity_tip",
-                    "value": "EPANET 0.0001 से ऊपर के मान को पानी में क्लोरीन की विसरणशीलता के अनुपात के रूप में पढ़ता है, और 0.0001 या उससे कम के मान को स्वयं विसरणशीलता के रूप में, US प्रवाह इकाइयों के लिए ft²\/s में और SI प्रवाह इकाइयों के लिए m²\/s में। खाली छोड़ने पर EPANET का डिफ़ॉल्ट 1.0 उपयोग होता है।",
-                    "english": "EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²\/s for US flow units and m²\/s for SI flow units. Blank uses the EPANET default of 1.0."
-                }
-            },
-            "tip": {
-                "key": "lpn_quality_diffusivity_tip",
-                "english": "EPANET reads a value above 0.0001 as a ratio to the diffusivity of chlorine in water, and a value of 0.0001 or less as the diffusivity itself, in ft²\/s for US flow units and m²\/s for SI flow units. Blank uses the EPANET default of 1.0.",
-                "value": "EPANET 0.0001 से ऊपर के मान को पानी में क्लोरीन की विसरणशीलता के अनुपात के रूप में पढ़ता है, और 0.0001 या उससे कम के मान को स्वयं विसरणशीलता के रूप में, US प्रवाह इकाइयों के लिए ft²\/s में और SI प्रवाह इकाइयों के लिए m²\/s में। खाली छोड़ने पर EPANET का डिफ़ॉल्ट 1.0 उपयोग होता है।"
-            }
-        },
-        "lpn_quality_diffusivity_tip": {
-            "reason": "english_changed",
-            "current_value": "EPANET 0.0001 से ऊपर के मान को पानी में क्लोरीन की विसरणशीलता के अनुपात के रूप में पढ़ता है, और 0.0001 या उससे कम के मान को स्वयं विसरणशीलता के रूप में, US प्रवाह इकाइयों के लिए ft²\/s में और SI प्रवाह इकाइयों के लिए m²\/s में। खाली छोड़ने पर EPANET का डिफ़ॉल्ट 1.0 उपयोग होता है।",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_diffusivity",
-                    "value": "विसरणशीलता",
-                    "english": "Diffusivity"
-                },
-                "next_translated": {
-                    "key": "lpn_quality_named_concentration",
-                    "value": "{chemical} सांद्रता",
-                    "english": "{chemical} concentration"
-                }
-            },
-            "label": {
-                "key": "lpn_quality_diffusivity",
-                "english": "Diffusivity",
-                "value": "विसरणशीलता"
-            }
         }
     },
-    "key_plain": {
-        "lpn_settings_viscosity": "Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else."
-    },
+    "key_plain": [],
     "key_notes": [],
     "key_concepts": [],
     "uniqueness_attention": []
