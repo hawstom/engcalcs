@@ -48034,6 +48034,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					: (l.setting || 0);
 				// A GPV's behaviour IS its curve, and the curve is the document's (Task 586).
 				if (l.curveId) { out._curveId = l.curveId; }   // base-write: import builds Base, as the setting above does
+				// [STATUS] Open on a valve: fixed open in EPANET, never regulating (js/lpn-inp.js).
+				if (l.fixedOpen) { out.valveOpen = true; }   // base-write: an imported document is born in Base
 			}
 			if (l.type === 'pump') {
 				// **THE PUMP KEEPS A REFERENCE AND THE CURVE GOES TO THE LIBRARY** (Task 586). The
@@ -80579,6 +80581,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					out.setting = toSI(effective(l, 'setting') || 0, 'lpn_u_flow');
 				} else {
 					out.setting = effective(l, 'setting') || 0;
+				}
+				// A valve stated Open in the file's [STATUS] is FIXED open (EPANET unsets its setting): a plain minor loss that never
+				// regulates. A PBV fixed open is a setting of 0 in both engines (hydcoeffs.c pbvcoeff()).
+				if (l.valveOpen && effective(l, 'status') !== 'closed' && /^(PRV|PSV|FCV|PBV)$/.test(out.valveType)) {
+					out.valveFixed = 'open';
+					if (out.valveType === 'PBV') { out.setting = 0; }
 				}
 			}
 			return out;
