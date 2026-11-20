@@ -20,7 +20,9 @@
 //      opens the box; a tap on no ink beside Junction 61 selects the junction, and one beside the pump's glyph selects the pump, not the reservoir whose band lies over the cluster.
 //   B5. phone 412 x 915 at 2.6x, at the opening view and 8 notches out (Tom, 2026-11-19: "I can't select the pipes even though
 //      they are clearly visible"): a tap on a pipe's line, or 3 px off it, near either end and clear of every symbol's
-//      ink, selects that pipe (it gave the junction while only symbols counted as nearby ink).
+//      ink, selects that pipe (it gave the junction while only symbols counted as nearby ink);
+//   B6. the same views: a tap 2 or 3 px from a junction's centre gives the junction (or its box), and a drag from 3 px off its
+//      centre moves it (TOUCH_NODE_MIN_PX: a pipe's line does not take a junction's own ground).
 // The cases built by hand are in pick-chooser-browser-harness.js.
 //
 //   node dev/lpn-spike/pick-chooser-zoom-browser-harness.js   (takes the browser lock itself)
@@ -479,6 +481,7 @@ async function main() {
 			const segD = (x, y, a, b) => { const dx = b.x - a.x, dy = b.y - a.y, L = dx * dx + dy * dy, t = L ? Math.max(0, Math.min(1, ((x - a.x) * dx + (y - a.y) * dy) / L)) : 0; return Math.hypot(x - a.x - t * dx, y - a.y - t * dy); };
 			const lineD = (q, x, y) => { let d = Infinity; for (let i = 0; i + 1 < q.pts.length; i++) { d = Math.min(d, segD(x, y, q.pts[i], q.pts[i + 1])); } return d - q.hw; };
 			const discs = Array.from(document.querySelectorAll('#lpn_canvas circle.lpn-node[data-node]')).map((e) => { const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2, r: b.width / 2 + 0.6 }; }).filter((d) => d.r > 0.6);
+			const centres = Array.from(document.querySelectorAll('#lpn_canvas circle.lpn-node[data-node]')).map((e) => { const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
 			const fills = Array.from(document.querySelectorAll('#lpn_canvas path.lpn-node-hit[data-node], #lpn_canvas path.lpn-link-symbol-hit')).filter((e) => e.getBoundingClientRect().width > 0).map((e) => ({ e, b: e.getBoundingClientRect(), m: e.getScreenCTM().inverse() }));
 			const symD = (x, y) => {
 				let d = Math.min.apply(null, discs.map((c) => Math.hypot(x - c.x, y - c.y) - c.r));
@@ -498,7 +501,9 @@ async function main() {
 						if (x < cr.left + 8 || x > cr.right - 8 || y < cr.top + 70 || y > cr.bottom - 10) { continue; }
 						const top = document.elementFromPoint(x, y); if (!top || !top.closest('#lpn_canvas')) { continue; }
 						const mine = Math.max(0, lineD(q, x, y)), sd = symD(x, y);
-						if (sd - mine < 1.5 || sd > 24 || pipes.some((o) => o !== q && lineD(o, x, y) - mine < 1.5)) { continue; }
+						// Not within a junction's own ground (TOUCH_NODE_MIN_PX = 5 px of its centre, plus a pixel): B6 holds that side.
+					if (centres.some((c) => Math.hypot(x - c.x, y - c.y) <= 6)) { continue; }
+					if (sd - mine < 1.5 || sd > 24 || pipes.some((o) => o !== q && lineD(o, x, y) - mine < 1.5)) { continue; }
 						out.push({ id: q.id, x, y, off });
 					}
 				}
@@ -506,25 +511,96 @@ async function main() {
 			return out;
 		});
 		const ySel = () => Y.page.evaluate(() => { const r = Array.from(document.querySelectorAll('#lpn_canvas .lpn-selected')).map((e) => e.dataset.node ? 'n' + e.dataset.node : (e.dataset.link !== undefined ? 'l' + e.dataset.link : (e.nextElementSibling && e.nextElementSibling.dataset.link !== undefined ? 'l' + e.nextElementSibling.dataset.link : 'x'))); return r.filter((v, i) => r.indexOf(v) === i).sort().join(','); });
+		// **A PRESS, READ AT ONCE, THEN CANCELLED.** A finger's press is decided on the way down (touchNodeOver(), Task 415) and a
+		// tap's lift opens the Properties box, which on a phone docks over most of the map and would take the next taps; so each
+		// point is pressed, what it selected is read, and the press is cancelled; then a press on bare map clears it. A press that
+		// would open the chooser selects nothing yet, and reads as ''.
+		const yCdp = await Y.page.context().newCDPSession(Y.page);
+		const yBare = () => Y.page.evaluate(() => {
+			const cv = document.getElementById('lpn_canvas'), r = cv.getBoundingClientRect();
+			const bareAt = (x, y) => { const e = document.elementFromPoint(x, y); return !!e && !!e.closest('#lpn_canvas') && !e.closest('[data-node],[data-link],[data-lbl],[data-nodelbl],[data-linklbl],[data-shape],[data-cust]'); };
+			for (let y = r.top + 80; y < r.bottom - 20; y += 7) { for (let x = r.left + 10; x < r.right - 10; x += 7) {
+				let ok = bareAt(x, y);
+				for (let dx = -30; dx <= 30 && ok; dx += 3) { for (let dy = -30; dy <= 30 && ok; dy += 3) { if (!bareAt(x + dx, y + dy)) { ok = false; } } }
+				if (ok) { return { x, y }; }
+			} }
+			return null;
+		});
+		const yPress = async (x, y, bare) => {
+			await yCdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y, id: 1 }] });
+			const sel = await ySel();
+			await yCdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
+			if (sel && bare) { await yCdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: bare.x, y: bare.y, id: 1 }] }); await yCdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] }); }
+			return sel;
+		};
+		const yOnMap = (x, y) => Y.page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return !!(e && e.closest('#lpn_canvas')); }, [x, y]);
 		const pipeTaps = async (label) => {
+			await Y.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c) { c.click(); } });
+			const bare = await yBare();
 			const pts = (await pipePts()).slice(0, 40);
 			const wrong = [];
 			let tapped = 0;
 			for (const q of pts) {
-				// A point the docked Properties box has come to cover since the points were listed is not a tap on the map.
-				if (!(await Y.page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return !!(e && e.closest('#lpn_canvas')); }, [q.x, q.y]))) { continue; }
+				if (!(await yOnMap(q.x, q.y))) { continue; }
 				tapped++;
-				await Y.page.touchscreen.tap(q.x, q.y); await Y.settle(150);
-				const sel = await ySel(), rows = await Y.page.$$eval('.lpn-pick-chooser button', (bs) => bs.length);
-				if (sel !== 'l' + q.id || rows) { wrong.push(q.id + (q.off ? '+3px' : '') + '->' + (rows ? 'box' : sel || 'nothing')); }
-				await Y.page.evaluate(() => { document.querySelectorAll('.lpn-pane-ctxmenu').forEach((m) => m.remove()); const c = document.getElementById('lpn_popup_close'); if (c) { c.click(); } });
-				await Y.page.keyboard.press('Escape'); await Y.settle(80);
+				const sel = await yPress(q.x, q.y, bare);
+				if (sel !== 'l' + q.id) { wrong.push(q.id + (q.off ? '+3px' : '') + '->' + (sel || 'nothing or box') + '@' + q.x.toFixed(1) + ',' + q.y.toFixed(1)); }
 			}
-			ok(label + ': ' + tapped + ' taps on a pipe\'s line or 3 px off it, beside a junction, each select that pipe', tapped >= 10 && wrong.length === 0, wrong.slice(0, 8).join(' '));
+			ok(label + ': ' + tapped + ' presses on a pipe\'s line or 3 px off it, beside a junction, each select that pipe', tapped >= 10 && wrong.length === 0, wrong.slice(0, 8).join(' '));
+		};
+		// B6. The other side of the same balance (Task 562: *"many times pipes would edit when I was trying to edit nodes"*): a
+		// finger 2 or 3 px from a junction's centre, on the pipes through it or beside them, still gets the junction (or the
+		// box, where it is drawn over another symbol), and a drag from 3 px off its centre moves it.
+		const junctionTaps = async (label) => {
+			await Y.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c) { c.click(); } });
+			const bare = await yBare();
+			const pts = await Y.page.evaluate(() => {
+				const cv = document.getElementById('lpn_canvas'), cr = cv.getBoundingClientRect(), P = cv.createSVGPoint();
+				const discs = Array.from(document.querySelectorAll('#lpn_canvas circle.lpn-node[data-node]')).map((e) => { const b = e.getBoundingClientRect(); return { id: e.dataset.node, x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
+				const fills = Array.from(document.querySelectorAll('#lpn_canvas path.lpn-node-hit[data-node], #lpn_canvas path.lpn-link-symbol-hit')).filter((e) => e.getBoundingClientRect().width > 0).map((e) => ({ e, m: e.getScreenCTM().inverse() }));
+				const onFill = (x, y) => fills.some((f) => { P.x = x; P.y = y; return f.e.isPointInFill(P.matrixTransform(f.m)); });
+				const out = [];
+				discs.forEach((d) => {
+					if (d.x < cr.left + 8 || d.x > cr.right - 48 || d.y < cr.top + 70 || d.y > cr.bottom - 10) { return; }
+					if (discs.some((o) => o !== d && Math.hypot(o.x - d.x, o.y - d.y) < 10)) { return; }
+					[[2, 0], [0, 2], [-3, 0], [0, -3]].forEach(([ox, oy]) => {
+						const x = d.x + ox, y = d.y + oy, t = document.elementFromPoint(x, y);
+						// Clear of every other symbol's ink by 4 px, so this junction is the nearest drawn thing.
+						const near = [[0, 0], [4, 0], [-4, 0], [0, 4], [0, -4], [3, 3], [-3, 3], [3, -3], [-3, -3]].some(([a, b]) => onFill(x + a, y + b));
+						if (t && t.closest('#lpn_canvas') && !near) { out.push({ id: d.id, x, y }); }
+					});
+				});
+				return out;
+			});
+			const wrong = [];
+			let tapped = 0;
+			for (const q of pts.slice(0, 60)) {
+				if (!(await yOnMap(q.x, q.y))) { continue; }
+				tapped++;
+				const sel = await yPress(q.x, q.y, bare);
+				if (sel !== 'n' + q.id && sel !== '') { wrong.push(q.id + '->' + sel + '@' + q.x.toFixed(1) + ',' + q.y.toFixed(1)); }
+			}
+			ok(label + ': ' + tapped + ' presses 2 or 3 px from a junction\'s centre each give that junction (or its box)', tapped >= 10 && wrong.length === 0, wrong.slice(0, 8).join(' '));
+			// A drag from 3 px off the centre of three junctions moves each (and Undo puts it back).
+			let moved = 0, tried = 0;
+			for (const q of pts.filter((p, i, a) => a.findIndex((o) => o.id === p.id) === i).slice(0, 3)) {
+				const at = () => Y.page.evaluate((id) => { const b = document.querySelector('#lpn_canvas circle.lpn-node[data-node="' + id + '"]').getBoundingClientRect(); return b.left + b.width / 2; }, q.id);
+				const x0 = await at(), sx = x0 + 3;
+				const cy = await Y.page.evaluate((id) => { const b = document.querySelector('#lpn_canvas circle.lpn-node[data-node="' + id + '"]').getBoundingClientRect(); return b.top + b.height / 2; }, q.id);
+				await yCdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: sx, y: cy, id: 1 }] });
+				for (let i = 1; i <= 6; i++) { await yCdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: sx + i * 5, y: cy, id: 1 }] }); await sleep(16); }
+				await yCdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await Y.settle(200);
+				tried++;
+				if ((await at()) - x0 > 20) { moved++; await Y.page.keyboard.press('Control+z'); await Y.settle(250); }
+				await Y.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c) { c.click(); } });
+			}
+			ok(label + ': a finger dragging from 3 px off a junction\'s centre moves it (' + moved + ' of ' + tried + ')', tried >= 2 && moved === tried, '');
 		};
 		await pipeTaps('the opening view');
+		await junctionTaps('the opening view');
 		await zoomOut(Y, 8);
 		await pipeTaps('8 notches out');
+		await junctionTaps('8 notches out');
 		await Y.page.close();
 
 		ok('no page error', errors.length === 0, errors.join(' | '));
