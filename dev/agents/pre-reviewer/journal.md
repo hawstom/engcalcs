@@ -5101,3 +5101,11 @@ OBSERVED (re-verify; real Chromium phone 412x915 2.6x, real touch taps, Net3, ow
 - No 16-notch tap selecting nothing found within +-5 px of the pump; only far bare map selects nothing.
 - Tank 1 box with Junction 40 at 2, 4, 8 notches (none at opening view); zoomed in 3 and 6 notches: pump, J60, J61, River, J601, J123 each selected by tapping its centre, no box.
 - NOT DONE: pipe-body taps near a pump glyph (the new nearest-ink rule now includes pump glyphs, so a pipe tap within 24 px of a glyph may go to the pump), mutation test, a real finger.
+
+## 2026-11-20 feat/pick-chooser round 9 (d4f8f0eed), Task 861, Perry
+OBSERVED (re-verify; real Chromium phone 412x915 2.6x, CDP touch taps, Net3, own tap probes):
+- pick-chooser-zoom harness: no FAIL (opening view 2 boxes, 20 notches 46, none listing a pipe); touch-radius: all passed.
+- Pump 335 tap grid (+-6 px of glyph centre, 8 points) at opening, 4, 8, 10, 12, 16 notches: pump selected on almost every tap on or beside the glyph; 6 px above gives the box Junction 60 / Pump 335 at 8-10 notches, 6 px below gives Junction 61 at every view. At 16 notches (glyph 5.7x7.8) centre and sides give the pump, 3 px above a box, 6 px left Junction 601. Pump line itself is part of what is tapped (P regions run 16 px right of the glyph).
+- Pump 10 (Lake end) is off-screen at the opening view and to 12 notches on a 412 phone (glyph x = -149 .. -14), so Tom cannot see it without panning. At 16 notches every tap within 10 px gives box "Reservoir Lake / Pump 10" or Lake/J10; the pump alone is only reachable through the box.
+- Unreproduced: one first-tap-after-zoom "selects nothing" at the glyph centre (4 and 8 notches); repeated, 6 of 6 gave the pump. Zoom by wheel notches is not repeatable in size run to run (glyph 12.2 vs 9.1 px at "4 notches").
+- NOT DONE: the 5-12 px junction-vs-pipe percentages (taken from the builder), long-press and drag harnesses, a real finger, mutation test.
