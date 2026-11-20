@@ -749,6 +749,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const realLinks = {};
 	levelCtl.forEach((c) => { realLinks[c.link] = 1; });
 	ruleCtl.forEach((c) => { c.thenActs.concat(c.elseAct ? [c.elseAct] : []).forEach((a) => { realLinks[a.link] = 1; }); });
+	// (realControlLinks() below is this same set for a caller that has no writer running.)
 	const fmt2 = (v) => Number(v).toFixed(2);
 	function setRows(table, id, rowObj) { insert(db, table, Object.assign({ SupportElementID: id }, rowObj)); }
 	// One action row set: a pump's action is the pump itself, a pipe's the pipe (status only). Returns its id and text.
@@ -1056,6 +1057,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			report.scenarios.push(rec);
 			if (!name || taken[name.toLowerCase()]) { rec.reason = 'name'; lost('scenario "' + name + '" not written: its name is empty, or already used by a scenario or an alternative (capitals do not tell names apart)'); return; }
 			const j = judgeScenario(parsed, s);
+			if (j.reason === 'root') { rec.reason = 'root'; lost('scenario ' + name + ' not written: it is a Base of its own'); return; }
 			if (j.reason === 'nested') { rec.reason = 'nested'; lost('scenario ' + name + ' not written: only children of Base are written'); return; }
 			if (j.reason === 'unreadable') { rec.reason = 'unreadable'; lost('scenario ' + name + ' not written: its network could not be read'); return; }
 			const ov = j.ov;
@@ -1064,6 +1066,8 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				lost('scenario ' + name + ' not written, it overrides what this writer does not store: ' + ov.unsupported.map((u) => u.what + ' (' + u.ids.slice(0, 6).join(', ') + (u.ids.length > 6 ? ', ...' : '') + ')').join('; '));
 				return;
 			}
+			// The file states one switching schedule for pumps and controls, Base's; a child whose own run switches differently would compute otherwise.
+			if (s.switching) { rec.reason = 'switching'; lost('scenario ' + name + ' not written: its pumps and controls switch at different times than in Base'); return; }
 			// The row each override edits must be one the template's elements hold, or the edit would land on nothing.
 			const holds = (kind, alt, table) => !!alt && (plans[kind][alt] || []).some((pl) => pl.table === table);
 			const needs = [];
@@ -1372,6 +1376,25 @@ function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives, 
 // gives the status each pump and controlled pipe holds at the start and the times it changes, which
 // the clock-time controls carry. `mod` is the epanet-js module namespace the caller loaded.
 // ---------------------------------------------------------------------------------------------
+/**
+ * The links WaterGEMS switches by a control of its own (a tank-level control or a written rule), so their switching times are
+ * computed there and need not match EPANET's. Every other pump and controlled link is written as the fixed clock times of the reference run.
+ */
+function realControlLinks(parsed) {
+	const out = {}, byId = {};
+	(parsed.nodes || []).forEach((n) => { byId[n.id] = n; });
+	(parsed.controls || []).forEach((c) => {
+		const cd = c.condition;
+		if (cd && cd.kind === 'node' && byId[cd.node] && (byId[cd.node].type === 'tank' || byId[cd.node].type === 'junction') && (cd.cmp === 'below' || cd.cmp === 'above')) { out[c.link] = 1; }
+	});
+	carriableRules(parsed).written.forEach((c) => { c.thenActs.concat(c.elseAct ? [c.elseAct] : []).forEach((a) => { out[a.link] = 1; }); });
+	return out;
+}
+/** A reference run's schedule as the file states it: every initial status, and the switching times of the links written as clock controls. */
+function frozenSchedule(sched, real) {
+	return JSON.stringify({ initial: sched.initial, changes: sched.changes.filter((c) => !real[c.link]) });
+}
+
 async function referenceSchedule(mod, inpText, watchLinks) {
 	const ws = new mod.Workspace();
 	await ws.loadModule();
@@ -1531,14 +1554,19 @@ function energyNotWritten(lines, patternIds) {
 /**
  * What a project scenario overrides, as this writer can store it (candidate; dev/wtg-export.md, "Child scenarios").
  * Both arguments are the lpnInpParse() of a network: Base's, and the scenario's resolved values written as Base's are.
- * Returns { diameters: [{ id, inches }], demands: [{ id, bases: [gpm, ...] }], unsupported: [{ what, ids }] }.
- * The two supported kinds: a pipe's diameter, and the base flows of a junction's demand rows (the same rows, the same
- * patterns). Every other difference, an asset in one network only, any other property of any asset, any other part
- * of the file, is named in `unsupported`, and the caller leaves the scenario out whole.
+ * Returns { diameters: [{ id, inches }], roughness: [{ id, c }], elevations: [{ id, feet }], demands: [{ id, bases: [gpm, ...] }],
+ *            unsupported: [{ what, scope, field, type, ids }] }.
+ * The supported kinds: a pipe's diameter and roughness, a junction's elevation, and the base flows of a junction's demand rows
+ * (the same rows, the same patterns). A junction's elevation is NOT supported where the junction is an end of a pump or a valve,
+ * because the Base writer copies that elevation onto the pump's or valve's own node, which a child would not change.
+ * Every other difference, an asset in one network only, any other property of any asset, any other part of the file, is named
+ * in `unsupported` (`what` for a developer; `scope` is 'assets', 'property', 'demand_rows', 'pump_valve_elevation' or 'file';
+ * `field` and `type` name the property and the asset type for the page to word), and the caller leaves the scenario out whole.
  */
 function scenarioOverrides(base, scen) {
 	const out = { diameters: [], roughness: [], elevations: [], demands: [], unsupported: [] }, bad = {};
-	const flag = (what, id) => { (bad[what] = bad[what] || []).push(id); };
+	const meta = {};
+	const flag = (what, id, m) => { (bad[what] = bad[what] || []).push(id); if (!meta[what]) { meta[what] = m || { scope: 'property' }; } };
 	const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 	const without = (o, drop) => { const c = {}; Object.keys(o).forEach((k) => { if (k !== 'tok' && drop.indexOf(k) < 0) { c[k] = o[k]; } }); return c; };
 	const rowsOfNode = demandRowsOf;
@@ -1546,20 +1574,24 @@ function scenarioOverrides(base, scen) {
 		const bm = {}, sm = {};
 		(a || []).forEach((x) => { bm[x.id] = x; });
 		(b || []).forEach((x) => { sm[x.id] = x; });
-		Object.keys(bm).forEach((id) => { if (!sm[id]) { flag('asset only in Base', id); } });
-		Object.keys(sm).forEach((id) => { if (!bm[id]) { flag('asset only in the scenario', id); } });
+		Object.keys(bm).forEach((id) => { if (!sm[id]) { flag('asset only in Base', id, { scope: 'assets' }); } });
+		Object.keys(sm).forEach((id) => { if (!bm[id]) { flag('asset only in the scenario', id, { scope: 'assets' }); } });
 		Object.keys(bm).forEach((id) => { if (sm[id]) { test(bm[id], sm[id]); } });
 	}
 	function keysDiffer(label, id, x, y) {
-		Object.keys(Object.assign({}, x, y)).forEach((k) => { if (!same(x[k], y[k])) { flag(label + ' ' + k, id); } });
+		Object.keys(Object.assign({}, x, y)).forEach((k) => { if (!same(x[k], y[k])) { flag(label + ' ' + k, id, { scope: 'property', field: k, type: label }); } });
 	}
+	const pumpValveEnds = {};
+	(base.links || []).forEach((l) => { if (l.type !== 'pipe') { pumpValveEnds[l.from] = 1; pumpValveEnds[l.to] = 1; } });
 	each(base.nodes, scen.nodes, (a, b) => {
 		if (a.type !== 'junction' || b.type !== 'junction') { keysDiffer(a.type, a.id, without(a, []), without(b, [])); return; }
 		const ra = rowsOfNode(a), rb = rowsOfNode(b);
 		const norm = (n) => Object.assign(without(n, ['demand', 'extraDemands', 'elev']), { extra: (n.extraDemands || []).map((d) => without(d, ['base'])) });
 		keysDiffer('junction', a.id, norm(a), norm(b));
-		if (a.elev !== b.elev) { out.elevations.push({ id: a.id, feet: b.elev }); }
-		if (ra.length !== rb.length || ra.some((d, i) => (d.pattern || null) !== (rb[i].pattern || null))) { flag('junction demand rows (number or pattern)', a.id); return; }
+		if (a.elev !== b.elev) {
+			if (pumpValveEnds[a.id]) { flag('junction elevation at a pump or valve', a.id, { scope: 'pump_valve_elevation' }); } else { out.elevations.push({ id: a.id, feet: b.elev }); }
+		}
+		if (ra.length !== rb.length || ra.some((d, i) => (d.pattern || null) !== (rb[i].pattern || null))) { flag('junction demand rows (number or pattern)', a.id, { scope: 'demand_rows' }); return; }
 		if (ra.some((d, i) => d.base !== rb[i].base)) { out.demands.push({ id: a.id, bases: rb.map((d) => d.base) }); }
 	});
 	each(base.links, scen.links, (a, b) => {
@@ -1576,21 +1608,24 @@ function scenarioOverrides(base, scen) {
 	const SKIP = { nodes: 1, links: 1, title: 1, dropped: 1, ok: 1 };
 	Object.keys(Object.assign({}, base, scen)).forEach((k) => {
 		if (SKIP[k] || same(base[k], scen[k])) { return; }
-		flag('file part ' + k, '');
+		flag('file part ' + k, '', { scope: 'file' });
 	});
-	out.unsupported = Object.keys(bad).map((w) => ({ what: w, ids: bad[w].filter((x) => x !== '') }));
+	out.unsupported = Object.keys(bad).map((w) => ({ what: w, scope: meta[w].scope, field: meta[w].field || '', type: meta[w].type || '', ids: bad[w].filter((x) => x !== '') }));
 	return out;
 }
 
 /**
  * Whether a project scenario can be written as a child of Base, and why not (the page asks this before it writes, to say so
  * in the box it shows; the writer asks it again). `s` is { name, parent?, inp | parsed }.
- * Returns { reason: '' | 'nested' | 'unreadable' | 'unsupported', ov }. The name checks are the writer's, against the file.
+ * Returns { reason: '' | 'root' | 'nested' | 'unreadable' | 'unsupported', ov }. `s.root` is a scenario with a Base of its own.
+ * The network read is kept on `s.parsed`, so the plan's reading is the writer's. The name checks are the writer's, against the file.
  */
 function judgeScenario(base, s) {
+	if (s.root === true) { return { reason: 'root', ov: null }; }
 	if (s.parent !== undefined && s.parent !== null && s.parent !== '') { return { reason: 'nested', ov: null }; }
 	const sp = s.parsed || (s.inp ? EngCalcs.lpnInpParse(s.inp) : null);
 	if (!sp || sp.ok === false) { return { reason: 'unreadable', ov: null }; }
+	s.parsed = sp;
 	const ov = scenarioOverrides(base, sp);
 	return { reason: ov.unsupported.length ? 'unsupported' : '', ov: ov };
 }
@@ -1769,6 +1804,14 @@ async function build(planned, o) {
 	const watch = Array.from(new Set(parsed.links.filter((l) => l.type === 'pump').map((l) => l.id).concat((parsed.controls || []).map((c) => c.link))));
 	let sched = { initial: {}, changes: [] };
 	if (watch.length) { sched = await referenceSchedule(o.epanet, planned.inp, watch); }
+	// A child is written only where its own run switches pumps and controls as Base's does (the file holds Base's schedule).
+	if (watch.length && planned.scenarios) {
+		const real = realControlLinks(parsed), same = frozenSchedule(sched, real);
+		for (const sc of planned.scenarios) {
+			if (!sc.inp || judgeScenario(parsed, sc).reason) { continue; }
+			try { sc.switching = frozenSchedule(await referenceSchedule(o.epanet, sc.inp, watch), real) !== same; } catch (e) { sc.switching = true; }
+		}
+	}
 	const eff = Number((/Global Efficiency\s+([\d.]+)/i.exec(planned.inp) || [])[1]) || 75;
 	let crsJson = o.crsJson || '';
 	if (planned.crs === CRS_WRITTEN && !crsJson) { crsJson = await loadCrs(); }
@@ -1783,6 +1826,13 @@ async function build(planned, o) {
 
 EngCalcs.lpnWtgExportPlan = plan;
 EngCalcs.lpnWtgScenarioJudge = judgeScenario;
+// The scenario and alternative labels the template already holds (lower case), so the plan can say a name is taken before the box opens.
+EngCalcs.lpnWtgTakenLabels = async function () {
+	const tpl = templateInjected || await loadTemplate();
+	const SQL = await getEngine();
+	const db = new SQL.Database(new Uint8Array(tpl.sqlite));
+	try { return rowsOf(db, 'SELECT Label FROM HMIModelingElement WHERE ElementType IN (1, 2)').map((r) => String(r.Label).toLowerCase()); } finally { db.close(); }
+};
 EngCalcs.lpnWtgExportBuild = build;
 EngCalcs.lpnWtgExportSetTemplate = function (sqliteBytes, wtgText) { templateInjected = sqliteBytes ? { sqlite: sqliteBytes, wtg: wtgText } : null; };
 EngCalcs.lpnWtgExportSetEngine = function (initSqlJs, wasmBinary) { injected = { init: initSqlJs, wasmBinary: wasmBinary }; engine = null; };

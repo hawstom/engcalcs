@@ -72,37 +72,51 @@ async function pagePath() {
 	const wet = mk('Wet year', undefined, () => { L.setProp(L.linkById('2'), 'diameter', 10); L.setProp(L.nodeById('J1'), 'demand', 500); });
 	const odd = mk('Odd one', undefined, () => { L.setProp(L.linkById('3'), 'length', 650); });
 	const deep = mk('Deeper', wet.id, () => { L.setProp(L.nodeById('J1'), 'demand', 520); });
+	// Higher ground: a junction's elevation (carried). Pump side: the elevation of J0, an end of pump PU1 (refused: the writer copies it onto the pump's own node).
+	// Other base: a scenario with a Base of its own. wet YEAR: a name that differs from Wet year in capitals only.
+	const high = mk('Higher ground', undefined, () => { L.setProp(L.nodeById('J1'), 'elev', L.nodeById('J1').elev + 5); });
+	const pside = mk('Pump side', undefined, () => { L.setProp(L.nodeById('J0'), 'elev', L.nodeById('J0').elev + 5); });
+	const other = mk('Other base', undefined, () => { });
+	other.root = true;
+	const dup = mk('wet YEAR', undefined, () => { L.setProp(L.nodeById('J1'), 'demand', 510); });
 	L.switchScenario(base.id);
 
-	console.log('\n9. The page path: Base, Wet year (carried), Odd one (a length), Deeper (a child of Wet year)');
+	console.log('\n9. The page path: Base, Wet year and Higher ground (carried), Odd one (a length), Pump side (a pump end), Other base (a root), wet YEAR (a taken name), Deeper (a child of Wet year)');
 	const planned = L.wtgPlan();
-	ok('the plan is made and holds the three scenarios', planned.ok && planned.scenarios && planned.scenarios.map((x) => x.name).sort().join() === 'Deeper,Odd one,Wet year', planned.ok ? '' : planned.detail);
-	ok('only Wet year will be written', planned.scenarioWritten.join() === 'Wet year');
+	ok('the plan is made and holds the three scenarios', planned.ok && planned.scenarios && planned.scenarios.length === 7, planned.ok ? '' : planned.detail);
+	ok('Wet year and Higher ground will be written', planned.scenarioWritten.slice().sort().join() === 'Higher ground,Wet year', planned.scenarioWritten.join());
 	const lines = L.wtgLines(planned.notCarried);
 	const oddLine = lines.find((x) => /^Scenario Odd one is not written/.test(x)), deepLine = lines.find((x) => /^Scenario Deeper is not written/.test(x));
-	ok('Odd one is named, with what it changes (pipe length on pipe 3)', !!oddLine && /pipe length \(3\)/.test(oddLine) && !/\{/.test(oddLine), oddLine);
+	ok('Odd one is named, with what it changes in a visitor label (Length, pipe 3), no parser field name', !!oddLine && /not write: Length \(3\)\./.test(oddLine) && !/\{|pipe length/.test(oddLine), oddLine);
+	const psLine = lines.find((x) => /^Scenario Pump side is not written/.test(x)), rtLine = lines.find((x) => /^Scenario Other base is not written/.test(x)), dupLines = lines.filter((x) => /^Scenario wet YEAR is not written/.test(x));
+	ok('Pump side is named: elevation at a pump or valve (J0)', !!psLine && /Elevation at a pump or valve \(J0\)/.test(psLine), psLine);
+	ok('Other base is named as a Base of its own, not as a scenario that is not a child of Base', !!rtLine && /a Base of its own/.test(rtLine), rtLine);
+	ok('wet YEAR is refused in the plan, for its name, and named once', dupLines.length === 1 && /its name is already used/.test(dupLines[0]), JSON.stringify(dupLines));
 	ok('Deeper is named: only children of Base are written', !!deepLine && /only children of Base/.test(deepLine), deepLine);
 	ok('the open scenario was put back (Base)', L.activeScenario().id === base.id);
 	const was = planned.parsed;
-	ok('the plan leaves the project\'s scenarios as they were (4 scenarios)', L.getScenarios().length === 4);
+	ok('the plan leaves the project\'s scenarios as they were (4 scenarios)', L.getScenarios().length === 8);
 
 	// The box the menu opens, from inside Wet year: Base is still the file's Base.
 	L.switchScenario(wet.id);
 	L.exportWtg();
+	for (let k = 0; k < 400 && !JSON.stringify((global.document.getElementById('lpn_dialog_body').children || []).map((e) => e.textContent || e._text || '')).includes('does not yet write'); k++) { await new Promise((r) => setTimeout(r, 25)); }
 	const walk = (e, f) => { f(e); (e.children || []).forEach((c) => walk(c, f)); };
 	const texts = []; walk(global.document.getElementById('lpn_dialog_body'), (e) => { if (e._tag === 'li' || e._tag === 'p') { texts.push(e.textContent || e._text || ''); } });
-	ok('the box says what it holds: Base and, as a child of Base, Wet year', texts.some((x) => x.indexOf('It holds the Base scenario and, as children of Base, the scenarios Wet year.') === 0), JSON.stringify(texts.slice(0, 2)));
+	ok('the box says what it holds: Base and, as a child of Base, Wet year', texts.some((x) => x.indexOf('It holds the Base scenario and, as children of Base, scenarios (2): ') === 0), JSON.stringify(texts.slice(0, 2)));
 	ok('and lists Odd one and Deeper as not written', texts.some((x) => /^Scenario Odd one is not written/.test(x)) && texts.some((x) => /^Scenario Deeper is not written/.test(x)));
 	const cancel = (global.document.getElementById('lpn_dialog_buttons').children || [])[1];
+	ok('the box names Higher ground as written, in the one-or-many form', texts.some((x) => /scenarios \(2\): (Higher ground, Wet year|Wet year, Higher ground)\./.test(x)), JSON.stringify(texts.slice(0, 1)));
 	if (cancel && cancel.click) { cancel.click(); }
 	ok('the scenario open when the box was asked for is still open', L.activeScenario().id === wet.id);
 
-	const wrote = await new Promise((resolve) => L.wtgWrite((out, err) => resolve({ out: out, err: err })));
+	const wrote = await new Promise((resolve) => L.wtgWrite((out, err) => resolve({ out: out, err: err }), planned));
 	ok('written', !!wrote.out, wrote.err);
 	if (!wrote.out) { return; }
 	const recs = wrote.out.report.scenarios, rec = (n) => recs.find((x) => x.name === n) || {};
-	ok('the writer was handed all three and wrote one: Wet year', recs.length === 3 && rec('Wet year').written === true && rec('Odd one').written === false && rec('Deeper').written === false, JSON.stringify(recs.map((r) => [r.name, r.written, r.reason])));
-	ok('the refusals are the reasons the plan gave (unsupported, nested)', rec('Odd one').reason === 'unsupported' && rec('Deeper').reason === 'nested');
+	ok('the writer was handed all seven and wrote two: Wet year and Higher ground', recs.length === 7 && rec('Wet year').written === true && rec('Higher ground').written === true && recs.filter((x) => x.written).length === 2, JSON.stringify(recs.map((r) => [r.name, r.written, r.reason])));
+	ok('the refusals are the reasons the plan gave', rec('Odd one').reason === 'unsupported' && rec('Deeper').reason === 'nested' && rec('Pump side').reason === 'unsupported' && rec('Other base').reason === 'root' && rec('wet YEAR').reason === 'name');
+	ok('the receipt lists each refused scenario once (plan and writer do not both name it)', (() => { const it = wrote.out.planned.notCarried.filter((x) => x.code === 'scenario'); return it.length === 5 && new Set(it.map((x) => x.ids[0])).size === 5; })());
 	const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'wtg-scen-page-'));
 	fs.writeFileSync(path.join(tmp, 'x.zip'), Buffer.from(await wrote.out.zip.arrayBuffer()));
 	execFileSync('python3', ['-I', '-c', "import zipfile,sys\nzipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])", path.join(tmp, 'x.zip'), tmp]);
@@ -110,8 +124,10 @@ async function pagePath() {
 	const r = EC.lpnWtgRead(await EC.lpnSqliteOpen(bytes), { flowUnits: 'GPM', display: EC.lpnWtgDisplayUnits(wtg) });
 	ok('read back from the file', r.ok, r.message);
 	const scs = r.scenarios || [];
-	ok('the file holds one child scenario, Wet year', scs.map((x) => x.name).join() === 'Wet year', JSON.stringify(scs.map((x) => x.name)));
-	const dif = (scs[0] && scs[0].differences) || {};
+	ok('the file holds two child scenarios, Wet year and Higher ground', scs.map((x) => x.name).sort().join() === 'Higher ground,Wet year', JSON.stringify(scs.map((x) => x.name)));
+	const hg = scs.find((x) => x.name === 'Higher ground');
+	ok('Higher ground differs from Base in J1\'s elevation and nothing else', !!hg && Object.keys(hg.differences).join() === 'n:J1' && hg.differences['n:J1'].elev !== undefined, JSON.stringify(hg && hg.differences));
+	const dif = ((scs.find((x) => x.name === 'Wet year')) || {}).differences || {};
 	ok('Wet year differs from Base in pipe 2 (diameter 10 in) and J1 (demand 500 gpm), and nothing else', Object.keys(dif).sort().join() === 'l:2,n:J1' && dif['l:2'].diameter === 10 && Math.abs(dif['n:J1'].demand - 500) < 1e-6, JSON.stringify(dif));
 	const baseInp = EC.lpnInpParse(r.inp);
 	ok('the file\'s Base is Base (pipe 2 8 in, J1 300 gpm) though Wet year was open when it was exported', baseInp.links.find((l) => l.id === '2').diameter === 8 && baseInp.nodes.find((n) => n.id === 'J1').demand === 300);
@@ -147,7 +163,7 @@ async function pagePath() {
 	const DEMAND_ONLY = edit(/ J1\s+50\s+300/, ' J1 50 420');
 	const DIAM_ONLY = edit(/ 3\s+J1\s+T1\s+500\s+8 /, ' 3 J1 T1 500 12 ');
 	const ROUGH = edit(/ 3\s+J1\s+T1\s+500\s+8\s+120/, ' 3 J1 T1 500 8 100');
-	const ELEV = edit(/ J0\s+40\s+0/, ' J0 45 0');
+	const ELEV = edit(/ J1\s+50\s+300/, ' J1 55 300');
 	// What the writer still does not store: a pipe's length, a tank's elevation.
 	const LONGER = edit(/ 3\s+J1\s+T1\s+500\s+8 /, ' 3 J1 T1 650 8 ');
 	const TANKELEV = edit(/ T1\s+120\s+12/, ' T1 125 12');
@@ -264,20 +280,20 @@ async function pagePath() {
 
 	console.log('\n2b. Pipe roughness and junction elevation (Physical alternative, the rows of the diameter\'s table and the node table)');
 	{
-		const R = write([['Rougher', ROUGH], ['Higher ground', ELEV], ['Both', ROUGH.replace(/ J0\s+40\s+0/, ' J0 45 0').replace(/ 2\s+J0\s+J1\s+1000\s+8 /, ' 2 J0 J1 1000 9 ')]]);
+		const R = write([['Rougher', ROUGH], ['Higher ground', ELEV], ['Both', ROUGH.replace(/ J1\s+50\s+300/, ' J1 55 300').replace(/ 2\s+J0\s+J1\s+1000\s+8 /, ' 2 J0 J1 1000 9 ')]]);
 		const sid = (i) => R.report.scenarios[i].id;
 		ok('all three written, one Physical child alternative each, none for demand', R.report.scenarios.every((x) => x.written) && rows(R.db, 'SELECT * FROM HMIAlternative WHERE ParentID IS NOT NULL AND AlternativeTypeID = 4').length === 3 && rows(R.db, 'SELECT * FROM HMIAlternative WHERE ParentID IS NOT NULL AND AlternativeTypeID = 20').length === 0, JSON.stringify(R.report.scenarios.map((x) => x.reason)));
 		const c = (scen, el) => resolveRow(R.db, scen, 'IdahoPipe_Physical_Data', el, PHYS)[0].Physical_HazenWilliamsC;
 		const ev = (scen, el) => resolveRow(R.db, scen, 'BaseIdahoNode_Physical_Data', el, PHYS)[0].Physical_NodeElevation;
 		ok('pipe 3 C: 100 in Rougher, 120 in Base and in Higher ground', c(sid(0), elOf(R.db, '3')) === 100 && c(1, elOf(R.db, '3')) === 120 && c(sid(1), elOf(R.db, '3')) === 120);
-		ok('J0 elevation: 45 in Higher ground and Both, 40 in Base and in Rougher', ev(sid(1), elOf(R.db, 'J0')) === 45 && ev(sid(2), elOf(R.db, 'J0')) === 45 && ev(1, elOf(R.db, 'J0')) === 40 && ev(sid(0), elOf(R.db, 'J0')) === 40);
+		ok('J1 elevation: 55 in Higher ground and Both, 50 in Base and in Rougher', ev(sid(1), elOf(R.db, 'J1')) === 55 && ev(sid(2), elOf(R.db, 'J1')) === 55 && ev(1, elOf(R.db, 'J1')) === 50 && ev(sid(0), elOf(R.db, 'J1')) === 50);
 		ok('Both: pipe 2 is 9 in, pipe 3 C 100, one copy of each pipe\'s rows (no duplicate row)', near(resolveRow(R.db, sid(2), 'IdahoPipe_Physical_Data', elOf(R.db, '2'), PHYS)[0].Physical_PipeDiameter * 12, 9, 1e-9) && c(sid(2), elOf(R.db, '3')) === 100
 			&& rows(R.db, 'SELECT * FROM IdahoPipe_Physical_Data WHERE DomainElementID = ? AND AlternativeID = (SELECT AlternativeID FROM HMIScenarioAlternative WHERE ScenarioID = ? AND AlternativeTypeID = 4)', [elOf(R.db, '2'), sid(2)]).length === 1);
 		ok('integrity ok', R.report.integrity === 'ok' && R.report.foreignKeyViolations === 0);
 		if (reader) {
 			const rr = EC.lpnWtgRead(await EC.lpnSqliteOpen(Buffer.from(R.out.bytes)), { flowUnits: 'GPM' });
 			const dif = (n) => ((rr.scenarios || []).find((x) => x.name === n) || {}).differences || {};
-			ok('the reader finds exactly those differences: Rougher l:3 roughness 100; Higher ground n:J0 elev 45', Object.keys(dif('Rougher')).join() === 'l:3' && dif('Rougher')['l:3'].roughness === 100 && Object.keys(dif('Higher ground')).join() === 'n:J0' && dif('Higher ground')['n:J0'].elev === 45, JSON.stringify([dif('Rougher'), dif('Higher ground')]));
+			ok('the reader finds exactly those differences: Rougher l:3 roughness 100; Higher ground n:J1 elev 55', Object.keys(dif('Rougher')).join() === 'l:3' && dif('Rougher')['l:3'].roughness === 100 && Object.keys(dif('Higher ground')).join() === 'n:J1' && dif('Higher ground')['n:J1'].elev === 55, JSON.stringify([dif('Rougher'), dif('Higher ground')]));
 		}
 	}
 
@@ -289,6 +305,20 @@ async function pagePath() {
 		ok('a length override is named: pipe length on pipe 3', r0.reason === 'unsupported' && r0.unsupported.length === 1 && r0.unsupported[0].what === 'pipe length' && r0.unsupported[0].ids.join() === '3', JSON.stringify(r0.unsupported));
 		ok('a tank elevation override is named: tank elev on T1', r1.reason === 'unsupported' && r1.unsupported.some((u) => u.what === 'tank elev' && u.ids.join() === 'T1'), JSON.stringify(r1.unsupported));
 		ok('and each says so in the not-written list of the report', D.report.notCarried.filter((x) => /^scenario (Longer pipe|Higher tank) not written/.test(x)).length === 2);
+		ok('(root, switching) a scenario with a Base of its own is refused as a root; one whose switching differs from Base\'s is refused for it', (() => {
+			const parsed = EC.lpnInpParse(BASE);
+			const w = lib.writeWtg(SQL, env.tplSqlite, parsed, { initial: {}, changes: [] }, { name: 'x', candidate: { scenarios: [{ name: 'R', root: true, inp: DEMAND_ONLY }, { name: 'S', switching: true, inp: DEMAND_ONLY }, { name: 'T', inp: DEMAND_ONLY }] } });
+			return w.report.scenarios.map((x) => x.written + ':' + (x.reason || '')).join(',') === 'false:root,false:switching,true:' && w.report.integrity === 'ok';
+		})());
+		ok('(pump end) an elevation change at an end of a pump is refused, named, as is not a plain junction\'s', (() => {
+			const base = EC.lpnInpParse(BASE), pump = base.links.find((l) => l.type === 'pump');
+			if (!pump) { return true; }
+			const end = base.nodes.find((n) => n.type === 'junction' && (n.id === pump.from || n.id === pump.to));
+			if (!end) { return true; }
+			const sc = JSON.parse(JSON.stringify(base)); sc.nodes.find((n) => n.id === end.id).elev += 5;
+			const ov = lib.scenarioOverrides(base, sc);
+			return ov.elevations.length === 0 && ov.unsupported.some((u) => u.scope === 'pump_valve_elevation' && u.ids.join() === end.id);
+		})());
 		ok('(names) a repeated or empty name is refused, a nested scenario is refused', (() => {
 			const parsed = EC.lpnInpParse(BASE);
 			const w = lib.writeWtg(SQL, env.tplSqlite, parsed, { initial: {}, changes: [] }, { name: 'x', candidate: { scenarios: [{ name: 'A', inp: DEMAND_ONLY }, { name: 'A', inp: DIAM_ONLY }, { name: '', inp: DIAM_ONLY }, { name: 'Child', parent: 'A', inp: DIAM_ONLY }] } });
