@@ -69,7 +69,7 @@
     "key_context": {
         "lpn_guide_fr_what_def": {
             "reason": "english_changed",
-            "current_value": "<p>选择“<strong>水务<\/strong>”、“<strong>报告<\/strong>”、“<strong>完整<\/strong>”。该表在每个报告时间步为每个节点和连接线各设一行，采用“<strong>表格<\/strong>”窗格的单位。其列为：<strong>类型<\/strong>、<strong>ID<\/strong>、<strong>需水量<\/strong>、<strong>水头<\/strong>、<strong>压力<\/strong>、氯浓度、<strong>流量<\/strong>、<strong>流速<\/strong>、<strong>水头损失<\/strong>、<strong>水泵水头<\/strong>和<strong>状态<\/strong>，若元件没有某个量，则该单元格为空白。“<strong>时刻<\/strong>”列表选择所显示的时间步，“<strong>下载 CSV<\/strong>”、“<strong>复制 HTML<\/strong>”和“<strong>打印报告<\/strong>”则包含每一个时间步。没有延时模拟时，该表显示某一时刻的当前解。<\/p>",
+            "current_value": "<p>选择“<strong>水务<\/strong>”、“<strong>报告<\/strong>”、“<strong>完整<\/strong>”。该表在每个报告时间步为每个节点和连接线各设一行，采用“<strong>表格<\/strong>”窗格的单位。其列为：<strong>类型<\/strong>、<strong>ID<\/strong>、<strong>需水量<\/strong>、<strong>水头<\/strong>、<strong>压力<\/strong>、<strong>氯浓度<\/strong>、<strong>流量<\/strong>、<strong>流速<\/strong>、<strong>水头损失<\/strong>、<strong>水泵水头<\/strong>和<strong>状态<\/strong>，若元件没有某个量，则该单元格为空白。“<strong>时刻<\/strong>”列表选择所显示的时间步，“<strong>下载 CSV<\/strong>”、“<strong>复制 HTML<\/strong>”和“<strong>打印报告<\/strong>”则包含每一个时间步。没有延时模拟时，该表显示某一时刻的当前解。<\/p>",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_guide_st_example_def",
@@ -85,7 +85,7 @@
         },
         "lpn_guide_cal_what_def": {
             "reason": "english_changed",
-            "current_value": "<p>选择“<strong>水务<\/strong>”、“<strong>报告<\/strong>”、“<strong>率定<\/strong>”。“<strong>参数<\/strong>”列表选择文件测量的对象：<strong>需水量<\/strong>、<strong>水头<\/strong>、<strong>压力<\/strong>、氯浓度、<strong>流量<\/strong>或<strong>流速<\/strong>。每个参数保存一个文件，“<strong>载入率定文件…<\/strong>”按钮会打开文件选择器。报告共三页。“<strong>统计量<\/strong>”为每个位置给出观测次数、观测均值、计算均值、平均误差和<strong>均方根误差<\/strong>，然后是汇总所有位置的“<strong>管网<\/strong>”行以及两组均值之间的相关系数。“<strong>相关图<\/strong>”把每次测量按观测值作横坐标、计算值作纵坐标绘出，并带有一条两者一致时的对角线。“<strong>均值比较<\/strong>”为每个位置把观测均值和计算均值画成一对柱。<\/p><p>计算值读取自延时运行，介于两个报告时间步之间的测量值，与二者之间的插值进行比较。落在运行所报告时间之外的测量值会被跳过并计数。对于单一时刻的解，无论文件给出的是什么时间，每次测量都与那一个结果比较。管网计算之后，报告才会填入内容。<\/p>",
+            "current_value": "<p>选择“<strong>水务<\/strong>”、“<strong>报告<\/strong>”、“<strong>率定<\/strong>”。“<strong>参数<\/strong>”列表选择文件测量的对象：<strong>需水量<\/strong>、<strong>水头<\/strong>、<strong>压力<\/strong>、<strong>氯浓度<\/strong>、<strong>流量<\/strong>或<strong>流速<\/strong>。每个参数保存一个文件，“<strong>载入率定文件…<\/strong>”按钮会打开文件选择器。报告共三页。“<strong>统计量<\/strong>”为每个位置给出观测次数、观测均值、计算均值、平均误差和<strong>均方根误差<\/strong>，然后是汇总所有位置的“<strong>管网<\/strong>”行以及两组均值之间的相关系数。“<strong>相关图<\/strong>”把每次测量按观测值作横坐标、计算值作纵坐标绘出，并带有一条两者一致时的对角线。“<strong>均值比较<\/strong>”为每个位置把观测均值和计算均值画成一对柱。<\/p><p>计算值读取自延时运行，介于两个报告时间步之间的测量值，与二者之间的插值进行比较。落在运行所报告时间之外的测量值会被跳过并计数。对于单一时刻的解，无论文件给出的是什么时间，每次测量都与那一个结果比较。管网计算之后，报告才会填入内容。<\/p>",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_guide_cal_what_term",
