@@ -194,7 +194,7 @@ judgement and does not belong to a script.
 - [x] R-447 feat/assembly | (locking) "I'm lost. Hold my hand. I forgot where we are on this." (tank label hidden while joined) "I don't know. What's your advice." -- answered in the 11-18 night report
 - [ ] R-448 feat/pick-chooser | (phone, r8) "On my phone, it's very hard to select the pump ... When I zoom in close enough to see the pump and the pipes around it, I am able to reasonably reliably select the pump. But I can't select the pipes even though they are clearly visible. ... I think the real need is to let me select what I tap, and I am certain that much of the time I am really tapping on the pipes." "I have to zoom in very close to select pipes." "My verdict. Phone mode is seriously broken." -- round 9
 - [ ] R-449 feat/pick-chooser | (16 notches, River over Junction 60) "I don't get it. I get River." -- round 9; finger allowance: "we have bugs to fix before tweaking the allowance. So I believe that I cannot say."
-- [ ] R-450 feat/assembly | (Well with tank is one symbol) "Not true. It's three." Lock: "Good. But not elevation." Tank label while joined: "I agree. Proceed." -- round 15
+- [ ] R-450 feat/assembly | (Well with tank is one symbol) "Not true. It's three." Lock: "Good. But not elevation." Tank label while joined: "I agree. Proceed." -- round 15 built, awaits his pass
 - [ ] R-451 feat/volume-unit | (Decimals to zero) "Keep. User should know better. We can warn that \"There are values (n) that would be converted to 0\". Your advice?" -- round 5
 - [x] R-452 - | (Chlorine concentration bold) "Yes." -- fix/chlorine-bold
-- [ ] R-453 - | (audit 2) "Proceed with the audit." -- fix/eps-audit-3
+- [x] R-453 - | (audit 2) "Proceed with the audit." -- fix/eps-audit-3, merged 11-20
