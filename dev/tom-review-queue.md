@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-438. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-448. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -173,9 +173,22 @@ judgement and does not belong to a script.
 - [ ] R-429 feat/assembly | "How about the message goes at the top of the box and says, 'Associated with Well W3. Change volume and control properties there'?" Lock Elevation and Base elevation: "Or above. Yes." Lock the open-air tank's inputs: "Yes." -- round 13
 - [ ] R-430 feat/assembly | "I don't understand why the Total tank volume of 1000 ft^3 becomes Minimum volume 1000 ft^3 when exploded. Can you please check everything closely and then explain to me if necessary?" -- round 13
 - [ ] R-431 feat/assembly | "For the new well symbol, N1 has the arrow too close to the circle. But N2 and N3 are good. Make N1 like N2 and N3." Q1: "OK. Adjust the arrow per previous comments." -- round 13
-- [?] R-432 feat/assembly | "I am considering moving the well commands to be extensions of the Reservoir toolbar button. So we'd have Res, Well, Well-Tank-Open, Well-Tank-Pressure; Valve, Valve+; Pipe, Virtual pipe; Pump, Pump+ ... Your advice?" -- advice in the 11-18 report; nothing built
+- [x] R-432 feat/assembly | "I am considering moving the well commands to be extensions of the Reservoir toolbar button. So we'd have Res, Well, Well-Tank-Open, Well-Tank-Pressure; Valve, Valve+; Pipe, Virtual pipe; Pump, Pump+ ... Your advice?" -- advice in the 11-18 report; nothing built
 - [x] R-433 feat/library-order | "The decision at hand (baby steps) is simply to bold all label citations in documentation (tips, manual, and any other references)." On the rule as stated: "Yes. That is correct, and that is the task at hand." -- the branch already does exactly that; tips are plain text and cannot carry bold
-- [ ] R-434 feat/graph-scrub | (phone) "I can drag the line, but not the triangle." "Most modern applications find a more intuitive way to do this without a triangle and a heavy line, I think. Maybe they do it on hover or on click or drag on a graph." -- round 3
+- [x] R-434 feat/graph-scrub | (phone) "I can drag the line, but not the triangle." "Most modern applications find a more intuitive way to do this without a triangle and a heavy line, I think. Maybe they do it on hover or on click or drag on a graph." -- round 3
 - [ ] R-435 feat/volume-unit | (Minimum volume tip) "'0 uses the tank diameter and minimum depth'?" (unit change) "Should it ask simply 'Convert inputs from old unit to new? [Convert] [Keep] [Cancel]'? (2) Also, I think it should ask for the decimals if converting. (3) Should Initial volume be added as a node label option?" -- round 3
-- [?] R-436 - | (testing and audit) "Would a session dedicated to testing and auditing be good? I have the budget. Would an adjustment to my prompts be good to ensure we are not building up code debt or missing any mathematical problems?" -- EPS-vs-EPANET audit started 11-18 on chore/audit-eps; advice in the report
+- [x] R-436 - | (testing and audit) "Would a session dedicated to testing and auditing be good? I have the budget. Would an adjustment to my prompts be good to ensure we are not building up code debt or missing any mathematical problems?" -- EPS-vs-EPANET audit started 11-18 on chore/audit-eps; advice in the report
 - [x] R-437 - | (Task 812) "I have noticed multiple times that I really like our best current label placement. I am okay if this shouldn't be done. We can keep researching with our competitive builders. Maybe we should start them with the current state of the art and update our rules and findings." -- recorded on Task 812
+
+## 2026-11-18 evening (reply to the evening report)
+
+- [ ] R-438 feat/pick-chooser | (phone, r7) "(1) Zoomed far out, all I can see at the cluster is the reservoir with the pump symbol possibly peeking out at its bottom. When I tap, I get either reservoir River or junction 61. I never get a chooser, and I never get anything else. (2) When I zoom in, I get what I tap, and never a box ... (3) As before, I get a chooser when I tap a tank." Allowance: "We may need to add a finger allowance that would cause more chooser occurences. But first we need to resolve the current bugs above." -- round 8
+- [ ] R-439 feat/assembly | "Shouldn't the Tank have the standard DEM row?" -- answered in the 11-18 night report; nothing built
+- [ ] R-440 feat/assembly | "We've disabled the Base Elevation, Tank diameter etc. entry. Please audit. This is non-functional." -- audited round 14 (works; tank section moved to the top of the Well's box)
+- [ ] R-441 feat/assembly | (Explode) "See /tmp/volume-bug-*.png" -- round 14: the box after Explode fixed; data never changed
+- [x] R-442 feat/assembly | "Move the wells." -- round 14
+- [ ] R-443 feat/volume-unit | (four-figure floor) "This causes a problem because the user has no control. I think we must give them what they request." -- round 4: Decimals blank means no rounding
+- [x] R-444 feat/graph-scrub | "I love it. Merge feat/graph-scrub" -- merged 11-18
+- [x] R-445 - | "Contour plot box: (1) It appears not to be translated. I thought we translated everything. Did we push to github?" -- on GitHub it was translated but for two notes added 11-16, which feat/library-order carried
+- [x] R-446 - | "I don't see a prominent link to the source code. Why doesn't the commit id in Help, About have a link? Where is the link to Github?" -- fix/about-source
+- [ ] R-447 feat/assembly | (locking) "I'm lost. Hold my hand. I forgot where we are on this." (tank label hidden while joined) "I don't know. What's your advice." -- answered in the 11-18 night report
