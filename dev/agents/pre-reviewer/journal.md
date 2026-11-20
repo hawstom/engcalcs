@@ -5101,3 +5101,10 @@ OBSERVED (re-verify; real Chromium, Net1 EPS 25 frames to 24 h, desktop 1400x900
 - OBSERVED: Decimals input has max 8, so a typed larger number is silently clamped; convert-as/unit-change/pda/initial-volume harnesses pass.
 - CITED: lang.ec.en.php vs round 3 lost no keys; master-only keys are the removed units_* set and lpn_about_source (master moved after the last merge).
 - Not checked: File > Convert as in a browser (static: select defaults to No rounding), DW roughness conversion, how noise displays.
+
+## 2026-11-20 feat/volume-unit round 5 (9ab9abfa9, ef4cc96b3), Perry
+- OBSERVED (Chromium, Net1 US and SI): the Decimals warning count equals the nonzero numbers that actually became 0 in the stored project (before/after diff, labelSettings excluded) in every case tried: diameter in/mm to m at 0 decimals 13, demand to m3/s at 0 decimals 9 (8 nodes + 1 pump-curve point), to mgd 8, Minimum volume to ML 1. Blank, and any Decimals that zeroes nothing, show no line. Settings tolerances never counted (no settings path ever zeroed).
+- OBSERVED: typing updates live; Cancel leaves the document byte-identical; Convert as counts (13 SI, 11 US at step 100) equal the new copy's real zeros; an edit to a node's Base demand under the open Convert as box moved the count 8 -> 8 (0) -> 8 (5000) -> 9 (7).
+- OBSERVED: out-of-range Decimals (13, -1) are treated as no rounding by Convert and the warning agrees; 1.5 behaves as 1 decimal.
+- OBSERVED: Convert as line sits tight under the Head row with no gap; the warning glyph renders as a box in headless Chromium (font, probably environmental).
+- Not checked: scenario overrides with numbers (Net1's are empty; harness covers only convert); how the glyph looks in Tom's browser.
