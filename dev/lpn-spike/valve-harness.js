@@ -126,7 +126,8 @@ console.log('\n--- what the writer puts in [VALVES] ---');
 		// EPANET ignores a TCV's minor-loss column (measured -- see EngCalcs.lpnLinkK). Writing
 		// the 3 would state a number the engine discards, and would make the file disagree with
 		// the native solver, which reads the setting alone.
-		ok('V1 minor loss is written as 0, because EPANET ignores it on a TCV', +r1[6] === 0, r1[6]);
+		// hydcoeffs.c tcvcoeff(): the column is ignored while the valve regulates and is its whole loss when fixed open, so it is written as stated.
+		ok('V1 minor loss is written as stated (EPANET uses it when the TCV is fixed open)', +r1[6] === 3, r1[6]);
 	}
 
 	// 1b. A PRESSURE setting. LPS pressure unit is the metre of water, which is this suite's own
@@ -199,7 +200,7 @@ console.log('\n--- a GPM (US) file ---');
 	ok('...in the pipe unit (inches), not feet', near(byId.V1.diameter * p.scale.dia, 10 * IN, 1e-9) &&
 		!near(byId.V1.diameter * p.scale.dia, 10 * FT, 1e-9), byId.V1.diameter * p.scale.dia);
 	ok('...its setting is dimensionless and untouched', byId.V1.setting === 8, byId.V1.setting);
-	ok('...its minor loss is dropped to 0, because EPANET ignores it on a TCV', byId.V1.k === 0, byId.V1.k);
+	ok('...its minor loss is kept (the loss of a TCV fixed open)', byId.V1.k === 3, byId.V1.k);
 	ok('...and it has NO length, so no friction is smuggled in', byId.V1.length === 0, byId.V1.length);
 
 	ok('a PRV comes in as a valve', byId.V2 && byId.V2.type === 'valve' && byId.V2.valveType === 'PRV');

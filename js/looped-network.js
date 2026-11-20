@@ -80584,7 +80584,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 				// A valve stated Open in the file's [STATUS] is FIXED open (EPANET unsets its setting): a plain minor loss that never
 				// regulates. A PBV fixed open is a setting of 0 in both engines (hydcoeffs.c pbvcoeff()).
-				if (l.valveOpen && effective(l, 'status') !== 'closed' && /^(PRV|PSV|FCV|PBV)$/.test(out.valveType)) {
+				if (l.valveOpen && effective(l, 'status') !== 'closed' && /^(PRV|PSV|FCV|PBV|TCV)$/.test(out.valveType)) {
 					out.valveFixed = 'open';
 					if (out.valveType === 'PBV') { out.setting = 0; }
 				}

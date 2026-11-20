@@ -512,11 +512,10 @@
 				}
 				valves.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  ' +
 					(link.diameter * 1000) + '  ' + vt + '  ' + setting + '  ' +
-					// A TCV's minor-loss column is IGNORED by EPANET (measured -- see
-					// EngCalcs.lpnLinkK), so writing anything but 0 there would be a number the
-					// file states and the engine discards. Every other type applies it while the
-					// valve is fully open, so it is written.
-					(vt === 'TCV' ? 0 : (link.k || 0)));
+					// A TCV's minor-loss column is ignored while it regulates and is its whole loss when fixed
+					// open (hydcoeffs.c tcvcoeff(); EngCalcs.lpnLinkK). Every other type applies it while the
+					// valve is fully open. So it is written for all.
+					(link.k || 0));
 				// A VALVE HAS NO STATUS COLUMN of its own -- unlike a pipe, whose Open/Closed is
 				// the eighth token on its own row. A closed valve is stated in [STATUS] instead,
 				// which is why that section exists below and did not before.
@@ -1556,9 +1555,8 @@
 				// the loss of the first network it read -- found by native-valve-harness.js as
 				// exactly one k V^2/2g on an open PRV. After, because EN_DIAMETER rescales the stored
 				// loss by the diameter ratio and EN_MINORLOSS converts with the current diameter. A
-				// TCV is written 0, as [VALVES] writes it: EPANET ignores the column for one.
-				p.setLinkValue(idx, EN_MINORLOSS,
-					String(l.valveType || 'TCV').toUpperCase() === 'TCV' ? 0 : (l.k || 0));
+				// TCV's is written as [VALVES] writes it (EngCalcs.lpnLinkK).
+				p.setLinkValue(idx, EN_MINORLOSS, l.k || 0);
 				if (String(l.valveType || 'TCV').toUpperCase() === 'GPV') { continue; }
 				p.setLinkValue(idx, EN_INITSTATUS, l.status === 'closed' ? 0 : 1);
 				if (l.status !== 'closed') {
