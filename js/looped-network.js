@@ -45997,7 +45997,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			morphViewFollow();
 			r = withLightMap(function () { return EngCalcs.lpnExportInp(inpExportDocument(), inpExportOptions()); });
 			p = s.root === true ? null : parentScenarioOf(s);
-			out.push({ name: scenarioDisplayName(s), root: s.root === true, parent: (p && !p.isBase) ? scenarioDisplayName(p) : undefined, inp: (r && r.ok) ? r.inp : null });
+			out.push({ autoLengthIds: doc.links.filter(function (l) { return l.lenAuto; }).map(function (l) { return l.id; }), name: scenarioDisplayName(s), root: s.root === true, parent: (p && !p.isBase) ? scenarioDisplayName(p) : undefined, inp: (r && r.ok) ? r.inp : null });
 		});
 		return out;
 	}
@@ -46033,6 +46033,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (u.scope === 'assets') { return wtgFill('lpn_wtg_export_scn_what_assets', 'Assets added or removed', {}); }
 		if (u.scope === 'demand_rows') { return wtgFill('lpn_wtg_export_scn_what_demand_rows', 'The number of demands, or a demand pattern', {}); }
 		if (u.scope === 'pump_valve_elevation') { return wtgFill('lpn_wtg_export_scn_what_pv_elev', 'Elevation at a pump or valve', {}); }
+		if (u.scope === 'auto_length') { return wtgFill('lpn_wtg_export_scn_what_auto_length', 'Length of pipes that follow the drawing', {}); }
 		if (u.scope === 'file') { return wtgFill('lpn_wtg_export_scn_what_file', 'Project settings', {}); }
 		return hit ? String(pcX[hit[0]] || hit[1]) : wtgFill('lpn_wtg_export_scn_what_other', 'Other properties', {});
 	}
@@ -46043,14 +46044,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			unreadable: 'its network could not be read.',
 			name: 'its name is already used by a scenario or an alternative in the file.',
 			layout: 'the export template holds no rows to copy for it.',
+			autolength: 'it changes junction elevation, and the lengths of pipes that follow the drawing ({value}) change with it. Type those lengths to write this scenario.',
 			switching: 'its pumps and controls switch at different times than in Base, and the file states Base\'s switching schedule only.',
-			unsupported: 'it differs from Base in properties this export does not write: {value}. A scenario is written only where it differs from Base in pipe diameter, pipe roughness, junction elevation, or junction demand.'
+			unsupported: 'it differs from Base in properties this export does not write: {value}.'
 		};
 		(unsupported || []).forEach(function (u) {
 			var l = wtgDifferenceLabel(u);
 			what.push(l + (u.ids.length ? ' (' + wtgIdList(u.ids.slice(0, 3)) + ')' : ''));
 		});
+		if (reason === 'autolength') {
+			what = [];
+			(unsupported || []).forEach(function (u) { what = what.concat(u.ids.slice(0, 6)); });
+			what = [wtgIdList(what)];
+		}
 		return { code: 'scenario', ids: [name], value: wtgFill('lpn_wtg_export_scn_' + reason, fb[reason] || reason, { value: what.join(', ') }) };
+	}
+	// Said once after the list, not in every line: what a scenario must differ in to be written.
+	function wtgScenarioRule(items) {
+		var any = (items || []).some(function (it) { return it.code === 'scenario'; });
+		return any ? wtgFill('lpn_wtg_export_scn_rule', 'A scenario is written only where it differs from Base in pipe diameter, pipe roughness, junction elevation, or junction demand.', {}) : '';
 	}
 	// Which scenarios the file holds, in a sentence; nothing is said of one when the project is Base alone.
 	function wtgScenarioSentence(names) {
@@ -46158,6 +46170,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				ul.appendChild(li);
 			});
 			body.appendChild(ul);
+			if (wtgScenarioRule(planned.notCarried)) { p(wtgScenarioRule(planned.notCarried)); }
 		}, [
 			{ label: pcX.lpn_export_table_go || 'Export', isDefault: true, fn: function () { runWtgExport(planned); } },
 			{ label: pcX.lpn_cancel || 'Cancel', cancel: true, fn: function () { } }
@@ -46207,7 +46220,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setNotice(wtgFill('lpn_wtg_export_exported', 'Exported {zip}, holding {wtg} and {sqlite}.',
 			{ zip: out.zipName, wtg: out.wtgName, sqlite: out.sqliteName }) + ' ' + extract + (holds ? ' ' + holds : ''));
 		left = wtgNotCarriedLines(items).join(' ');
-		showExportReceipt(out.zipName, [], [extract, wtgFill('lpn_wtg_export_left_out', 'Not written: {items}', { items: left })], { scenario: baseScenario(), holds: holds });
+		showExportReceipt(out.zipName, [], [extract, wtgFill('lpn_wtg_export_left_out', 'Not written: {items}', { items: left }) + (wtgScenarioRule(items) ? ' ' + wtgScenarioRule(items) : '')], { scenario: baseScenario(), holds: holds });
 	}
 	/**
 	 * **EXPORT GeoJSON (ROADMAP Task 728, Tom 2026-10-06, approving Mary's order: GeoJSON out

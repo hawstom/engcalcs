@@ -310,6 +310,17 @@ async function pagePath() {
 			const w = lib.writeWtg(SQL, env.tplSqlite, parsed, { initial: {}, changes: [] }, { name: 'x', candidate: { scenarios: [{ name: 'R', root: true, inp: DEMAND_ONLY }, { name: 'S', switching: true, inp: DEMAND_ONLY }, { name: 'T', inp: DEMAND_ONLY }] } });
 			return w.report.scenarios.map((x) => x.written + ':' + (x.reason || '')).join(',') === 'false:root,false:switching,true:' && w.report.integrity === 'ok';
 		})());
+		ok('(auto length) an elevation change that moves the length of an auto-length pipe is refused as that; a length change with no elevation behind it is a plain length', (() => {
+			const base = EC.lpnInpParse(BASE), p3 = base.links.find((l) => l.id === '3');
+			const mk = (fn) => { const sc = JSON.parse(JSON.stringify(base)); fn(sc); return sc; };
+			const moved = mk((sc) => { sc.nodes.find((n) => n.id === p3.from).elev += 5; sc.links.find((l) => l.id === '3').length += 7; });
+			const a = lib.scenarioOverrides(base, moved, ['3']), b = lib.scenarioOverrides(base, moved, []);
+			const lone = mk((sc) => { sc.links.find((l) => l.id === '3').length += 7; });
+			const c = lib.scenarioOverrides(base, lone, ['3']);
+			const j = EC.lpnWtgScenarioJudge(base, { name: 'x', parsed: moved, autoLengthIds: ['3'] });
+			return a.unsupported.length === 1 && a.unsupported[0].scope === 'auto_length' && a.unsupported[0].ids.join() === '3' && a.elevations.length === 1
+				&& b.unsupported.some((u) => u.field === 'length') && c.unsupported.some((u) => u.field === 'length') && j.reason === 'autolength';
+		})());
 		ok('(pump end) an elevation change at an end of a pump is refused, named, as is not a plain junction\'s', (() => {
 			const base = EC.lpnInpParse(BASE), pump = base.links.find((l) => l.type === 'pump');
 			if (!pump) { return true; }

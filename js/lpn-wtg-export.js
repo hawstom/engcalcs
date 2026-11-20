@@ -1061,8 +1061,8 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			if (j.reason === 'nested') { rec.reason = 'nested'; lost('scenario ' + name + ' not written: only children of Base are written'); return; }
 			if (j.reason === 'unreadable') { rec.reason = 'unreadable'; lost('scenario ' + name + ' not written: its network could not be read'); return; }
 			const ov = j.ov;
-			if (j.reason === 'unsupported') {
-				rec.reason = 'unsupported'; rec.unsupported = ov.unsupported;
+			if (j.reason === 'unsupported' || j.reason === 'autolength') {
+				rec.reason = j.reason; rec.unsupported = ov.unsupported;
 				lost('scenario ' + name + ' not written, it overrides what this writer does not store: ' + ov.unsupported.map((u) => u.what + ' (' + u.ids.slice(0, 6).join(', ') + (u.ids.length > 6 ? ', ...' : '') + ')').join('; '));
 				return;
 			}
@@ -1562,8 +1562,10 @@ function energyNotWritten(lines, patternIds) {
  * Every other difference, an asset in one network only, any other property of any asset, any other part of the file, is named
  * in `unsupported` (`what` for a developer; `scope` is 'assets', 'property', 'demand_rows', 'pump_valve_elevation' or 'file';
  * `field` and `type` name the property and the asset type for the page to word), and the caller leaves the scenario out whole.
+ * `autoLengthIds` names the pipes whose length follows the drawing: such a pipe's length that differs because an end's elevation
+ * differs is scope 'auto_length' (the elevation is the override; the length is its consequence, and no length override is written).
  */
-function scenarioOverrides(base, scen) {
+function scenarioOverrides(base, scen, autoLengthIds) {
 	const out = { diameters: [], roughness: [], elevations: [], demands: [], unsupported: [] }, bad = {};
 	const meta = {};
 	const flag = (what, id, m) => { (bad[what] = bad[what] || []).push(id); if (!meta[what]) { meta[what] = m || { scope: 'property' }; } };
@@ -1581,7 +1583,9 @@ function scenarioOverrides(base, scen) {
 	function keysDiffer(label, id, x, y) {
 		Object.keys(Object.assign({}, x, y)).forEach((k) => { if (!same(x[k], y[k])) { flag(label + ' ' + k, id, { scope: 'property', field: k, type: label }); } });
 	}
-	const pumpValveEnds = {};
+	const pumpValveEnds = {}, autoIds = {}, elevMoved = {};
+	(autoLengthIds || []).forEach((id) => { autoIds[id] = 1; });
+	(base.nodes || []).forEach((a) => { const b = (scen.nodes || []).find((x) => x.id === a.id); if (b && a.elev !== b.elev) { elevMoved[a.id] = 1; } });
 	(base.links || []).forEach((l) => { if (l.type !== 'pipe') { pumpValveEnds[l.from] = 1; pumpValveEnds[l.to] = 1; } });
 	each(base.nodes, scen.nodes, (a, b) => {
 		if (a.type !== 'junction' || b.type !== 'junction') { keysDiffer(a.type, a.id, without(a, []), without(b, [])); return; }
@@ -1596,7 +1600,10 @@ function scenarioOverrides(base, scen) {
 	});
 	each(base.links, scen.links, (a, b) => {
 		if (a.type === 'pipe' && b.type === 'pipe') {
-			keysDiffer('pipe', a.id, without(a, ['diameter', 'roughness']), without(b, ['diameter', 'roughness']));
+			// A length that follows the drawing moves with an end's elevation: named as that, not as a length override.
+			const lenAuto = a.length !== b.length && autoIds[a.id] && (elevMoved[a.from] || elevMoved[a.to]);
+			if (lenAuto) { flag('length of a pipe that follows the drawing', a.id, { scope: 'auto_length' }); }
+			keysDiffer('pipe', a.id, without(a, lenAuto ? ['diameter', 'roughness', 'length'] : ['diameter', 'roughness']), without(b, lenAuto ? ['diameter', 'roughness', 'length'] : ['diameter', 'roughness']));
 			if (a.diameter !== b.diameter) { out.diameters.push({ id: a.id, inches: b.diameter }); }
 			if (a.roughness !== b.roughness) { out.roughness.push({ id: a.id, c: b.roughness }); }
 		} else {
@@ -1617,7 +1624,7 @@ function scenarioOverrides(base, scen) {
 /**
  * Whether a project scenario can be written as a child of Base, and why not (the page asks this before it writes, to say so
  * in the box it shows; the writer asks it again). `s` is { name, parent?, inp | parsed }.
- * Returns { reason: '' | 'root' | 'nested' | 'unreadable' | 'unsupported', ov }. `s.root` is a scenario with a Base of its own.
+ * Returns { reason: '' | 'root' | 'nested' | 'unreadable' | 'autolength' | 'unsupported', ov }. `s.root` is a scenario with a Base of its own.
  * The network read is kept on `s.parsed`, so the plan's reading is the writer's. The name checks are the writer's, against the file.
  */
 function judgeScenario(base, s) {
@@ -1626,8 +1633,8 @@ function judgeScenario(base, s) {
 	const sp = s.parsed || (s.inp ? EngCalcs.lpnInpParse(s.inp) : null);
 	if (!sp || sp.ok === false) { return { reason: 'unreadable', ov: null }; }
 	s.parsed = sp;
-	const ov = scenarioOverrides(base, sp);
-	return { reason: ov.unsupported.length ? 'unsupported' : '', ov: ov };
+	const ov = scenarioOverrides(base, sp, s.autoLengthIds);
+	return { reason: ov.unsupported.length ? (ov.unsupported.every((u) => u.scope === 'auto_length') ? 'autolength' : 'unsupported') : '', ov: ov };
 }
 
 function plan(doc, opts) {

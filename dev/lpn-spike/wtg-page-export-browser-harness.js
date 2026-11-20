@@ -164,6 +164,7 @@ async function main() {
 		console.log('5. A project with scenarios: the menu export carries the carriable one and names the rest');
 		const proj = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'fixtures', 'Basic-example-US-units.lwn'), 'utf8'));
 		proj.scenarios.push({ id: 's1', name: 'Wet year', overrides: { 'l:L2': { diameter: 8 }, 'n:J2': { demand: 90 } } });
+		proj.scenarios.push({ id: 's3', name: 'Higher ground', overrides: { 'n:J3': { elev: 67 } } });   // J3's pipes L2 and L3 follow the drawing
 		proj.scenarios.push({ id: 's2', name: 'Odd one', overrides: { 'l:L3': { length: 500 } } });
 		proj.project = Object.assign({}, proj.project, { activeScenario: 's1' });
 		await s.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); }, JSON.stringify(proj));
@@ -180,6 +181,7 @@ async function main() {
 		await s.page.evaluate((l) => { const r = Array.from(document.querySelectorAll('#lpn_menu_list3 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0); if (r) { r.click(); } }, labels.row);
 		const box2 = await s.waitDialog(4000);
 		ok('the box says the file holds Base and Wet year as a child of Base', !!box2 && box2.text.indexOf('as children of Base, scenarios (1): Wet year.') >= 0, box2 && box2.text.slice(0, 200));
+		ok('and names Higher ground: the lengths of pipes that follow the drawing change with the elevation', !!box2 && /Scenario Higher ground is not written: it changes junction elevation, and the lengths of pipes that follow the drawing \(L2, L3\) change with it\. Type those lengths/.test(box2.text), box2 && box2.text);
 		ok('and lists Odd one as not written, with what it changes', !!box2 && /Scenario Odd one is not written: it differs from Base in properties this export does not write: Length/.test(box2.text), box2 && box2.text);
 		const dl2P = s.page.waitForEvent('download', { timeout: 120000 });
 		await s.dialogClick(labels.go);
