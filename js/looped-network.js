@@ -10487,7 +10487,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The LINK sibling of nearestNodeNearScreen() (Task 502), measured to the nearest point ON the
 	// centreline and reported with the fraction along it -- the parameter a Text anchor stores, so
-	// the caller never has to re-derive it. Screen pixels, same as the node snap, for the same
+	// the caller never has to re-derive it -- and the distance (`px`). Screen pixels, same as the node snap, for the same
 	// reason: a world tolerance is visually huge zoomed out and invisible zoomed in.
 	function nearestLinkNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, l, hit, dPx;
@@ -10496,27 +10496,9 @@ var EngCalcs = EngCalcs || {};
 			if (!nodeById(l.from) || !nodeById(l.to)) { continue; }
 			hit = Geom.nearestFractionOnPolyline(linkPointList(l), w.x, w.y);
 			dPx = hit.dist * state.s;
-			if (dPx <= bestPx) { best = { link: l, t: hit.f }; bestPx = dPx; }
+			if (dPx <= bestPx) { best = { link: l, t: hit.f, px: dPx }; bestPx = dPx; }
 		}
 		return best;
-	}
-	// The element a FINGER meant, when the real hit test found bare map (Task 417). Returns the
-	// drawn element so the caller's existing `t.dataset.*` branches read it exactly as they read a
-	// genuine hit -- there is no second dispatch and no second vocabulary.
-	//
-	// A NODE WINS A TIE, deliberately: every link ends at a node, so near a junction both are in
-	// tolerance, and the node is the more specific thing the user can have meant. Same ordering the
-	// add-Text branch uses, for the same reason.
-	// **ONLY A NODE GETS REACH. Tom, 2026-09-01, after using it:** *"I was wrong. Everything other
-	// than a node is easy to tap. I would be tempted to remove the padding from all objects (text,
-	// label, link) other than nodes."* Measured by him on the device, which is the only place this
-	// question can be answered — a pipe is a long stroke with a wide halo, a label is drawn text,
-	// and a Text object is a whole sentence; all three are already finger-sized and none of them
-	// needed help. **The node is the only small target on the map**, and giving reach to its rivals
-	// was spending the same 24 px on things that never asked for it.
-	function touchAssetNear(cx, cy) {
-		var n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX);
-		return (n && nodeEls[n.id]) ? nodeEls[n.id].circle : null;
 	}
 	// **A SYMBOL THE POINT IS ON OUTRANKS A NODE NEARBY** (Tom, 2026-11-18, of Pump 335 beside Junctions 60
 	// and 61: *"I repeatedly select N60 or N61"*): when the finger's point is on the drawn ink of exactly one
@@ -10559,9 +10541,9 @@ var EngCalcs = EngCalcs || {};
 	// but not on phone anywhere"*) and taking their handle away would deepen a defect that is
 	// already its own roadmap task rather than fix anything.
 	//
-	// **THE COST, SAID OUT LOUD:** a pipe drawn shorter on screen than twice the reach is entirely
-	// inside its own end nodes' reach and cannot be tapped. Screen pixels, so zooming in separates
-	// them and the pipe comes back.
+	// **EXCEPT ON THE PIPE'S OWN LINE** (Tom, 2026-11-19: *"I can't select the pipes even though they are clearly
+	// visible"*): the precedence used to cost every pipe drawn shorter than twice the reach, which zoomed out is every
+	// pipe. A press on a pipe's line or within its band is now the pipe unless a node's drawn ink is nearer (touchNodeOver).
 	function nodeOutranks(t) {
 		if (!t || t === svg) { return true; }
 		if (t.classList && t.classList.contains('lpn-vhandle')) { return false; }
@@ -10596,11 +10578,20 @@ var EngCalcs = EngCalcs || {};
 		}
 		// Two or more inks are the chooser's: whatever was hit goes on to pickPressAt(), which reads the point itself.
 		if (ink.length > 1) { return hit; }
-		// **ON NO INK AT ALL, THE SYMBOL WHOSE INK IS NEAREST, WHICHEVER BAND WAS HIT** (Tom, 2026-11-18: zoomed far out "I get
+		// **ON NO SYMBOL'S INK, WHAT IS DRAWN NEAREST, WHICHEVER BAND WAS HIT** (Tom, 2026-11-18: zoomed far out "I get
 		// either reservoir River or junction 61"). A reservoir keeps its size on the screen while a junction and a pump shrink to a
 		// few px beneath it, so its band lay over the whole cluster and took every press. One rule for a node band, a pipe's halo and
 		// bare map alike, so the outcome does not depend on which band is on top.
-		return nearestInkNearScreen(cx, cy, TOUCH_REACH_PX) || hit;
+		// **A PIPE'S LINE IS DRAWN INK TOO** (Tom, 2026-11-19, on his phone: *"I can't select the pipes even though they are
+		// clearly visible ... I think the real need is to let me select what I tap"*). A press on a pipe's line, or within its
+		// band, is that pipe unless a node's or glyph's ink is nearer; before, any node whose ink was within the finger's 24 px
+		// took it, and zoomed out every pipe is within 24 px of a junction. **A LABEL OVER THE PIPE DOES NOT HIDE IT EITHER**:
+		// where a data label or a Text was hit, a node within reach used to take the press and the pipe under the finger was
+		// never asked; the pipe's line now outranks that node by the same nearness, but never the label itself.
+		var lab = !!(hit && hit.dataset && (hit.dataset.nodelbl !== undefined || hit.dataset.linklbl !== undefined || hit.dataset.lbl !== undefined)),
+			sym = nearestSymbolInk(cx, cy, TOUCH_REACH_PX), line = nearestLineInk(cx, cy);
+		if (line && (lab ? sym && line.d < sym.d : !sym || line.d < sym.d)) { return line.el; }
+		return sym ? sym.el : hit;
 	}
 	// The element a picked ink item stands for (the one a plain press on it would hit), or null.
 	function inkElement(m) {
@@ -10609,10 +10600,10 @@ var EngCalcs = EngCalcs || {};
 			: m.kind === 'label' ? (labelEls[m.id] && labelEls[m.id].text)
 			: (shapeEls[m.id] && shapeEls[m.id].g);
 	}
-	// The node or pump/valve symbol whose drawn ink is nearest the press, within `reach` px of it, as its element; null when none
-	// (a node wins a tie). pickItemsNear() bounds the candidates by the press, the reach and the largest symbol, so a tank or
-	// reservoir whose ink is nearest is eligible however far its centre is.
-	function nearestInkNearScreen(cx, cy, reach) {
+	// The node or pump/valve symbol whose drawn ink is nearest the press, within `reach` px of it: {el: its element, d: px from
+	// the press to its ink}, or null (a node wins a tie). pickItemsNear() bounds the candidates by the press, the reach and the
+	// largest symbol, so a tank or reservoir whose ink is nearest is eligible however far its centre is.
+	function nearestSymbolInk(cx, cy, reach) {
 		var items = pickItemsNear(cx, cy, reach), best = null, bestD = reach, i, m, d;
 		for (i = 0; i < items.length; i++) {
 			m = items[i];
@@ -10620,7 +10611,17 @@ var EngCalcs = EngCalcs || {};
 			d = Geom.pickExtentDistance(m, cx, cy);
 			if (d < bestD || (d === bestD && best && m.kind === 'node' && best.kind !== 'node') || (!best && d <= bestD)) { best = m; bestD = d; }
 		}
-		return best ? inkElement(best) : null;
+		return best ? { el: inkElement(best), d: bestD } : null;
+	}
+	// The link whose drawn line is nearest a press, within the line's band (LPN_LINK_HIT_PX / 2 from its centreline), when it is
+	// drawn: {el: its band, d: px from the press to the stroke's edge, 0 on the stroke}, else null. **Only a node gets the
+	// finger's 24 px of reach** (Tom, 2026-09-01: *"Everything other than a node is easy to tap"*): a line keeps its own band.
+	// Measured inside the canvas's border, as the browser draws the band and pickItemsNear() measures the symbols it competes
+	// with; screenToWorld() does not take the border off, and a 1 px skew lost taps at the band's edge to a junction.
+	function nearestLineInk(cx, cy) {
+		var hit = nearestLinkNearScreen(cx - svg.clientLeft, cy - svg.clientTop, LPN_LINK_HIT_PX / 2), le = hit && linkEls[hit.link.id];
+		if (!le || !le.hit || !hitIsVisible(le.line)) { return null; }
+		return { el: le.hit, d: Math.max(0, hit.px - linkStrokeWidth() * (state.s || 1) / 2) };
 	}
 	function nearestNodeNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;
@@ -60698,7 +60699,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// reach outrank a link. touchNodeOver() carries the rule and names what a node does not
 			// outrank.
 			if (e.pointerType === 'touch' && mode === 'select') {
-				if (t === svg) { t = touchAssetNear(e.clientX, e.clientY) || t; }
 				t = touchNodeOver(e.clientX, e.clientY, t);
 				// **AND A METER GETS THE SAME REACH A NODE DOES, for the same reason** (Task 247):
 				// it is deliberately a 3 px dot at system zoom, which makes it the one symbol on

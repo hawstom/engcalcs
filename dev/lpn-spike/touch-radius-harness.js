@@ -27,8 +27,8 @@
 // is not a violation of that rule; the pointer's number moving would be.
 //
 // **SECTION 4 IS THE OTHER HALF OF THE SAME TASK.** Tom, 2026-08-30: *"dragging a node can be very
-// difficult"* on a phone. A TAP got the fallback above; a PRESS did not -- touchAssetNear() has one
-// call site and it is the pointerUP handler -- so a finger could OPEN a node it could not GRAB. It
+// difficult"* on a phone. A TAP got the fallback above; a PRESS did not -- the fallback had one
+// call site and it was the pointerUP handler -- so a finger could OPEN a node it could not GRAB. It
 // asserts the GESTURE, driven through the real pointerdown/move/up handlers, because every number
 // section 1 checks was already right while the drag was still broken.
 //
@@ -48,7 +48,6 @@ const L = loadLoopedNetwork(
 	"\t\tpointerSlop: function () { return POINTER_REACH_PX; },\n" +
 	"\t\ttouchSlop: function () { return TOUCH_REACH_PX; },\n" +
 	"\t\tslopFor: reachPx,\n" +
-	"\t\ttouchAssetNear: touchAssetNear,\n" +
 	"\t\ttouchNodeOver: touchNodeOver,\n" +
 	"\t\tnodeOutranks: nodeOutranks,\n" +
 	"\t\thitAt: mapHitAt,\n" +
@@ -124,7 +123,8 @@ console.log('\n--- one number for a finger, one for a pointer, and no others ---
 			}
 			return rest.slice(0, i).trim();
 		})
-		.filter(function (a) { return a && !/^(reachPx\(e\)|TOUCH_REACH_PX|POINTER_REACH_PX|pxTolerance|slop \|\| POINTER_REACH_PX)$/.test(a); });
+		// `LPN_LINK_HIT_PX / 2` is not a reach: it is the pipe's own band, the mark a finger already hit-tests (nearestLineInk).
+		.filter(function (a) { return a && !/^(reachPx\(e\)|TOUCH_REACH_PX|POINTER_REACH_PX|pxTolerance|slop \|\| POINTER_REACH_PX|LPN_LINK_HIT_PX \/ 2)$/.test(a); });
 	ok('no finder is handed a tolerance of its own invention', args.length === 0,
 		JSON.stringify(args));
 	// HIT_SLOP_PX stays, and stays OUT. Task 562 says so in the roadmap; the declaration has to say
@@ -181,46 +181,49 @@ console.log('\n--- "any asset, not just a new asset" ---');
 	// The add-* branches have always had this snap. SELECT mode never did: it asked the browser what
 	// was under the point and took it within HIT_SLOP_PX, which is 2. So a tap that missed a
 	// junction's dot by a few pixels opened nothing, and the user could not tell that from a press
-	// the page dropped.
-	const near = L.touchAssetNear(at.x + 20, at.y);
-	ok('a finger 20px from a junction finds it', !!near && near.getAttribute('data-node') === a,
-		near && near.getAttribute('data-node'));
+	// the page dropped. touchNodeOver() is the one door a finger's press goes through; the browser
+	// found bare map at every point below.
+	const svgEl = byId.lpn_canvas;
+	const what = (t) => { if (!t || t === svgEl) { return null; } const n = t.getAttribute('data-node'); return n !== null && n !== undefined ? 'n' + n : 'l' + t.getAttribute('data-link'); };
+	const finger = (x, y) => what(L.touchNodeOver(x, y, svgEl));
+	ok('a finger 20px from a junction, off its pipe, finds it', finger(at.x - 20, at.y) === 'n' + a, finger(at.x - 20, at.y));
 	// The pointer's own tolerance would NOT have found it, which is what makes the two numbers
 	// different rather than decorative.
 	ok('...where the pointer\'s 14px would not have',
-		!L.nearNode(at.x + 20, at.y, L.pointerSlop()));
-	// **MEASURED PERPENDICULAR TO THE PIPE, NOT ALONG IT**, and getting that wrong first is worth
-	// recording: 30px along the x axis from this junction is still ON the pipe leaving it, so the
-	// fallback correctly found the pipe and the assertion was the thing that was wrong. Off-axis,
-	// nothing is within reach.
+		!L.nearNode(at.x - 20, at.y, L.pointerSlop()));
 	ok('...and 30px away from everything is outside even the finger\'s reach',
-		!L.touchAssetNear(at.x, at.y - 30), 'still bounded');
-
-	// **A NODE WINS A TIE.** Near a junction both it and its pipe are in tolerance, and the node is
-	// the more specific thing the user can have meant. Without this the commonest tap on any network
-	// -- on a junction, which every pipe ends at -- would open a pipe.
-	const onPipe = L.touchAssetNear(at.x + 10, at.y);
-	ok('a press near a junction opens the junction, not the pipe leaving it',
-		!!onPipe && onPipe.getAttribute('data-node') === a, onPipe && onPipe.getAttribute('data-node'));
-	// **BUT ONLY A NODE GETS REACH AT ALL.** Tom, 2026-09-01, having used it: *"Everything other
-	// than a node is easy to tap. I would be tempted to remove the padding from all objects (text,
-	// label, link) other than nodes."* So 15 px OFF the middle of a pipe finds nothing -- the pipe
-	// is found by the browser's own hit test, on its own wide stroke, which is not this function.
-	// This assertion used to demand the opposite and is the measurement changing, not a regression.
+		finger(at.x, at.y - 30) === null, 'still bounded');
+	// **A PIPE'S LINE IS WHAT A FINGER ON IT MEANT** (Tom, 2026-11-19, on his phone: *"I can't select the pipes even though
+	// they are clearly visible ... I think the real need is to let me select what I tap"*). Until round 9 of Task 861 a
+	// node whose ink was within the finger's 24 px outranked the pipe under the finger, and zoomed out every pipe is within
+	// 24 px of a junction. Now a press on a pipe's line, or within its band, is the pipe unless a node's drawn ink is nearer.
+	ok('a press ON the pipe 10px from its junction selects the pipe, not the junction', finger(at.x + 10, at.y) === 'l' + pipe, finger(at.x + 10, at.y));
+	ok('...and 4px off the pipe line, 10px along it, the pipe too (its band; the junction\'s ink is farther)', finger(at.x + 10, at.y + 4) === 'l' + pipe, finger(at.x + 10, at.y + 4));
+	ok('...but a press on the junction\'s own disc is the junction', finger(at.x + 1, at.y) === 'n' + a, finger(at.x + 1, at.y));
+	ok('...and 1px off the disc beside the pipe, where the disc\'s ink is nearer than the stroke\'s edge, the junction', finger(at.x + 2, at.y - 4.4) === 'n' + a, finger(at.x + 2, at.y - 4.4));
+	// **ONLY A NODE GETS REACH AT ALL.** Tom, 2026-09-01, having used it: *"Everything other than a node is easy to tap. I
+	// would be tempted to remove the padding from all objects (text, label, link) other than nodes."* So a pipe keeps its own
+	// band, 6px either side of its centreline, and 15 px off the middle of a pipe finds nothing.
 	const mid = L.worldToScreen(350, 200);
-	const found = L.touchAssetNear(mid.x, mid.y + 15);
-	ok('...and 15px off the middle of a pipe finds NOTHING: reach is a node privilege',
-		found === null, found && (found.getAttribute('data-link') || found.getAttribute('data-node')));
-	// Bare map stays bare map. The fallback may only ever ADD a hit where the real test found
-	// nothing; it must never invent one out in the open, or panning becomes impossible on a phone.
+	ok('...and 15px off the middle of a pipe finds NOTHING: reach is a node privilege', finger(mid.x, mid.y + 15) === null, finger(mid.x, mid.y + 15));
+	ok('...while 5px off the middle of a pipe is the pipe', finger(mid.x, mid.y + 5) === 'l' + pipe, finger(mid.x, mid.y + 5));
+	// **A DATA LABEL OVER THE PIPE** (Net3 on a phone, 2026-11-20: a junction's label box lies over the pipe beside it, the
+	// browser answers with the label, and the junction within reach took the press while the pipe under the finger was never
+	// asked). The pipe's line outranks that junction by nearness; the label itself is never outranked by a line.
+	const lblHit = { dataset: { nodelbl: a }, classList: { contains: () => false } };
+	const viaLbl = (x, y) => { const t = L.touchNodeOver(x, y, lblHit); return t === lblHit ? 'label' : what(t); };
+	ok('a press ON the pipe 10px from its junction, where a data label was hit, selects the pipe', viaLbl(at.x + 10, at.y) === 'l' + pipe, viaLbl(at.x + 10, at.y));
+	ok('...a press there off the pipe\'s band still gives the junction within reach', viaLbl(at.x - 12, at.y) === 'n' + a, viaLbl(at.x - 12, at.y));
+	ok('...and on the middle of the pipe, no node within reach, the label stays the label', viaLbl(mid.x, mid.y) === 'label', viaLbl(mid.x, mid.y));
+	// Bare map stays bare map: the finger's fallback never invents a hit out in the open, or panning becomes impossible.
 	const far = L.worldToScreen(350, 500);
-	ok('a press in open space still finds nothing', !L.touchAssetNear(far.x, far.y));
+	ok('a press in open space still finds nothing', finger(far.x, far.y) === null);
 }
 
 // ---------------------------------------------------------------------------
 // 4. THE GESTURE, not the number: a finger must be able to GRAB a node, and a
 //    pan must survive. Driven through the real pointerdown/move/up handlers,
-//    because the defect lived in the wiring -- touchAssetNear() was already
+//    because the defect lived in the wiring -- the bare-map fallback was already
 //    correct and reachable, from the pointerUP path alone.
 // ---------------------------------------------------------------------------
 console.log('\n--- a press, not a tap: grabbing a node with a finger ---');
@@ -311,7 +314,7 @@ console.log('\n--- a press, not a tap: grabbing a node with a finger ---');
 //     LINK HIT, which is what the browser really returns 8 px off a junction:
 //     the pipe's stroke halo is wide, the junction's drawn disc is 7 px.
 // ---------------------------------------------------------------------------
-console.log('\n--- a node outranks the pipe that leaves it ---');
+console.log('\n--- a node outranks the pipe that leaves it, except on the pipe\'s own line ---');
 {
 	L.seedDefaultInputs();
 	const doc = L.getDoc();
@@ -352,20 +355,28 @@ console.log('\n--- a node outranks the pipe that leaves it ---');
 	ok('the page\'s own hit test answers a press 8px off the junction with the PIPE',
 		L.hitAt(at.x + 8, at.y) === line);
 	setHitTarget(null);
-	const grabbed = pressOn(line, 'touch', at.x + 8, at.y);
-	ok('...and a finger there now drags the NODE, not the pipe',
+	// **ROUND 9 OF TASK 861 TURNED THIS AROUND, ON THE PIPE ITSELF** (Tom, 2026-11-19, on his phone: *"I can't select the
+	// pipes even though they are clearly visible ... I think the real need is to let me select what I tap"*). The press
+	// 8 px off the junction is ON the pipe's drawn line, so a finger there means the pipe; it used to drag the junction,
+	// and zoomed out that rule made every pipe untappable. Off the pipe's band, the node within reach still wins.
+	pressOn(line, 'touch', at.x + 8, at.y);
+	const onLine = L.selectedRef();
+	ok('...and a finger there, ON the pipe\'s line, selects the PIPE, not the junction (Tom, 2026-11-19)',
+		!!onLine && onLine.kind === 'link' && onLine.id === pipe, onLine && (onLine.kind + ' ' + onLine.id));
+	const grabbed = pressOn(line, 'touch', at.x + 4, at.y - 7);
+	ok('...but 7px off the pipe\'s centreline (outside its 6px band), 8px from the junction, the finger drags the NODE',
 		!!grabbed && grabbed.type === 'node' && grabbed.id === a,
 		grabbed && (grabbed.type + ' ' + grabbed.id));
-	// Out along the pipe, away from every node, the pipe is still the pipe. Precedence is a rule
-	// about NEARNESS, not a rule that pipes cannot be touched -- and the press SELECTS the pipe,
+	// Out along the pipe, away from every node, the pipe is still the pipe -- and the press SELECTS the pipe,
 	// which is the user-visible half. (No drag arms: a pipe's body is not draggable, so the press
 	// falls through to a pan, exactly as it always did.)
 	pressOn(line, 'touch', mid.x, mid.y);
 	const sel = L.selectedRef();
 	ok('a finger in the middle of the pipe still selects the PIPE',
 		!!sel && sel.kind === 'link' && sel.id === pipe, sel && (sel.kind + ' ' + sel.id));
-	ok('...and the hit itself is handed back untouched there',
-		L.touchNodeOver(mid.x, mid.y, line) === line);
+	const there = L.touchNodeOver(mid.x, mid.y, line);
+	ok('...and the press there is answered with that pipe',
+		!!there && there.getAttribute('data-link') === pipe, there && there.getAttribute('data-link'));
 
 	// **THE POINTER IS DELIBERATELY UNCHANGED.** A mouse has a visible cursor, a hover readout and
 	// sub-pixel aim; it can see it is on the pipe and move 3 px. Giving it this precedence would
