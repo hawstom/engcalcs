@@ -28,7 +28,7 @@ require(ROOT + 'js/lpn-native-run.js');
 
 const L = loadLoopedNetwork(
 	"\t\townerOfProp: ownerOfProp, pushSpecList: pushSpecList, replaceOwnedNote: replaceOwnedNote, paneTables: paneTables, paneCellIsPlain: paneCellIsPlain,\n" +
-	"\t\tviaOwnerDoor: viaOwnerDoor, paneCellText: paneCellText, wellJoined: wellJoined, wellKindOf: wellKindOf, elementsInRing: elementsInRing, joinedTankPoint: joinedTankPoint, joinedHiddenNow: function () { return joinedHidden; }, terrainFillElevations: terrainFillElevations,\n" +
+	"\t\tviaOwnerDoor: viaOwnerDoor, paneCellText: paneCellText, wellJoined: wellJoined, wellKindOf: wellKindOf, elementsInRing: elementsInRing, joinedTankPoint: joinedTankPoint, nodeLabelAt: nodeLabelAt, staticObstacles: staticObstacles, incidentBearings: incidentBearings, joinedHiddenNow: function () { return joinedHidden; }, terrainFillElevations: terrainFillElevations,\n" +
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode, getMode: function () { return mode; },\n" +
@@ -770,6 +770,12 @@ console.log('\n--- 12. round 13 review: joined only when nothing else joins, box
 	ok('the tank\'s place on the map is the vessel\'s, beside the Well and not at the tank\'s own point', Math.abs(vp.y - 150) < 40 && vp.x > 200 && Math.hypot(vp.x - 500, vp.y - 400) > 100, JSON.stringify(vp));
 	ok('a box round the empty place the tank really is catches nothing, and a box round the vessel catches the tank', !caught(500, 400, 30).includes(a.tank) && caught(vp.x, vp.y, 6).includes(a.tank), JSON.stringify([caught(500, 400, 30), caught(vp.x, vp.y, 6)]));
 	ok('and the hidden tee and branch pipes are not caught at their places', !caught(500, 150, 30).includes(a.tee) && a.branch.every((id) => !L.elementsInRing(sq(350, 270, 400)).some((e) => e.id === id)));
+	const la = L.nodeLabelAt(tk);
+	ok('the tank\'s label is anchored at its vessel (a drag measures its offset from there too), not at the tank\'s own point', Math.abs(la.x - vp.x) < 1e-9 && Math.abs(la.y - vp.y) < 1e-9);
+	const ob = L.staticObstacles();
+	ok('the joined tee and the two hidden branch pipes are not obstacles (drawn as nothing), and the tank is one box at its vessel, not a round one at its own point',
+		!ob.segments.some((sg) => a.branch.some((id) => sg.owner === 'l:' + id)) && !ob.boxes.some((bx) => Math.hypot(bx.cx - 500, bx.cy - 150) < 1e-6 && bx.owner === 'n:' + a.tee) && ob.boxes.some((bx) => bx.owner === 'n:' + a.tank && Math.abs(bx.cx - vp.x) < 1e-6 && Math.abs(bx.cy - vp.y) < 1e-6 && bx.round === false), JSON.stringify(ob.boxes.filter((bx) => bx.owner === 'n:' + a.tank)));
+	ok('and no pipe drawn as nothing gives the tank a bearing', L.incidentBearings(tk).length === 0, JSON.stringify(L.incidentBearings(tk)));
 	const j = L.addNode('junction', 700, 100);
 	L.addLink('pipe', a.tee, j.id, []);
 	ok('a pipe on the tee ends the joined drawing: the Well alone, and the tank, tee and both pipes are drawn as themselves', !L.wellJoined(a) && L.wellKindOf(a) === 'well' && Object.keys(L.joinedHiddenNow().nodes).length === 0 && Object.keys(L.joinedHiddenNow().links).length === 0);
