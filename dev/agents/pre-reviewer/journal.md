@@ -5071,3 +5071,9 @@ OBSERVED (re-verify; real Chromium, Net1 EPS 25 frames to 24 h, desktop 1400x900
 - OBSERVED: transport-ends-browser-harness passes (46 ok). Own drive, real Chromium, Net1 EPS, Junction 10: thin blue time line (1.5px, token colour) visible at 0:00 on the left plot edge in the bottom pane and on the phone Properties graph; hover shows crosshair + time/value readout and changes nothing; click set 15:00, drag scrubbed; phone tap and sideways drag set time, readout shown with finger down; no page errors.
 - OBSERVED: the run-finished Calculate dialog sits over the right of the bottom graph on first run (pre-existing, not this branch).
 - Not checked: how it feels under a real finger; pixel look beyond screenshots.
+
+## 2026-11-20 feat/wtg-page-scenario (b3b7f3d43..1c3ac51e3), Perry
+
+- OBSERVED (real Chromium, the test sheet's five scenarios injected as saved project data, not clicked in): `Higher ground` (J3 +5 ft) is NOT written on the sheet's own project, because auto pipe lengths follow elevation; box and receipt say "Length (L2, L3)". The harness passes only because its fixture has typed lengths. With lengths typed, all three carried scenarios are written and the file holds exactly the overrides (alt rows: J3 67 ft; L2 8 in; J2 90 gpm; L4 8 in, C 110), Base unchanged, Base active, integrity ok.
+- OBSERVED: pump-end elevation refusal fires (J1) and not for a plain junction. Switching refusal not driven by a real run (harness only sets the flag).
+- SPECULATION: WaterGEMS acceptance of elevation/roughness children unverified (Tom's step 6).
