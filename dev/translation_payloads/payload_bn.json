@@ -2,8 +2,8 @@
     "meta": {
         "language": "bn",
         "expected_key_count": 3383,
-        "delta_key_count": 1,
-        "english_changed_key_count": 0,
+        "delta_key_count": 3,
+        "english_changed_key_count": 2,
         "exempt_key_count": 54,
         "exempt_keys": [
             "u_imgd",
@@ -85,14 +85,50 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "No glossary term is used by the strings in this batch.",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: প্রবাহ\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: প্রবাহ বেগ\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: হেড\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: পানিশীর্ষ ক্ষতি\n- flow used, taken, or consumed\n    English: demand\n    Your language: চাহিদা\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: চাপ\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: লিংক\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- checking, adjusting, or tuning the model against field readings or measurements\n    English: calibration\n    Your language: ক্যালিব্রেশন\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
+        "lpn_guide_fr_what_def": "<p>Choose <strong>Water<\/strong>, <strong>Reports<\/strong>, <strong>Full<\/strong>. The table has one row for each node and link at each reporting time step, in the units of the <strong>Tables<\/strong> pane. Its columns are <strong>Type<\/strong>, <strong>ID<\/strong>, <strong>Demand<\/strong>, <strong>Head<\/strong>, <strong>Pressure<\/strong>, <strong>Chlorine concentration<\/strong>, <strong>Flow<\/strong>, <strong>Velocity<\/strong>, <strong>Head loss<\/strong>, <strong>Pump head<\/strong>, and <strong>Status<\/strong>, and a cell is blank where the asset has no such quantity. The <strong>Time step<\/strong> list chooses the step shown, and <strong>Download CSV<\/strong>, <strong>Copy HTML<\/strong>, and <strong>Print report<\/strong> carry every step. Without an extended period simulation, the table shows the current solution at one instant.<\/p>",
+        "lpn_guide_cal_what_def": "<p>Choose <strong>Water<\/strong>, <strong>Reports<\/strong>, <strong>Calibration<\/strong>. The <strong>Parameter<\/strong> list chooses what the file measures: <strong>Demand<\/strong>, <strong>Head<\/strong>, <strong>Pressure<\/strong>, <strong>Chlorine concentration<\/strong>, <strong>Flow<\/strong>, or <strong>Velocity<\/strong>. One file is held for each parameter, and the <strong>Load calibration file…<\/strong> button opens a file chooser. The report has three pages. <strong>Statistics<\/strong> gives, for each location, the number of observations, the observed mean, the computed mean, the mean error, and the <strong>RMS error<\/strong>, then a <strong>Network<\/strong> row for all locations together and the correlation between the means. <strong>Correlation plot<\/strong> puts each measurement at its observed value across and its computed value up, with a diagonal line where the two agree. <strong>Mean comparisons<\/strong> draws the observed and computed means as a pair of bars for each location.<\/p><p>The computed value is read from the extended period run, and a measurement between two reporting steps is compared with the value interpolated between them. A measurement outside the times the run reported is skipped and counted. With a single instant solution, every measurement is compared with that one result, whatever time the file gives. The report fills in after the network is calculated.<\/p>",
         "lpn_inp_dup_comma": ", "
     },
     "keys": {
+        "lpn_guide_fr_what_def": "<p>Choose <strong>Water<\/strong>, <strong>Reports<\/strong>, <strong>Full<\/strong>. The table has one row for each node and link at each reporting time step, in the units of the <strong>Tables<\/strong> pane. Its columns are <strong>Type<\/strong>, <strong>ID<\/strong>, <strong>Demand<\/strong>, <strong>Head<\/strong>, <strong>Pressure<\/strong>, <strong>Chlorine concentration<\/strong>, <strong>Flow<\/strong>, <strong>Velocity<\/strong>, <strong>Head loss<\/strong>, <strong>Pump head<\/strong>, and <strong>Status<\/strong>, and a cell is blank where the asset has no such quantity. The <strong>Time step<\/strong> list chooses the step shown, and <strong>Download CSV<\/strong>, <strong>Copy HTML<\/strong>, and <strong>Print report<\/strong> carry every step. Without an extended period simulation, the table shows the current solution at one instant.<\/p>",
+        "lpn_guide_cal_what_def": "<p>Choose <strong>Water<\/strong>, <strong>Reports<\/strong>, <strong>Calibration<\/strong>. The <strong>Parameter<\/strong> list chooses what the file measures: <strong>Demand<\/strong>, <strong>Head<\/strong>, <strong>Pressure<\/strong>, <strong>Chlorine concentration<\/strong>, <strong>Flow<\/strong>, or <strong>Velocity<\/strong>. One file is held for each parameter, and the <strong>Load calibration file…<\/strong> button opens a file chooser. The report has three pages. <strong>Statistics<\/strong> gives, for each location, the number of observations, the observed mean, the computed mean, the mean error, and the <strong>RMS error<\/strong>, then a <strong>Network<\/strong> row for all locations together and the correlation between the means. <strong>Correlation plot<\/strong> puts each measurement at its observed value across and its computed value up, with a diagonal line where the two agree. <strong>Mean comparisons<\/strong> draws the observed and computed means as a pair of bars for each location.<\/p><p>The computed value is read from the extended period run, and a measurement between two reporting steps is compared with the value interpolated between them. A measurement outside the times the run reported is skipped and counted. With a single instant solution, every measurement is compared with that one result, whatever time the file gives. The report fills in after the network is calculated.<\/p>",
         "lpn_inp_dup_comma": ", "
     },
     "key_context": {
+        "lpn_guide_fr_what_def": {
+            "reason": "english_changed",
+            "current_value": "<p><strong>পানি<\/strong>, <strong>প্রতিবেদন<\/strong>, <strong>পূর্ণাঙ্গ<\/strong> বেছে নিন। সারণিতে প্রতিটি প্রতিবেদন টাইম স্টেপে প্রতিটি নোড ও লিংকের জন্য একটি সারি থাকে, <strong>টেবিল<\/strong> প্যানেলের এককে। এর কলামগুলো হলো <strong>ধরন<\/strong>, <strong>ID<\/strong>, <strong>চাহিদা<\/strong>, <strong>হেড<\/strong>, <strong>চাপ<\/strong>, ক্লোরিনের ঘনত্ব, <strong>প্রবাহ<\/strong>, <strong>বেগ<\/strong>, <strong>হেড ক্ষতি<\/strong>, <strong>পাম্প হেড<\/strong> এবং <strong>অবস্থা<\/strong>, এবং অ্যাসেটে এমন রাশি না থাকলে ঘরটি ফাঁকা। <strong>সময় ধাপ<\/strong> তালিকা দেখানো ধাপটি বেছে নেয়, এবং <strong>CSV ডাউনলোড করুন<\/strong>, <strong>HTML কপি করুন<\/strong> ও <strong>প্রতিবেদন প্রিন্ট করুন<\/strong> প্রতিটি ধাপ বহন করে। বর্ধিত সময়কাল সিমুলেশন ছাড়া, সারণি একটি মুহূর্তে বর্তমান সমাধান দেখায়।<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_st_example_def",
+                    "value": "<p>Net1 উদাহরণটি খুলুন এবং <strong>পানি<\/strong>, <strong>প্রতিবেদন<\/strong>, <strong>অবস্থার পরিবর্তন<\/strong> বেছে নিন। ট্যাংক N2 এখন 1:00-এ ভরছে, 11:00-এ খালি হচ্ছে, 16:00-এ ভরছে এবং 22:00-এ খালি হচ্ছে। পাম্প L9 এখন 10:00-এ বন্ধ, 15:00-এ খোলা এবং 21:00-এ বন্ধ।<\/p>",
+                    "english": "<p>Open the Net1 example and choose <strong>Water<\/strong>, <strong>Reports<\/strong>, <strong>Status changes<\/strong>. Tank N2 is now filling at 1:00, emptying at 11:00, filling at 16:00, and emptying at 22:00. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_fr_example_def",
+                    "value": "<p>Net1 উদাহরণটি খুলুন এবং <strong>পানি<\/strong>, <strong>প্রতিবেদন<\/strong>, <strong>পূর্ণাঙ্গ<\/strong> বেছে নিন। 24টি অ্যাসেট 25টি প্রতিবেদন ধাপে, 0:00 থেকে 24:00, তালিকাভুক্ত, যা 600টি সারি। 0:00-এ সংযোগস্থল 11-এর চাহিদা 150 gpm, হেড 985.23 ft H2O এবং চাপ 119.26 psi।<\/p>",
+                    "english": "<p>Open the Net1 example and choose <strong>Water<\/strong>, <strong>Reports<\/strong>, <strong>Full<\/strong>. The 24 assets are listed at 25 reporting steps, 0:00 to 24:00, which is 600 rows. At 0:00, Junction 11 has a demand of 150 gpm, a head of 985.23 ft H2O, and a pressure of 119.26 psi.<\/p>"
+                }
+            }
+        },
+        "lpn_guide_cal_what_def": {
+            "reason": "english_changed",
+            "current_value": "<p><strong>পানি<\/strong>, <strong>প্রতিবেদন<\/strong>, <strong>ক্যালিব্রেশন<\/strong> বেছে নিন। <strong>প্যারামিটার<\/strong> তালিকা বেছে নেয় ফাইলটি কী পরিমাপ করে: <strong>চাহিদা<\/strong>, <strong>হেড<\/strong>, <strong>চাপ<\/strong>, ক্লোরিনের ঘনত্ব, <strong>প্রবাহ<\/strong> বা <strong>বেগ<\/strong>। প্রতিটি প্যারামিটারের জন্য একটি ফাইল রাখা হয়, এবং <strong>ক্যালিব্রেশন ফাইল লোড করুন…<\/strong> বোতাম একটি ফাইল বাছাইকারী খোলে। প্রতিবেদনে তিনটি পৃষ্ঠা আছে। <strong>পরিসংখ্যান<\/strong> প্রতিটি অবস্থানের জন্য পর্যবেক্ষণের সংখ্যা, পর্যবেক্ষিত গড়, গণনা করা গড়, গড় ত্রুটি এবং <strong>RMS ত্রুটি<\/strong> দেয়, তারপর সব অবস্থান একসাথে নিয়ে একটি <strong>নেটওয়ার্ক<\/strong> সারি এবং গড়গুলোর মধ্যে সম্পর্ক। <strong>সম্পর্ক প্লট<\/strong> প্রতিটি পরিমাপকে আড়াআড়ি তার পর্যবেক্ষিত মানে ও ওপরের দিকে তার গণনা করা মানে বসায়, যেখানে দুটি মেলে সেখানে একটি কর্ণ রেখা সহ। <strong>গড়ের তুলনা<\/strong> প্রতিটি অবস্থানের জন্য পর্যবেক্ষিত ও গণনা করা গড়কে একজোড়া দণ্ড হিসেবে আঁকে।<\/p><p>গণনা করা মান বর্ধিত-সময়কালের রান থেকে পড়া হয়, এবং দুটি প্রতিবেদন ধাপের মাঝের একটি পরিমাপ তাদের মধ্যে ইন্টারপোলেট করা মানের সাথে তুলনা করা হয়। রান যে সময়গুলো প্রতিবেদন করেছে তার বাইরের একটি পরিমাপ বাদ দেওয়া হয় ও গোনা হয়। একটি একক মুহূর্তের সমাধানে, ফাইল যে সময়ই দিক, প্রতিটি পরিমাপ সেই একটি ফলাফলের সাথে তুলনা করা হয়। নেটওয়ার্ক গণনা করার পরে প্রতিবেদন পূর্ণ হয়।<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cal_what_term",
+                    "value": "প্রতিবেদন কী তুলনা করে",
+                    "english": "What the report compares"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cal_file_term",
+                    "value": "ক্যালিব্রেশন ফাইল",
+                    "english": "The calibration file"
+                }
+            }
+        },
         "lpn_inp_dup_comma": {
             "reason": "equal_to_english",
             "current_value": ",",
@@ -113,5 +149,36 @@
     "key_plain": [],
     "key_notes": [],
     "key_concepts": [],
-    "uniqueness_attention": []
+    "uniqueness_attention": [
+        {
+            "instruction": "Find unique names for each.",
+            "members": [
+                {
+                    "plain_name": "short word, name, or tag stuck on a pipe or point",
+                    "english_rendering": "Tag",
+                    "preferred_translation": "ট্যাগ"
+                },
+                {
+                    "plain_name": "words, values, or names the program writes beside a pipe or point",
+                    "english_rendering": "Label",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "words, notes, or captions you type onto the map",
+                    "english_rendering": "Text",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "note, remark, or description for people about one item",
+                    "english_rendering": "Description",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "short code that names one item, like J-1 or P-12",
+                    "english_rendering": "ID",
+                    "preferred_translation": ""
+                }
+            ]
+        }
+    ]
 }
