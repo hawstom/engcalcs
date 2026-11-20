@@ -3726,8 +3726,13 @@
             "answer": "OK."
         },
         "lpn_guide_set_units_def": {
-            "on": "<p>Each quantity has its own unit in <strong>Units</strong>. When values in the project are entered in that unit, changing it asks a question first. <strong>Non-destructive</strong> keeps every number as typed and reads it in the new unit. <strong>Destructive</strong> rewrites the numbers by conversion, so the network stays physically the same, and the original numbers are lost unless <strong>Undo</strong> is used; one <strong>Undo</strong> restores the numbers and the unit. <strong>Cancel</strong> leaves everything as it was.</p><p>Example on Net1: choose mm for <strong>Diameter</strong> in <strong>Units</strong>. <strong>Destructive</strong> rewrites 13 values, and Pipe 10 reads 457.2 mm. <strong>Non-destructive</strong> leaves the 13 values alone, and Pipe 10 reads 18 mm.</p>",
-            "ruled": "2026-10-17",
+            "on": "<p>Each quantity has its own unit in <strong>Units</strong>. When values in the project are entered in that unit, changing it asks a question first. <strong>Convert</strong> rewrites the numbers by conversion, rounded to the <strong>Decimals</strong> you give (blank means no rounding), so the network stays physically the same; one <strong>Undo</strong> restores the numbers and the unit. <strong>Keep</strong> leaves every number as typed and reads it in the new unit. <strong>Cancel</strong> leaves everything as it was.</p><p>Example on Net1: choose mm for <strong>Diameter</strong> in <strong>Units</strong>. With the field blank, <strong>Convert</strong> rewrites 13 values, and Pipe 10 reads 457.2 mm. <strong>Keep</strong> leaves the 13 values alone, and Pipe 10 reads 18 mm.</p>",
+            "ruled": "2026-11-20",
+            "answer": "OK."
+        },
+        "lpn_units_convert_note": {
+            "on": "Convert rewrites each number in the new unit, rounded to the Decimals given; blank means no rounding. Keep leaves each number as typed and reads it in the new unit. Undo puts back a conversion.",
+            "ruled": "2026-11-20",
             "answer": "OK."
         },
         "lpn_guide_set_units_term": {

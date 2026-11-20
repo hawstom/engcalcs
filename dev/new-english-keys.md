@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 3382 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**8 still to read on master**, of 9 untranslated keys, of 3385 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -45,13 +45,44 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   *Current plain sentence:* Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else.
   @@ NEEDS RULING
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (5, 4 to read @@ NEEDS RULING)
+
+- **`lpn_field_tank_initvol`**
+  > Initial volume
+  @@ NEEDS RULING
+- **`lpn_units_convert_note`**
+  > Convert rewrites each number in the new unit, rounded to the Decimals given; blank means no rounding. Keep leaves each number as typed and reads it in the new unit. Undo puts back a conversion.
+  _Ruled OK 2026-11-20._
+- **`lpn_units_convert_q`**
+  > Convert inputs from {old} to {new}?
+  @@ NEEDS RULING
+- **`lpn_units_keep`**
+  > Keep
+  @@ NEEDS RULING
+- **`lpn_units_zero_warn`**
+  > ⚠ There are values ({n}) that would be converted to 0.
+  @@ NEEDS RULING
+
+## u_  (4, 4 to read @@ NEEDS RULING)
+
+- **`u_gal`**
+  > gal
+  @@ NEEDS RULING
+- **`u_l`**
+  > L
+  @@ NEEDS RULING
+- **`u_megaliter`**
+  > ML
+  @@ NEEDS RULING
+- **`u_mgal`**
+  > MG
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**77 still to read**, of 77 new keys across 6 unmerged branch(es).
+**84 still to read**, of 84 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -62,7 +93,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/assembly (`abff65d80`) — 67 new, 67 to read @@ NEEDS RULING
+### chore/handoff-1120 (`687e8f6f5`) — adds no English strings
+
+### feat/assembly (`e581482c5`) — 67 new, 67 to read @@ NEEDS RULING
 
 - **`lpn_assembly_down_head`**
   > Downstream head
@@ -146,7 +179,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Elevation of the static water level, the groundwater surface with the pump off. The groundwater reservoir and the pump node stand at this elevation.
   @@ NEEDS RULING
 - **`lpn_guide_prop_virtual_def`**
-  > <p>A virtual pipe joins two nodes with no length, volume, velocity or head loss. A pipe is virtual when the Virtual pipe box is ticked or when its Length is 0, and Properties then shows Virtual pipe (length = 0). The built-in solver treats it as a direct connection and reports its velocity as 0. EPANET refuses a pipe of length 0, so EPANET and an exported .inp file are given a stand-in 0.01 m long, as wide as the largest ordinary pipe in the project (1000 mm when there is none), with a ;VIRTUAL: note that reopens it as a virtual pipe here. Plain EPANET reads the stand-in as a short, wide pipe.</p>
+  > <p>A virtual pipe joins two nodes with no length, volume, velocity or head loss. A pipe is virtual when the <strong>Virtual pipe</strong> box is ticked or when its <strong>Length</strong> is 0, and <strong>Properties</strong> then shows <strong>Virtual pipe (length = 0)</strong>. The built-in solver treats it as a direct connection and reports its velocity as 0. EPANET refuses a pipe of length 0, so EPANET and an exported .inp file are given a stand-in 0.01 m long, as wide as the largest ordinary pipe in the project (1000 mm when there is none), with a ;VIRTUAL: note that reopens it as a virtual pipe here. Plain EPANET reads the stand-in as a short, wide pipe.</p>
   @@ NEEDS RULING
 - **`lpn_guide_prop_virtual_term`**
   > Virtual pipes and length 0
@@ -266,11 +299,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > A pressure tank is made new. Specify a point on the map, not an existing tank.
   @@ NEEDS RULING
 
-### feat/graph-scrub (`e95a5991d`) — adds no English strings
-
-### feat/library-order (`48e6950e1`) — adds no English strings
-
-### feat/pick-chooser (`50e757d1d`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/pick-chooser (`5cbe14b97`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pick_chooser_label`**
   > Select one of the elements here
@@ -282,29 +311,56 @@ build for that would be a gate nobody keeps. Refresh it with
   > More time controls
   @@ NEEDS RULING
 
-### feat/volume-unit (`38027cbba`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/volume-unit (`ba5e53414`) — adds no English strings
 
-- **`lpn_field_tank_initvol`**
-  > Initial volume
+### feat/wtg-page-scenario (`becb557ac`) — 15 new, 15 to read @@ NEEDS RULING
+
+- **`lpn_wtg_export_holds_children`**
+  > It holds the Base scenario and, as children of Base, scenarios ({n}): {scenarios}.
   @@ NEEDS RULING
-- **`lpn_units_convert_note`**
-  > Convert rewrites each number in the new unit, rounded to the decimals given. Keep leaves each number as typed and reads it in the new unit. Undo puts back a conversion.
+- **`lpn_wtg_export_lost_scenario`**
+  > Scenario {ids} is not written: {value}
   @@ NEEDS RULING
-- **`lpn_units_convert_q`**
-  > Convert inputs from {old} to {new}?
+- **`lpn_wtg_export_scn_autolength`**
+  > it changes junction elevation, and the lengths of pipes that follow the drawing ({value}) change with it. Type those lengths to write this scenario.
   @@ NEEDS RULING
-- **`lpn_units_keep`**
-  > Keep
+- **`lpn_wtg_export_scn_layout`**
+  > the export template holds no rows to copy for it.
   @@ NEEDS RULING
-- **`u_gal`**
-  > gal
+- **`lpn_wtg_export_scn_name`**
+  > its name is already used by a scenario or an alternative in the file.
   @@ NEEDS RULING
-- **`u_l`**
-  > L
+- **`lpn_wtg_export_scn_nested`**
+  > only children of Base are written.
   @@ NEEDS RULING
-- **`u_megaliter`**
-  > ML
+- **`lpn_wtg_export_scn_root`**
+  > it is a Base of its own, and only children of Base are written.
   @@ NEEDS RULING
-- **`u_mgal`**
-  > MG
+- **`lpn_wtg_export_scn_rule`**
+  > A scenario is written only where it differs from Base in pipe diameter, pipe roughness, junction elevation, or junction demand.
   @@ NEEDS RULING
+- **`lpn_wtg_export_scn_switching`**
+  > its pumps and controls switch at different times than in Base, and the file states Base's switching schedule only.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_unreadable`**
+  > its network could not be read.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_assets`**
+  > Assets added or removed
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_demand_rows`**
+  > The number of demands, or a demand pattern
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_file`**
+  > Project settings
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_other`**
+  > Other properties
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_pv_elev`**
+  > Elevation at a pump or valve
+  @@ NEEDS RULING
+
+### fix/chlorine-bold (`0a3032b0e`) — adds no English strings
+
+### fix/eps-audit-3 (`81108d39c`) — adds no English strings
