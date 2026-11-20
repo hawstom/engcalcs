@@ -26,10 +26,13 @@ deliberately undone and item 7 is still open.
    a tap, a snap-on-create, a Text anchor and a path handle all measure with it, whether the thing
    is a node, a label, a pipe or a route handle. It is the knob a report of *too hard to pan* or
    *too hard to drag* moves, and moving it needs no per-object judgement.
-4. **A node outranks a link, because a node is hardest to aim at.** On touch, a node within reach
-   wins even where the browser confidently answered with the pipe. It does not outrank another node,
-   a label, or a vertex handle — each of those is either already resolved or is what the user aimed
-   at.
+4. **A finger gets what is drawn under it, and a node gets reach because it is hardest to aim at.**
+   On touch, a press on one symbol's drawn mark is that symbol; a press on a pipe's line, or within
+   its band, is that pipe unless a symbol's mark is nearer; elsewhere the node whose mark is nearest,
+   within reach, wins. A junction drawn smaller than `TOUCH_NODE_MIN_PX` (5 px) is taken to be that
+   big, so zoomed out it keeps a finger's ground against the pipes through it. A node does not
+   outrank a label or a vertex handle; a pipe's line outranks a node near a data label, never the
+   label (Task 861, round 9).
 5. **Nothing done for the finger changes anything for the mouse.** Every touch rule is reached only
    on a touch press; the desktop paths are untouched by construction. The precedence in rule 4 is
    the sharpest case: a mouse can see it is on the pipe and correct by three pixels, so it does not
@@ -66,12 +69,16 @@ rules 8 and 10 are the pair Tom's 2026-09-01 phone reading rewrote.
   rival — was true and is superseded: Tom has reported *too hard to drag* and *too hard to get
   nodes* and has never reported *too hard to pan*, so the family collapsed UP. The path handle's
   contradiction dissolved with it; it reads the same accessor everything else reads.
-- **What replaced it is a PRECEDENCE, not a number.** *"Nodes need to get precedence always, because
-  they are hardest to aim at."* On touch, a node within reach outranks a link, a link label and bare
-  map. It does **not** outrank another node, a label of any kind (a node's own data label is drawn a
-  few pixels away and is always inside the reach) or a vertex handle. That reverses the constraint
-  the touch fallback shipped under — *"it can add a hit, never overrule one"* — and both call sites
-  say so where the old sentence used to stand.
+- **What replaced it is a PRECEDENCE, not a number, and Tom's phone pass of 2026-11-19 bounded it.**
+  *"Nodes need to get precedence always, because they are hardest to aim at"* (2026-09-01) made a
+  node within reach outrank a pipe everywhere; zoomed out every point of every pipe is within 24 px
+  of a junction, and Tom: *"I can't select the pipes even though they are clearly visible ... the
+  real need is to let me select what I tap."* Measured on Net3 on a phone, 3 to 10 % of taps on a
+  pipe selected it. Now a pipe's drawn line is ink like any symbol's: on it or within its band, the
+  pipe, unless a symbol's mark is nearer, and a junction smaller than 5 px counts as 5 px across
+  its centre so it can still be tapped and dragged zoomed out. The rejected alternative is the old
+  one, a node within reach outranking the line it sits on. The fallback no longer only fills in
+  bare map; `touchNodeOver()` is the one door, at both call sites.
 - **The pointer deliberately does not get that precedence**, which is the one place the two hands
   now differ in kind rather than in degree. A mouse has a visible cursor, a hover readout and
   sub-pixel aim: it can see it is on the pipe and move three pixels. Giving it the same rule would
@@ -217,7 +224,7 @@ personally would want" is the 6.3 mm figure felt rather than measured, and he is
 His own framing of why a phone needs this much slack is also the literature's: a phone keyboard is
 too small for the finger that uses it, and the industry's answer was not smaller fingers but
 **swipe-typing and autocorrect** — accommodations layered over a target nobody can reliably hit. The
-node reach is the same kind of accommodation, and `touchAssetNear()` is where it lives.
+node reach is the same kind of accommodation, and `touchNodeOver()` is where it lives.
 
 **What this does NOT settle** is where the number goes when a report comes in. It is one knob on
 purpose: *too hard to pan* moves `TOUCH_REACH_PX` down, *too hard to drag* moves it up, and the

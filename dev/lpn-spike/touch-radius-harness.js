@@ -123,8 +123,7 @@ console.log('\n--- one number for a finger, one for a pointer, and no others ---
 			}
 			return rest.slice(0, i).trim();
 		})
-		// `LPN_LINK_HIT_PX / 2` is not a reach: it is the pipe's own band, the mark a finger already hit-tests (nearestLineInk).
-		.filter(function (a) { return a && !/^(reachPx\(e\)|TOUCH_REACH_PX|POINTER_REACH_PX|pxTolerance|slop \|\| POINTER_REACH_PX|LPN_LINK_HIT_PX \/ 2)$/.test(a); });
+		.filter(function (a) { return a && !/^(reachPx\(e\)|TOUCH_REACH_PX|POINTER_REACH_PX|pxTolerance|slop \|\| POINTER_REACH_PX)$/.test(a); });
 	ok('no finder is handed a tolerance of its own invention', args.length === 0,
 		JSON.stringify(args));
 	// HIT_SLOP_PX stays, and stays OUT. Task 562 says so in the roadmap; the declaration has to say
@@ -218,6 +217,15 @@ console.log('\n--- "any asset, not just a new asset" ---');
 	// Bare map stays bare map: the finger's fallback never invents a hit out in the open, or panning becomes impossible.
 	const far = L.worldToScreen(350, 500);
 	ok('a press in open space still finds nothing', finger(far.x, far.y) === null);
+	// **ZOOMED OUT A JUNCTION KEEPS A FINGER'S GROUND AROUND IT** (TOUCH_NODE_MIN_PX; Task 562 against Task 861 round 9). Here the
+	// pipe is 30 px long on screen and the junction a few px across: a press on the pipe 3 px from the junction's centre is the
+	// junction, one in the pipe's middle is the pipe.
+	L.setScale(0.1);
+	const az = L.worldToScreen(200, 200), mz = L.worldToScreen(350, 200), r0 = L.nodeCircle(a).getAttribute('r') * 0.1;
+	ok('zoomed out (junction ' + (2 * r0).toFixed(1) + ' px across), a press on the pipe 3px from the junction\'s centre is the junction', r0 < 3 && finger(az.x + 3, az.y) === 'n' + a, finger(az.x + 3, az.y));
+	ok('...6px from it, the pipe', finger(az.x + 6, az.y) === 'l' + pipe, finger(az.x + 6, az.y));
+	ok('...and in the pipe\'s middle, the pipe', finger(mz.x, mz.y) === 'l' + pipe, finger(mz.x, mz.y));
+	L.setScale(1);
 }
 
 // ---------------------------------------------------------------------------
