@@ -1310,9 +1310,9 @@
 				return st;
 			}
 			// valvedata() starts a valve ACTIVE at its setting; inithyd() unsets the setting of one
-			// stated Closed (or Open), which is what makes it FIXED. A PRV, PSV or FCV stated Open (`valveFixed`, from the file's
+			// stated Closed (or Open), which is what makes it FIXED. A PRV, PSV, FCV or TCV stated Open (`valveFixed`, from the file's
 			// [STATUS]) starts OPEN with no setting; a control or rule can still give it one.
-			if (l.status !== 'closed' && l.valveFixed === 'open' && (st.vt === 'PRV' || st.vt === 'PSV' || st.vt === 'FCV')) { st.s = OPEN; st.k = MISSING; }
+			if (l.status !== 'closed' && l.valveFixed === 'open' && (st.vt === 'PRV' || st.vt === 'PSV' || st.vt === 'FCV' || st.vt === 'TCV')) { st.s = OPEN; st.k = MISSING; }
 			else if (l.status === 'closed') { st.s = CLOSED; st.k = MISSING; }
 			else { st.s = ACTIVE; st.k = l.setting || 0; }
 			return st;
@@ -1343,10 +1343,10 @@
 			if (st.k === MISSING) {
 				if (st.s === CLOSED) { c.status = 'closed'; return c; }
 				c.status = 'open';
-				// Fixed open: a PRV, PSV or FCV is told so; a TCV or PBV with no setting is its open
-				// minor loss, which a setting of zero is in both engines (hydcoeffs.c tcvcoeff(),
-				// pbvcoeff(); js/lpn-epanet.js writes a TCV's minor loss as 0).
-				if (st.vt === 'PRV' || st.vt === 'PSV' || st.vt === 'FCV') { c.valveFixed = 'open'; }
+				// Fixed open: a PRV, PSV, FCV or TCV is told so (a TCV's loss is then its stated minor loss k,
+				// hydcoeffs.c tcvcoeff(), EngCalcs.lpnLinkK); a PBV with no setting is its open minor loss,
+				// which a setting of zero is (pbvcoeff()).
+				if (st.vt === 'PRV' || st.vt === 'PSV' || st.vt === 'FCV' || st.vt === 'TCV') { c.valveFixed = 'open'; }
 				else { c.setting = 0; }
 				return c;
 			}

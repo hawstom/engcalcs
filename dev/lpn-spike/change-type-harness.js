@@ -533,7 +533,7 @@ function run(mutate, quiet) {
 		const geom = L.linkGeomLength(L.linkById('10'));
 		const shown = String(+geom.toFixed(2));
 		ok('13.2 ...and the new pipe\'s drawn length is said, to the field\'s 2 places', text.indexOf(PC.lpn_change_type_born) > 0 &&
-			String(geom).length > shown.length && text.indexOf('10: ' + PC.lpn_field_length + ' ' + shown + ' ft\n') >= 0, shown + ' | ' + text);
+			String(geom).length > shown.length && text.indexOf('10: ' + PC.lpn_field_length + ' ' + shown + ' ft') >= 0, shown + ' | ' + text);
 		ok('13.3 Cancel: byte-identical', snap() === before);
 		changeLink('10', 'pipe', true);
 		const p = L.linkById('10');

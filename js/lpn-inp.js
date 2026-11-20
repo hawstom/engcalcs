@@ -1371,24 +1371,21 @@
 					valveType: vtype || 'TCV',
 					setting: vtype === 'GPV' ? 0 : setting,
 					settingUnit: valveSettingUnit(vtype),
-					// A TCV's loss is its SETTING ALONE. The [VALVES] minor-loss column is IGNORED
-					// for it, which is the opposite of what the section's own column heading
-					// suggests and was measured rather than assumed (js/vendor/epanet-js.js:
-					// setting 16 with loss 0 gives 8.00 ft, setting 12 with loss 3 gives 6.00 ft
-					// = 12/16 of it, and setting 0 with loss 16 gives exactly zero). Adding the
-					// two -- the obvious reading -- puts ~10.6 m of phantom head into a real model.
-					// So a TCV's k is stored as zero and never read; EngCalcs.lpnLinkK is the one
+					// A TCV's loss is its SETTING ALONE while it regulates: EPANET's tcvcoeff() (hydcoeffs.c)
+					// replaces Km by 0.02517 x setting / d^4 for the solve. The stated minor loss is kept in k
+					// and is the TCV's loss only when it is fixed OPEN (setting unset: [STATUS] Open, or a control
+					// or rule that opens it), where tcvcoeff() leaves Km as read. EngCalcs.lpnLinkK is the one
 					// place that rule lives.
-					k: vtype === 'TCV' ? 0 : vloss
+					k: vloss
 				});
 				if (vtype === 'GPV' && r[5]) {
 					vlink.curveId = r[5];
 					if (!gcurve.length) { drop('gpv-curve-missing', [r[0]], r[5], 'link'); }
 				}
 			}
-			// A valve's diameter falls back to a plausible main when the column is blank, and a TCV's
-			// k is forced to zero -- both are numbers WE chose, so mergeTok refuses their columns'
-			// text on its own and neither case needs a branch here.
+			// A valve's diameter falls back to a plausible main when the column is blank, a number WE chose,
+			// so mergeTok refuses its column's text on its own and needs no branch here. A TCV's k is the
+			// stated column, kept (it is the loss when the valve is fixed open).
 			mergeTok(vlink, 'diameter', r[3], vlink.diameter);
 			mergeTok(vlink, 'k', r[6], vlink.k);
 			if (vlink.type === 'valve') { mergeTok(vlink, 'setting', r[5], vlink.setting); }
@@ -1407,11 +1404,11 @@
 			var sv = (r[1] || '').toUpperCase();
 			if (sv === 'CLOSED') { sl.status = 'closed'; sl.fixedOpen = false; }
 			// A valve stated OPEN is FIXED open to EPANET (input3.c: its setting is unset), so it never regulates and is its plain
-			// minor loss. The page keeps that as `fixedOpen`, written back by both exporters and run by both engines. A TCV is left
-			// out: its stated minor loss is not carried (EngCalcs.lpnLinkK), so a fixed-open TCV stays a known difference.
+			// minor loss. The page keeps that as `fixedOpen`, written back by both exporters and run by both engines. A TCV too:
+			// its stated minor loss (k) is then its whole loss (EngCalcs.lpnLinkK).
 			else if (sv === 'OPEN') {
 				sl.status = 'open';
-				if (sl.type === 'valve' && /^(PRV|PSV|FCV|PBV)$/.test(String(sl.valveType).toUpperCase())) { sl.fixedOpen = true; }
+				if (sl.type === 'valve' && /^(PRV|PSV|FCV|PBV|TCV)$/.test(String(sl.valveType).toUpperCase())) { sl.fixedOpen = true; }
 			}
 			else if (sl.type === 'valve' && r[1] !== '' && isFinite(+r[1])) {
 				// A NUMBER here is a SETTING, not a status, and for a valve that is a value this
@@ -3336,13 +3333,13 @@
 						settingText = gname;
 					}
 				}
-				// A TCV's minor-loss column is IGNORED by EPANET (measured -- see EngCalcs.lpnLinkK),
-				// so writing anything but 0 there states a number the engine discards.
+				// A TCV's minor-loss column is ignored by EPANET while it regulates and is its whole loss when fixed open
+				// (hydcoeffs.c tcvcoeff()), so it is written as stated.
 				valves.push(row([lk.id, lk.from, lk.to, dia, vt, settingText,
-					vt === 'TCV' ? '0' : n(PLAIN, lk, '_k', eff(lk, 'k') || 0)]) + descOf(lk));
+					n(PLAIN, lk, '_k', eff(lk, 'k') || 0)]) + descOf(lk));
 				// A valve row has no status column; a closed one is stated in [STATUS].
 				if (status === 'Closed') { statuses.push(row([lk.id, 'Closed'])); }
-				else if (lk.valveOpen && vt !== 'TCV' && vt !== 'GPV') { statuses.push(row([lk.id, 'Open'])); }
+				else if (lk.valveOpen && vt !== 'GPV') { statuses.push(row([lk.id, 'Open'])); }
 			} else if (lk.type === 'pump') {
 				// **A PUMP NAMES A LIBRARY CURVE** (Task 586). The reference goes through the
 				// resolver seam, because it is overridable (Tom, 2026-09-05: *"Scenario pump

@@ -56,6 +56,12 @@ function energyFromReport(txt) {
 async function truth(EngCalcs, model, wantReport) {
 	await engine(EngCalcs);
 	const built = EngCalcs.lpnToInp(JSON.parse(JSON.stringify(model)), { eps: true });
+	return truthOfInp(EngCalcs, model, built.inp, wantReport);
+}
+// The same on any .inp text (the ORIGINAL file, to see what an export drops); `model` names the nodes for the full-tank hold.
+async function truthOfInp(EngCalcs, model, inpText, wantReport) {
+	await engine(EngCalcs);
+	const built = { inp: inpText };
 	const p = new MODULE.Project(WS);
 	WS.writeFile('e.inp', built.inp);
 	p.open('e.inp', 'e.rpt', 'e.out');
@@ -117,4 +123,4 @@ function diff(n, t) {
 	if (!close(n.totalCostPerDay, totT, REL_TOL, REL_TOL * Math.max(totT, 1e-12))) { good = false; detail += ` total ${n.totalCostPerDay} vs ${totT};`; }
 	return { good, worst, detail };
 }
-module.exports = { truth, engine, energyFromBinary, energyFromReport, diff, USAGE_TOL, REL_TOL, EFF_REL };
+module.exports = { truth, truthOfInp, engine, energyFromBinary, energyFromReport, diff, USAGE_TOL, REL_TOL, EFF_REL };
