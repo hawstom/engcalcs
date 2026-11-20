@@ -2578,6 +2578,7 @@ $ec_lang['lpn_storage_unreadable']='Neuloženo. Tento projekt se nepodařilo na�
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='Poděkování';
+$ec_lang['lpn_about_source']='Zdrojový kód';
 $ec_lang['lpn_help_welcome']='Uvítací stránka';
 $ec_lang['lpn_about_license']='Licencováno pod GNU General Public License v3.0 nebo novější.';
 $ec_lang['lpn_about_dedication']='Jsi navždy milován a ceněn, nemáš se čeho bát a nekazíš všechno.';

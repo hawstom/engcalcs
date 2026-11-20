@@ -161,7 +161,11 @@
 		// exporter's own [TIMES] list: absent means "EPANET's own default", and writing a line
 		// stating that default into every file that never had one is exactly the round-trip damage
 		// the sparseness rule exists to prevent.
-		QUALITYTIMESTEP: 'qualityStep'
+		QUALITYTIMESTEP: 'qualityStep',
+		// The rule time step, read the same way and for the same reason: a file that states one (EPANET's default is a tenth of
+		// the hydraulic step) gives different tank levels and pump times when its rules are evaluated on another grid.
+		// Written to the engine and used by the built-in loop only when stated, and written back by the exporter only then.
+		RULETIMESTEP: 'ruleStep'
 	};
 	EC.lpnTimesKeys = TIMES_KEYS;
 

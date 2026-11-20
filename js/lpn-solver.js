@@ -50,6 +50,13 @@ EngCalcs.lpnGradMin = 1e-6 * 0.3048 / (0.3048 * 0.3048 * 0.3048);
 // that is lpnGradMin above -- and it must not be used as one.
 EngCalcs.lpnQMin = 1e-8;
 
+// An emitter's discharge, m3/s: coefficient x |pressure head|^exponent, signed with the head. Below the junction's elevation it
+// is water entering the network (EPANET 2.2's default, Emitter Backflow allowed). The one place the law is written.
+EngCalcs.lpnEmitterFlow = function (coef, dh, exponent) {
+	if (!(coef > 0)) { return 0; }
+	return (dh < 0 ? -1 : 1) * coef * Math.pow(Math.abs(dh), exponent);
+};
+
 // How converged a PLATEAUED iteration must already be before it is accepted as an
 // answer rather than reported as a failure -- a fraction of the network's largest
 // flow. This is EPANET's own default Accuracy, deliberately: it is the point that
@@ -1624,11 +1631,13 @@ EngCalcs.lpnSolve = function (model, options) {
 				F[i] -= (junctions[i].demand || 0);
 			}
 			if (junctions[i].emitter > 0) {
-				// Outflow C (H - z)^gamma, linearized about the current head.
-				var dh = Math.max(H[i] - (junctions[i].elev || 0), 0),
-					qe = junctions[i].emitter * Math.pow(dh, emitterExp),
-					ge = dh > qMin
-						? emitterExp * junctions[i].emitter * Math.pow(dh, emitterExp - 1)
+				// Outflow C (H - z)^gamma, linearized about the current head. Below the junction's elevation it is an INFLOW of the
+				// same law (EngCalcs.lpnEmitterFlow): EPANET 2.2's default is Emitter Backflow allowed, measured against js/vendor/epanet-js.js.
+				var dh = (H[i] - (junctions[i].elev || 0)),
+					adh = Math.abs(dh),
+					qe = EngCalcs.lpnEmitterFlow(junctions[i].emitter, dh, emitterExp),
+					ge = adh > qMin
+						? emitterExp * junctions[i].emitter * Math.pow(adh, emitterExp - 1)
 						: junctions[i].emitter;
 				M[envDiag[i]] += ge;
 				F[i] += ge * H[i] - qe;
@@ -1887,7 +1896,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		for (i = 0; i < nn; i++) {
 			// EN_DEMAND is the delivered demand plus what the junction's emitter discharges (hydraul.c NodeDemand).
 			report.demands[junctions[i].id] = pdaD[i] + (junctions[i].emitter > 0
-				? junctions[i].emitter * Math.pow(Math.max(H[i] - (junctions[i].elev || 0), 0), emitterExp) : 0);
+				? EngCalcs.lpnEmitterFlow(junctions[i].emitter, H[i] - (junctions[i].elev || 0), emitterExp) : 0);
 			report.demandDeficits[junctions[i].id] = Math.max(0, pdaFull[i] - pdaD[i]);
 		}
 	}

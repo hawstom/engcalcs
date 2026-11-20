@@ -2578,6 +2578,7 @@ $ec_lang['lpn_storage_unreadable']='Kaydedilmedi. Bu proje tarayıcı deposundan
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='Emeği geçenler';
+$ec_lang['lpn_about_source']='Kaynak kod';
 $ec_lang['lpn_help_welcome']='Karşılama sayfası';
 $ec_lang['lpn_about_license']='GNU Genel Kamu Lisansı v3.0 veya sonraki bir sürümü altında lisanslanmıştır.';
 $ec_lang['lpn_about_dedication']='Sonsuza dek seviliyor ve değer görüyorsun, korkacak hiçbir şeyin yok ve her şeyi mahvetmiyorsun.';

@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-11-01",
-    "count": 3382,
+    "count": 3383,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -6715,6 +6715,48 @@
                 "lpn_notes_color_def"
             ],
             "reason": "Resynced in all 26 languages by sprint 1118 (2026-11-18)"
+        },
+        {
+            "date": "2026-11-19",
+            "keys": [
+                "lpn_about_source"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
+        },
+        {
+            "date": "2026-11-19",
+            "keys": [
+                "lpn_inp_drop_quality_options"
+            ],
+            "reason": "Sprint 1118b: all 26 translators read the current English against their language and resynced (he, ru, fr, hr, hi, fa edited; the rest already matched)"
+        },
+        {
+            "date": "2026-11-19",
+            "keys": [
+                "lpn_quality_diffusivity"
+            ],
+            "reason": "Sprint 1118b: all 26 translators read the current English against their language and resynced (he, ru, fr, hr, hi, fa edited; the rest already matched)"
+        },
+        {
+            "date": "2026-11-19",
+            "keys": [
+                "lpn_quality_diffusivity_tip"
+            ],
+            "reason": "Sprint 1118b: all 26 translators read the current English against their language and resynced (he, ru, fr, hr, hi, fa edited; the rest already matched)"
+        },
+        {
+            "date": "2026-11-19",
+            "keys": [
+                "lpn_settings_viscosity"
+            ],
+            "reason": "Sprint 1118b: all 26 translators read the current English against their language and resynced (he, ru, fr, hr, hi, fa edited; the rest already matched)"
+        },
+        {
+            "date": "2026-11-19",
+            "keys": [
+                "lpn_settings_viscosity_tip"
+            ],
+            "reason": "Sprint 1118b: all 26 translators read the current English against their language and resynced (he, ru, fr, hr, hi, fa edited; the rest already matched)"
         }
     ],
     "hashes": {
@@ -6947,6 +6989,7 @@
         "lpn_about_credits": "bfac50d6424b5166c3ee2808c85ae7c139b5182f",
         "lpn_about_dedication": "c3f5d7d9b6039a55d9eb30982b87a9aba5aec4e5",
         "lpn_about_license": "4af04a4c7d9b35a6fcbd325fbb041853fced2ba9",
+        "lpn_about_source": "22a35fbebff47762d94faae1d7babdf97b0736bf",
         "lpn_ago_days": "c752c6dea2f93583c2da965c3b0ac6a837aa088d",
         "lpn_ago_hours": "bc7107f4a791a1034616e2c069ba6e03643fedaa",
         "lpn_ago_minutes": "5bac86d4ed544f09d349c91c624aa7241b3b56d4",
@@ -8306,7 +8349,7 @@
         "lpn_inp_drop_pump_other": "a2fb002123b214c66fa396c709638b4ed7c020fe",
         "lpn_inp_drop_pump_speed": "9ed560116830e6d68418e5149383f1b3d5d318e8",
         "lpn_inp_drop_quality": "e7408141ab44188aa2d1696ba7a7bb55be926a84",
-        "lpn_inp_drop_quality_options": "a4dc5aa7713600f142f74d9968ad5012ec90419a",
+        "lpn_inp_drop_quality_options": "bc1077ac6e9ead437fd1bae600eda5bd23050398",
         "lpn_inp_drop_report": "874622f02d91347dd799f3c8eef7dab805b07a8a",
         "lpn_inp_drop_rules": "8c8d4507bac493d09cc7beae1ce6b6458b7e10cd",
         "lpn_inp_drop_sections": "9c38cd934dcb158935293754298118af00a45369",
@@ -8881,8 +8924,8 @@
         "lpn_quality_chemical": "7ff59e4cad4880ff5c1e2abddf9bb79cadfc0c31",
         "lpn_quality_chemical_name": "f238c7f009564ee35f2f08a9f477b565f09a068e",
         "lpn_quality_chemical_name_tip": "c118f0196b5e1190bbf0fc889c3408258848c106",
-        "lpn_quality_diffusivity": "d6f424895b022fa0be1f5b7a8c01d32cb919d5b9",
-        "lpn_quality_diffusivity_tip": "ea504a4e02aea6241bae05cdd1ef9d3b34441fdf",
+        "lpn_quality_diffusivity": "1a32451e5b20c16af248c431c9105f089ef51668",
+        "lpn_quality_diffusivity_tip": "180bec5eaa4e9b105f93d89c31fc7115072a452f",
         "lpn_quality_initial": "30816fbac042eb86175f8d27d1f79b3b001e7604",
         "lpn_quality_initial_tip": "c64a22a31f905f90882ecfe3b145c5f38eedbc13",
         "lpn_quality_mass_units": "5b49db18dadd978ae099116543e934c774ee0ae0",
@@ -9292,8 +9335,8 @@
         "lpn_settings_view_scale": "b041b2a98eb7a703fe07644388134d955e29fea5",
         "lpn_settings_view_scale_tip": "fbdc41aef8bcd0f45f5206a62e3c5975a62b771b",
         "lpn_settings_view_top_left": "e1a6b3cde1db5af2018ca9ed7ef586942a597ff6",
-        "lpn_settings_viscosity": "a9da9923da44821eda11c27c0a26b338937c88f5",
-        "lpn_settings_viscosity_tip": "1bdb5865af5f18efdce1f6ce5449ab9f308b3b5b",
+        "lpn_settings_viscosity": "4a999a75139812005feb1c6bef7f6d4ad277a34f",
+        "lpn_settings_viscosity_tip": "45adee7e4ce6e5d99b4c49c31ae295d2f315e551",
         "lpn_settings_wipe_btn": "e321d4cf609290e8ab6ba5cacaafdf7d25b6620c",
         "lpn_shapes_every_scenario": "311306886a462f7d8adfe52ace574361a178b9ac",
         "lpn_shapes_frame_latlon": "3d0bcf7b54971d7918b9a0a587955060c5ab0e9b",
@@ -11017,6 +11060,10 @@
         "lpn_about_license": {
             "words": 10,
             "ends_sentence": true
+        },
+        "lpn_about_source": {
+            "words": 2,
+            "ends_sentence": false
         },
         "lpn_ago_days": {
             "words": 2,

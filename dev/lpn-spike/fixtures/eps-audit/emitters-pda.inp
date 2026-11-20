@@ -1,0 +1,52 @@
+[TITLE]
+Audit fixture: emitters over a period under a pressure-driven demand model. Exponent 0.7, a reservoir head pattern, a junction that goes below its elevation pressure, a tank.
+
+[JUNCTIONS]
+J1  10  10  D1
+J2  12  8   D1
+J3  45  5   D1
+J4  14  0
+
+[RESERVOIRS]
+R1  50  HP
+
+[TANKS]
+T1  30  6  0  12  10
+
+[PIPES]
+P1  R1  J1  800  200  120  0  Open
+P2  J1  J2  500  150  120  0  Open
+P3  J2  J3  500  150  120  1  Open
+P4  J2  T1  300  150  120  0  Open
+P5  J1  J4  400  100  120  0  Open
+
+[EMITTERS]
+J1  2.5
+J2  1.5
+J3  3.0
+J4  4.0
+
+[PATTERNS]
+D1  1.0  0.7  0.5  0.5  0.8  1.3  1.7  1.6  1.2  1.0  1.0  1.1
+D1  1.2  1.0  0.9  1.2  1.6  1.8  1.5  1.1  0.8  0.7  0.6  0.8
+HP  1.0  1.0  0.95 0.9  0.85 0.8  0.75 0.8  0.85 0.9  0.95 1.0
+HP  1.0  1.0  0.95 0.9  0.85 0.8  0.75 0.8  0.85 0.9  0.95 1.0
+
+[OPTIONS]
+Units LPS
+Headloss H-W
+Accuracy 0.00001
+Trials 100
+Emitter Exponent 0.7
+Demand Model PDA
+Minimum Pressure 0
+Required Pressure 25
+Pressure Exponent 0.5
+
+[TIMES]
+Duration 48:00
+Hydraulic Timestep 1:00
+Pattern Timestep 2:00
+Report Timestep 1:00
+
+[END]

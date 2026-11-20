@@ -2796,6 +2796,7 @@ $ec_lang['lpn_storage_unreadable']='Not saved. This project could not be read fr
 // About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
 // librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
 $ec_lang['lpn_about_credits']='Credits';
+$ec_lang['lpn_about_source']='Source code';
 $ec_lang['lpn_help_welcome']='Welcome page';
 $ec_lang['lpn_about_license']='Licensed under the GNU General Public License v3.0 or later.';
 $ec_lang['lpn_about_dedication']='You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.';
