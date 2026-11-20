@@ -18,6 +18,9 @@
 //      Tank 1 at 4 notches out gives its box;
 //   B4. phone 412 x 915 at 2.6x, 12 notches out (the cluster is a few px across): a tap on the ink of Pump 335 and a junction
 //      opens the box; a tap on no ink beside Junction 61 selects the junction, and one beside the pump's glyph selects the pump, not the reservoir whose band lies over the cluster.
+//   B5. phone 412 x 915 at 2.6x, at the opening view and 8 notches out (Tom, 2026-11-19: "I can't select the pipes even though
+//      they are clearly visible"): a tap on a pipe's line, or 3 px off it, near either end and clear of every symbol's
+//      ink, selects that pipe (it gave the junction while only symbols counted as nearby ink).
 // The cases built by hand are in pick-chooser-browser-harness.js.
 //
 //   node dev/lpn-spike/pick-chooser-zoom-browser-harness.js   (takes the browser lock itself)
@@ -460,6 +463,69 @@ async function main() {
 			ok('...a tap there selects Pump 335, with no box', res.rows.length === 0 && res.sel === 'l335' && res.clear, JSON.stringify([res, cl.beside]));
 		}
 		await X.page.close();
+
+		console.log('\nB5. Phone 412 x 915 at 2.6x, a finger on a visible pipe (Tom, 2026-11-19: "I can\'t select the pipes even though they are clearly visible")');
+		const Y = await Session.open(browser, NAME + '-p5', { viewport: { width: 412, height: 915 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2.6 });
+		await open(Y);
+		// Points where a finger is plainly on a pipe: on its drawn line (or 3 px off it, inside its 6 px band), within the
+		// finger's 24 px of a junction's ink (where the old rule gave the junction), more than 1.5 px clear of every symbol's
+		// ink and of every other pipe's line, so nothing else drawn is as near.
+		const pipePts = () => Y.page.evaluate(() => {
+			const cv = document.getElementById('lpn_canvas'), cr = cv.getBoundingClientRect(), P = cv.createSVGPoint();
+			const pipes = Array.from(document.querySelectorAll('#lpn_canvas polyline.lpn-link.lpn-link-pipe[data-link]')).filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 || b.height > 0; }).map((e) => {
+				const m = e.getScreenCTM();
+				return { id: e.dataset.link, hw: parseFloat(getComputedStyle(e).strokeWidth) * Math.abs(m.a) / 2, pts: e.getAttribute('points').trim().split(/\s+/).map((t) => { const a = t.split(','); return { x: m.a * a[0] + m.c * a[1] + m.e, y: m.b * a[0] + m.d * a[1] + m.f }; }) };
+			});
+			const segD = (x, y, a, b) => { const dx = b.x - a.x, dy = b.y - a.y, L = dx * dx + dy * dy, t = L ? Math.max(0, Math.min(1, ((x - a.x) * dx + (y - a.y) * dy) / L)) : 0; return Math.hypot(x - a.x - t * dx, y - a.y - t * dy); };
+			const lineD = (q, x, y) => { let d = Infinity; for (let i = 0; i + 1 < q.pts.length; i++) { d = Math.min(d, segD(x, y, q.pts[i], q.pts[i + 1])); } return d - q.hw; };
+			const discs = Array.from(document.querySelectorAll('#lpn_canvas circle.lpn-node[data-node]')).map((e) => { const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2, r: b.width / 2 + 0.6 }; }).filter((d) => d.r > 0.6);
+			const fills = Array.from(document.querySelectorAll('#lpn_canvas path.lpn-node-hit[data-node], #lpn_canvas path.lpn-link-symbol-hit')).filter((e) => e.getBoundingClientRect().width > 0).map((e) => ({ e, b: e.getBoundingClientRect(), m: e.getScreenCTM().inverse() }));
+			const symD = (x, y) => {
+				let d = Math.min.apply(null, discs.map((c) => Math.hypot(x - c.x, y - c.y) - c.r));
+				fills.forEach((f) => { if (x > f.b.left - 2 && x < f.b.right + 2 && y > f.b.top - 2 && y < f.b.bottom + 2) { for (const [ox, oy] of [[0, 0], [1.5, 0], [-1.5, 0], [0, 1.5], [0, -1.5]]) { P.x = x + ox; P.y = y + oy; if (f.e.isPointInFill(P.matrixTransform(f.m))) { d = Math.min(d, ox || oy ? 1 : -1); } } } });
+				return d;
+			};
+			const out = [];
+			pipes.forEach((q) => {
+				// From each end, 10 px along the pipe (or a third of a short one), on the line and 3 px off it
+				const n = q.pts.length;
+				for (const [a, b] of [[q.pts[0], q.pts[1]], [q.pts[n - 1], q.pts[n - 2]]]) {
+					const L = Math.hypot(b.x - a.x, b.y - a.y);
+					if (L < 12) { continue; }
+					const ux = (b.x - a.x) / L, uy = (b.y - a.y) / L, along = Math.min(10, L / 3);
+					for (const off of [0, 3]) {
+						const x = a.x + ux * along - uy * off, y = a.y + uy * along + ux * off;
+						if (x < cr.left + 8 || x > cr.right - 8 || y < cr.top + 70 || y > cr.bottom - 10) { continue; }
+						const top = document.elementFromPoint(x, y); if (!top || !top.closest('#lpn_canvas')) { continue; }
+						const mine = Math.max(0, lineD(q, x, y)), sd = symD(x, y);
+						if (sd - mine < 1.5 || sd > 24 || pipes.some((o) => o !== q && lineD(o, x, y) - mine < 1.5)) { continue; }
+						out.push({ id: q.id, x, y, off });
+					}
+				}
+			});
+			return out;
+		});
+		const ySel = () => Y.page.evaluate(() => { const r = Array.from(document.querySelectorAll('#lpn_canvas .lpn-selected')).map((e) => e.dataset.node ? 'n' + e.dataset.node : (e.dataset.link !== undefined ? 'l' + e.dataset.link : (e.nextElementSibling && e.nextElementSibling.dataset.link !== undefined ? 'l' + e.nextElementSibling.dataset.link : 'x'))); return r.filter((v, i) => r.indexOf(v) === i).sort().join(','); });
+		const pipeTaps = async (label) => {
+			const pts = (await pipePts()).slice(0, 40);
+			const wrong = [];
+			let tapped = 0;
+			for (const q of pts) {
+				// A point the docked Properties box has come to cover since the points were listed is not a tap on the map.
+				if (!(await Y.page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return !!(e && e.closest('#lpn_canvas')); }, [q.x, q.y]))) { continue; }
+				tapped++;
+				await Y.page.touchscreen.tap(q.x, q.y); await Y.settle(150);
+				const sel = await ySel(), rows = await Y.page.$$eval('.lpn-pick-chooser button', (bs) => bs.length);
+				if (sel !== 'l' + q.id || rows) { wrong.push(q.id + (q.off ? '+3px' : '') + '->' + (rows ? 'box' : sel || 'nothing')); }
+				await Y.page.evaluate(() => { document.querySelectorAll('.lpn-pane-ctxmenu').forEach((m) => m.remove()); const c = document.getElementById('lpn_popup_close'); if (c) { c.click(); } });
+				await Y.page.keyboard.press('Escape'); await Y.settle(80);
+			}
+			ok(label + ': ' + tapped + ' taps on a pipe\'s line or 3 px off it, beside a junction, each select that pipe', tapped >= 10 && wrong.length === 0, wrong.slice(0, 8).join(' '));
+		};
+		await pipeTaps('the opening view');
+		await zoomOut(Y, 8);
+		await pipeTaps('8 notches out');
+		await Y.page.close();
 
 		ok('no page error', errors.length === 0, errors.join(' | '));
 	} finally {
