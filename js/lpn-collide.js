@@ -786,6 +786,8 @@ EngCalcs.lpnCollide = (function () {
 			c[list].push(idx);
 		}
 		function span(x0, y0, x1, y1, list, idx) {
+			// An obstacle a released label has switched off sits at 1e300: it is nowhere, and the cell loop below cannot step across it (i + 1 === i there), so it is not indexed.
+			if (Math.abs(x0) > 1e290 || Math.abs(y0) > 1e290) { return; }
 			var i, j, i0 = Math.floor(x0 / cell), i1 = Math.floor(x1 / cell),
 				j0 = Math.floor(y0 / cell), j1 = Math.floor(y1 / cell),
 				nx = i1 - i0 + 1, ny = j1 - j0 + 1;

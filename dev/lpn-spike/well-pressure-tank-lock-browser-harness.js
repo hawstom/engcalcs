@@ -4,7 +4,7 @@
 // Task 822, round 12 (Tom, round 11 pass: the tank's properties can be edited). Opens well-pressure-tank-fixture.lwn (written by
 // `well-tank-three-point-harness.js --write-fixture`), selects the tank on the map and asserts: the seven owned rows (initial, minimum and
 // maximum depth, volume curve, diameter, minimum volume, can overflow) are not form controls and typing over them changes nothing; the
-// sentence "Associated with Well W1. Change volume and control properties there." shows once; Elevation and Base elevation are still typeable;
+// sentence "Associated with Well W1. Change volume and control properties there." shows once; Elevation is the tank's own, typeable, with the DEM row beside it (round 15), while Base elevation is read-only; the tank's label is drawn beside its vessel while the Well is joined;
 // Explode gives the tank its inputs back (`well-tank-three-point-harness.js` holds the Tables and Find and replace halves).
 //
 // Copyright 2009 Thomas Gail Haws
@@ -54,7 +54,7 @@ async function main() {
 	if (!executablePath) { console.error(NAME + ': no Chromium found. SKIPPING.'); env.stopServer(); process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
 	// The Well's Total tank volume is 1000 here, the number Tom asked about after Explode: nothing on the exploded tank's box may carry it.
-	const fixture = (() => { const f = JSON.parse(require('fs').readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'well-pressure-tank-fixture.lwn'), 'utf8')); f.assemblies.forEach((g) => { if (g.pt) { g.pt.vol = 1000; } }); return JSON.stringify(f); })();
+	const fixture = (() => { const f = JSON.parse(require('fs').readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'well-pressure-tank-fixture.lwn'), 'utf8')); f.assemblies.forEach((g) => { if (g.pt) { g.pt.vol = 1000; } }); f.project = Object.assign({}, f.project, { basemap: 'osm', crs: 'EPSG:2234' }); return JSON.stringify(f); })();
 	const OWNED = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank volume'];
 	const ABSENT = ['Tank diameter', 'Minimum volume', 'Can overflow'];
 	const SENTENCE = 'Associated with Well W1. Change volume and control properties there.';
@@ -102,8 +102,21 @@ async function main() {
 		const wellRows = await (async () => { await P.keyboard.press('Escape'); const w0 = await centreOf('W1'); await P.mouse.click(w0.x, w0.y); await a.settle(900); const r0 = await rows(); await P.keyboard.press('Escape'); return r0; })();
 		ok('the Well\'s own volume row is "Total tank volume" (m^3 or ft^3), and the Well has no plain "Tank volume" row', wellRows.some((r) => /^Total tank volume/.test(r.t)) && !wellRows.some((r) => /^Tank volume/.test(r.t)), wellRows.map((r) => r.t).join(' | '));
 		const c1 = await centreOf('T1'); await P.mouse.click(c1.x, c1.y); await a.settle(900); rs = await rows();
-		ok('Elevation and Base elevation are locked too (a tank may stand below or above the well\'s ground): read-only rows on the tank\'s box', find('Elevation').controls === 0 && find('Base elevation').controls === 0);
-		ok('the Well\'s box holds them, typeable, in the tank\'s section (the Well\'s own Elevation is the first of two)', wellRows.filter((r) => /^Elevation/.test(r.t)).length === 2 && wellRows.filter((r) => /^Elevation/.test(r.t)).every((r) => r.controls > 0) && wellRows.some((r) => /^Base elevation/.test(r.t) && r.controls > 0), wellRows.map((r) => r.t + ':' + r.controls).join(' | '));
+		ok('Elevation is the tank\'s own (round 15; Tom: "Their elevation must be independent like their position."): a typeable row on the tank\'s box, and Base elevation is a read-only one', find('Elevation').controls > 0 && find('Base elevation').controls === 0);
+		const demRows = await P.evaluate(() => document.querySelectorAll('#lpn_popup_fields .lpn-elev-dem').length);
+		ok('and the standard DEM row (Read DEM, Use DEM) is beside it, once', demRows === 1, String(demRows));
+		const lbl = await P.evaluate(() => {
+			const t = document.querySelector('#lpn_canvas text[data-nodelbl="T1"]'), ves = document.querySelector('#lpn_canvas [data-node="T1"]'), cir = document.querySelector('#lpn_canvas [data-node="W1"]');
+			if (!t || !ves || !cir) { return { missing: [!!t, !!ves, !!cir].join() }; }
+			const hid = (e) => { for (let x = e; x && x.nodeType === 1; x = x.parentNode) { const cs = getComputedStyle(x); if (cs.display === 'none' || cs.visibility === 'hidden' || (x.classList && (x.classList.contains('lpn-asm-hid') || x.classList.contains('lpn-lbl-hidden')))) { return true; } } return false; };
+			const rng = document.createRange(); rng.selectNodeContents(t);
+			const tr = rng.getBoundingClientRect(), vr = ves.getBoundingClientRect(), cr = cir.getBoundingClientRect();
+			const hit = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+			const d = Math.hypot(tr.left + tr.width / 2 - (vr.left + vr.width / 2), tr.top + tr.height / 2 - (vr.top + vr.height / 2));
+			return { text: t.textContent.replace(/\s+/g, ' ').trim(), hidden: hid(t), onVessel: hit(tr, vr), onCircle: hit(tr, cr), dist: Math.round(d), vw: Math.round(vr.width) };
+		});
+		ok('the tank\'s label is drawn while the Well is joined (round 15; Tom: "I agree. Proceed."): shown, reading T1, off the vessel and off the Well\'s circle, and beside the vessel', !!lbl && !lbl.missing && /^T1/.test(lbl.text) && !lbl.hidden && !lbl.onVessel && !lbl.onCircle && lbl.dist < 220, JSON.stringify(lbl));
+		ok('the Well\'s box holds Base elevation, typeable, in the tank\'s section, and has only its own Elevation (one door for the tank\'s, its own box)', wellRows.filter((r) => /^Elevation/.test(r.t)).length === 1 && wellRows.filter((r) => /^Elevation/.test(r.t)).every((r) => r.controls > 0) && wellRows.some((r) => /^Base elevation/.test(r.t) && r.controls > 0), wellRows.map((r) => r.t + ':' + r.controls).join(' | '));
 		const before = rs.map((r) => r.t).join('|');
 		for (const o of OWNED) {
 			const box = await P.evaluate((name) => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.textContent.replace(/\s+/g, ' ').trim().indexOf(name) === 0)[0]; const sp = l.querySelector('span') || l, r = sp.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, o);

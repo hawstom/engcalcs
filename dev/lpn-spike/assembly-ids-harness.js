@@ -203,18 +203,18 @@ console.log('\n--- 3. a file saved before this round keeps its IDs ---');
 	ok('so changing its Well\'s elevation leaves its tank and tee alone', L.nodeById(w2.tank).elev === t0 && L.nodeById(w2.tee).elev !== 777);
 }
 
-console.log('\n--- 4. a Well with tank: the tee and the tank follow the Well\'s elevation until the user types their own ---');
+console.log('\n--- 4. a Well with tank: the tee follows the Well\'s elevation until the user types its own; the tank opens at it and is its own (round 15) ---');
 {
 	const doc = fresh();
 	L.setMode('add-welltank'); press(200, 150); press(400, 150); press(400, 400);
 	L.setMode('select');
 	const a = doc.assemblies[0], well = L.nodeById('W1'), tee = L.nodeById(a.tee), tank = L.nodeById(a.tank);
-	ok('a new Well with tank: the tee and the tank open at the Well\'s elevation and follow it', tee.elev === well.elev && tank.elev === well.elev && a.teeFollow === true && a.tankFollow === true, [well.elev, tee.elev, tank.elev].join());
+	ok('a new Well with tank: the tee and the tank open at the Well\'s elevation, and only the tee follows it', tee.elev === well.elev && tank.elev === well.elev && a.teeFollow === true && a.tankFollow === undefined, [well.elev, tee.elev, tank.elev].join());
 	L.setProp(well, 'elev', 250);
-	ok('typing the Well\'s elevation moves both', tee.elev === 250 && tank.elev === 250);
+	ok('typing the Well\'s elevation moves the tee and leaves the tank', tee.elev === 250 && tank.elev === 0, [tee.elev, tank.elev].join());
 	L.snap();
-	L.viaOwnerDoor(() => L.setProp(tank, 'elev', 300));
-	ok('typing a tank elevation of its own ends the tank\'s following and leaves the tee following', a.tankFollow === undefined && a.teeFollow === true && tank.elev === 300 && tee.elev === 250);
+	L.setProp(tank, 'elev', 300);
+	ok('a tank elevation typed on the tank itself (no owner door) is written, and the tee still follows', a.tankFollow === undefined && a.teeFollow === true && tank.elev === 300 && tee.elev === 250);
 	L.setProp(well, 'elev', 260);
 	ok('the Well\'s next elevation moves the tee, and the tank stays as typed', tee.elev === 260 && tank.elev === 300, [tee.elev, tank.elev].join());
 	L.setProp(tee, 'elev', 270);
@@ -223,13 +223,13 @@ console.log('\n--- 4. a Well with tank: the tee and the tank follow the Well\'s 
 	// Undo: back to the state before the tank was typed.
 	L.undo();
 	const a2 = L.getDoc().assemblies[0];
-	ok('Undo restores the following, flags and elevations (the flags are part of the document)', a2.tankFollow === true && a2.teeFollow === true && L.nodeById(a2.tank).elev === 250 && L.nodeById(a2.tee).elev === 250, JSON.stringify([a2.teeFollow, a2.tankFollow, L.nodeById(a2.tank).elev]));
+	ok('Undo restores the tee\'s following and the tank\'s elevation before it was typed', a2.tankFollow === undefined && a2.teeFollow === true && L.nodeById(a2.tank).elev === 0 && L.nodeById(a2.tee).elev === 250, JSON.stringify([a2.teeFollow, a2.tankFollow, L.nodeById(a2.tank).elev]));
 	// Diverge, save, reopen.
-	L.viaOwnerDoor(() => L.setProp(L.nodeById(a2.tank), 'elev', 400));
+	L.setProp(L.nodeById(a2.tank), 'elev', 400);
 	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
 	L.applySaved(L.migrateSaved(saved)); L.buildDom();
 	const a3 = L.getDoc().assemblies[0];
-	ok('the diverged state survives save and reopen: the tank does not follow, the tee still does', !a3.tankFollow && a3.teeFollow === true);
+	ok('the tank\'s own elevation survives save and reopen, and the tee still follows', !a3.tankFollow && a3.teeFollow === true && L.nodeById(a3.tank).elev === 400);
 	L.setProp(L.nodeById('W1'), 'elev', 500);
 	ok('and after reopening the Well moves the tee and not the tank', L.nodeById(a3.tee).elev === 500 && L.nodeById(a3.tank).elev === 400, [L.nodeById(a3.tee).elev, L.nodeById(a3.tank).elev].join());
 	// The existing-elements forms: a tee that is an existing junction and an existing tank were the user's, so they never follow.
@@ -341,21 +341,22 @@ console.log('\n--- 7. following: the DEM source, a batch in either order, a scen
 	// A blank typed on the outlet is not an elevation to follow.
 	L.setProp(L.nodeById('W1'), 'elev', 120);
 	L.setProp(L.nodeById('W1'), 'elev', '');
-	ok('a blank typed on the Well leaves the followers where they were', L.nodeById(a.tee).elev === 120 && L.nodeById(a.tank).elev === 120, [L.nodeById(a.tee).elev, L.nodeById(a.tank).elev].join());
+	ok('a blank typed on the Well leaves the tee where it was', L.nodeById(a.tee).elev === 120, String(L.nodeById(a.tee).elev));
+	L.setProp(L.nodeById(a.tank), 'elev', 60);
 	L.setProp(L.nodeById('W1'), 'elev', 120);
 	// Scenarios.
 	const scn = L.createScenario('Dry year');
 	L.setProp(L.nodeById('W1'), 'elev', 900);
-	ok('in a scenario the Well\'s elevation reaches the followers as overrides: Base is untouched', L.effective(L.nodeById(a.tee), 'elev') === 900 && L.effective(L.nodeById(a.tank), 'elev') === 900 && L.nodeById(a.tee).elev === 120 && L.nodeById(a.tank).elev === 120);
+	ok('in a scenario the Well\'s elevation reaches the tee as an override and not the tank: Base is untouched', L.effective(L.nodeById(a.tee), 'elev') === 900 && L.effective(L.nodeById(a.tank), 'elev') === 60 && L.nodeById(a.tee).elev === 120 && L.nodeById(a.tank).elev === 60);
 	L.clearOverride(L.nodeById('W1'), 'elev');
-	ok('clearing the Well\'s override in the scenario clears the followers\' too: no stale 900', L.effective(L.nodeById('W1'), 'elev') === 120 && L.effective(L.nodeById(a.tee), 'elev') === 120 && L.effective(L.nodeById(a.tank), 'elev') === 120, [L.effective(L.nodeById(a.tee), 'elev'), L.effective(L.nodeById(a.tank), 'elev')].join());
+	ok('clearing the Well\'s override in the scenario clears the tee\'s too: no stale 900', L.effective(L.nodeById('W1'), 'elev') === 120 && L.effective(L.nodeById(a.tee), 'elev') === 120 && L.effective(L.nodeById(a.tank), 'elev') === 60, [L.effective(L.nodeById(a.tee), 'elev'), L.effective(L.nodeById(a.tank), 'elev')].join());
 	L.setProp(L.nodeById(a.tee), 'elev', 500);
-	ok('an elevation typed on the tee in the scenario ends its following there only: Base still follows', a.teeFollow === true && a.followOff && Object.keys(a.followOff).length === 1 && a.tankFollow === true);
+	ok('an elevation typed on the tee in the scenario ends its following there only: Base still follows', a.teeFollow === true && a.followOff && Object.keys(a.followOff).length === 1 && a.tankFollow === undefined);
 	L.setProp(L.nodeById('W1'), 'elev', 950);
-	ok('in that scenario the next Well elevation moves the tank and not the tee', L.effective(L.nodeById(a.tee), 'elev') === 500 && L.effective(L.nodeById(a.tank), 'elev') === 950, [L.effective(L.nodeById(a.tee), 'elev'), L.effective(L.nodeById(a.tank), 'elev')].join());
+	ok('in that scenario the next Well elevation moves neither the tee nor the tank', L.effective(L.nodeById(a.tee), 'elev') === 500 && L.effective(L.nodeById(a.tank), 'elev') === 60, [L.effective(L.nodeById(a.tee), 'elev'), L.effective(L.nodeById(a.tank), 'elev')].join());
 	L.switchScenario('base');
 	L.setProp(L.nodeById('W1'), 'elev', 130);
-	ok('back in Base the tee still follows (typing in the scenario did not end it here)', L.nodeById(a.tee).elev === 130 && L.nodeById(a.tank).elev === 130, [L.nodeById(a.tee).elev, L.nodeById(a.tank).elev].join());
+	ok('back in Base the tee still follows (typing in the scenario did not end it here) and the tank stays', L.nodeById(a.tee).elev === 130 && L.nodeById(a.tank).elev === 60, [L.nodeById(a.tee).elev, L.nodeById(a.tank).elev].join());
 	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
 	L.applySaved(L.migrateSaved(saved)); L.buildDom();
 	const b = L.getDoc().assemblies[0];

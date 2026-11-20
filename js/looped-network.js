@@ -117,9 +117,9 @@ var EngCalcs = EngCalcs || {};
 	var LABEL_LEADER_THRESHOLD = 3.4;
 	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
 	function nodeLabelBase(n, full) {
-		var d = defaultLabelOffset(full);
-		return { x: nodeDrawX(n) + (n.lx !== undefined ? n.lx : d.x),
-			y: nodeDrawY(n) + (n.ly !== undefined ? n.ly : d.y) };
+		var d = defaultLabelOffset(full), at = nodeLabelAt(n);
+		return { x: at.x + (n.lx !== undefined ? n.lx : d.x),
+			y: at.y + (n.ly !== undefined ? n.ly : d.y) };
 	}
 	// A link's centerline as a point list: its two end nodes with any user vertices between.
 	// This is the one place link topology becomes plain geometry, and everything in
@@ -486,7 +486,7 @@ var EngCalcs = EngCalcs || {};
 		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
 		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
 		if (n.lx !== undefined) { ne.leaderAttach = null; }   // a label the user placed keeps the end they gave its leader
-		var anchor = nodeAt(n), end = nodeLabelPos(n),
+		var anchor = nodeLabelAt(n), end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
 		repositionMultilineText(ne.text, justifyDataLabel(ne.text, ne.side, end, org), org.y);
 		updateDataLeader(ne, anchor, end);
@@ -945,7 +945,7 @@ var EngCalcs = EngCalcs || {};
 	function nodeFirstFitSpec(n, ne, fs) {
 		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id), s0 = state.s || 1, f = ne.inlineFrom,
 			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
-			sides = Collide.cardinalSides(nodeAt(n), d,
+			sides = Collide.cardinalSides(nodeLabelAt(n), d,
 				(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
 		// **AN ASSEMBLY'S LABEL BLOCK NEVER LIES ON A PIPE, AND A WELL'S LEADER IS KEPT OFF ITS OWN PUMP BOX** (Task 822; Perry's round 6 review:
 		// the block's rows were drawn across a pipe when the last sweep took "a pipe under it or not"). `offLinks` makes the first-fit refuse a side any
@@ -965,12 +965,12 @@ var EngCalcs = EngCalcs || {};
 		// measures banked when the line was chosen), so every pass places the drawing's stacks
 		// exactly as the content pass did, and insertInlineNodeLabels() sets the line afterwards.
 		if (f) {
-			return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n), offLinks: asmBlock,
+			return { id: nodeLabelKey(n.id), anchor: nodeLabelAt(n), home: nodeLabelBase(n), offLinks: asmBlock,
 				dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 				w: f.wPx / s0, h: dataLabelBoxHeight(f.lineCount), yOff: -fs * 0.85,
 				lines: f.rowWPx ? f.rowWPx.map(function (v) { return v / s0; }) : null };
 		}
-		return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n), offLinks: asmBlock,
+		return { id: nodeLabelKey(n.id), anchor: nodeLabelAt(n), home: nodeLabelBase(n), offLinks: asmBlock,
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
 			lines: labelRowWidths(ne) };
@@ -982,7 +982,7 @@ var EngCalcs = EngCalcs || {};
 		// pipe grazing the first pixel of the glyphs, which are a pixel taller than the box the first-fit
 		// reasons with).
 		return { w: w, h: dataLabelBoxHeight(1), lines: null, leaderClean: true, offLinks: true, linkMargin: 2 / (state.s || 1),
-			sides: inlineNodeSides(nodeAt(n), d, fs, Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS)) };
+			sides: inlineNodeSides(nodeLabelAt(n), d, fs, Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS)) };
 	}
 	// **WHERE A ONE-LINE NODE LABEL MAY GO: EAST OR WEST OF ITS NODE** (Task 734, Tom 2026-09-26:
 	// *"where there is infinite space east or west, we might want to recognize that infinity and
@@ -1093,7 +1093,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		doc.nodes.forEach(function (n) {
-			if (n.lx !== undefined) { add(nodeLabelKey(n.id), nodeEls[n.id], nodeAt(n), nodeLabelBase(n), n); }
+			if (n.lx !== undefined) { add(nodeLabelKey(n.id), nodeEls[n.id], nodeLabelAt(n), nodeLabelBase(n), n); }
 		});
 		doc.links.forEach(function (l) {
 			if (l.lx !== undefined) { add(linkLabelKey(l.id), linkEls[l.id], linkLabelMid(l), linkLabelBase(l), l); }
@@ -1157,7 +1157,7 @@ var EngCalcs = EngCalcs || {};
 			// link label against ground nothing occupies, clearing a conflict that is really there.
 			var at = nodeLabelBase(n),
 				w = labelBoxWidth(ne), h = dataLabelBoxHeight(ne.lineCount),
-				b = Collide.boxFromRect({ x: movedLabelSide(ne, n, nodeAt(n), at, labelInHand(ne)) === 'right' ? at.x : at.x - w,
+				b = Collide.boxFromRect({ x: movedLabelSide(ne, n, nodeLabelAt(n), at, labelInHand(ne)) === 'right' ? at.x : at.x - w,
 					y: at.y - fs * 0.85, w: w, h: h });
 			b.kind = 'label';
 			obs.boxes.push(b);
@@ -2052,7 +2052,22 @@ var EngCalcs = EngCalcs || {};
 			// so no side was clear for three rows at that scale and the shed took the rows. A drawn nothing blocks nothing; the Well's symbol blocks every other label
 			// but its own (an ordinary node's label never starts inside its own symbol either).
 			if (role === 'R' || role === 'S') { return; }
-			var sb = Collide.box(nodeDrawX(n), nodeDrawY(n), r * 2, r * 2, 0);
+			var sb, hw = n.type === 'tank' ? hostWellOfTank(n) : null, jp = hw ? joinedTankPoint(n) : null, wa = role === 'T' ? assemblyOfNode(n.id) : null, g, k, rc;
+			// **A JOINED WELL IS TWO OBSTACLES, THE CIRCLE AND THE VESSEL** (round 15): the Well's label ignores its own circle, the tank's label ignores its own vessel,
+			// and each keeps off the other's. A tank drawn with its Well is an obstacle where its vessel is, never at its own point, where nothing of it is drawn.
+			if (jp) {
+				g = wellGeometry(wellKindOf(hw)); k = nodeSymbolSize(nodeById(hw.nodes[2])).w / 24;
+				sb = Collide.box(jp.x, jp.y, Math.max(g.x1 - g.vx, g.y1 - g.vy) * k * 2, Math.max(g.x1 - g.vx, g.y1 - g.vy) * k * 2, 0);
+				sb.kind = 'symbol'; sb.round = true; sb.owner = nodeLabelKey(n.id);
+				out.boxes.push(sb);
+				return;
+			}
+			sb = Collide.box(nodeDrawX(n), nodeDrawY(n), r * 2, r * 2, 0);
+			if (wa && wa.tank && nodeById(wa.tank) && hostWellOfTank(nodeById(wa.tank))) {
+				g = wellGeometry(wellSymbolKind(n)); k = nodeSymbolSize(n).w / 24;
+				rc = Math.max(g.ax - g.x0, g.ay - g.y0, g.y1 - g.ay) * k;
+				sb = Collide.box(nodeDrawX(n), nodeDrawY(n), rc * 2, rc * 2, 0);
+			}
 			sb.kind = 'symbol'; sb.round = true;   // a node symbol is a circle (hideCoveringMovedLabels())
 			if (role === 'T') { sb.owner = nodeLabelKey(n.id); }
 			out.boxes.push(sb);
@@ -3238,7 +3253,7 @@ var EngCalcs = EngCalcs || {};
 			if (d > lo && d <= min && bs.length) { cands.push({ r: r, sp: sp, bs: bs }); }
 		});
 		if (!cands.length) { return out; }
-		pts = doc.nodes.map(function (n) { var p = nodeAt(n); return { id: nodeLabelKey(n.id), x: p.x, y: p.y }; });
+		pts = doc.nodes.map(function (n) { var p = nodeLabelAt(n); return { id: nodeLabelKey(n.id), x: p.x, y: p.y }; });
 		entries = crossingEntries(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs);
 		cands.forEach(function (c) {
 			var own = dist(c.sp.anchor.x, c.sp.anchor.y, c.bs), near = false, g, clear = true, i, j, e, o;
@@ -3960,7 +3975,7 @@ var EngCalcs = EngCalcs || {};
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			ne.hiddenDropped = false;
 			if (n.lx !== undefined) {
-				addDataLabel(nodeLabelKey(n.id), ne, nodeAt(n), nodeLabelBase(n), true, ne.lineCount, n);
+				addDataLabel(nodeLabelKey(n.id), ne, nodeLabelAt(n), nodeLabelBase(n), true, ne.lineCount, n);
 				return;
 			}
 			addNodeFirstFit(n, ne);
@@ -5171,6 +5186,12 @@ var EngCalcs = EngCalcs || {};
 	// STRAIGHT THROUGH**: linkPointList() puts a dangling link's missing end into its own point list
 	// and the geometry pass already knows what that means, so this must not invent a point there.
 	function nodeAt(n) { return n ? { x: nodeDrawX(n), y: nodeDrawY(n) } : n; }
+	// **WHERE A NODE'S LABEL IS ANCHORED**: its own point, except a tank drawn with its Well (Tom, round 15: "Draw it beside the vessel"), whose
+	// label stands beside the vessel the joined symbol draws, not at the tank node's own point, where nothing of it is drawn.
+	function nodeLabelAt(n) {
+		var jp = n && n.type === 'tank' && hostWellOfTank(n) ? joinedTankPoint(n) : null;
+		return jp || nodeAt(n);
+	}
 	// Whether this scenario has moved this node at all -- what the `.inp` exporter reports and what
 	// a harness counts.
 	function nodeHasCoordOverride(n) {
@@ -6083,10 +6104,10 @@ var EngCalcs = EngCalcs || {};
 		wellStaticAuto = true;
 		try { setProp(r, 'elev', +(+effective(r, 'elev') + (now - was)).toFixed(4)); } finally { wellStaticAuto = false; }
 	}
-	// **A WELL WITH TANK'S TEE AND TANK FOLLOW THE WELL'S GROUND ELEVATION UNTIL THE USER TYPES ONE OF THEIR OWN** (Task 822; Tom, 2026-11-14: "Can the tank
-	// and node elevation follow the well elevation until they are diverged by the user?"). The same shape as the static level above: a value typed
-	// on the tee or the tank ends its following (`teeFollow`, `tankFollow` on the grouping, which the project carries, are true only while it follows) and
-	// it stays as typed. Only a tee or tank the Well's own placing made follows (on open ground or on a point of a pipe): one opened on an existing junction or tank was already
+	// **A WELL WITH TANK'S TEE FOLLOWS THE WELL'S GROUND ELEVATION UNTIL THE USER TYPES ONE OF ITS OWN** (Task 822; Tom, 2026-11-14: "Can the tank
+	// and node elevation follow the well elevation until they are diverged by the user?"). **The tank does not follow** (Tom, round 14: "Their elevation must be independent
+	// like their position."): it opens at the Well's elevation and is its own from then on. The same shape as the static level above: a value typed
+	// on the tee ends its following (`teeFollow` on the grouping, which the project carries, is true only while it follows) and it stays as typed. Only a tee or tank the Well's own placing made follows (on open ground or on a point of a pipe): one opened on an existing junction or tank was already
 	// the user's, and so is any in a file written before the flags, or imported from an `.inp`. The program's own write (`wellTankAuto`: the follow itself,
 	// and the DEM fill of the tee's or tank's own point) neither ends it nor follows.
 	// **FOLLOWING IS PER SCENARIO** (reviewer, 2026-11-14): a value typed in Base ends it in Base and so everywhere (a scenario inherits Base's decision); one typed
@@ -6107,11 +6128,10 @@ var EngCalcs = EngCalcs || {};
 	function wellTankFollow(asm, el, value) {
 		if (wellTankAuto || !asm || !asm.tank) { return; }
 		if (el.id === asm.tee) { wellFollowEnd(asm, 'tee'); return; }
-		if (el.id === asm.tank) { wellFollowEnd(asm, 'tank'); return; }
 		if (el.id !== asm.nodes[2]) { return; }
 		// A blank or unreadable value is not an elevation to follow (as wellStaticFollow() guards).
 		if (value === '' || value === null || value === undefined || !isFinite(+value)) { return; }
-		['tee', 'tank'].forEach(function (key) {
+		['tee'].forEach(function (key) {
 			var n = nodeById(asm[key]);
 			if (!n || !wellFollowing(asm, key)) { return; }
 			wellTankAuto = true;
@@ -6123,7 +6143,7 @@ var EngCalcs = EngCalcs || {};
 	function wellTankFollowClear(el) {
 		var asm = assemblyOfAnyMember('node', el.id);
 		if (wellTankAuto || !asm || !asm.tank || el.id !== asm.nodes[2]) { return; }
-		['tee', 'tank'].forEach(function (key) {
+		['tee'].forEach(function (key) {
 			var n = nodeById(asm[key]);
 			if (!n || !wellFollowing(asm, key)) { return; }
 			wellTankAuto = true;
@@ -9124,7 +9144,7 @@ var EngCalcs = EngCalcs || {};
 		return [
 			{ key: 'nodeElev', group: 'node', field: 'elev', prop: 'elev', label: pc.lpn_field_elev || 'Elevation',
 				// Overridable since 2026-10-12 (Tom: every property), so the scenario push reaches it.
-				applies: function (n) { return !wellTankOwner(n); }, get: function (n) { return effective(n, 'elev'); }, set: function (n, v) { n.elev = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (n) { return true; }, get: function (n) { return effective(n, 'elev'); }, set: function (n, v) { n.elev = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// `altField` exists for this one row and says why it has to: a push is scoped by the
 			// labels on screen, and since 2026-08-25 a map showing a junction's demand is normally
 			// showing the RESOLVED one. Both labels describe the same stored number, so either being
@@ -21507,7 +21527,7 @@ var EngCalcs = EngCalcs || {};
 		if (!pending.length) { refreshPopupIfOpen(); return []; }
 		saveUndoSnapshot();
 		// **THE FILL NEVER MOVES A FOLLOWER AND NEVER ENDS ONE** (reviewer, 2026-11-14: the tee's final elevation depended on whether it came before or after the Well's
-		// outlet in the list): each node takes its own reading, the outlet's included, and a tee or tank that follows is not carried to the outlet's reading, so the
+		// outlet in the list): each node takes its own reading, the outlet's included, and a tee that follows is not carried to the outlet's reading, so the
 		// batch's order cannot change an answer.
 		pending.forEach(function (p) {
 			var a = assemblyOfNode(p.n.id), r;
@@ -27505,8 +27525,7 @@ var EngCalcs = EngCalcs || {};
 		var spec = replaceSpec(replaceState.prop), out = [];
 		if (!spec) { return out; }
 		replaceFoundSet().forEach(function (c) {
-			// A Well's tank is left out of the typed push but not of the DEM fill: the program's own reading, which passes the lock (ownerOfProp()).
-			if (!replaceSpecGroupOk(spec, c.group) || !(spec.applies(c.el) || (spec.prop === 'elev' && wellTankOwner(c.el)))) { return; }
+			if (!replaceSpecGroupOk(spec, c.group) || !spec.applies(c.el)) { return; }
 			out.push({ group: c.group, id: c.el.id });
 		});
 		return out;
@@ -29644,7 +29663,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function paneColElev() {
 		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead, em: 3.5, prop: 'elev',
-			plainFor: paneOwnedFor('elev'),
 			get: function (n) { return effective(n, 'elev'); },
 			set: function (n, v) { setProp(n, 'elev', v); updateNode(n.id, true); } };
 	}
@@ -41291,7 +41309,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					if (a.tee && a.tank && Array.isArray(a.branch) && a.branch.length === 2 && nodeIds[a.tee] && nodeIds[a.tank] && a.branch.every(function (id) { return linkIds[id]; })) {
 						w.tee = a.tee; w.tank = a.tank; w.branch = a.branch.slice();
 						if (a.teeFollow) { w.teeFollow = true; }
-						if (a.tankFollow) { w.tankFollow = true; }
 						if (a.followOff && typeof a.followOff === 'object') { w.followOff = JSON.parse(JSON.stringify(a.followOff)); }
 						// A pressure tank's own numbers; the curve, the limits and the controls are in the file already and are not rewritten here.
 						if (a.pt && typeof a.pt === 'object' && ['vol', 'on', 'off'].every(function (k) { return typeof a.pt[k] === 'number'; })) {
@@ -41454,9 +41471,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		hideJoinedTanks();
 	}
-	// **A WELL WITH A TANK IS ONE POINT ON THE MAP** (Tom, round 13, option a): the joined symbol draws the tank, so the tank node's own symbol and label are not drawn, nor
-	// are its short pipes and the tee when nothing else joins the tee. Picking: the circle is the Well's and the vessel is the tank's (the tank's grab shape moves to it).
-	// Explode, or a lost member, draws every element as itself again. The tank's results are in the Well's box and its block.
+	// **A JOINED WELL WITH A TANK IS ONE DRAWING OF TWO PARTS** (Tom, round 13, option a): the Well's circle and arrow, and the tank's vessel beside them; the pump and the drawdown
+	// valve are drawn as nothing. The tank node's own symbol is not drawn, nor are its short pipes and the tee when nothing else joins the tee. Picking: the circle is the Well's and the
+	// vessel is the tank's (the tank's grab shape moves to it). **The tank's label IS drawn, beside the vessel** (round 15; nodeLabelAt()); the tee's is not.
+	// Explode, or a lost member, draws every element as itself again.
 	var joinedHidden = { nodes: {}, links: {} }, joinedSeen = {};
 	function hideJoinedTanks() {
 		var nodes = {}, links = {};
@@ -41473,7 +41491,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var ne = nodeEls[n.id], on = !!nodes[n.id], host = on ? hostWellOfTank(n) : null, d;
 			if (!ne) { return; }
 			if (on || ne.joinedHid) {
-				[ne.circle, ne.symbolG, ne.symbol, ne.text, ne.leader, ne.lblHit].forEach(function (e) { hid(e, on); });
+				[ne.circle, ne.symbolG, ne.symbol].forEach(function (e) { hid(e, on); });
+				// **THE JOINED TANK'S LABEL IS DRAWN BESIDE THE VESSEL** (round 15); the tee has no vessel, so its label stays hidden.
+				[ne.text, ne.leader, ne.lblHit].forEach(function (e) { hid(e, on && !host); });
 				ne.joinedHid = on;
 				if (ne.hit && !host) { hid(ne.hit, on); }
 			}
@@ -41636,8 +41656,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// takes its whole vessel and its two elevations from the Well's Properties box. A pressure tank's volume curve, limits and start level are derived from the Well's pressures
 	// (syncPressureTank()); an open-air tank's are typed on the Well, in the tank's own section. The tank's position, Description, Tag, reaction, mixing and initial quality
 	// stay its own. A scenario overrides an owned value exactly as before, from the Well's box.
-	var TANK_OWNED = { elev: 1, bottomElev: 1, level: 1, minLevel: 1, maxLevel: 1, volCurve: 1, tankDiameter: 1, minVolume: 1, overflow: 1 };
-	// What the group writes itself on a pressure tank, so a scenario override of it (a file from before it was owned) is cleared: never the two elevations, which stay overridable.
+	var TANK_OWNED = { bottomElev: 1, level: 1, minLevel: 1, maxLevel: 1, volCurve: 1, tankDiameter: 1, minVolume: 1, overflow: 1 };
+	// What the group writes itself on a pressure tank, so a scenario override of it (a file from before it was owned) is cleared: never the elevation, which is the tank's own, nor the base elevation, which stays overridable.
 	var PT_WRITTEN = { level: 1, minLevel: 1, maxLevel: 1, volCurve: 1, tankDiameter: 1, minVolume: 1, overflow: 1 };
 	// The Well's own box writes the tank's owned values through this one door; nothing else does.
 	var ownerDoorOpen = false;
@@ -41759,7 +41779,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The node a press names, if any: the one under the pointer, else the nearest within the gesture's own reach.
 	function wellTankHitNode(e, t) { var id = (t && t.dataset && t.dataset.node) || (nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) || {}).id; return id ? nodeById(id) : null; }
 	function wellTankStep(e, w, t) {
-		var a = wellTankPending && assemblyById(wellTankPending.id), hit, wellOut, tee, tank, pid, pipe, r, p1, p2, from, teeFollows = false, tankFollows = false;
+		var a = wellTankPending && assemblyById(wellTankPending.id), hit, wellOut, tee, tank, pid, pipe, r, p1, p2, from, teeFollows = false;
 		if (wellTankPending && (!a || a.tank)) { wellTankPending = null; a = null; }
 		if (!a) { return false; }
 		wellOut = nodeById(a.nodes[2]);
@@ -41794,12 +41814,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else if (hit) { wellTankPrompt('lpn_welltank_tank_refused', 'The tank must be a tank that is not part of another assembly. Specify the tank again.'); return true; }
 		else {
 			tank = addNode('tank', w.x, w.y);
-			if (!elevSourceIsDem()) { if (typeof wellOut.elev === 'number') { tank.elev = wellOut.elev; } tankFollows = true; }   // base-write: construction: a new tank takes the well's elevation and follows it (not under the DEM: see the tee)
+			if (!elevSourceIsDem()) { if (typeof wellOut.elev === 'number') { tank.elev = wellOut.elev; } }   // base-write: construction: a new tank opens at the well's elevation and is then its own (Tom, round 14: "Their elevation must be independent like their position."); not under the DEM: see the tee
 		}
 		p2 = wellTankPipe(wellTankPending.tee, tank.id);
 		a.tee = wellTankPending.tee; a.tank = tank.id; a.branch = [wellTankPending.pipe1, p2.id];
 		if (wellTankPending.teeFollow) { a.teeFollow = true; }
-		if (tankFollows) { a.tankFollow = true; }
 		assemblyIndexDirty();
 		if (wellTankPending.form === 'pressure') { a.pt = pressureTankDefaults(); syncPressureTank(a); }
 		wellTankPending = null;
@@ -42121,7 +42140,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
-	// **A WELL'S TANK'S INPUTS ARE TYPED HERE** (Tom, round 12 pass: one door, the Well's): the tank's Elevation and Base elevation in either form, and for the open-air form its
+	// **A WELL'S TANK'S INPUTS ARE TYPED HERE** (Tom, round 12 pass: one door, the Well's): the tank's Base elevation in either form (its Elevation is the tank's own, round 15), and for the open-air form its
 	// initial, minimum and maximum depth, diameter, minimum volume and overflow (a pressure tank's are derived from the Well's pressures). Each is written through the
 	// owner's door, so a scenario overrides it from here exactly as it did from the tank's own box, and the tank's own box shows it read-only.
 	function wellTankOwnedRows(rows, a) {
@@ -78031,19 +78050,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// A tank's two elevations: the ground it stands on (read from the terrain like a junction's) and where its base sits (blank is the ground). `own` is true for a tank nobody owns:
 	// typeable, with the DEM row. For a tank a Well owns it is false: read-only in the tank's own box, and typeable with the DEM row when `door` is true (the Well's box), written through the owner's door.
+	// **A TANK'S ELEVATION IS ITS OWN, EVEN A WELL'S** (Tom, round 14: "Unlock it and add DEM. Their elevation must be independent like their position."): the Elevation row and the DEM row
+	// are the tank's own box's, always. A Well's tank's Base elevation stays the Well's to type (`door`: the Well's box draws only that row), and reads here as the Well set it.
 	function tankElevationRows(fields, n, nodeId, own, door) {
 		var pc = EngCalcs.pageConfig || {}, eu = ' (' + unitLabel('lpn_u_elevhead') + ')', W = door ? viaOwnerDoor : function (f) { return f(); }, base;
+		if (!door) {
+			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
+				function () { return effective(n, 'elev'); },
+				function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
+				pc.lpn_tank_ground_elev_tip, { el: n, prop: 'elev' });
+			elevationDemRow(fields, n, nodeId, function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); });
+		}
 		if (own === false && !door) {
-			readonlyField(fields, (pc.lpn_field_elev || 'Elevation') + eu, lockedNumber(effective(n, 'elev')), pc.lpn_tank_ground_elev_tip);
 			base = effective(n, 'bottomElev');
 			readonlyField(fields, (pc.lpn_field_tank_base_elev || 'Base elevation') + eu, lockedNumber(typeof base === 'number' ? base : effective(n, 'elev')), pc.lpn_field_tank_base_elev_tip);
 			return;
 		}
-		unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
-			function () { return effective(n, 'elev'); },
-			function (v) { W(function () { setProp(n, 'elev', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
-			pc.lpn_tank_ground_elev_tip, { el: n, prop: 'elev' });
-		if (own || door) { elevationDemRow(fields, n, nodeId, function (v) { W(function () { setProp(n, 'elev', v); }); updateNode(nodeId, true); }); }
 		unitNumberFieldBlank(fields, pc.lpn_field_tank_base_elev || 'Base elevation', 'lpn_u_elevhead',
 			function () { return effective(n, 'bottomElev'); },
 			function (v) { W(function () { setTankBottom(n, v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
@@ -78216,7 +78238,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Elevation (depth and volume tank base)."*). Elevation is the ground, read and filled
 			// from the terrain exactly as a junction's is; the base is blank-means-the-ground, so its
 			// placeholder is the ground.
-			// A Well's tank: its two elevations are the Well's, typed in the tank's section of the Well's box (wellTankOwnedRows()).
+			// A Well's tank: its Elevation is its own, with the DEM row; its Base elevation is the Well's, typed in the tank's section of the Well's box (wellTankOwnedRows()).
 			tankElevationRows(fields, n, nodeId, !wellTankOwner(n));
 			tankDepthFields(fields, n, nodeId);
 			// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), shown on the same terms as the

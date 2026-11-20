@@ -331,8 +331,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   obstacles, and the Well's own symbol is not an obstacle to its own label. A Well of a file whose labels do not tick Head shows its heading alone, rightly: the
   member rows are Head.
 - **The "box" in the hole was the pump's and the drawdown valve's own symbols** (`well-symbol-browser-harness.js`): choosing a curve rebuilds those links, and a link built after `buildDom()` drew its solid symbol over the Well's (only `syncAssemblyGlyphs()` hid them, once, at the build); `buildLinkEls()` now hides a well link's symbol where it makes it.
-- **Well with tank elevations:** a tee and a tank the Well's own placing made follow the Well's elevation until the user types one of their own into either
-  (`teeFollow`, `tankFollow` on the grouping, true only while following). An existing junction or tank pressed as the tee or tank, a tee on a pipe, a file from
+- **Well with tank elevations:** a tee the Well's own placing made follows the Well's elevation until the user types one of its own (`teeFollow` on the grouping, true only while following; the tank stopped following in round 15, see there). An existing junction or tank pressed as the tee or tank, a tee on a pipe, a file from
   before this round and an `.inp` import never follow. **Under the DEM elevation source a tee or tank on open ground takes its own ground and does not
   follow** (follow is for a value carried from the Well or typed, never one the DEM reads); the value written otherwise is the Well's Base elevation, the one a
   node is born with in Base. **The DEM fill never moves or ends a follower**, and each node takes its own reading, so one batch gives one answer in any order.
@@ -367,7 +366,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 
 ### Round 12 and 13: a member whose inputs the group owns is locked (Tom, round 11 and 12 passes; `well-tank-three-point-harness.js` sections 9 to 11, `well-pressure-tank-lock-browser-harness.js`, `well-symbol-browser-harness.js`)
 
-- **The rule:** one fact gets one door, the Well's Properties box. A Well's tank, either form, takes nine inputs from it (`TANK_OWNED`): Elevation, Base elevation, initial, minimum and
+- **The rule:** one fact gets one door, the Well's Properties box. A Well's tank, either form, takes eight inputs from it (`TANK_OWNED`; Elevation left it in round 15): Base elevation, initial, minimum and
   maximum depth, volume curve, diameter, minimum volume and can overflow. Tom, round 12, asked whether a pressure tank's Elevation and Base elevation should be locked too (a tank
   may stand below the well's ground): "Or above. Yes."; and of the open-air tank: "Yes." `setProp()` refuses every one with the sentence, so Tables, Find and replace and the Settings
   push cannot write them. The Well's box writes them through `viaOwnerDoor()`, the only door, so a scenario overrides one from there as before (the override sits in the scenario or
@@ -390,7 +389,14 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
   the Well is a circle on a vertical arrow whose head stands clear of the circle and whose shaft runs through it; Well with tank is that mark joined to a rectangle; Well with pressure tank,
   to a capsule (a diagonal arrow reads as the male sign and was dropped). One set of numbers (`EC_WELL_*`, `ecWellMark()` in `lib/Icons.lib.php`) draws all three; the first path of each icon is
   the silhouette (circle and vessel) with `data-ax data-ay` (the circle's centre) and `data-x0 .. data-y1` (the bounds), which the map reads (`wellGeometry()`) for the backdrop, the grab shape,
-  the label-leader avoidance box and the reach. On the map a Well with a tank draws as the one joined symbol on its outlet node, the circle on the node and the vessel reaching to its right,
-  redrawn when the tank is placed; the tank node, the tee and both pipes are drawn and picked as before. The harness rasterizes the three icons at 17, 21 and 24 px (the arrow clear of
+  the label-leader avoidance box and the reach. On the map a Well with a tank is drawn as one joined drawing of two parts (the circle and arrow on the outlet node, the tank's vessel reaching to its right), redrawn when the tank is placed, while the
+  tank is joined to nothing but the group. Under it stand three elements (the aquifer reservoir and its drawdown, the pump, the tank), the pump and valve drawn as nothing, plus a tee and two short pipes, also not drawn; the circle is picked as the Well and the vessel as the tank. A pipe on the tee or the tank ends the joined drawing and every element is drawn as itself. The harness rasterizes the three icons at 17, 21 and 24 px (the arrow clear of
   the circle, and not the pump). Proofs: `_panel/www/img/pump-plus/r13-*.png`.
 - **No Select-the-well button:** no such door exists yet.
+
+### Round 15 (Tom, round 14 pass; `well-tank-three-point-harness.js`, `assembly-ids-harness.js`, `well-tank-entry-browser-harness.js`)
+
+- **The tank's Elevation is its own** (Tom: "Unlock it and add DEM. Their elevation must be independent like their position."; "Good. But not elevation."): the tank of a Well, either form, types its Elevation in its own box with the standard DEM row (`tankElevationRows()`), and Tables and Find and replace write it like any tank's. It opens at the Well's elevation (not under the DEM) and never follows it again (`tankFollow` is gone; a file that carried it keeps the value it has). One door: the Well's box no longer shows a tank Elevation row, only Base elevation, which stays the Well's. The sentence "Associated with Well W1. Change volume and control properties there." stays.
+- **The tank's label is drawn while joined** (Tom: "I agree. Proceed."): beside the vessel, through the ordinary placement (`nodeLabelAt()`, and the Well's drawing is two obstacles, circle and vessel, each ignored by its own label). It was hidden with the tank's symbol by `hideJoinedTanks()`; the tee's label stays hidden.
+- **Wording:** a Well with tank is not "one symbol with elements underneath" (Tom: "Not true. It's three."): three elements, a drawing in two parts.
+- **Exploded pressure tank keeps "Can overflow"** (Tom: "Show it. It's no longer an assembly.").
