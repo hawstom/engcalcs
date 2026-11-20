@@ -142,6 +142,7 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			const u = L.convasUnits().filter((x) => x.name === 'lpn_u_diameter')[0];
 			p2._diameter = 0.4;   // 0.4 in is 10.16 mm: a step of 100 rounds it to 0, 8 in (203.2 mm) to 200
 			u.sel.value = 'mm';
+			const snap0 = JSON.stringify([L.getDoc(), L.getProject()]);
 			byId.lpn_convas_round_diameter.value = '';
 			L.convasWarn();
 			ok('Convert as: no step chosen, no warning', L.convasZeroed() === 0 && byId.lpn_convas_zero_warn.textContent === '');
@@ -155,6 +156,7 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			u.sel.value = 'in';
 			byId.lpn_convas_round_diameter.value = '100';
 			ok('Convert as: an unchanged unit counts nothing', L.convasZeroed() === 0);
+			ok('Convert as: counting the warning changed nothing in the document', JSON.stringify([L.getDoc(), L.getProject()]) === snap0);
 			p2._diameter = 6; u.sel.value = 'mm'; byId.lpn_convas_round_diameter.value = '';
 		}
 		L.runConvertAs({ kind: 'none', crs: '', units: SI,

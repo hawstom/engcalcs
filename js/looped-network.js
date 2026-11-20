@@ -44030,6 +44030,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function scheduleSave() {
 		if (saveTimer) { clearTimeout(saveTimer); }
 		saveTimer = setTimeout(function () { saveTimer = null; saveToStorage(); }, LPN_SAVE_PAUSE_MS);
+		// Convert as is not modal, so an edit can land under it: its count follows the document.
+		var cb = convasEl();
+		if (cb && cb.style.display === 'flex') { refreshConvasZeroWarn(); }
 	}
 	// Write now whatever is owed. Returns whether anything was: the harness asserts on that, and a
 	// flush of nothing must be free, because two of the three doors above fire on an ordinary tab
@@ -51020,21 +51023,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The nonzero numbers this Convert as would round to 0, for the box as it stands now.
 	function convasZeroedCount() {
-		var changed = {}, probe = { zeroed: 0 }, a = convasAnswers();
-		LPN_UNIT_SELECTS.forEach(function (name) {
-			var from = unitKey(name), to = a.units && a.units[name], fOld = from && EngCalcs.unitFactors[from],
-				fNew = to && EngCalcs.unitFactors[to];
-			if (to && from && to !== from && fOld && fNew) { changed[name] = fNew / fOld; }
-		});
-		convasRound(changed, a.rounding || {}, probe);
+		var a = convasAnswers(), mult = convasUnitMultipliers(a.units), probe = { zeroed: 0, k: mult };
+		convasRound(mult, a.rounding || {}, probe);
 		return probe.zeroed;
 	}
 	function refreshConvasZeroWarn() {
 		var el = document.getElementById('lpn_convas_zero_warn'), n;
 		if (!el) { return; }
 		n = convasZeroedCount();
-		el.textContent = n > 0 ? String((EngCalcs.pageConfig || {}).lpn_units_zero_warn
-			|| '\u26a0 There are values ({n}) that would be converted to 0.').replace('{n}', String(n)) : '';
+		el.textContent = formatZeroWarn(n);
 	}
 	// The box's answers as a plain value, so a harness can hand runConvertAs() one without a browser.
 	// { kind, crs, units: { lpn_u_*: unitKey }, rounding: { diameter: '0.1', ... } }
@@ -51270,18 +51267,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// answer uses, so the two cannot come to disagree about which numbers a unit decides; the
 	// difference is only where it runs, which is a project nobody has typed into yet. Returns the
 	// unit names that actually changed, which is what the rounding reads.
-	function convasApplyUnits(a) {
-		var changed = {}, fromUnits = readUnitSelections();
+	// **THE ONE LIST OF UNITS A CONVERT AS CHANGES**, as {name: multiplier} (that unit per old unit):
+	// convasApplyUnits() converts by it and the box's warning counts by it, so they cannot disagree.
+	// A unit is left out when it is unchanged, unknown, or not an option the page's select offers.
+	function convasUnitMultipliers(units) {
+		var out = {};
 		LPN_UNIT_SELECTS.forEach(function (name) {
-			var from = unitKey(name), to = a.units && a.units[name], fOld, fNew;
-			if (!to || !from || to === from) { return; }
-			fOld = EngCalcs.unitFactors[from];
-			fNew = EngCalcs.unitFactors[to];
-			if (!fOld || !fNew) { return; }
-			applyOneUnit(name, to);
-			if (unitKey(name) !== to) { return; }   // not an option this select offers
-			convertUnitValues(name, fNew / fOld);
-			convertDefaultInputs(name, fNew / fOld);
+			var from = unitKey(name), to = units && units[name], sel = unitEl(name), i, offered = false;
+			if (!to || !from || to === from || !EngCalcs.unitFactors[from] || !EngCalcs.unitFactors[to]) { return; }
+			for (i = 0; sel && sel.options && i < sel.options.length; i++) { if (sel.options[i].value === to) { offered = true; } }
+			if (offered) { out[name] = EngCalcs.unitFactors[to] / EngCalcs.unitFactors[from]; }
+		});
+		return out;
+	}
+	function convasApplyUnits(a) {
+		var changed = {}, fromUnits = readUnitSelections(), mult = convasUnitMultipliers(a.units);
+		Object.keys(mult).forEach(function (name) {
+			applyOneUnit(name, a.units[name]);
+			convertUnitValues(name, mult[name]);
+			convertDefaultInputs(name, mult[name]);
 			changed[name] = true;
 		});
 		convasRound(changed, a.rounding || {});
@@ -51316,15 +51320,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **ONLY WHAT THIS CONVERSION REWROTE.** A number whose unit did not change is the user's as
 	// typed, and rounding it would be a second edit nobody asked for.
-	// `probe` ({zeroed: 0}) makes it a dry run for the Convert as warning: `changed` then holds each
-	// unit's multiplier (not true), the numbers are still in their OLD unit, and the nonzero ones
+	// `probe` ({zeroed: 0, k: multipliers}) makes it a dry run for the Convert as warning: the numbers are still in their OLD unit, and the nonzero ones
 	// that the multiplier and the step would turn into 0 are counted. Nothing is written.
 	function convasRound(changed, rounding, probe) {
 		var kk = 1;
 		function step(k) { var s = parseFloat(rounding[k]); return (isFinite(s) && s > 0) ? s : 0; }
 		function rnd(obj, prop, s) {
 			if (!obj || typeof obj[prop] !== 'number') { return; }
-			if (probe) { if (obj[prop] !== 0 && roundToStep(obj[prop] * kk, s) === 0) { probe.zeroed++; } return; }
+			if (probe) {
+				// The same two steps as the real Convert: tidied to 12 figures by convertUnitValues(), then stepped.
+				var v = obj[prop] * kk;
+				if (obj[prop] !== 0 && roundToStep(isFinite(v) ? Number(v.toPrecision(12)) : v, s) === 0) { probe.zeroed++; }
+				return;
+			}
 			obj[prop] = roundToStep(obj[prop], s);
 		}
 		function ovs(prop, s) {
@@ -51334,25 +51342,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		var s = step('diameter');
 		if (s && changed.lpn_u_diameter) {
-			kk = changed.lpn_u_diameter;
+			kk = probe ? probe.k.lpn_u_diameter : 1;
 			doc.links.forEach(function (l) { rnd(l, '_diameter', s); });
 			ovs('diameter', s);
 		}
 		s = step('depth');
 		if (s && changed.lpn_u_elevhead) {
-			kk = changed.lpn_u_elevhead;
+			kk = probe ? probe.k.lpn_u_elevhead : 1;
 			doc.nodes.forEach(function (n) { rnd(n, '_level', s); rnd(n, 'minLevel', s); rnd(n, 'maxLevel', s); });
 			ovs('level', s);
 		}
 		s = step('head');
 		if (s && changed.lpn_u_elevhead) {
-			kk = changed.lpn_u_elevhead;
+			kk = probe ? probe.k.lpn_u_elevhead : 1;
 			doc.nodes.forEach(function (n) { rnd(n, '_head', s); });
 			ovs('head', s);
 		}
 		s = step('flow');
 		if (s && changed.lpn_u_flow) {
-			kk = changed.lpn_u_flow;
+			kk = probe ? probe.k.lpn_u_flow : 1;
 			doc.nodes.forEach(function (n) {
 				rnd(n, '_demand', s);
 				(n.extraDemands || []).forEach(function (d) { rnd(d, 'base', s); });
@@ -62380,8 +62388,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Decimals rounds nothing and so warns of nothing.
 			warn.className = 'lpn-unit-zero-warn';
 			body.appendChild(warn);
+			warn.setAttribute('role', 'status');
+			warn.setAttribute('aria-live', 'polite');
 			inp.addEventListener('input', function () { refreshUnitZeroWarn(warn, u, unitDecimalsOf([{ name: u.name, input: inp }], u.name)); });
-			inp.addEventListener('change', function () { refreshUnitZeroWarn(warn, u, unitDecimalsOf([{ name: u.name, input: inp }], u.name)); });
 			fields.push({ name: u.name, input: inp });
 		});
 		note.textContent = pc.lpn_units_convert_note;
@@ -62397,7 +62406,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function refreshUnitZeroWarn(el, u, dec) {
 		var n = unitZeroedCount(u.name, u.from, u.to, dec);
-		el.textContent = n > 0 ? String((EngCalcs.pageConfig || {}).lpn_units_zero_warn
+		el.textContent = formatZeroWarn(n);
+	}
+	// The one sentence of both Decimals warnings; no count, no sentence.
+	function formatZeroWarn(n) {
+		return n > 0 ? String((EngCalcs.pageConfig || {}).lpn_units_zero_warn
 			|| '\u26a0 There are values ({n}) that would be converted to 0.').replace('{n}', String(n)) : '';
 	}
 	function unitDecimalsOf(fields, name) {
