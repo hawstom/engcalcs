@@ -110,10 +110,10 @@ async function main() {
 			if (!t || !ves || !cir) { return { missing: [!!t, !!ves, !!cir].join() }; }
 			const hid = (e) => { for (let x = e; x && x.nodeType === 1; x = x.parentNode) { const cs = getComputedStyle(x); if (cs.display === 'none' || cs.visibility === 'hidden' || (x.classList && (x.classList.contains('lpn-asm-hid') || x.classList.contains('lpn-lbl-hidden')))) { return true; } } return false; };
 			const rng = document.createRange(); rng.selectNodeContents(t);
-			const tr = rng.getBoundingClientRect(), vr = ves.getBoundingClientRect(), cr = cir.getBoundingClientRect();
+			const tr = rng.getBoundingClientRect(), vr = ves.getBoundingClientRect(), cw = cir.getBoundingClientRect(), cr = { left: cw.left, top: cw.top, right: Math.min(cw.right, vr.left), bottom: cw.bottom };   // the Well's grab shape holds the vessel too: its circle is the part left of the vessel
 			const hit = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 			const d = Math.hypot(tr.left + tr.width / 2 - (vr.left + vr.width / 2), tr.top + tr.height / 2 - (vr.top + vr.height / 2));
-			return { text: t.textContent.replace(/\s+/g, ' ').trim(), hidden: hid(t), onVessel: hit(tr, vr), onCircle: hit(tr, cr), dist: Math.round(d), vw: Math.round(vr.width) };
+			return { text: t.textContent.replace(/\s+/g, ' ').trim(), hidden: hid(t), onVessel: hit(tr, vr), onCircle: hit(tr, cr), dist: Math.round(d), vw: Math.round(vr.width), r: [tr, vr, cr].map((q) => [q.left, q.top, q.right, q.bottom].map(Math.round).join(',')).join(' | ') };
 		});
 		ok('the tank\'s label is drawn while the Well is joined (round 15; Tom: "I agree. Proceed."): shown, reading T1, off the vessel and off the Well\'s circle, and beside the vessel', !!lbl && !lbl.missing && /^T1/.test(lbl.text) && !lbl.hidden && !lbl.onVessel && !lbl.onCircle && lbl.dist < 220, JSON.stringify(lbl));
 		ok('the Well\'s box holds Base elevation, typeable, in the tank\'s section, and has only its own Elevation (one door for the tank\'s, its own box)', wellRows.filter((r) => /^Elevation/.test(r.t)).length === 1 && wellRows.filter((r) => /^Elevation/.test(r.t)).every((r) => r.controls > 0) && wellRows.some((r) => /^Base elevation/.test(r.t) && r.controls > 0), wellRows.map((r) => r.t + ':' + r.controls).join(' | '));
@@ -135,6 +135,9 @@ async function main() {
 		await P.evaluate(() => { const b = document.querySelector('[data-assembly-explode]'); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });
 		await a.settle(700);
 		await P.keyboard.press('Escape');
+		// The exploded tank stands at its own point, which was off the screen while only its vessel was drawn: Zoom to fit brings it in.
+		await P.evaluate(() => { const b = Array.from(document.querySelectorAll('button, [role="button"], [title]')).filter((e) => /zoom to fit/i.test((e.getAttribute('title') || '') + ' ' + (e.getAttribute('aria-label') || '') + ' ' + e.textContent))[0]; if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });
+		await a.settle(900);
 		const c2 = await centreOf('T1');
 		await P.mouse.click(c2.x, c2.y);
 		await a.settle(900);
