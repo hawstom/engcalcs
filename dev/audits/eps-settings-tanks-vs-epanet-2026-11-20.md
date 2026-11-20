@@ -35,7 +35,8 @@ EPANET source: 2.2 C source (`hydcoeffs.c`, `hydraul.c`, `output.c`, `report.c`)
 | 2 | Scenario overrides of pump speed and tank overflow | audit | no defect; fixtures added |
 | 3 | EPANET 2.2's printed demand charge is the charge per kW applied twice | defect in EPANET's report, not ours | recorded and pinned |
 | 4 | A pump stated `SPEED 0`: Open to EPANET (counted as online), Closed to the page | known difference | open |
-| 5 | A TCV's stated minor loss can be edited nowhere on the page (the box is not drawn for a TCV) | known limitation | open |
+| 5 | A TCV's stated minor loss could be edited nowhere on the page (no box for a TCV) | limitation | **fixed**: Properties and the Valves table show the existing Minor loss row and column for a TCV; Change type carries it |
+| 8 | The warm EPANET path rewrote every valve's setting, so a fixed-open valve of any type (PRV, PSV, FCV, TCV) started regulating again (valves3 steady solve: 1.1e+1 m off the built-in solver) | defect in ours | **fixed** (`pushValues()` skips the setting for `valveFixed: 'open'`); `eps-audit-warm-harness.js` |
 | 6 | MSX over changing settings: the two engines part ways, up to 5.8e-2 mg/L on a 1.0 to 1.2 mg/L species | difference, cause not found | open |
 | 7 | MSX CONCEN source at a reservoir: the engine adds none, the built-in loop adds it | difference | open |
 
@@ -71,11 +72,9 @@ EPANET leaves a pump stated `SPEED 0` Open at speed 0: no flow, but its time on 
 average kW 7.60 against 30.4; energy and cost agree, since power is zero while it stands). The page closes it, as `assembleModel` does for a stated speed of 0 (the page offers no speed 0), so status shows Closed, headloss 0 where
 EPANET reports 84 m, and the usage factor differs. Cost, total energy and flows agree. The scenario fixture and the energy rows of `pumps` carry this by name.
 
-### 5. A TCV's stated minor loss is not editable (limitation)
+### 5. A TCV's stated minor loss (fixed)
 
-The popup and the table do not draw the minor-loss box for a TCV (`js/looped-network.js`, comment "A TCV gets no separate minor loss"). With finding 1 a TCV a control opens now uses its stored `k`, which a file can state and a
-visitor can no longer see or change. A TCV drawn on the page has `k` 0 and a pipe turned into a TCV drops its `k` (the type change keeps only what the new type has), so nothing the visitor does gives an unseen loss. Showing the field for
-a TCV (and saying it applies only when the valve is fixed open) is Tom's call on wording, so it was not changed.
+The popup and the Valves table now draw the existing Minor loss row and column for a TCV, with the existing label and tip, and Change type carries `k` across like any valve.
 
 ### 6. MSX with settings that change (open, difference found, cause not found)
 

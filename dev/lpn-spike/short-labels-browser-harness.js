@@ -125,8 +125,7 @@ async function main() {
 		rs = await rows(a.page);
 		r = find(rs, 'Type'); ok(id + ': the valve type row is "Type" with the valve type tip', !!r && /^Type\b/.test(r.text) && /^Valve type\./.test(r.tip), JSON.stringify(r));
 		r = find(rs, 'Minor loss'); 
-		if (vt === 'TCV') { ok('TCV: no minor loss row (its loss is its setting)', !r); }
-		else { ok(id + ': "Minor loss, k" with the valve tip beginning with the full name', !!r && /^Minor \(local\) loss coefficient, k: the loss through the valve body/.test(r.tip), JSON.stringify(r)); }
+		{ ok(id + ': "Minor loss, k" with the valve tip beginning with the full name', !!r && /^Minor \(local\) loss coefficient, k: the loss through the valve body/.test(r.tip), JSON.stringify(r)); }
 		if (vt === 'GPV') {
 			const sels = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields select')).map((s) => ({ last: s.options[s.options.length - 1].textContent, value: s.value })));
 			const sel = sels.filter((s) => s.last === 'Edit curves…')[0];

@@ -1383,9 +1383,9 @@
 					if (!gcurve.length) { drop('gpv-curve-missing', [r[0]], r[5], 'link'); }
 				}
 			}
-			// A valve's diameter falls back to a plausible main when the column is blank, and a TCV's
-			// k is forced to zero -- both are numbers WE chose, so mergeTok refuses their columns'
-			// text on its own and neither case needs a branch here.
+			// A valve's diameter falls back to a plausible main when the column is blank, a number WE chose,
+			// so mergeTok refuses its column's text on its own and needs no branch here. A TCV's k is the
+			// stated column, kept (it is the loss when the valve is fixed open).
 			mergeTok(vlink, 'diameter', r[3], vlink.diameter);
 			mergeTok(vlink, 'k', r[6], vlink.k);
 			if (vlink.type === 'valve') { mergeTok(vlink, 'setting', r[5], vlink.setting); }

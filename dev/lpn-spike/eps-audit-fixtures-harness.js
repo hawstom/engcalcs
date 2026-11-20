@@ -29,6 +29,9 @@ const NEEDS = {
 };
 // Third pass (2026-11-20): a SCENARIO's override of a pump speed or a tank's Can overflow, run through the page (createScenario, setProp,
 // assembleModel) in both engines, against EPANET on the ORIGINAL file with the same change written in by hand (<name>.<what>.scn.json).
+// Fixtures with a pump: each owes an energy comparison (a missing one fails). SPEED0 names the pumps stated SPEED 0 (finding 4).
+const HAS_PUMPS = { pumps: 1, pumps2: 1, valves2: 1, valves3: 1, energy: 1, 'pumps.speed': 1 };
+const SPEED0 = { pumps: ['PU3'] };
 const SCENARIOS = {
 	'pumps.speed': (c) => c.scenarioMoved > 0.05 && c.pumpSettings >= 6,
 	'tanks.overflow': (c) => c.scenarioMoved > 0.05 && c.tankVolSpan > 300
@@ -52,13 +55,21 @@ RUNS.forEach((run) => {
 	// (prices, a price pattern, per-pump price, pattern and efficiency curve, a demand charge).
 	// KNOWN: a pump stated `SPEED 0` is Open at speed 0 to EPANET (usage, average and peak kW counted while it stands open) and Closed to the page
 	// (audit record, finding 5); pumps.inp has one (PU3), so only the other pumps' rows are held there.
-	if (res.energyOrig && name === 'pumps') { ok(name + ': pump energy: every pump but the SPEED 0 one (PU3) agrees with the engine on the original file', !/PU[12]\./.test(res.energyOrig.detail), res.energyOrig.detail); }
-	else if (res.energyOrig) {
-		ok(name + ': pump energy, cost and demand charge: built-in summary agrees with the engine on the original file', res.energyOrig.good, res.energyOrig.detail);
-		ok(name + ': pump energy cost and demand charge: bridge summary agrees with the engine on the original file', !!res.energyOrig.bridge && res.energyOrig.bridge.good, JSON.stringify(res.energyOrig.bridge));
-		// EPANET 2.2's printed report multiplies the demand charge in twice (output.c saveenergy() stores Emax x Dcost back into Emax and report.c writeenergy() multiplies again);
-		// the binary block is right. Pinned so the day the engine is fixed, the record is revisited.
-		if (res.energyOrig.demandCharge > 0) { ok(name + ': the engine\'s printed demand charge is still its binary figure times the charge per kW (record, finding 3)', Math.abs(res.energyOrig.reportDemandCharge / res.energyOrig.demandCharge - 12) < 1e-2, res.energyOrig.reportDemandCharge + ' / ' + res.energyOrig.demandCharge); }
+	if (HAS_PUMPS[run.base]) {
+		const eo = res.energyOrig;
+		ok(name + ': the engine\'s energy block for the original file was read (a pump fixture must have one)', !!eo && Array.isArray(eo.pumpIds) && eo.pumpIds.length > 0, eo ? eo.pumpIds.join(',') : 'missing');
+		if (eo) {
+			// `pumps` holds one pump stated SPEED 0 (PU3), which is Open at speed 0 to EPANET and Closed to the page (audit record, finding 4): only its usage and
+			// average kW may differ. Every other quantity of every pump, the demand charge and the totals are held, and the bridge's summary too.
+			const known = name === 'pumps' ? SPEED0.pumps : [];
+			const bad = eo.detail.split(';').map((x) => x.trim()).filter((x) => x && !known.some((id) => x.indexOf(id + '.') === 0 && /usage|avgKw|kwhPerM3/.test(x)));
+			ok(name + ': pump energy, cost and demand charge: built-in summary agrees with the engine on the original file' + (known.length ? ' (but the documented SPEED 0 usage and kW of ' + known.join(',') + ')' : ''), eo.good || (known.length > 0 && bad.length === 0), eo.detail);
+			ok(name + ': the built-in summary lists the same pumps as the engine, and the same demand charge and total', eo.samePumps === true && eo.demandOk === true && eo.totalOk === true, JSON.stringify({ pumps: eo.pumpIds, samePumps: eo.samePumps, demandOk: eo.demandOk, totalOk: eo.totalOk }));
+			ok(name + ': pump energy cost and demand charge: bridge summary agrees with the engine on the original file', !!eo.bridge && eo.bridge.good, JSON.stringify(eo.bridge));
+			// EPANET 2.2's printed report multiplies the demand charge in twice (output.c saveenergy() stores Emax x Dcost back into Emax and report.c writeenergy() multiplies again);
+			// the binary block is right. Pinned so the day the engine is fixed, the record is revisited.
+			if (eo.demandCharge > 0) { ok(name + ': the engine\'s printed demand charge is still its binary figure times the charge per kW (record, finding 3)', Math.abs(eo.reportDemandCharge / eo.demandCharge - 12) < 1e-2, eo.reportDemandCharge + ' / ' + eo.demandCharge); }
+		}
 	}
 	ok(name + ': still exercises its feature', !!res.cover && run.needs(res.cover), JSON.stringify(res.cover));
 });

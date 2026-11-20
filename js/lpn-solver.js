@@ -1032,7 +1032,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		// MISSING -- what a simple control's `LINK v OPEN` leaves (hydraul.c controls(), with
 		// input3.c controldata() setting MISSING for a valve). It is a plain minor loss and its
 		// state is never re-decided: hydstatus.c valvestatus() and linkstatus() both skip a valve
-		// whose setting is MISSING. Only js/lpn-native-run.js sets it; nothing on the page does.
+		// whose setting is MISSING. A file's `[STATUS] Open` sets it (the importer's `valveOpen`, through assembleModel), and so does js/lpn-native-run.js when a control or rule opens the valve.
 		// A valve's status is carried from solve to solve by an extended-period run (`valveStart`), as EPANET carries
 		// LinkStatus; a run's first solve and the single instant start it ACTIVE, as inithyd() does.
 		vStat[k] = links[k].valveFixed === 'open' ? 'open' :

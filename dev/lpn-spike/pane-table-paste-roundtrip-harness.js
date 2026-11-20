@@ -152,7 +152,7 @@ L.refreshAll();
 // This loader keeps Net3's words under their saved name; the page reads `_text`. A Text always has words.
 L.getDoc().labels.forEach((lb) => { if (!lb._text) { lb._text = lb.text || 'Note'; } });
 const someJ = L.getDoc().nodes.filter((n) => n.type === 'junction').slice(0, 2).map((n) => n.id);
-L.addLink('valve', someJ[0], someJ[1], [], 'PRV-1');   // Net3 carries no valve; TCV by default, so its km cell is plain
+L.addLink('valve', someJ[0], someJ[1], [], 'PRV-1');   // Net3 carries no valve; TCV by default
 const somePipe = L.getDoc().links.filter((l) => l.type === 'pipe')[0];
 L.addCustomer(0, 0, { link: somePipe.id, t: 0.5 });   // Net3 carries no customer
 L.addText(0, 0, someJ[0])._text = 'Pump house';            // anchored to a NODE: align/valign plain ("Attached"), Attached to = the node's id
@@ -166,8 +166,8 @@ const sheets = {};
 tableIds.forEach((t) => { sheets[t.id] = copyTable(t.id); });
 report(sheets.tanks.sheet.indexOf(PC.lpn_pane_not_used) >= 0,
 	"Net3's own Tanks copy carries the plain word Not used, reproducing Tom's paste", JSON.stringify(sheets.tanks.sheet));
-report(sheets.valves.sheet.indexOf(PC.lpn_pane_not_used) >= 0,
-	"the added valve's Km cell copies as Not used too (a TCV's minor loss is plain)");
+report(sheets.valves.sheet.indexOf(PC.lpn_pane_not_used) < 0,
+	"the added valve's Km cell is a number, not Not used (a TCV's minor loss is its loss when fixed open)");
 report(sheets.text.sheet.indexOf(PC.lpn_pane_text_attached) >= 0,
 	'an anchored Text row copies its align/valign as Attached');
 const anchorHead = sheets.text.heads.filter((h) => h.key === 'anchor')[0];

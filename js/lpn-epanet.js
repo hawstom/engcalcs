@@ -1559,7 +1559,9 @@
 				p.setLinkValue(idx, EN_MINORLOSS, l.k || 0);
 				if (String(l.valveType || 'TCV').toUpperCase() === 'GPV') { continue; }
 				p.setLinkValue(idx, EN_INITSTATUS, l.status === 'closed' ? 0 : 1);
-				if (l.status !== 'closed') {
+				// A valve FIXED open (valveFixed 'open', every type but GPV) has no setting in EPANET: [STATUS] Open unset it
+				// when the .inp was read (input3.c), so the setting is not written here or it would start regulating again.
+				if (l.status !== 'closed' && l.valveFixed !== 'open') {
 					p.setLinkValue(idx, EN_INITSETTING,
 						String(l.valveType || 'TCV').toUpperCase() === 'FCV'
 							? (l.setting || 0) * 1000

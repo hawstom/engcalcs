@@ -248,6 +248,9 @@ function line(c) {
 					if (!el) { throw new Error('scenario: no ' + o[0] + ' ' + o[1]); }
 					L.setProp(el, o[2], o[3]);
 				});
+				// The reference is read as the engine's own LPS/metre numbers and compared with the engines' SI frames unscaled, so the fixture must be SI.
+				const sc = EC.lpnInpParse(text).scale;
+				if (!sc || sc.head !== 1 || sc.flow !== 0.001 || sc.len !== 1) { throw new Error('scenario fixture must be an LPS (metre) file: scale ' + JSON.stringify(sc)); }
 				refText = text;
 				spec.edits.forEach((e) => { const t2 = refText.replace(new RegExp(e[0], 'm'), e[1]); if (t2 === refText) { throw new Error('scenario edit matched nothing: ' + e[0]); } refText = t2; });
 			}
@@ -266,7 +269,7 @@ function line(c) {
 			const built = EC.lpnToInp(JSON.parse(JSON.stringify(model)), { eps: true });
 			if (refText !== null) { res.scenarioExportVsReference = true; }
 			if (process.env.EPS_AUDIT_INP) { fs.writeFileSync(process.env.EPS_AUDIT_INP, built.inp); }
-			let raw;
+			let raw, unedited = null;
 			try { raw = await rawRun(refText !== null ? refText : built.inp, model, times, hasQ); } catch (e) {
 				// EPANET refuses our own export: say what the page itself then does (the bridge, the built-in solver)
 				const bm0 = JSON.parse(JSON.stringify(model)), br0 = await EC.lpnEpanetRun(bm0, {}), nt0 = EC.lpnNativeRun(model, { quality: true });
@@ -299,20 +302,21 @@ function line(c) {
 			// scenario mode: how far the override moved the answer, on the engine alone (the unedited file against the edited one), so
 			// a scenario that changes nothing cannot go on passing
 			if (refText !== null) {
-				const b0 = await rawRun(text, model, times, false); let mv = 0;
+				const b0 = unedited = await rawRun(text, model, times, false); let mv = 0;
 				raw.order.forEach((t) => { if (b0.frames[t]) { model.nodes.forEach((n) => { mv = Math.max(mv, Math.abs(b0.frames[t].heads[n.id] - raw.frames[t].heads[n.id])); mv = Math.max(mv, Math.abs((b0.frames[t].vol[n.id] || 0) - (raw.frames[t].vol[n.id] || 0)) / 1000); }); } });
 				res.cover.scenarioMoved = mv;
 			}
 			// the ORIGINAL file against our export, heads (only a file that came from an .inp)
 			if (s.inp) {
 				try {
-					const parsed = EC.lpnInpParse(text), orig = await rawRun(text, model, times, false);
-					// scenario mode: `raw` is the hand-edited reference, so the page's EXPORT of the scenario is the one compared with it (heads, file in metres)
-					const expRun = refText !== null ? await rawRun(built.inp, model, times, false) : null;
-					let d = 0, at = ''; const sh = refText !== null ? 1 : parsed.scale.head;
-					const cmp = expRun || orig, ref0 = expRun ? raw : raw;
-					cmp.order.forEach((t) => { if (!ref0.frames[t]) { d = Infinity; at = 'time ' + t; return; } model.nodes.forEach((n) => { const x = Math.abs(cmp.frames[t].heads[n.id] * sh - ref0.frames[t].heads[n.id]); if (x > d) { d = x; at = n.id + '@' + t / 3600 + 'h'; } if (process.env.EPS_AUDIT_ORIG && x > 1e-4) { console.log('  orig-vs-export ' + n.id + '@' + t / 3600 + 'h ' + x.toExponential(2)); } }); });
-					res.origVsExport = { head: d, at, frames: cmp.order.length, exportFrames: raw.order.length };
+					// `fileRun` is the file as written (the original, or in scenario mode the hand-edited reference); `exportRun` is the page's own export
+					// of the model (of the scenario, in scenario mode). Heads of the file are scaled to metres.
+					const parsed = EC.lpnInpParse(text);
+					unedited = unedited || await rawRun(text, model, times, false);
+					const fileRun = refText !== null ? raw : unedited, exportRun = refText !== null ? await rawRun(built.inp, model, times, false) : raw;
+					let d = 0, at = ''; const sh = parsed.scale.head;
+					fileRun.order.forEach((t) => { if (!exportRun.frames[t]) { d = Infinity; at = 'time ' + t; return; } model.nodes.forEach((n) => { const x = Math.abs(fileRun.frames[t].heads[n.id] * sh - exportRun.frames[t].heads[n.id]); if (x > d) { d = x; at = n.id + '@' + t / 3600 + 'h'; } if (process.env.EPS_AUDIT_ORIG && x > 1e-4) { console.log('  orig-vs-export ' + n.id + '@' + t / 3600 + 'h ' + x.toExponential(2)); } }); });
+					res.origVsExport = { head: d, at, frames: fileRun.order.length, exportFrames: exportRun.order.length };
 				} catch (e) { res.notes.push('original-file raw run: ' + e.message); }
 			}
 			const dumpArg = (argv.find((a) => /^--dump=/.test(a)) || '').slice(7);
@@ -361,7 +365,7 @@ function line(c) {
 						if (s.inp) {
 							const to = await T.truthOfInp(EC, model, refText !== null ? refText : text, true), dfo = T.diff(nat.energy, to.bin);
 							const sumCpd = to.bin.pumps.reduce((a, r) => a + r.costPerDay, 0);
-							res.energyOrig = { good: dfo.good, worst: dfo.worst, detail: dfo.detail, demandCharge: to.bin.demandCharge, reportDemandCharge: to.report && to.report.demandCharge,
+							res.energyOrig = { good: dfo.good, worst: dfo.worst, detail: dfo.detail, pumpIds: to.bin.pumps.map((r) => r.id), samePumps: !/pumps listed/.test(dfo.detail), demandOk: !/demand charge/.test(dfo.detail), totalOk: !/ total /.test(dfo.detail), demandCharge: to.bin.demandCharge, reportDemandCharge: to.report && to.report.demandCharge,
 								reportTotal: to.report && to.report.totalCost, binTotal: sumCpd + to.bin.demandCharge, pumpCost: to.bin.pumps.map((r) => r.id + ':' + r.costPerDay.toFixed(2)).join(' ') };
 							if (br.ok && br.energy) {
 								const hd = nat.energy.duration / 3600, e = br.energy; let bw = 0;
