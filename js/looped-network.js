@@ -46123,8 +46123,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function exportWtgFile() {
 		// The template's labels come first (a name it already holds cannot be a scenario's), so the box promises only what the file will hold.
-		var labels = scenarios.length > 1 ? Promise.resolve(EngCalcs.lpnWtgTakenLabels()).catch(function () { return []; }) : Promise.resolve([]);
-		labels.then(function (taken) { exportWtgBox(wtgExportPlan(taken)); });
+		if (scenarios.length < 2) { exportWtgBox(wtgExportPlan([])); return; }   // Base alone: no name to check
+		Promise.resolve(EngCalcs.lpnWtgTakenLabels()).catch(function () { return []; }).then(function (taken) { exportWtgBox(wtgExportPlan(taken)); });
 	}
 	function exportWtgBox(planned) {
 		var pcX = EngCalcs.pageConfig || {}, fmt, scnSentence;
