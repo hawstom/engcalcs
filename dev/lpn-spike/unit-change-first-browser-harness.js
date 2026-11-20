@@ -112,7 +112,7 @@ async function main() {
 			await a.settle(500);
 			ok('the question appears', await dialogOpen(a));
 			ok('the question names ft^3 and MG', await a.page.evaluate(() => document.getElementById('lpn_dialog_body').textContent.indexOf('Convert inputs from ft') === 0));
-			ok('one Decimals field is offered, at 3 for MG', await a.page.evaluate(() => { const f = document.querySelectorAll('#lpn_dialog_body input[data-decimals-for]'); return f.length === 1 && f[0].value === '3'; }));
+			ok('one Decimals field is offered, blank (no rounding)', await a.page.evaluate(() => { const f = document.querySelectorAll('#lpn_dialog_body input[data-decimals-for]'); return f.length === 1 && f[0].value === ''; }));
 			if (mode === 'destructive') { await setDecimals(a, 6); }
 			await press(a, L[mode === 'destructive' ? 'lpn_convas_ok' : 'lpn_units_keep']);
 			await a.settle(900);
@@ -177,6 +177,38 @@ async function main() {
 		const l1 = await pipeLen();
 		ok('Length Convert as the first change: ' + l0.v + ' m became ' + (l0.v / 0.3048).toFixed(3) + ' ft', !!l1 && l1.id === l0.id && Math.abs(l1.v - l0.v / 0.3048) < 1e-6 * l0.v, JSON.stringify(l1));
 		await b.close();
+
+		// The Decimals warning (Tom, 2026-11-20), on a Spanish page: the count must follow the Decimals
+		// field there too, with the Spanish page's own number input and labels.
+		console.log('\n--- the Decimals warning, on a Spanish page ---');
+		const es = await Session.open(browser, 'ucf-es', { viewport: { width: 1500, height: 950 }, extraHTTPHeaders: { 'Accept-Language': process.env.UCF_LANG || 'es-ES,es;q=0.9' } });
+		await es.goto('Looped-Network.php?ec_nolog=1');
+		await es.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		const ES = {};
+		for (const k of ['lpn_convas_ok', 'lpn_cancel', 'lpn_ex_net1_si_title', 'lpn_units_zero_warn']) { ES[k] = await es.lang(k); }
+		ok('the page is Spanish (its Convert button is not "Convert")', ES.lpn_convas_ok !== 'Convert', ES.lpn_convas_ok);
+		await es.openExampleCard(ES.lpn_ex_net1_si_title);
+		await es.settle(800);
+		const wantZero = await es.page.evaluate(() => {
+			const ix = JSON.parse(localStorage.getItem('lpn_index') || '{}');
+			const d = JSON.parse(localStorage.getItem('lpn_project_' + ix.openId) || 'null');
+			return d.links.filter((l) => typeof l._diameter === 'number' && l._diameter !== 0 && Math.round(l._diameter / 1000) === 0).length;
+		});
+		ok('the example has pipes to count', wantZero > 0, String(wantZero));
+		await setSel(es, 'lpn_u_diameter', 'm');
+		await es.settle(500);
+		const warn = () => es.page.evaluate(() => { const w = document.querySelector('#lpn_dialog_body .lpn-unit-zero-warn'); return w ? w.textContent : ''; });
+		ok('the question opens with no warning (Decimals blank)', await dialogOpen(es) && await warn() === '', await warn());
+		await setDecimals(es, 0);
+		ok('Decimals 0 mm to m: the warning counts every pipe', await warn() === ES.lpn_units_zero_warn.replace('{n}', String(wantZero)), await warn());
+		if (process.env.UCF_SHOT) { await es.page.screenshot({ path: process.env.UCF_SHOT }); }
+		await setDecimals(es, 3);
+		ok('Decimals 3: the warning goes', await warn() === '', await warn());
+		await setDecimals(es, 0);
+		await setDecimals(es, '');
+		ok('Decimals blank: the warning goes', await warn() === '', await warn());
+		await press(es, ES.lpn_cancel);
+		await es.close();
 	} finally { await browser.close(); env.stopServer(); }
 	console.log('\n' + NAME + ': ' + (checks - fails) + '/' + checks + ' checks passed');
 	process.exit(fails ? 1 : 0);

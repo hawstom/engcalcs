@@ -1800,6 +1800,7 @@ echoHeader("EngCalcsApp", $html_title,
 			</div>
 			<?php } ?>
 		</div>
+		<p id="lpn_convas_zero_warn" class="lpn-unit-zero-warn" role="status"></p>
 		<p class="lpn-dim"><?=$ec_lang['lpn_convas_oneway']?></p>
 	</div>
 	<?php // OK and Cancel stand in a footer outside the scrolling body, so they are always in view. ?>
@@ -2305,6 +2306,7 @@ EngCalcs.pageConfig = {
 	lpn_units_convert_note: <?=json_encode($ec_lang['lpn_units_convert_note'])?>,
 	lpn_status_reinterpreted: <?=json_encode($ec_lang['lpn_status_reinterpreted'])?>,
 	lpn_status_converted: <?=json_encode($ec_lang['lpn_status_converted'])?>,
+	lpn_units_zero_warn: <?=json_encode($ec_lang['lpn_units_zero_warn'])?>,
 	lpn_file_export_menu: <?=json_encode($ec_lang['lpn_file_export_menu'])?>,
 	lpn_file_export_item_inp: <?=json_encode($ec_lang['lpn_file_export_item_inp'])?>,
 	lpn_file_export_item_geojson: <?=json_encode($ec_lang['lpn_file_export_item_geojson'])?>,

@@ -449,5 +449,63 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	ok('the converted Minimum volume keeps no stale .inp text', !(L.getDoc().nodes[0].tok && L.getDoc().nodes[0].tok.minVolume), JSON.stringify(L.getDoc().nodes[0].tok));
 }
 
+// ---- 8. The Decimals warning: nonzero values that Convert would turn into 0 ---------------------
+{
+	console.log('\n--- the Decimals warning ---');
+	// Tom, 2026-11-20: "Keep. User should know better. We can warn that there are values (n) that
+	// would be converted to 0." A count, shown beside the Decimals field, never a block.
+	function warnEl() {
+		let out = null;
+		(function walk(el) { (el.children || []).forEach(c => { if (c.className === 'lpn-unit-zero-warn') { out = c; } walk(c); }); })(byId.lpn_dialog_body);
+		return out;
+	}
+	function typeDecimals(v) {
+		decimalFields().forEach(f => { f.value = String(v); (f._listeners.input || []).forEach(fn => fn()); });
+	}
+	const shown = () => { const w = warnEl(); return w ? w.textContent : ''; };
+	const want = n => PC.lpn_units_zero_warn.replace('{n}', String(n));
+	L.reset(); L.setCanvas(800, 600);
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'mm', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'lps', lpn_u_roughness: 'mm', lpn_u_volume: 'ft3' });
+	L.remember();
+	const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0), k = L.addNode('junction', 200, 0);
+	const p1 = L.addLink('pipe', r.id, j.id), p2 = L.addLink('pipe', j.id, k.id);
+	L.setProp(p1, 'diameter', 12); L.setProp(p2, 'diameter', 150);
+	L.buildDom();
+	const before = snapshot();
+	pickUnit('lpn_u_diameter', 'in');
+	ok('the warning line exists and is hidden while Decimals is blank', warnEl() && shown() === '', shown());
+	typeDecimals(0);
+	ok('Decimals 0: the 12 mm pipe is counted, the 150 mm pipe is not', shown() === want(1), shown());
+	ok('the warning leads with the warning sign', shown().charAt(0) === '⚠');
+	typeDecimals(2);
+	ok('Decimals 2: nothing would become 0, so the warning goes', shown() === '', shown());
+	typeDecimals(0);
+	ok('...and returns at Decimals 0', shown() === want(1), shown());
+	typeDecimals('');
+	ok('a blank Decimals field removes the warning', shown() === '', shown());
+	ok('counting changed nothing in the document', snapshot() === before);
+	typeDecimals(0);
+	press('Convert');
+	ok('the warning never blocked: Convert rounded 12 mm to 0 and 150 mm to 6 in', p1._diameter === 0 && p2._diameter === 6, p1._diameter + ' ' + p2._diameter);
+	L.undo();
+	// A stated zero is not "would become 0": it already is.
+	L.getDoc().links[0]._diameter = 0;   // undo restored the document, so the old reference is stale
+	pickUnit('lpn_u_diameter', 'in');
+	typeDecimals(0);
+	ok('a value that is already 0 is not counted', shown() === '', shown());
+	press('Cancel');
+	// A small demand and a tiny volume count too (a Volume minimum of 0 is "no minimum", so a
+	// nonzero one that rounds to 0 is the case worth the warning).
+	L.reset(); L.setCanvas(800, 600);
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_volume: 'ft3' });
+	L.remember();
+	const t = L.addNode('tank', 0, 0);
+	L.setProp(t, 'minVolume', 0.0004); L.buildDom();
+	pickUnit('lpn_u_volume', 'gal');
+	typeDecimals(0);
+	ok('Volume: a 0.0004 ft3 minimum at Decimals 0 is counted', shown() === want(1), shown());
+	press('Keep');
+}
+
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');
 process.exit(fails === 0 ? 0 : 1);

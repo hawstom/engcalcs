@@ -6873,6 +6873,8 @@ html[dir="rtl"] .lpn-lib-entry-sel { box-shadow: inset -3px 0 0 var(--ec-select)
 /* The Decimals field of the unit question: a small number box beside its word. */
 .lpn-unit-decimals { display: block; margin: 0 0 0.9em 1.4em; }
 .lpn-unit-decimals input { width: 4em; margin-left: 0.5em; }
+.lpn-unit-zero-warn { margin: -0.4em 0 0.9em 1.4em; color: var(--ec-warn-ink); }
+.lpn-unit-zero-warn:empty { display: none; }   /* no count, no line: a text write is the only switch */
 
 /* Print preparation: the Printable version button. */
 .engcalcs-print-tools > p { margin-bottom: 0.2em; }

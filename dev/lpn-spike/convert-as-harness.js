@@ -44,6 +44,7 @@ const L = loadLoopedNetwork(
 	"\t\tnewProject: newProject, saveToStorage: saveToStorage,\n" +
 	"\t\tlibrary: function () { return library; }, unitKey: unitKey,\n" +
 	"\t\topenFileMenu: openFileMenu, openConvertAsBox: openConvertAsBox,\n" +
+	"\t\tconvasUnits: function () { return convasUnits; }, convasZeroed: convasZeroedCount, convasWarn: refreshConvasZeroWarn,\n" +
 	"\t\tconvasAnswers: convasAnswers, runConvertAs: runConvertAs, coordKind: projectCoordKind,\n" +
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tgeoref: function () { return georef; }, georefAttach: georefAttach,\n" +
@@ -136,6 +137,26 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			JSON.stringify(a0.units));
 		ok('...with no rounding chosen', Object.keys(a0.rounding).every((k) => a0.rounding[k] === ''));
 
+		// The warning's count (Tom, 2026-11-20): nonzero numbers the chosen step would round to 0.
+		{
+			const u = L.convasUnits().filter((x) => x.name === 'lpn_u_diameter')[0];
+			p2._diameter = 0.4;   // 0.4 in is 10.16 mm: a step of 100 rounds it to 0, 8 in (203.2 mm) to 200
+			u.sel.value = 'mm';
+			byId.lpn_convas_round_diameter.value = '';
+			L.convasWarn();
+			ok('Convert as: no step chosen, no warning', L.convasZeroed() === 0 && byId.lpn_convas_zero_warn.textContent === '');
+			byId.lpn_convas_round_diameter.value = '100';
+			L.convasWarn();
+			ok('Convert as: a step of 100 counts the one 0.4 in pipe', L.convasZeroed() === 1 && byId.lpn_convas_zero_warn.textContent !== ''
+				&& byId.lpn_convas_zero_warn.textContent === String(PC.lpn_units_zero_warn).replace('{n}', '1'), byId.lpn_convas_zero_warn.textContent);
+			byId.lpn_convas_round_diameter.value = '1';
+			L.convasWarn();
+			ok('Convert as: a step of 1 counts nothing and the warning goes', L.convasZeroed() === 0 && byId.lpn_convas_zero_warn.textContent === '');
+			u.sel.value = 'in';
+			byId.lpn_convas_round_diameter.value = '100';
+			ok('Convert as: an unchanged unit counts nothing', L.convasZeroed() === 0);
+			p2._diameter = 6; u.sel.value = 'mm'; byId.lpn_convas_round_diameter.value = '';
+		}
 		L.runConvertAs({ kind: 'none', crs: '', units: SI,
 			rounding: { diameter: '1', depth: '', flow: '0.1', head: '0.01' } });
 		const d = L.getDoc();

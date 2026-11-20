@@ -1311,6 +1311,8 @@ $ec_lang['lpn_units_keep']='Keep';
 $ec_lang['lpn_units_convert_note']='Convert rewrites each number in the new unit, rounded to the Decimals given; blank means no rounding. Keep leaves each number as typed and reads it in the new unit. Undo puts back a conversion.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='Values ({n}) now mean {unit}. Nothing was rewritten.';
+// {n} is a whole number: the stored values that are not 0 now and would be 0 after the Decimals given.
+$ec_lang['lpn_units_zero_warn']='⚠ There are values ({n}) that would be converted to 0.';
 $ec_lang['lpn_status_converted']='Values ({n}) were rewritten into {unit}.';
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
