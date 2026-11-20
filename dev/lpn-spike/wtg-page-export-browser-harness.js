@@ -160,6 +160,40 @@ async function main() {
 		const after = await s.page.evaluate(() => JSON.stringify(Object.keys(localStorage).sort().map((k) => [k, (localStorage.getItem(k) || '').length])));
 		const keysOf = (j) => JSON.parse(j).map((x) => x[0]).join();
 		ok('the export stored nothing new on the device', keysOf(before) === keysOf(after), keysOf(after));
+		// ---- 5. a project with scenarios (Task 749): the same menu, the same box, the same download ----
+		console.log('5. A project with scenarios: the menu export carries the carriable one and names the rest');
+		const proj = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'fixtures', 'Basic-example-US-units.lwn'), 'utf8'));
+		proj.scenarios.push({ id: 's1', name: 'Wet year', overrides: { 'l:L2': { diameter: 8 }, 'n:J2': { demand: 90 } } });
+		proj.scenarios.push({ id: 's2', name: 'Odd one', overrides: { 'l:L3': { length: 500 } } });
+		proj.project = Object.assign({}, proj.project, { activeScenario: 's1' });
+		await s.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); }, JSON.stringify(proj));
+		await s.reload();
+		await s.answerTrainingPanel().catch(() => {});
+		await s.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
+		await s.settle(2500);
+		await s.page.click('#lpn_menu_file');
+		await s.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+		await s.page.evaluate((l) => { const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0); if (r) { r.click(); } }, labels.file);
+		await s.page.waitForSelector('#lpn_menu_list2 button.lpn-menu-row', { state: 'attached' });
+		await s.page.evaluate(() => { const r = document.querySelector('#lpn_menu_list2 button.lpn-menu-row[aria-haspopup]'); if (r) { r.click(); } });
+		await s.page.waitForSelector('#lpn_menu_list3 button.lpn-menu-row', { state: 'attached' });
+		await s.page.evaluate((l) => { const r = Array.from(document.querySelectorAll('#lpn_menu_list3 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0); if (r) { r.click(); } }, labels.row);
+		const box2 = await s.waitDialog(4000);
+		ok('the box says the file holds Base and Wet year as a child of Base', !!box2 && box2.text.indexOf('as children of Base, the scenarios Wet year.') >= 0, box2 && box2.text.slice(0, 200));
+		ok('and lists Odd one as not written, with what it changes', !!box2 && /Scenario Odd one is not written: it changes pipe length/.test(box2.text), box2 && box2.text);
+		const dl2P = s.page.waitForEvent('download', { timeout: 120000 });
+		await s.dialogClick(labels.go);
+		const dl2 = await dl2P;
+		const files2 = unzip(fs.readFileSync(await dl2.path()));
+		const sq2 = Object.keys(files2).find((k) => /\.sqlite$/.test(k));
+		ok('one download holding the two files, named for the project and not for the open scenario', Object.keys(files2).length === 2 && !!sq2 && dl2.suggestedFilename() === 'Basic-example-US-units.wtg.zip', dl2.suggestedFilename() + ' ' + JSON.stringify(Object.keys(files2)));
+		fs.writeFileSync(path.join(tmp, 'scen.wtg.sqlite'), files2[sq2]);
+		const py2 = JSON.parse(execFileSync('python3', ['-I', '-c', "import sqlite3,sys,json\ndb=sqlite3.connect('file:'+sys.argv[1]+'?mode=ro',uri=True)\n"
+			+ "print(json.dumps({'integrity':db.execute('pragma integrity_check').fetchone()[0],'fk':len(db.execute('pragma foreign_key_check').fetchall()),'scen':[r[0] for r in db.execute('select m.Label from HMIScenario s join HMIModelingElement m on m.ElementID=s.ScenarioID order by s.ScenarioID')],'parents':db.execute('select count(*) from HMIScenario where ParentID is not null').fetchone()[0],'active':db.execute('select m.Label from HMIDomainDataSet d join HMIModelingElement m on m.ElementID=d.ActiveScenarioID').fetchone()[0]}))", path.join(tmp, 'scen.wtg.sqlite')], { encoding: 'utf8' }));
+		ok('the database is sound and holds Base and one child, Wet year; Base is the active scenario', py2.integrity === 'ok' && py2.fk === 0 && py2.parents === 1 && py2.scen.length === 2 && py2.scen.indexOf('Wet year') >= 0 && py2.active !== 'Wet year', JSON.stringify(py2));
+		const rc2 = await s.waitDialog(8000);
+		ok('the receipt says what was written and names Odd one as left out', !!rc2 && rc2.text.indexOf('from Base of') >= 0 && rc2.text.indexOf('as children of Base, the scenarios Wet year.') >= 0 && !/Wet year only/.test(rc2.text) && /Scenario Odd one is not written/.test(rc2.text), rc2 && rc2.text.slice(0, 300));
+		ok('the scenario open before the export (Wet year) is still the one open', await s.page.evaluate(() => JSON.parse(localStorage.getItem('lpn_project_hover') || '{}').project.activeScenario) === 's1');
 		ok('no page error', s.errors.length === 0, s.errors.join(' | '));
 		await s.context.close();
 	} finally {

@@ -45969,8 +45969,73 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * click download one file (exportInpFile()). Exporting is not saving: no stampProjectSaved().
 	 */
 	function wtgExportPlan() {
+		var was, planned, list;
 		saveToStorage();   // export what is on screen, including edits not yet saved
-		return withLightMap(function () { return EngCalcs.lpnWtgExportPlan(inpExportDocument(), inpExportOptions()); });
+		was = project.activeScenario;
+		try {
+			// **THE FILE'S BASE IS THE PROJECT'S BASE, WHATEVER SCENARIO IS OPEN**, because the scenarios ride beside it as
+			// children of Base (Task 749). Each is assembled by making it active in turn, the way the scenario comparison
+			// builds its models (scenarioCompareModels()): the one resolver, put back in a `finally`.
+			if (scenarios.length > 1) { project.activeScenario = baseScenario().id; morphViewFollow(); }
+			planned = withLightMap(function () { return EngCalcs.lpnWtgExportPlan(inpExportDocument(), inpExportOptions()); });
+			if (planned.ok && scenarios.length > 1) { list = wtgScenarioList(); wtgJudgeScenarios(planned, list); }
+		} finally {
+			project.activeScenario = was;
+			if (scenarios.length > 1) { morphViewFollow(); }
+		}
+		return planned;
+	}
+	// Every scenario but Base, each as its own resolved network written as an .inp: { name, parent, inp }. `parent` is the
+	// name of a parent that is not Base (a deeper scenario, which the writer leaves out), or of itself for a scenario with a
+	// Base of its own, which is no child of this Base.
+	function wtgScenarioList() {
+		var out = [];
+		scenariosForDisplay().forEach(function (s) {
+			var p, r;
+			if (s.isBase) { return; }
+			project.activeScenario = s.id;
+			morphViewFollow();
+			r = withLightMap(function () { return EngCalcs.lpnExportInp(inpExportDocument(), inpExportOptions()); });
+			p = s.root === true ? s : parentScenarioOf(s);
+			out.push({ name: scenarioDisplayName(s), parent: (p && !p.isBase) ? scenarioDisplayName(p) : undefined, inp: (r && r.ok) ? r.inp : null });
+		});
+		return out;
+	}
+	// What the writer will do with each, said before it is asked: `planned.scenarios` is what it is handed, and each one it
+	// will leave out is a line of `planned.notCarried` (the list the box and the receipt print). The writer's name and
+	// template checks can only be made against the file, so those come out of the report afterwards (wtgExportFinish()).
+	function wtgJudgeScenarios(planned, list) {
+		planned.scenarios = list;
+		planned.scenarioWritten = [];
+		list.forEach(function (s) {
+			var j = EngCalcs.lpnWtgScenarioJudge(planned.parsed, s);
+			if (!j.reason) { planned.scenarioWritten.push(s.name); return; }
+			planned.notCarried.push(wtgScenarioLeftOut(s.name, j.reason, j.ov && j.ov.unsupported));
+		});
+	}
+	function wtgScenarioLeftOut(name, reason, unsupported) {
+		var what = [], fb = {
+			nested: 'only children of Base are written.',
+			unreadable: 'its network could not be read.',
+			name: 'its name is already used by a scenario or an alternative in the file.',
+			layout: 'the export template holds no rows to copy for it.',
+			unsupported: 'it changes {value}. A scenario is written only where it differs from Base in pipe diameter, pipe roughness, junction elevation, or junction demand.'
+		};
+		(unsupported || []).forEach(function (u) {
+			what.push(String(u.what).replace(/^file part /, '') + (u.ids.length ? ' (' + wtgIdList(u.ids.slice(0, 3)) + ')' : ''));
+		});
+		return { code: 'scenario', ids: [name], value: wtgFill('lpn_wtg_export_scn_' + reason, fb[reason] || reason, { value: what.join(', ') }) };
+	}
+	// Which scenarios the file holds, in a sentence; nothing is said of one when the project is Base alone.
+	function wtgScenarioSentence(names) {
+		var pcX = EngCalcs.pageConfig || {}, out;
+		if (!exportLeavesSomething()) { return ''; }
+		out = names.length ? wtgFill('lpn_wtg_export_holds_children', 'It holds the Base scenario and, as children of Base, the scenarios {scenarios}.', { scenarios: names.join(', ') })
+			: (pcX.lpn_export_holds_base || 'It holds the Base scenario only.');
+		if ((doc.alternatives || []).length || (doc.calcSets || []).length) {
+			out += ' ' + (pcX.lpn_export_leaves_alternatives || 'The alternatives stored in this project are not in the file.');
+		}
+		return out;
 	}
 	function wtgIdList(ids) {
 		var shown = (ids || []).slice(0, 12).join(', ');
@@ -45995,6 +46060,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			demand_model: 'Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.',
 			texts: 'Text on the map.',
 			backdrop: 'The background picture.',
+			scenario: 'Scenario {ids} is not written: {value}',
 			positions: 'True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.'
 		};
 		return (items || []).map(function (it) {
@@ -46042,7 +46108,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				text: planned.refused.map(wtgRefusalText).join('\n') });
 			return;
 		}
-		scnSentence = exportScenarioSentence().replace(/^\s+/, '');
+		scnSentence = wtgScenarioSentence(planned.scenarioWritten || []);
 		openDialog(function (body) {
 			function p(text) {
 				var e = document.createElement('p');
@@ -46075,7 +46141,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * is called with the Blob of the .zip and its name, or with an error message; a harness drives this.
 	 */
 	function wtgExportWrite(done) {
-		var base = inpExportBaseName(), planned = wtgExportPlan();
+		// The file's Base is the project's Base, so the name is the project's, whatever scenario is open.
+		var base = safeFileName(projectDisplayName(project)), planned = wtgExportPlan();
 		if (!planned.ok || planned.refused.length) {
 			done(null, wtgFill('lpn_wtg_export_failed', 'The .wtg project was not written: {detail}', { detail: planned.ok ? planned.refused.map(wtgRefusalText).join(' ') : (planned.detail || planned.error || '?') }));
 			return;
@@ -46093,13 +46160,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}).catch(fail);
 	}
 	function wtgExportFinish(out, err) {
-		var left, extract = wtgFill('lpn_wtg_export_extract', 'Extract both files into one folder, then open the .wtg.', {});
+		var left, extract = wtgFill('lpn_wtg_export_extract', 'Extract both files into one folder, then open the .wtg.', {}), recs, items, written = [];
 		if (!out) { setWarning(err); return; }
 		downloadBlob(out.zip, out.zipName);
+		// What the writer did with each scenario, from the file's own report: the two refusals the plan could not foresee
+		// (a name the file already holds, a template with no rows to copy) join the ones it did.
+		recs = (out.report && out.report.scenarios) || [];
+		items = out.planned.notCarried.slice();
+		recs.forEach(function (r) {
+			if (r.written) { written.push(r.name); } else if (r.reason === 'name' || r.reason === 'layout') { items.push(wtgScenarioLeftOut(r.name, r.reason)); }
+		});
 		setNotice(wtgFill('lpn_wtg_export_exported', 'Exported {zip}, holding {wtg} and {sqlite}.',
-			{ zip: out.zipName, wtg: out.wtgName, sqlite: out.sqliteName }) + ' ' + extract + exportScenarioSentence());
-		left = wtgNotCarriedLines(out.planned.notCarried).join(' ');
-		showExportReceipt(out.zipName, [], [extract, wtgFill('lpn_wtg_export_left_out', 'Not written: {items}', { items: left })]);
+			{ zip: out.zipName, wtg: out.wtgName, sqlite: out.sqliteName }) + ' ' + extract + (wtgScenarioSentence(written) ? ' ' + wtgScenarioSentence(written) : ''));
+		left = wtgNotCarriedLines(items).join(' ');
+		showExportReceipt(out.zipName, [], [extract, wtgFill('lpn_wtg_export_left_out', 'Not written: {items}', { items: left })], { scenario: baseScenario(), holds: wtgScenarioSentence(written) });
 	}
 	/**
 	 * **EXPORT GeoJSON (ROADMAP Task 728, Tom 2026-10-06, approving Mary's order: GeoJSON out
@@ -47597,8 +47671,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * only when something is left behind (confirmExportLeaves); this one reports the file as written.
 	 * `lines` are the .inp's flattening sentences; `extra` are further sentences (GeoJSON results).
 	 */
-	function showExportReceipt(fileName, lines, extra) {
-		var pc = EngCalcs.pageConfig || {}, scn = activeScenario();
+	// `over`, where a file is not the open scenario's: { scenario: the one the heading names, holds: the sentence saying what the file holds }.
+	function showExportReceipt(fileName, lines, extra, over) {
+		var pc = EngCalcs.pageConfig || {}, scn = (over && over.scenario) || activeScenario();
 		lines = lines || [];
 		openDialog(function (body) {
 			function p(text, bold) {
@@ -47608,7 +47683,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				e.textContent = text;
 				body.appendChild(e);
 			}
-			var left = exportScenarioSentence().replace(/^\s+/, ''), ul = document.createElement('ul');
+			var left = (over && over.holds !== undefined) ? over.holds : exportScenarioSentence().replace(/^\s+/, ''), ul = document.createElement('ul');
 			p((pc.lpn_export_receipt_heading || 'Exported {file} from {scenario} of {project}.').split('{file}').join('\u0001')
 				.split('{scenario}').join('\u0002').split('{project}').join('\u0003')
 				.split('\u0001').join(fileName).split('\u0002').join(scn ? scenarioDisplayName(scn) : '')

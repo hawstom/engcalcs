@@ -5,6 +5,8 @@
 // resolves each scenario back from the file twice (by this harness's own walk up the alternatives, and through the reader of
 // branch feat/sqlite-reader), and checks the structure against what the saved pair and Tom's TGH-1 show. NOT proof that
 // WaterGEMS opens or resolves it: only Tom's copy can say that.
+//   node dev/lpn-spike/wtg-scenario-harness.js --page   (section 9 only: it runs in a child process of its own, the page's code and this
+//   harness's writer-only environment not sharing one set of globals)
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -17,7 +19,109 @@ function ok(name, cond, extra) {
 const near = (a, b, tol) => Math.abs(a - b) <= tol;
 const GPM = 0.22280092967190634 / 100;
 
+
+// ---------------------------------------------------------------------------------------------
+// 9. THE PAGE PATH (Task 749): a project with Base and three scenarios exported through the same functions the File > Export menu
+// calls (wtgExportPlan, exportWtgFile's box, wtgExportWrite), with the real page code under the DOM stub. Run as a child process.
+// ---------------------------------------------------------------------------------------------
+async function pagePath() {
+	const os = require('os');
+	const { execFileSync } = require('child_process');
+	const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+	const helper = require('./wtg-sqljs.js');
+	const zlib = require('zlib');
+	let rp = null;
+	try { rp = helper.readerPaths(); helper.sqlJsPath(); } catch (e) { rp = null; }
+	if (!rp) { console.log('  (the reader of feat/sqlite-reader or sql.js is not here: the page path is NOT RUN)'); return; }
+	require(ROOT + 'js/lpn-inp.js'); require(ROOT + 'js/lpn-net.js'); require(ROOT + 'js/lpn-patterns.js'); require(ROOT + 'js/lpn-wtg-export.js');
+	global.FileReader = function () {
+		this.readAsArrayBuffer = function (file) {
+			const bytes = new TextEncoder().encode(file._text);
+			this.result = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+			if (this.onload) { this.onload({ target: { result: this.result } }); }
+		};
+	};
+	global.alert = global.window.alert = function () {};
+	global.confirm = global.window.confirm = function () { return true; };
+	const L = loadLoopedNetwork(
+		"\t\timportInp: importInpFromFile, wtgPlan: wtgExportPlan, wtgWrite: wtgExportWrite, wtgLines: wtgNotCarriedLines, exportWtg: exportWtgFile,\n" +
+		"\t\tcreateScenario: createScenario, switchScenario: switchScenario, baseScenario: baseScenario, activeScenario: activeScenario,\n" +
+		"\t\tsetProp: setProp, nodeById: nodeById, linkById: linkById, getScenarios: function () { return scenarios; },\n" +
+		"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
+		"\t\t\tworld = el('g', {}, svg);\n" +
+		"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
+		"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
+		"\t\t\tlabelsLayer = el('g', {}, world);\n" +
+		"\t\t\trubberBandEl = el('line', {}, world); }"
+	);
+	L.buildLayers();
+	const EC = global.EngCalcs, PC = EC.pageConfig;
+	const initSqlJs = require(helper.sqlJsPath()), wasm = fs.readFileSync(helper.wasmPath());
+	EC.lpnWtgExportSetEngine(initSqlJs, wasm);
+	global.window.EngCalcs = EC;
+	require(rp.sqlite); require(rp.wtg);
+	EC.lpnSqliteSetEngine(initSqlJs, wasm);
+	const tplDir = path.join(ROOT, 'js', 'data', 'wtg-template');
+	EC.lpnWtgExportSetTemplate(zlib.gunzipSync(fs.readFileSync(path.join(tplDir, 'wtg-template.wtg.sqlite.gz'))), zlib.gunzipSync(fs.readFileSync(path.join(tplDir, 'wtg-template.wtg.gz'))).toString('utf8'));
+
+	setUnitSet('us');
+	L.importInp({ name: 'scen.inp', _text: require('./wtg-composite-test.js').compositeNet() });
+	const base = L.baseScenario();
+	const mk = (name, parent, edit) => { const sc = L.createScenario(name, parent); edit(); return sc; };
+	// Wet year: what the writer carries (pipe 2 diameter 8 to 10 in, J1 demand 300 to 500 gpm). Odd one: a pipe's length, which it does not.
+	const wet = mk('Wet year', undefined, () => { L.setProp(L.linkById('2'), 'diameter', 10); L.setProp(L.nodeById('J1'), 'demand', 500); });
+	const odd = mk('Odd one', undefined, () => { L.setProp(L.linkById('3'), 'length', 650); });
+	const deep = mk('Deeper', wet.id, () => { L.setProp(L.nodeById('J1'), 'demand', 520); });
+	L.switchScenario(base.id);
+
+	console.log('\n9. The page path: Base, Wet year (carried), Odd one (a length), Deeper (a child of Wet year)');
+	const planned = L.wtgPlan();
+	ok('the plan is made and holds the three scenarios', planned.ok && planned.scenarios && planned.scenarios.map((x) => x.name).sort().join() === 'Deeper,Odd one,Wet year', planned.ok ? '' : planned.detail);
+	ok('only Wet year will be written', planned.scenarioWritten.join() === 'Wet year');
+	const lines = L.wtgLines(planned.notCarried);
+	const oddLine = lines.find((x) => /^Scenario Odd one is not written/.test(x)), deepLine = lines.find((x) => /^Scenario Deeper is not written/.test(x));
+	ok('Odd one is named, with what it changes (pipe length on pipe 3)', !!oddLine && /pipe length \(3\)/.test(oddLine) && !/\{/.test(oddLine), oddLine);
+	ok('Deeper is named: only children of Base are written', !!deepLine && /only children of Base/.test(deepLine), deepLine);
+	ok('the open scenario was put back (Base)', L.activeScenario().id === base.id);
+	const was = planned.parsed;
+	ok('the plan leaves the project\'s scenarios as they were (4 scenarios)', L.getScenarios().length === 4);
+
+	// The box the menu opens, from inside Wet year: Base is still the file's Base.
+	L.switchScenario(wet.id);
+	L.exportWtg();
+	const walk = (e, f) => { f(e); (e.children || []).forEach((c) => walk(c, f)); };
+	const texts = []; walk(global.document.getElementById('lpn_dialog_body'), (e) => { if (e._tag === 'li' || e._tag === 'p') { texts.push(e.textContent || e._text || ''); } });
+	ok('the box says what it holds: Base and, as a child of Base, Wet year', texts.some((x) => x.indexOf('It holds the Base scenario and, as children of Base, the scenarios Wet year.') === 0), JSON.stringify(texts.slice(0, 2)));
+	ok('and lists Odd one and Deeper as not written', texts.some((x) => /^Scenario Odd one is not written/.test(x)) && texts.some((x) => /^Scenario Deeper is not written/.test(x)));
+	const cancel = (global.document.getElementById('lpn_dialog_buttons').children || [])[1];
+	if (cancel && cancel.click) { cancel.click(); }
+	ok('the scenario open when the box was asked for is still open', L.activeScenario().id === wet.id);
+
+	const wrote = await new Promise((resolve) => L.wtgWrite((out, err) => resolve({ out: out, err: err })));
+	ok('written', !!wrote.out, wrote.err);
+	if (!wrote.out) { return; }
+	const recs = wrote.out.report.scenarios, rec = (n) => recs.find((x) => x.name === n) || {};
+	ok('the writer was handed all three and wrote one: Wet year', recs.length === 3 && rec('Wet year').written === true && rec('Odd one').written === false && rec('Deeper').written === false, JSON.stringify(recs.map((r) => [r.name, r.written, r.reason])));
+	ok('the refusals are the reasons the plan gave (unsupported, nested)', rec('Odd one').reason === 'unsupported' && rec('Deeper').reason === 'nested');
+	const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'wtg-scen-page-'));
+	fs.writeFileSync(path.join(tmp, 'x.zip'), Buffer.from(await wrote.out.zip.arrayBuffer()));
+	execFileSync('python3', ['-I', '-c', "import zipfile,sys\nzipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])", path.join(tmp, 'x.zip'), tmp]);
+	const bytes = fs.readFileSync(path.join(tmp, wrote.out.sqliteName)), wtg = fs.readFileSync(path.join(tmp, wrote.out.wtgName), 'utf8');
+	const r = EC.lpnWtgRead(await EC.lpnSqliteOpen(bytes), { flowUnits: 'GPM', display: EC.lpnWtgDisplayUnits(wtg) });
+	ok('read back from the file', r.ok, r.message);
+	const scs = r.scenarios || [];
+	ok('the file holds one child scenario, Wet year', scs.map((x) => x.name).join() === 'Wet year', JSON.stringify(scs.map((x) => x.name)));
+	const dif = (scs[0] && scs[0].differences) || {};
+	ok('Wet year differs from Base in pipe 2 (diameter 10 in) and J1 (demand 500 gpm), and nothing else', Object.keys(dif).sort().join() === 'l:2,n:J1' && dif['l:2'].diameter === 10 && Math.abs(dif['n:J1'].demand - 500) < 1e-6, JSON.stringify(dif));
+	const baseInp = EC.lpnInpParse(r.inp);
+	ok('the file\'s Base is Base (pipe 2 8 in, J1 300 gpm) though Wet year was open when it was exported', baseInp.links.find((l) => l.id === '2').diameter === 8 && baseInp.nodes.find((n) => n.id === 'J1').demand === 300);
+	ok('the .wtg names the child in its tree', wtg.indexOf('<ScenarioSettings ScenarioID="' + rec('Wet year').id + '"') >= 0);
+	ok('the open scenario is still Wet year after the write', L.activeScenario().id === wet.id);
+	fs.rmSync(tmp, { recursive: true, force: true });
+}
+
 (async function () {
+	if (process.argv[2] === '--page') { await pagePath(); console.log(fails ? '\n' + fails + ' FAILED' : '\nall checks passed'); process.exit(fails ? 1 : 0); }
 	const helper = require('./wtg-sqljs.js');
 	try { helper.sqlJsPath(); } catch (e) { console.log('NOT RUN: sql.js not found (' + e.message + ').'); process.exit(0); }
 	const ft = require('./wtg-feature-tests.js');
@@ -44,6 +148,9 @@ const GPM = 0.22280092967190634 / 100;
 	const DIAM_ONLY = edit(/ 3\s+J1\s+T1\s+500\s+8 /, ' 3 J1 T1 500 12 ');
 	const ROUGH = edit(/ 3\s+J1\s+T1\s+500\s+8\s+120/, ' 3 J1 T1 500 8 100');
 	const ELEV = edit(/ J0\s+40\s+0/, ' J0 45 0');
+	// What the writer still does not store: a pipe's length, a tank's elevation.
+	const LONGER = edit(/ 3\s+J1\s+T1\s+500\s+8 /, ' 3 J1 T1 650 8 ');
+	const TANKELEV = edit(/ T1\s+120\s+12/, ' T1 125 12');
 
 	function write(scenarios, extra) {
 		const parsed = EC.lpnInpParse(BASE);
@@ -155,21 +262,40 @@ const GPM = 0.22280092967190634 / 100;
 			&& near(resolveRow(C.db, s3, 'IdahoPipe_Physical_Data', elOf(C.db, '2'), PHYS)[0].Physical_PipeDiameter * 12, 8, 1e-9));
 	}
 
+	console.log('\n2b. Pipe roughness and junction elevation (Physical alternative, the rows of the diameter\'s table and the node table)');
+	{
+		const R = write([['Rougher', ROUGH], ['Higher ground', ELEV], ['Both', ROUGH.replace(/ J0\s+40\s+0/, ' J0 45 0').replace(/ 2\s+J0\s+J1\s+1000\s+8 /, ' 2 J0 J1 1000 9 ')]]);
+		const sid = (i) => R.report.scenarios[i].id;
+		ok('all three written, one Physical child alternative each, none for demand', R.report.scenarios.every((x) => x.written) && rows(R.db, 'SELECT * FROM HMIAlternative WHERE ParentID IS NOT NULL AND AlternativeTypeID = 4').length === 3 && rows(R.db, 'SELECT * FROM HMIAlternative WHERE ParentID IS NOT NULL AND AlternativeTypeID = 20').length === 0, JSON.stringify(R.report.scenarios.map((x) => x.reason)));
+		const c = (scen, el) => resolveRow(R.db, scen, 'IdahoPipe_Physical_Data', el, PHYS)[0].Physical_HazenWilliamsC;
+		const ev = (scen, el) => resolveRow(R.db, scen, 'BaseIdahoNode_Physical_Data', el, PHYS)[0].Physical_NodeElevation;
+		ok('pipe 3 C: 100 in Rougher, 120 in Base and in Higher ground', c(sid(0), elOf(R.db, '3')) === 100 && c(1, elOf(R.db, '3')) === 120 && c(sid(1), elOf(R.db, '3')) === 120);
+		ok('J0 elevation: 45 in Higher ground and Both, 40 in Base and in Rougher', ev(sid(1), elOf(R.db, 'J0')) === 45 && ev(sid(2), elOf(R.db, 'J0')) === 45 && ev(1, elOf(R.db, 'J0')) === 40 && ev(sid(0), elOf(R.db, 'J0')) === 40);
+		ok('Both: pipe 2 is 9 in, pipe 3 C 100, one copy of each pipe\'s rows (no duplicate row)', near(resolveRow(R.db, sid(2), 'IdahoPipe_Physical_Data', elOf(R.db, '2'), PHYS)[0].Physical_PipeDiameter * 12, 9, 1e-9) && c(sid(2), elOf(R.db, '3')) === 100
+			&& rows(R.db, 'SELECT * FROM IdahoPipe_Physical_Data WHERE DomainElementID = ? AND AlternativeID = (SELECT AlternativeID FROM HMIScenarioAlternative WHERE ScenarioID = ? AND AlternativeTypeID = 4)', [elOf(R.db, '2'), sid(2)]).length === 1);
+		ok('integrity ok', R.report.integrity === 'ok' && R.report.foreignKeyViolations === 0);
+		if (reader) {
+			const rr = EC.lpnWtgRead(await EC.lpnSqliteOpen(Buffer.from(R.out.bytes)), { flowUnits: 'GPM' });
+			const dif = (n) => ((rr.scenarios || []).find((x) => x.name === n) || {}).differences || {};
+			ok('the reader finds exactly those differences: Rougher l:3 roughness 100; Higher ground n:J0 elev 45', Object.keys(dif('Rougher')).join() === 'l:3' && dif('Rougher')['l:3'].roughness === 100 && Object.keys(dif('Higher ground')).join() === 'n:J0' && dif('Higher ground')['n:J0'].elev === 45, JSON.stringify([dif('Rougher'), dif('Higher ground')]));
+		}
+	}
+
 	console.log('\n3. What it will not write is named, and the scenario is left out whole');
 	{
-		const D = write([['Rougher', ROUGH], ['Higher ground', ELEV], ['Good one', DEMAND_ONLY]]);
+		const D = write([['Longer pipe', LONGER], ['Higher tank', TANKELEV], ['Good one', DEMAND_ONLY]]);
 		ok('3 requested, only the good one written', D.report.scenarios.map((x) => x.written).join(',') === 'false,false,true' && rows(D.db, 'SELECT * FROM HMIScenario WHERE ParentID IS NOT NULL').length === 1);
 		const r0 = D.report.scenarios[0], r1 = D.report.scenarios[1];
-		ok('a roughness override is named: pipe roughness on pipe 3', r0.reason === 'unsupported' && r0.unsupported.length === 1 && r0.unsupported[0].what === 'pipe roughness' && r0.unsupported[0].ids.join() === '3', JSON.stringify(r0.unsupported));
-		ok('an elevation override is named: junction elev on J0', r1.reason === 'unsupported' && r1.unsupported.some((u) => u.what === 'junction elev' && u.ids.join() === 'J0'), JSON.stringify(r1.unsupported));
-		ok('and each says so in the not-written list of the report', D.report.notCarried.filter((x) => /^scenario (Rougher|Higher ground) not written/.test(x)).length === 2);
+		ok('a length override is named: pipe length on pipe 3', r0.reason === 'unsupported' && r0.unsupported.length === 1 && r0.unsupported[0].what === 'pipe length' && r0.unsupported[0].ids.join() === '3', JSON.stringify(r0.unsupported));
+		ok('a tank elevation override is named: tank elev on T1', r1.reason === 'unsupported' && r1.unsupported.some((u) => u.what === 'tank elev' && u.ids.join() === 'T1'), JSON.stringify(r1.unsupported));
+		ok('and each says so in the not-written list of the report', D.report.notCarried.filter((x) => /^scenario (Longer pipe|Higher tank) not written/.test(x)).length === 2);
 		ok('(names) a repeated or empty name is refused, a nested scenario is refused', (() => {
 			const parsed = EC.lpnInpParse(BASE);
 			const w = lib.writeWtg(SQL, env.tplSqlite, parsed, { initial: {}, changes: [] }, { name: 'x', candidate: { scenarios: [{ name: 'A', inp: DEMAND_ONLY }, { name: 'A', inp: DIAM_ONLY }, { name: '', inp: DIAM_ONLY }, { name: 'Child', parent: 'A', inp: DIAM_ONLY }] } });
 			return w.report.scenarios.map((x) => x.written + ':' + (x.reason || '')).join(',') === 'true:,false:name,false:name,false:nested' && w.report.integrity === 'ok';
 		})());
 		ok('(a refused scenario leaves no QBAT, no scenario row and no counts behind)', (() => {
-			const w = write([['Rougher', ROUGH]]);
+			const w = write([['Longer pipe', LONGER]]);
 			return rows(w.db, 'SELECT * FROM HMIScenario').length === 1 && rows(w.db, 'SELECT * FROM QBATDefinition').length === 0
 				&& one(w.db, 'SELECT Count AS c FROM HMIElementTypeCount WHERE ElementType = 2 AND ElementTypeID = 0').c === 1 && one(w.db, 'SELECT Count AS c FROM HMIElementTypeCount WHERE ElementType = 4 AND ElementTypeID = 1000').c === 0
 				&& !w.report.addedScenarios;
@@ -316,6 +442,12 @@ const GPM = 0.22280092967190634 / 100;
 	console.log('\n8. The page path is unchanged');
 	ok('no scenarios asked: the report has no scenario list, no QBAT and the counts of one scenario', !plain.report.scenarios && rows(plain.db, 'SELECT * FROM QBATDefinition').length === 0 && rows(plain.db, 'SELECT * FROM HMIScenario').length === 1);
 
+	console.log('\n9. (runs in a child process)');
+	{
+		const r = require('child_process').spawnSync(process.execPath, [__filename, '--page'], { encoding: 'utf8' });
+		process.stdout.write(r.stdout || '');
+		ok('the page path passes', r.status === 0, (r.stderr || '').split('\n').slice(0, 6).join(' | '));
+	}
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall checks passed');
 	process.exit(fails ? 1 : 0);
 }()).catch((e) => { console.error(e); process.exit(1); });

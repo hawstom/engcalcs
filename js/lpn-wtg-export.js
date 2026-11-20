@@ -64,6 +64,8 @@ const IN_TO_FT = 1 / 12;
 // ONE PLACE for what a Base element and a child scenario's override both state (Task 749): the pipe's diameter and a junction's
 // demand row, with the unit conversion and the column each is stored in. The Base writer and the scenario writer both read these.
 const PIPE_DIAMETER = { table: 'IdahoPipe_Physical_Data', column: 'Physical_PipeDiameter', toStored: (inches) => inches * IN_TO_FT };
+const PIPE_ROUGHNESS = { table: 'IdahoPipe_Physical_Data', column: 'Physical_HazenWilliamsC' };   // the same row as the diameter (Hazen-Williams only: any other head loss method is refused)
+const NODE_ELEVATION = { table: 'BaseIdahoNode_Physical_Data', column: 'Physical_NodeElevation' };   // a junction's, in the Physical alternative, in feet
 const DEMAND_FLOW = { table: 'IdahoDemandNode_Demand_DemandCollection', column: 'DemandCollection_BaseFlow', toStored: (gpm, mult) => gpm * (mult === undefined ? 1 : mult) * GPM_TO_CFS };
 // A junction's demand rows, in the order it states them (row 0 is its own demand, the rest are `extraDemands`); a row that
 // states no flow is not written. The writer and scenarioOverrides() must agree on this list, so there is one.
@@ -1002,8 +1004,9 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 
 	// ---- CHILD SCENARIOS (candidate, Task 749, 2026-11-13): `opts.candidate.scenarios` = [{ name, parsed | inp }], each the
 	// project scenario's resolved network read as the Base's is (lpnInpParse of lpnExportInp with that scenario's resolver),
-	// a child of Base. Written only when every difference from Base is a pipe diameter or a junction's demand rows' base
-	// flows (the two a saved pair shows; scenarioOverrides() names the rest and the scenario is then left out whole).
+	// a child of Base. Written only when every difference from Base is a pipe's diameter or roughness, a junction's elevation or
+	// its demand rows' base flows (diameter and demand a saved pair shows; roughness and elevation are the same Physical rows;
+	// scenarioOverrides() names the rest and the scenario is then left out whole). The page hands it every project scenario.
 	// Structure OBSERVED (dev/wtg-export.md, "Child scenarios"): an HMIScenario row with ParentID Base; per alternative type
 	// an HMIScenarioAlternative row, IsLocal 0 naming Base's alternative, or IsLocal 1 naming a child alternative (an
 	// HMIAlternative row with ParentID the Base alternative and Level 2) that holds, for each element edited, ALL that element's
@@ -1027,9 +1030,11 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			});
 			return out;
 		};
-		const plans = {};
-		plans[physAlt] = copyPlan(proto.pipe, physAlt);
-		plans[demandAlt] = copyPlan(proto.junction, demandAlt);
+		// Per kind of element (a pipe's rows and a junction's are different tables), per alternative.
+		const plans = { pipe: {}, junction: {} };
+		plans.pipe[physAlt] = copyPlan(proto.pipe, physAlt);
+		plans.junction[physAlt] = copyPlan(proto.junction, physAlt);
+		plans.junction[demandAlt] = copyPlan(proto.junction, demandAlt);
 		const typeOfAlt = { };
 		typeOfAlt[physAlt] = 4; typeOfAlt[demandAlt] = 20;
 		// Names are compared without regard to case, against every scenario AND every alternative label the project holds.
@@ -1037,8 +1042,8 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		rowsOf(db, 'SELECT Label FROM HMIModelingElement WHERE ElementType IN (1, 2)').forEach((r) => { taken[String(r.Label).toLowerCase()] = 1; });
 		report.scenarios = [];
 		let qbat = false;
-		function copyRows(e, from, to) {
-			(plans[from] || []).forEach((pl) => {
+		function copyRows(kind, e, from, to) {
+			(plans[kind][from] || []).forEach((pl) => {
 				const rows = [];
 				pl.st.bind([e, from]);
 				while (pl.st.step()) { rows.push(pl.st.getAsObject()); }
@@ -1050,19 +1055,25 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			const name = String((s && s.name) || '').trim(), rec = { name: name, written: false };
 			report.scenarios.push(rec);
 			if (!name || taken[name.toLowerCase()]) { rec.reason = 'name'; lost('scenario "' + name + '" not written: its name is empty, or already used by a scenario or an alternative (capitals do not tell names apart)'); return; }
-			if (s.parent !== undefined && s.parent !== null && s.parent !== '') { rec.reason = 'nested'; lost('scenario ' + name + ' not written: only children of Base are written'); return; }
-			const sp = s.parsed || (s.inp ? EngCalcs.lpnInpParse(s.inp) : null);
-			if (!sp || sp.ok === false) { rec.reason = 'unreadable'; lost('scenario ' + name + ' not written: its network could not be read'); return; }
-			const ov = scenarioOverrides(parsed, sp);
-			if (ov.unsupported.length) {
+			const j = judgeScenario(parsed, s);
+			if (j.reason === 'nested') { rec.reason = 'nested'; lost('scenario ' + name + ' not written: only children of Base are written'); return; }
+			if (j.reason === 'unreadable') { rec.reason = 'unreadable'; lost('scenario ' + name + ' not written: its network could not be read'); return; }
+			const ov = j.ov;
+			if (j.reason === 'unsupported') {
 				rec.reason = 'unsupported'; rec.unsupported = ov.unsupported;
 				lost('scenario ' + name + ' not written, it overrides what this writer does not store: ' + ov.unsupported.map((u) => u.what + ' (' + u.ids.slice(0, 6).join(', ') + (u.ids.length > 6 ? ', ...' : '') + ')').join('; '));
 				return;
 			}
 			// The row each override edits must be one the template's elements hold, or the edit would land on nothing.
-			const holds = (alt, table) => !!alt && (plans[alt] || []).some((pl) => pl.table === table);
-			if ((ov.diameters.length && !holds(physAlt, PIPE_DIAMETER.table)) || (ov.demands.length && !holds(demandAlt, DEMAND_FLOW.table))) {
-				rec.reason = 'layout'; lost('scenario ' + name + ' not written: the saved project holds no ' + (ov.diameters.length && !holds(physAlt, PIPE_DIAMETER.table) ? PIPE_DIAMETER.table : DEMAND_FLOW.table) + ' rows to copy');
+			const holds = (kind, alt, table) => !!alt && (plans[kind][alt] || []).some((pl) => pl.table === table);
+			const needs = [];
+			if (ov.diameters.length) { needs.push(['pipe', physAlt, PIPE_DIAMETER.table]); }
+			if (ov.roughness.length) { needs.push(['pipe', physAlt, PIPE_ROUGHNESS.table]); }
+			if (ov.elevations.length) { needs.push(['junction', physAlt, NODE_ELEVATION.table]); }
+			if (ov.demands.length) { needs.push(['junction', demandAlt, DEMAND_FLOW.table]); }
+			const missing = needs.find((nd) => !holds(nd[0], nd[1], nd[2]));
+			if (missing) {
+				rec.reason = 'layout'; lost('scenario ' + name + ' not written: the saved project holds no ' + missing[2] + ' rows to copy');
 				return;
 			}
 			taken[name.toLowerCase()] = 1;
@@ -1082,7 +1093,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				local[parentAlt] = id;
 				return id;
 			}
-			const pAlt = ov.diameters.length ? childAlt(physAlt) : null, dAlt = ov.demands.length ? childAlt(demandAlt) : null;
+			const pAlt = (ov.diameters.length || ov.roughness.length || ov.elevations.length) ? childAlt(physAlt) : null, dAlt = ov.demands.length ? childAlt(demandAlt) : null;
 			const sid = newId();
 			modeling(sid, 2, name);
 			insert(db, 'HMIScenario', { ScenarioID: sid, ParentID: baseScen, IsDeleted: 0, DomainDataSetID: 1 });
@@ -1093,26 +1104,40 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			rowsOf(db, 'SELECT NumericalEngineTypeID AS n, CalculationOptionsID AS c FROM HMIScenarioCalculationOptions WHERE ScenarioID = ?', [baseScen]).forEach((r) => {
 				insert(db, 'HMIScenarioCalculationOptions', { ScenarioID: sid, NumericalEngineTypeID: r.n, CalculationOptionsID: r.c, IsLocal: 0 });
 			});
+			// A pipe edited in both its diameter and its roughness is copied once; so is a junction edited in elevation and demand
+			// (the copy is per alternative, the rows of the two alternatives being different tables).
+			const copied = {};
+			const copyOnce = (kind, e, from, to) => { const k = kind + e + ':' + to; if (!copied[k]) { copied[k] = 1; copyRows(kind, e, from, to); } };
 			ov.diameters.forEach((d) => {
 				const e = pipeElId[d.id];
-				copyRows(e, physAlt, pAlt);
+				copyOnce('pipe', e, physAlt, pAlt);
 				db.run('UPDATE ' + PIPE_DIAMETER.table + ' SET ' + PIPE_DIAMETER.column + ' = ? WHERE DomainElementID = ? AND AlternativeID = ?', [PIPE_DIAMETER.toStored(d.inches), e, pAlt]);
+			});
+			ov.roughness.forEach((d) => {
+				const e = pipeElId[d.id];
+				copyOnce('pipe', e, physAlt, pAlt);
+				db.run('UPDATE ' + PIPE_ROUGHNESS.table + ' SET ' + PIPE_ROUGHNESS.column + ' = ? WHERE DomainElementID = ? AND AlternativeID = ?', [d.c, e, pAlt]);
+			});
+			ov.elevations.forEach((d) => {
+				const e = elId['n:' + d.id];
+				copyOnce('junction', e, physAlt, pAlt);
+				db.run('UPDATE ' + NODE_ELEVATION.table + ' SET ' + NODE_ELEVATION.column + ' = ? WHERE DomainElementID = ? AND AlternativeID = ?', [d.feet, e, pAlt]);
 			});
 			ov.demands.forEach((d) => {
 				const e = elId['n:' + d.id];
-				copyRows(e, demandAlt, dAlt);
+				copyOnce('junction', e, demandAlt, dAlt);
 				const items = rowsOf(db, 'SELECT ItemID FROM ' + DEMAND_FLOW.table + ' WHERE DomainElementID = ? AND AlternativeID = ? ORDER BY ItemID', [e, dAlt]);
 				items.forEach((it, i) => {
 					db.run('UPDATE ' + DEMAND_FLOW.table + ' SET ' + DEMAND_FLOW.column + ' = ? WHERE ItemID = ?', [DEMAND_FLOW.toStored(d.bases[i], demandMult), it.ItemID]);
 				});
 			});
 			scenTally.scenarios++;
-			rec.written = true; rec.id = sid; rec.pipeDiameters = ov.diameters.length; rec.junctionDemands = ov.demands.length;
+			rec.written = true; rec.id = sid; rec.pipeDiameters = ov.diameters.length; rec.junctionDemands = ov.demands.length; rec.pipeRoughness = ov.roughness.length; rec.junctionElevations = ov.elevations.length;
 			(report.addedScenarios = report.addedScenarios || []).push(sid);
-			carried('scenario ' + name + ' (child of Base): ' + ov.diameters.length + ' pipe diameter' + (ov.diameters.length === 1 ? '' : 's') + ', ' + ov.demands.length + ' junction demand' + (ov.demands.length === 1 ? '' : 's') + ' overridden');
+			carried('scenario ' + name + ' (child of Base): ' + ov.diameters.length + ' pipe diameter' + (ov.diameters.length === 1 ? '' : 's') + ', ' + ov.roughness.length + ' pipe roughness value' + (ov.roughness.length === 1 ? '' : 's') + ', ' + ov.elevations.length + ' junction elevation' + (ov.elevations.length === 1 ? '' : 's') + ', ' + ov.demands.length + ' junction demand' + (ov.demands.length === 1 ? '' : 's') + ' overridden');
 			report.candidateWritten = (report.candidateWritten || 0) + 1;
 		});
-		Object.keys(plans).forEach((a) => { plans[a].forEach((pl) => { pl.st.free(); }); });
+		Object.keys(plans).forEach((k) => { Object.keys(plans[k]).forEach((a) => { plans[k][a].forEach((pl) => { pl.st.free(); }); }); });
 	}
 
 	// ---- AN AGE OR TRACE RUN: written on the page's path (Tom's round 3, 2026-11-03). He saw Age and Trace R in the
@@ -1512,7 +1537,7 @@ function energyNotWritten(lines, patternIds) {
  * of the file, is named in `unsupported`, and the caller leaves the scenario out whole.
  */
 function scenarioOverrides(base, scen) {
-	const out = { diameters: [], demands: [], unsupported: [] }, bad = {};
+	const out = { diameters: [], roughness: [], elevations: [], demands: [], unsupported: [] }, bad = {};
 	const flag = (what, id) => { (bad[what] = bad[what] || []).push(id); };
 	const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 	const without = (o, drop) => { const c = {}; Object.keys(o).forEach((k) => { if (k !== 'tok' && drop.indexOf(k) < 0) { c[k] = o[k]; } }); return c; };
@@ -1531,15 +1556,17 @@ function scenarioOverrides(base, scen) {
 	each(base.nodes, scen.nodes, (a, b) => {
 		if (a.type !== 'junction' || b.type !== 'junction') { keysDiffer(a.type, a.id, without(a, []), without(b, [])); return; }
 		const ra = rowsOfNode(a), rb = rowsOfNode(b);
-		const norm = (n) => Object.assign(without(n, ['demand', 'extraDemands']), { extra: (n.extraDemands || []).map((d) => without(d, ['base'])) });
+		const norm = (n) => Object.assign(without(n, ['demand', 'extraDemands', 'elev']), { extra: (n.extraDemands || []).map((d) => without(d, ['base'])) });
 		keysDiffer('junction', a.id, norm(a), norm(b));
+		if (a.elev !== b.elev) { out.elevations.push({ id: a.id, feet: b.elev }); }
 		if (ra.length !== rb.length || ra.some((d, i) => (d.pattern || null) !== (rb[i].pattern || null))) { flag('junction demand rows (number or pattern)', a.id); return; }
 		if (ra.some((d, i) => d.base !== rb[i].base)) { out.demands.push({ id: a.id, bases: rb.map((d) => d.base) }); }
 	});
 	each(base.links, scen.links, (a, b) => {
 		if (a.type === 'pipe' && b.type === 'pipe') {
-			keysDiffer('pipe', a.id, without(a, ['diameter']), without(b, ['diameter']));
+			keysDiffer('pipe', a.id, without(a, ['diameter', 'roughness']), without(b, ['diameter', 'roughness']));
 			if (a.diameter !== b.diameter) { out.diameters.push({ id: a.id, inches: b.diameter }); }
+			if (a.roughness !== b.roughness) { out.roughness.push({ id: a.id, c: b.roughness }); }
 		} else {
 			// A pump states no diameter; the .inp reader lends it the largest pipe's at its ends (js/lpn-inp.js), which is no override.
 			const drop = a.type === 'pump' ? ['diameter'] : [];
@@ -1553,6 +1580,19 @@ function scenarioOverrides(base, scen) {
 	});
 	out.unsupported = Object.keys(bad).map((w) => ({ what: w, ids: bad[w].filter((x) => x !== '') }));
 	return out;
+}
+
+/**
+ * Whether a project scenario can be written as a child of Base, and why not (the page asks this before it writes, to say so
+ * in the box it shows; the writer asks it again). `s` is { name, parent?, inp | parsed }.
+ * Returns { reason: '' | 'nested' | 'unreadable' | 'unsupported', ov }. The name checks are the writer's, against the file.
+ */
+function judgeScenario(base, s) {
+	if (s.parent !== undefined && s.parent !== null && s.parent !== '') { return { reason: 'nested', ov: null }; }
+	const sp = s.parsed || (s.inp ? EngCalcs.lpnInpParse(s.inp) : null);
+	if (!sp || sp.ok === false) { return { reason: 'unreadable', ov: null }; }
+	const ov = scenarioOverrides(base, sp);
+	return { reason: ov.unsupported.length ? 'unsupported' : '', ov: ov };
 }
 
 function plan(doc, opts) {
@@ -1732,7 +1772,7 @@ async function build(planned, o) {
 	const eff = Number((/Global Efficiency\s+([\d.]+)/i.exec(planned.inp) || [])[1]) || 75;
 	let crsJson = o.crsJson || '';
 	if (planned.crs === CRS_WRITTEN && !crsJson) { crsJson = await loadCrs(); }
-	const out = writeWtg(SQL, o.sqlite, parsed, sched, { crsJson: crsJson, name: o.name || 'Network', efficiency: eff, qualityStepSeconds: planned.qualityStepSeconds || 0, allowUntestedSchema: !!o.allowUntestedSchema });
+	const out = writeWtg(SQL, o.sqlite, parsed, sched, { crsJson: crsJson, name: o.name || 'Network', efficiency: eff, qualityStepSeconds: planned.qualityStepSeconds || 0, allowUntestedSchema: !!o.allowUntestedSchema, candidate: (planned.scenarios && planned.scenarios.length) ? { scenarios: planned.scenarios } : undefined });
 	const R = out.report;
 	if (R.integrity !== 'ok' || R.foreignKeyViolations) {
 		throw fail('integrity', 'The file written failed its own integrity check (' + R.integrity + ', ' + R.foreignKeyViolations + ' foreign key violations), so it was not offered.', null, 'integrity');
@@ -1742,6 +1782,7 @@ async function build(planned, o) {
 }
 
 EngCalcs.lpnWtgExportPlan = plan;
+EngCalcs.lpnWtgScenarioJudge = judgeScenario;
 EngCalcs.lpnWtgExportBuild = build;
 EngCalcs.lpnWtgExportSetTemplate = function (sqliteBytes, wtgText) { templateInjected = sqliteBytes ? { sqlite: sqliteBytes, wtg: wtgText } : null; };
 EngCalcs.lpnWtgExportSetEngine = function (initSqlJs, wasmBinary) { injected = { init: initSqlJs, wasmBinary: wasmBinary }; engine = null; };
