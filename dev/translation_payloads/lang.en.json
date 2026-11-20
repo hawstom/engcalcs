@@ -1258,6 +1258,7 @@
         "lpn_ctx_edit_text": "Edit text",
         "lpn_ctx_reset_position": "Reset position",
         "lpn_ctx_reset_position_off_tip": "Only a label or an attached Text that has been dragged from its own position can be reset.",
+        "lpn_pick_chooser_label": "Select one of the elements here",
         "lpn_tsb_off_tip": "Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.",
         "lpn_tsb_close": "Close graph",
         "lpn_tsb_resize": "Drag to resize",
@@ -3385,7 +3386,7 @@
         "lpn_field_auto_length_tip": "Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.",
         "lpn_prop_label_symbol": "{label}, {symbol}"
     },
-    "count": 3383,
+    "count": 3384,
     "active_prefixes": [
         "about",
         "bpn",

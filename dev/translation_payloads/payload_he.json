@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 3383,
-        "delta_key_count": 1,
+        "expected_key_count": 3384,
+        "delta_key_count": 2,
         "english_changed_key_count": 0,
         "exempt_key_count": 40,
         "exempt_keys": [
@@ -73,12 +73,30 @@
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
     "glossary": "No glossary term is used by the strings in this batch.",
     "keys_to_translate": {
+        "lpn_pick_chooser_label": "Select one of the elements here",
         "lpn_inp_dup_comma": ", "
     },
     "keys": {
+        "lpn_pick_chooser_label": "Select one of the elements here",
         "lpn_inp_dup_comma": ", "
     },
     "key_context": {
+        "lpn_pick_chooser_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ctx_reset_position_off_tip",
+                    "value": "אפשר לאפס רק תווית או טקסט מוצמד שנגררו ממקומם.",
+                    "english": "Only a label or an attached Text that has been dragged from its own position can be reset."
+                },
+                "next_translated": {
+                    "key": "lpn_tsb_off_tip",
+                    "value": "דורש תוצאות לתקופה ממושכת. הגדירו משך ריצה כולל בהגדרות, חישוב, זמן, וחשבו.",
+                    "english": "Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate."
+                }
+            }
+        },
         "lpn_inp_dup_comma": {
             "reason": "equal_to_english",
             "current_value": ",",
