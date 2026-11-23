@@ -1262,22 +1262,6 @@ $ec_lang['lpn_demand_tip']='Debite preluate din rețea în acest nod. Introduce�
 // **THE UNITS STRIP IS TWO GROUPS** (Task 422). The first decides what the numbers in the document
 // MEAN, so changing one is a model change and the page asks first; the second is how results are
 // read, and changes with no fanfare. Three quantities appear in both because they serve both sides.
-// The question an INPUT unit change asks, in Tom's own wording (2026-08-18, Task 425) rather than a
-// paraphrase of it: name the quantity, list the fields it decides ONE PER LINE, then name the two
-// answers by what they do to the numbers already typed. {unit} is a unit name; the field names are
-// built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
-// NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
-// 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='Această unitate stabilește cum sunt citite datele dvs. de intrare';
-$ec_lang['lpn_units_warn_lead']='{unit} este unitatea pentru ce introduceți la:';
-$ec_lang['lpn_units_options_head']='Când schimbați o unitate:';
-// Each option's sentence opens with the word on its own button, so the button and the explanation
-// say the same word. Non-destructive is the suite's standing behaviour and the first button;
-// Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='Nedistructiv';
-$ec_lang['lpn_units_nondestructive_desc']='Nedistructiv: lasă fiecare valoare introdusă așa cum este și o reinterpretează în noua unitate.';
-$ec_lang['lpn_units_destructive']='Distructiv';
-$ec_lang['lpn_units_destructive_desc']='Distructiv: rescrie fiecare valoare introdusă printr-o conversie matematică, astfel încât rețeaua rămâne aproape aceeași fizic, în limitele de toleranță ale conversiei. Se pierd valorile inițiale introduse. Anularea (Undo) le readuce.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='Valori care înseamnă acum {unit} ({n}). Nimic nu a fost rescris.';
 $ec_lang['lpn_status_converted']='Valori rescrise în {unit} ({n}).';

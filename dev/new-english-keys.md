@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 3383 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**7 still to read on master**, of 9 untranslated keys, of 3385 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -45,13 +45,44 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   *Current plain sentence:* Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else.
   @@ NEEDS RULING
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (5, 3 to read @@ NEEDS RULING)
+
+- **`lpn_field_tank_initvol`**
+  > Initial volume
+  @@ NEEDS RULING
+- **`lpn_units_convert_note`**
+  > Convert rewrites each number in the new unit, rounded to the Decimals given; blank means no rounding. Keep leaves each number as typed and reads it in the new unit. Undo puts back a conversion.
+  _Ruled OK 2026-11-20._
+- **`lpn_units_convert_q`**
+  > Convert inputs from {old} to {new}?
+  @@ NEEDS RULING
+- **`lpn_units_keep`**
+  > Keep
+  @@ NEEDS RULING
+- **`lpn_units_zero_warn`**
+  > ⚠ There are values ({n}) that would be converted to 0.
+  _Ruled 2026-11-22: I love it._
+
+## u_  (4, 4 to read @@ NEEDS RULING)
+
+- **`u_gal`**
+  > gal
+  @@ NEEDS RULING
+- **`u_l`**
+  > L
+  @@ NEEDS RULING
+- **`u_megaliter`**
+  > ML
+  @@ NEEDS RULING
+- **`u_mgal`**
+  > MG
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**77 still to read**, of 77 new keys across 4 unmerged branch(es).
+**86 still to read**, of 86 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -62,7 +93,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/assembly (`abb149e36`) — 67 new, 67 to read @@ NEEDS RULING
+### feat/assembly (`ee6c7a5eb`) — 67 new, 67 to read @@ NEEDS RULING
 
 - **`lpn_assembly_down_head`**
   > Downstream head
@@ -266,7 +297,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > A pressure tank is made new. Specify a point on the map, not an existing tank.
   @@ NEEDS RULING
 
-### feat/pick-chooser (`d35f38a9b`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/pick-chooser (`1b87aac56`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pick_chooser_label`**
   > Select one of the elements here
@@ -278,29 +309,58 @@ build for that would be a gate nobody keeps. Refresh it with
   > More time controls
   @@ NEEDS RULING
 
-### feat/volume-unit (`de36d0c3f`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/volume-unit (`76580b9e7`) — adds no English strings
 
-- **`lpn_field_tank_initvol`**
-  > Initial volume
+### feat/wtg-page-scenario (`de732f27e`) — 17 new, 17 to read @@ NEEDS RULING
+
+- **`lpn_wtg_export_holds_children`**
+  > It holds the Base scenario and, as children of Base, scenarios ({n}): {scenarios}.
   @@ NEEDS RULING
-- **`lpn_units_convert_note`**
-  > Convert rewrites each number in the new unit, rounded to the Decimals given; blank means no rounding. Keep leaves each number as typed and reads it in the new unit. Undo puts back a conversion.
+- **`lpn_wtg_export_lost_scenario`**
+  > Scenario {ids} is not written: {value}
   @@ NEEDS RULING
-- **`lpn_units_convert_q`**
-  > Convert inputs from {old} to {new}?
+- **`lpn_wtg_export_scn_autolength`**
+  > it changes junction elevation, and the lengths of pipes that follow the drawing ({value}) change with it. Type those lengths to write this scenario.
   @@ NEEDS RULING
-- **`lpn_units_keep`**
-  > Keep
+- **`lpn_wtg_export_scn_layout`**
+  > the export template holds no rows to copy for it.
   @@ NEEDS RULING
-- **`u_gal`**
-  > gal
+- **`lpn_wtg_export_scn_name`**
+  > its name is already used by a scenario or an alternative in the file.
   @@ NEEDS RULING
-- **`u_l`**
-  > L
+- **`lpn_wtg_export_scn_nested`**
+  > only children of Base are written.
   @@ NEEDS RULING
-- **`u_megaliter`**
-  > ML
+- **`lpn_wtg_export_scn_root`**
+  > it is a Base of its own, and only children of Base are written.
   @@ NEEDS RULING
-- **`u_mgal`**
-  > MG
+- **`lpn_wtg_export_scn_rule`**
+  > A scenario is written only where it differs from Base in pipe diameter, pipe roughness, junction elevation, or junction demand.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_switching`**
+  > its pumps and controls switch at different times than in Base, and the file states Base's switching schedule only.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_unreadable`**
+  > its network could not be read.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_unsupported`**
+  > it differs from Base in properties this export does not write: {value}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_assets`**
+  > Assets added or removed
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_auto_length`**
+  > Length of pipes that follow the drawing
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_demand_rows`**
+  > The number of demands, or a demand pattern
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_file`**
+  > Project settings
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_other`**
+  > Other properties
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_pv_elev`**
+  > Elevation at a pump or valve
   @@ NEEDS RULING

@@ -78150,8 +78150,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				function (v) { W(function () { setProp(n, 'tankDiameter', v); }); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
 		}
-		// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is in the Length unit cubed, as the
-		// Available volume below it is; blank is EPANET's 0, "use the diameter".
+		// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW.** The volume is typed in the Volume unit, as the
+		// Available volume below it is read; blank is EPANET's 0, "use the diameter".
 		if (!curved) {
 			numberFieldBlank(fields, (pc.lpn_field_tank_minvol || 'Minimum volume') + ' (' + tankVolumeUnitText() + ')',
 				effective(n, 'minVolume'),
@@ -78197,7 +78197,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
 			colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
 		readonlyField(fields, (pc.lpn_result_tank_volume || 'Available volume') + ' (' + tankVolumeUnitText() + ')',
-			colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
+			colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip,
+			labelDecimalsForUnit('lpn_u_volume', unitKey('lpn_u_volume')));
 	}
 	// A reservoir's pressure row: its head less its elevation, omitted when the ground is unknown.
 	function reservoirResultFields(fields, n) {

@@ -46,7 +46,8 @@ global.FileReader = function () {
 };
 const L = loadLoopedNetwork(EXAMPLE_EXPORTS + "\t\tcurrentModel: function () { return assembleModel(); },\n" +
 	"\t\timportInp: importInpFromFile, getDoc: function () { return doc; },\n" +
-	"\t\tcreateScenario: createScenario, setProp: setProp, activeScenario: activeScenario,\n" +
+	"\t\tcreateScenario: createScenario, setProp: setProp, activeScenario: activeScenario, switchScenario: switchScenario,\n" +
+	"\t\tbaseScenarioId: function () { return baseScenario().id; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas'); world = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world); linksLayer = el('g', {}, world);\n" +
 	"\t\t\tnodesLayer = el('g', {}, world); labelsLayer = el('g', {}, world); rubberBandEl = el('line', {}, world); },\n");
@@ -238,7 +239,12 @@ function line(c) {
 			// Third pass (scenario overrides): --scenario=<json> makes a scenario of the imported Base, writes the override(s)
 			// through the page's own setProp(), and the REFERENCE is the ORIGINAL file text with the same change made by hand
 			// (the json's `edits`: [regex, replacement] pairs), never our export of the scenario.
-			let refText = null;
+			let refText = null, baseSnap = null;
+			// Fourth pass: what Base says before the scenario exists, so that after the scenario is made, overridden and switched away from, Base can be asked again
+			// (the override must not have reached Base) and a switch back must give the scenario its own answer (a cached run of the other would show here).
+			const fpOf = (m) => JSON.stringify(m, (k, v) => (k === 'demand' ? undefined : v));
+			const runSnap = (m) => { const r = EC.lpnNativeRun(JSON.parse(JSON.stringify(m)), { quality: true }); return r && r.ok ? JSON.stringify(r.frames) : 'not ok'; };
+			if (scnArg) { const m0 = L.currentModel(); baseSnap = { fp: fpOf(m0), run: runSnap(m0) }; }
 			if (scnArg) {
 				const spec = JSON.parse(fs.readFileSync(path.resolve(ROOT, scnArg), 'utf8'));
 				L.createScenario(spec.name || 'Override');
@@ -252,6 +258,16 @@ function line(c) {
 				const sc = EC.lpnInpParse(text).scale;
 				if (!sc || sc.head !== 1 || sc.flow !== 0.001 || sc.len !== 1) { throw new Error('scenario fixture must be an LPS (metre) file: scale ' + JSON.stringify(sc)); }
 				refText = text;
+				// switch to Base and back, as the page's own scenario menu does
+				{
+					const scnId = L.activeScenario().id, mS = L.currentModel(), fpS = fpOf(mS), runS = runSnap(mS);
+					L.switchScenario(L.baseScenarioId());
+					const mB = L.currentModel(), fpB = fpOf(mB), runB = runSnap(mB);
+					L.switchScenario(scnId);
+					const mS2 = L.currentModel(), fpS2 = fpOf(mS2), runS2 = runSnap(mS2);
+					res.switchCheck = { baseUnchanged: fpB === baseSnap.fp, baseRunUnchanged: runB === baseSnap.run, scenarioDiffersFromBase: fpS !== fpB && runS !== runB,
+						scenarioStable: fpS2 === fpS && runS2 === runS, activeBack: L.activeScenario().id === scnId };
+				}
 				spec.edits.forEach((e) => { const t2 = refText.replace(new RegExp(e[0], 'm'), e[1]); if (t2 === refText) { throw new Error('scenario edit matched nothing: ' + e[0]); } refText = t2; });
 			}
 			const model = L.currentModel(); if (process.env.EPS_AUDIT_LINK) { console.log(JSON.stringify(model.links.filter((l) => l.id === process.env.EPS_AUDIT_LINK))); }
@@ -382,6 +398,7 @@ function line(c) {
 		results.push(res);
 		console.log(`${res.name}  [${res.nodes} nodes, ${res.links} links, ${res.dur / 3600} h${res.quality ? ', quality ' + res.quality : ''}${res.pda ? ', PDA' : ''}]`);
 		if (res.origVsExport) { console.log(`  RAW original file vs RAW our export: head ${res.origVsExport.head.toExponential(1)} m ${res.origVsExport.at} (${res.origVsExport.frames}/${res.origVsExport.exportFrames} frames)`); }
+		if (res.switchCheck) { console.log('  SWITCH ' + JSON.stringify(res.switchCheck)); }
 		res.runs.forEach((c) => console.log(line(c)));
 		if (res.msx) { console.log('  MSX engine vs built-in: ' + res.msx.count + ' values, worst ' + res.msx.worst.toExponential(2) + ' ' + res.msx.at + ' (largest value ' + res.msx.largest.toPrecision(3) + ', ' + res.msx.moved + ' changes)'); }
 		if (res.energyOrig) { console.log('  ENERGY original file (engine binary: ' + res.energyOrig.pumpCost + ' per day; demand charge ' + res.energyOrig.demandCharge.toFixed(2) + '; binary total ' + res.energyOrig.binTotal.toFixed(2) + ') vs built-in: ' + (res.energyOrig.good ? 'within tolerance' : 'DIFFERS ' + res.energyOrig.detail) + (res.energyOrig.bridge ? '; vs bridge pump cost ' + res.energyOrig.bridge.pumpCostRel.toExponential(1) + ' demand charge ' + res.energyOrig.bridge.demandChargeRel.toExponential(1) : '') + '; engine REPORT prints demand charge ' + res.energyOrig.reportDemandCharge + ' total ' + res.energyOrig.reportTotal); }

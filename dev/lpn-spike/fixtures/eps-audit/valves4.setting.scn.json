@@ -1,0 +1,6 @@
+{
+ "name": "Other valve settings",
+ "note": "Scenario override of the setting of a PRV, PSV, FCV and TCV over the run (PRV1 40 to 50, PSV1 45 to 35, FCV1 10 to 5, TCV1 4 to 9). Controls later close and reopen PRV1 and FCV1 (an opened valve is then fixed open to EPANET, so the stated setting stops mattering), TCV1 and PSV1 keep the overridden setting the whole run. Reference: valves4.inp with the four settings written in by hand.",
+ "props": [["link", "PRV1", "setting", 50], ["link", "PSV1", "setting", 35], ["link", "FCV1", "setting", 5], ["link", "TCV1", "setting", 9]],
+ "edits": [["^(PRV1 A B   150 PRV )40", "$150"], ["^(PSV1 E F   150 PSV )45", "$135"], ["^(FCV1 A C   150 FCV )10", "$15"], ["^(TCV1 A D   150 TCV )4", "$19"]]
+}

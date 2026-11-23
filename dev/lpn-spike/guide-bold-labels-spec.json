@@ -2856,16 +2856,20 @@
                 "bold": 2
             },
             {
-                "key": "lpn_units_nondestructive",
+                "key": "lpn_convas_ok",
                 "bold": 2
             },
             {
-                "key": "lpn_units_destructive",
+                "key": "lpn_units_keep",
                 "bold": 2
             },
             {
                 "key": "lpn_tool_undo",
-                "bold": 2
+                "bold": 1
+            },
+            {
+                "key": "lpn_labels_col_decimals",
+                "bold": 1
             },
             {
                 "key": "lpn_cancel",

@@ -5081,6 +5081,29 @@ OBSERVED (re-verify; real Chromium via the branch's env.js server, Net1 well-tes
 - OBSERVED: the tank's box opens with the Associated-with-Well sentence; the Well's box carries Total tank volume and, in the tank section, Elevation, Base elevation and the open-air inputs, typeable.
 - OBSERVED: N1 arrow head stands clear of the circle on the map and on r13-well-symbol-proofs.png.
 - NOT CHECKED: curves chosen (two-curve path), a hand look at the symbol zoomed in on the map.
+## 2026-11-16 feat/volume-unit (Task 857)
+OBSERVED (re-verify; real Chromium via the branch's own env.js server, scratchpad scripts p1-p4):
+- Net3 US run, 9:00: Tanks table, Properties and time-series graph agree for tanks 1 and 3 in all seven units; hand check 125,239 ft^3 = 936,849 gal = 3546.4 m^3 = 2.88 ac-ft. Graph axis title and ticks follow the selector.
+- Net2 US opens on gal, Net3 SI after US opens on m^3, Net1 US after SI opens on gal (selector resets with the project). Saved ML round-trips. Pre-857 project (no volume unit) with ft opens gal, with m opens m^3.
+- 390 px: Settings opens, Available volume sits last in Units, no sideways scroll. ?lang=es: "Volumen disponible (gal)", options pies^3, no errors.
+- CONCERN (judgement): Tanks table and Properties show "Minimum volume (ft^3)" beside "Available volume (gal)" under the US default.
+- NOT DONE: mutation test, map colouring, .inp import in the browser, Net2 graph, light/dark.
+
+## 2026-11-18 feat/volume-unit round 2 (f49bc5564), Task 857
+OBSERVED (re-verify; real Chromium via the branch's env.js server, Net3 US, scratchpad p3-p9; check_all --fast: only payload freshness failed, as expected):
+- Settings > Units row is "Volume", after Water age, before Roughness; choices gal, MG, ft^3, ac-ft, m^3, L, ML. Net3 US opens on ft^3, new US project on gal, new SI project on m^3, Net1 US on ft^3. A master-saved Net3 (MinVol 20000) reopens on ft^3 / 20000.
+- Tanks table, Properties, Properties-box graph, map bubble and bottom Time series all offer "Available volume" and agree after Calculate (ft^3 73768.52 -> gal 551826.87).
+- DEFECT (data): after opening an example the Volume select reads ft^3 but the page's memory of it is still the page default gal. First change to gal: no question, no refresh. First change to another unit (MG) with 20000 ft^3 typed: question asks, but Destructive converts as if the 20000 were gallons: 0.02 MG instead of 0.1496 MG; Available volume beside it 0.552 MG.
+- DEFECT: that silent change leaves Properties box, Properties graph, bubble and Time series on ft^3 numbers and titles until Calculate.
+- Stale comment left in js/looped-network.js near the Properties-box Minimum volume field: still says the Length unit cubed and no selector.
+- .inp export: ft^3 20000 -> 20000; after gal reinterpret 20000 gal -> 2673.61 ft^3. Right.
+- NOT DONE: mutation test, SI example, phone, other languages, volume-curve tank, scenarios.
+
+## 2026-11-18 feat/volume-unit round 3 (Task 857)
+- OBSERVED: Net3 tank 1, Minimum volume 20000, Volume ft^3 to gal Convert gives 149610; Keep is the focused button and Enter keeps; Cancel leaves ft; Length ft to m Convert, Decimals 2 gives 25.91 m (85 ft); 3 ft^3 to gal with Decimals 0 gives 22.44 (4 significant figure floor); SI preset Convert asks five blocks with one set of buttons, one Undo restores units and numbers. Harnesses green: unit-change, unit-change-first-browser, tank-depth-volume-browser, unit-preset-ask-browser, initial-volume-label (compares EPANET's own initial volume), convert-as, geojson, inp-export. No em dash in new English.
+- TRAP for drivers: a bare element.click() in page.evaluate is ignored by the dialog buttons (needs a pointer press, detail 1); use a real click.
+- Not checked: how Vi= looks on the map; Settings > New assets conversion by eye.
+
 ## 2026-11-16 feat/library-order round 5 (c5ae4391a), Task 859: comment rows, bold labels
 OBSERVED (re-verify; real Chromium via the branch's env.js server, Net3 gallery example, scratchpad s2.js/s3.js/cmp.php):
 - Five browser harnesses run alone: user-guide-library 50 pass, library-description-browser all passed, import-export-menu 60/60, table-export-dialog 81/81, box-view-visible all passed. inp-export 4497 and inp-roundtrip-net3 pass.
@@ -5143,3 +5166,17 @@ OBSERVED (re-verify; real Chromium, branch's env.js server, scratchpad probe.js/
 - Scenario vessel drag: apartIn {s1:true}; Base still joined after switching back.
 - Zero tank diameter flagged "EPANET does not accept zero or a negative number here." but EPANET (and lpn-native-run) treat zero area as a reservoir, not a refusal; claim doubtful for zero.
 - NOT DONE: typed X/Y by hand in a box, .inp round trip by hand (node harness only), dark theme, other languages, mutation test.
+
+## 2026-11-18 feat/volume-unit round 4 (0d78e562d), Perry
+- OBSERVED (Chromium, Net1 and Net3 US): the unit question's Decimals box opens blank; typed 0 and 2 are obeyed exactly (Net3 tank 85 ft -> 25.91 m at 2; pipe 457 at 0; pump-curve points rounded likewise); Ctrl+Z after one Convert restores numbers and unit.
+- OBSERVED: blank Convert stores binary noise (609.5999999999999 mm, 40.203120000000006 m, curve point 126.18039279999998); Settings tolerances are held to 6 sig figs, element inputs are not.
+- OBSERVED: Decimals input has max 8, so a typed larger number is silently clamped; convert-as/unit-change/pda/initial-volume harnesses pass.
+- CITED: lang.ec.en.php vs round 3 lost no keys; master-only keys are the removed units_* set and lpn_about_source (master moved after the last merge).
+- Not checked: File > Convert as in a browser (static: select defaults to No rounding), DW roughness conversion, how noise displays.
+
+## 2026-11-20 feat/volume-unit round 5 (9ab9abfa9, ef4cc96b3), Perry
+- OBSERVED (Chromium, Net1 US and SI): the Decimals warning count equals the nonzero numbers that actually became 0 in the stored project (before/after diff, labelSettings excluded) in every case tried: diameter in/mm to m at 0 decimals 13, demand to m3/s at 0 decimals 9 (8 nodes + 1 pump-curve point), to mgd 8, Minimum volume to ML 1. Blank, and any Decimals that zeroes nothing, show no line. Settings tolerances never counted (no settings path ever zeroed).
+- OBSERVED: typing updates live; Cancel leaves the document byte-identical; Convert as counts (13 SI, 11 US at step 100) equal the new copy's real zeros; an edit to a node's Base demand under the open Convert as box moved the count 8 -> 8 (0) -> 8 (5000) -> 9 (7).
+- OBSERVED: out-of-range Decimals (13, -1) are treated as no rounding by Convert and the warning agrees; 1.5 behaves as 1 decimal.
+- OBSERVED: Convert as line sits tight under the Head row with no gap; the warning glyph renders as a box in headless Chromium (font, probably environmental).
+- Not checked: scenario overrides with numbers (Net1's are empty; harness covers only convert); how the glyph looks in Tom's browser.

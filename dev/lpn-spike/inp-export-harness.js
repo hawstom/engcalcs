@@ -459,6 +459,27 @@ console.log('\n4. The file is written in the project\'s own units');
 	ok('and the diameter DOES, tracking Length rather than Elevation/Head',
 		mix2T[5] === String(15 * m2ft), mix2T[5]);
 
+	// **A TANK'S MinVol IS THE PROJECT'S VOLUME UNIT, WRITTEN IN THE FILE'S LENGTH UNIT CUBED** (Task 857).
+	// Length (m) disagrees with the GPM file here, and must NOT decide it: the Volume unit does.
+	const volDoc = (unit, len) => {
+		const d = JSON.parse(JSON.stringify(doc));
+		d.units = { lpn_u_length: len, lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_diameter: 'in', lpn_u_flow: 'gpm' };
+		if (unit) { d.units.lpn_u_volume = unit; }
+		d.nodes.push({ id: 'T1', type: 'tank', x: 20, y: 0, elev: 30, _level: 3, minLevel: 0, maxLevel: 10, tankDiameter: 15, minVolume: 500, tok: { minVolume: '500.0' } });
+		return d;
+	};
+	const volTok = (d) => tokensBySection(EngCalcs.lpnExportInp(d).inp).TANKS[0][6];
+	const galPerFt3 = EngCalcs.unitFactors.gal / EngCalcs.unitFactors.ft3;
+	ok('Volume in the file\'s own unit: the user\'s own characters, no conversion reported',
+		volTok(volDoc('ft3', 'ft')) === '500.0' && !EngCalcs.lpnExportInp(volDoc('ft3', 'ft')).differences.some((d) => /volume/.test(d.detail || '')), volTok(volDoc('ft3', 'ft')));
+	ok('Length (m) does not decide a Volume stated in ft3', volTok(volDoc('ft3', 'm')) === '500.0', volTok(volDoc('ft3', 'm')));
+	ok('Volume in gallons converts to the file\'s cubic feet: ' + 500 / galPerFt3, Math.abs(parseFloat(volTok(volDoc('gal', 'ft'))) - 500 / galPerFt3) < 1e-9);
+	ok('...and says it converted a volume', EngCalcs.lpnExportInp(volDoc('gal', 'ft')).differences.some((d) => d.code === 'unit-converted' && /volume/.test(d.detail)));
+	const zeroDoc = volDoc('gal', 'ft'); zeroDoc.nodes[zeroDoc.nodes.length - 1].minVolume = 0; delete zeroDoc.nodes[zeroDoc.nodes.length - 1].tok;
+	ok('a stated 0 is no volume to convert: no conversion is reported', !EngCalcs.lpnExportInp(zeroDoc).differences.some((d) => /volume/.test(d.detail || '')) && volTok(zeroDoc) === '0');
+	ok('Volume in cubic metres converts to cubic feet', Math.abs(parseFloat(volTok(volDoc('m3', 'ft'))) - 500 * EngCalcs.unitFactors.ft3) < 1e-6);
+	ok('a document with no Volume unit (saved before it existed) still cubes its Length', volTok(volDoc(null, 'm')) === String(500 * Math.pow(EngCalcs.unitFactors.ft / EngCalcs.unitFactors.m, 3)), volTok(volDoc(null, 'm')));
+
 	// A VALVE'S SETTING IS A DIFFERENT QUANTITY PER TYPE, and the two that convert differently are
 	// the pair to separate: under m3ps->LPS an FCV's setting is a FLOW and moves by 1000, while a
 	// PRV's is a PRESSURE in metres of water and does not move at all. Reading one as the other

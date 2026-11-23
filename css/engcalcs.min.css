@@ -2671,7 +2671,9 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 #lpn_convas_panel .lpn-convas-colhead > .lpn-gval { margin-block: 0; }
 #lpn_convas_panel .lpn-convas-colhead .lpn-gwrap > span { box-sizing: border-box; padding: 1px 6px; min-width: 0; line-height: 1.3; }
 #lpn_convas_panel .lpn-convas-colhead .lpn-convas-c2 { overflow: hidden; white-space: nowrap; }
-#lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; margin-block: 2px 0; }
+#lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; margin-block: 0; }
+#lpn_convas_panel .lpn-ghead { margin-top: 4px; }
+#lpn_convas_panel .lpn-new-presets { margin-block: 0; }
 #lpn_convas_panel, #lpn_crsbox, #lpn_new_panel { max-width: min(40rem, calc(100vw - 8px)); flex-direction: column; resize: both; overflow: hidden; min-width: var(--lpn-box-min-w, 5rem); }
 #lpn_convas_panel.lpn-float-sized, #lpn_crsbox.lpn-float-sized, #lpn_new_panel.lpn-float-sized { max-width: calc(100vw - 8px); }
 #lpn_convas_panel > .lpn-popover-body, #lpn_crsbox > .lpn-popover-body, #lpn_new_panel > .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
@@ -3378,6 +3380,11 @@ html[dir="rtl"] .lpn-lib-entry-sel { box-shadow: inset -3px 0 0 var(--ec-select)
 .lpn-lib-manual { border: 0; background: transparent; padding: 0 2px; font: inherit; font-size: 0.9em; color: var(--ec-help-ink); cursor: pointer; }
 .lpn-lib-sec > h3 { margin: 0 0 4px; padding: 0 0 4px; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid var(--ec-border-strong); }
 .lpn-unit-fields { margin: 0.15em 0 0.7em 1.4em; }
+.lpn-unit-decimals { display: block; margin: 0 0 0.9em 1.4em; }
+.lpn-unit-decimals input { width: 4em; margin-left: 0.5em; }
+.lpn-unit-zero-warn { margin: -0.4em 0 0.9em 1.4em; color: var(--ec-warn-ink); }
+.lpn-unit-zero-warn:empty { display: none; }
+#lpn_convas_zero_warn { margin: 0.6em 0 0.6em 0; }
 .engcalcs-print-tools > p { margin-bottom: 0.2em; }
 @media (max-width: 640px) {
 	html:has(#lpn_canvas) #lpn_toolbar > .lpn-toolbar-group:not(#lpn_toolbar_run) { display: none; }

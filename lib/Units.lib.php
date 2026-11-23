@@ -121,6 +121,11 @@ $ec_unit_families = Array(
     'gradient'         => $u_slope,
     'stress'           => Array('npm2', 'psf'),
     'volume'           => Array('m3', 'ft3', 'acft'),
+    // A tank's volume on the looped-network page. Split from 'volume' because the DEFAULT differs
+    // (US utilities report storage in gallons, and million gallons for a large tank; 'volume' opens
+    // on cubic feet for the drain-time and seepage pages). Governs a tank's typed Minimum volume
+    // and its Available volume alike; an .inp file states MinVol in its length unit cubed.
+    'volume_tank'      => Array('gal', 'mgal', 'ft3', 'acft', 'm3', 'l', 'megaliter'),
     'unit_discharge'   => Array('m2ps', 'ft2ps'),
     'application_rate' => Array('mmph', 'inph'),
     'power'            => Array('kw', 'mw', 'hp'),
@@ -167,6 +172,7 @@ $ec_unit_sets['us'] = Array(
     'gradient'         => 'gradePercent',
     'stress'           => 'psf',
     'volume'           => 'ft3',
+    'volume_tank'      => 'gal',
     'unit_discharge'   => 'ft2ps',
     'application_rate' => 'inph',
     'power'            => 'kw',
@@ -200,6 +206,7 @@ $ec_unit_sets['si'] = Array(
     'gradient'         => 'gradePercent',
     'stress'           => 'npm2',
     'volume'           => 'm3',
+    'volume_tank'      => 'm3',
     'unit_discharge'   => 'm2ps',
     'application_rate' => 'mmph',
     'power'            => 'kw',
@@ -365,6 +372,10 @@ $ec_units['in2']=1550.0031000062002;            // 1/0.0254^2
 $ec_units['m3']=1;
 $ec_units['ft3']=35.314666721488585;            // 1/0.3048^3 -- same conversion as ft3ps
 $ec_units['acft']=0.00081071319378991241;       // 1/(43560*0.3048^3)
+$ec_units['gal']=264.17205235814842;            // 1000/3.785411784 -- US gallon, exact definition
+$ec_units['mgal']=0.00026417205235814842;       // million US gallons
+$ec_units['l']=1000;                            // exact
+$ec_units['megaliter']=0.001;                          // megalitre, 1000 m3 -- exact
 
 $ec_units['mh2o']=1;
 $ec_units['mmh2o']=1000;

@@ -81,6 +81,34 @@ async function main() {
 			ok('every plotted depth equals head minus the tank bottom (' + checked + ' steps, worst error ' + maxErr.toFixed(4) + ')', bad === 0 && checked > 3);
 			ok('the depth moves over the run (not a flat line)', moved.size > 3, moved.size + ' distinct values');
 
+			// **AVAILABLE VOLUME IN THE SAME GRAPH** (Task 857; Tom, 2026-11-16: "Why is Available volume an
+			// option for the bottom pane graphs, but not for Tank time series graph bubbles?"). The Properties
+			// graph and the bubbles share pgAvailable(), so one list serves both. Plotted in the Volume unit.
+			const volName = await a.lang('lpn_result_tank_volume');
+			const pick = (v) => a.page.evaluate((q) => { const s = document.getElementById('lpn_pgraph_field'); s.value = q; s.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+			const dotsOf = () => a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pgraph_chart .lpn-ts-dot[data-reading]')).map((t) => parseFloat(t.getAttribute('data-reading').trim().split(/\s+/).pop())));
+			ok('the tank\'s Properties graph offers Available volume', opts.some((o) => o[0] === 'volume' && o[1] === volName), JSON.stringify(opts.map((o) => o[1])));
+			await a.page.evaluate(() => { const v = document.getElementById('lpn_u_volume'); v.value = 'ft3'; v.dispatchEvent(new Event('change', { bubbles: true })); });
+			await a.settle(700);
+			await openNode('2');
+			await pick('volume');
+			await a.settle(700);
+			const vol = await a.page.evaluate(() => { const h = document.getElementById('lpn_pgraph_chart'); return { text: h.textContent, lines: h.querySelectorAll('.lpn-ts-line').length }; });
+			ok('a volume line is drawn, named on the axis with the Volume unit', vol.lines >= 1 && vol.text.indexOf(volName) >= 0 && vol.text.indexOf('ft^3') >= 0, vol.text.slice(0, 90));
+			const ftDots = await dotsOf();
+			ok('the volume moves over the run', new Set(ftDots).size > 3 && ftDots.every((v) => isFinite(v)), ftDots.slice(0, 4).join(','));
+			await a.page.evaluate(() => { const v = document.getElementById('lpn_u_volume'); v.value = 'gal'; v.dispatchEvent(new Event('change', { bubbles: true })); });
+			await a.settle(900);
+			await openNode('2');
+			await pick('volume');
+			await a.settle(700);
+			const galDots = await dotsOf();
+			const perFt3 = 28.316846592 / 3.785411784;
+			ok('in gallons every dot is the cubic-foot number times 7.4805 (' + galDots.length + ' steps)', galDots.length === ftDots.length && galDots.length > 3 &&
+				galDots.every((g, i) => Math.abs(g - ftDots[i] * perFt3) <= Math.max(1, Math.abs(g) * 2e-3)), galDots.slice(0, 3).join(',') + ' vs ' + ftDots.slice(0, 3).join(','));
+			await a.page.evaluate(() => { const v = document.getElementById('lpn_u_volume'); v.value = 'ft3'; v.dispatchEvent(new Event('change', { bubbles: true })); });
+			await a.settle(700);
+
 			// The Time series tab agrees (it already offered Depth).
 			await a.toolbarClick(await a.lang('lpn_pane_toggle'));
 			await a.settle(500);
@@ -101,7 +129,7 @@ async function main() {
 			await a.settle(300);
 			await openNode('10');
 			opts = await options();
-			ok('a junction\'s Properties graph does not offer Depth', opts.length > 0 && !opts.some((o) => o[0] === 'depth'), JSON.stringify(opts.map((o) => o[0])));
+			ok('a junction\'s Properties graph does not offer Depth or Available volume', opts.length > 0 && !opts.some((o) => o[0] === 'depth' || o[0] === 'volume'), JSON.stringify(opts.map((o) => o[0])));
 
 			await a.page.keyboard.press('Escape');
 			await a.page.mouse.click(5, 300);

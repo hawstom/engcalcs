@@ -75,12 +75,12 @@ async function main() {
 		ok('...and the warning uses it', /above 0\.4 ft\/sec/.test(await status(a)), (await status(a)).slice(0, 120));
 		await a.page.evaluate(() => { const s = document.getElementById('lpn_u_velocity'); s.value = 'mps'; s.dispatchEvent(new Event('change', { bubbles: true })); });
 		await a.settle(600);
-		const asked = await a.page.evaluate(() => /Velocity warning limit/.test(document.body.innerText) && /Destructive/.test(document.body.innerText));
+		const asked = await a.page.evaluate(() => /Velocity warning limit/.test(document.body.innerText) && /Convert inputs from/.test(document.body.innerText));
 		ok('the unit question is asked and names the limit', asked);
-		await a.page.locator('#lpn_dialog_backdrop ~ * button, .lpn-dialog button, button').filter({ hasText: /^Destructive$/ }).last().click();
+		await a.page.evaluate(() => { const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === 'Convert'); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); } });
 		await a.settle(1500);
 		r = await row(a);
-		ok('Destructive: the row shows the scenario\'s limit converted (0.4 ft/s is 0.12192 m/s) and names m/s', r && /m\/s/.test(r.label) && Math.abs(+r.value - 0.12192) < 1e-4, JSON.stringify(r));
+		ok('Convert: the row shows the scenario\'s limit converted (0.4 ft/s is 0.12192 m/s) and names m/s', r && /m\/s/.test(r.label) && Math.abs(+r.value - 0.12192) < 1e-4, JSON.stringify(r));
 		ok('...and the warning compares against the converted number, not the old one read as m/s', /above 0\.122 m\/s/.test(await status(a)), (await status(a)).slice(0, 160));
 		await a.page.close && a.page.close();
 
