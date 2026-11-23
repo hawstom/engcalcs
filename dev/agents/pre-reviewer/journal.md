@@ -5135,3 +5135,11 @@ OBSERVED (re-verify; real Chromium, branch's env.js server, scratchpad p2-p9; bl
 - Review queue holds no R-450 in this worktree (next free R-448); Tom's 11-20 words are not in it.
 - NOT DONE: Use DEM click (no network), look at real zoom, dark theme, phone, other languages, mutation test of the builder's harnesses (their two run green).
 - TRAP: the browser-pass Session auto-answers in-page dialogs until `delete window.lpnDialogAnswerer`; until then New scenario creates nothing and says nothing.
+
+## 2026-11-22 feat/assembly round 16 (10a20ffd3, 51f4bec97, 81da94337), Perry
+OBSERVED (re-verify; real Chromium, branch's env.js server, scratchpad probe.js/probe2.js, pressure-tank form; screenshots perry-asm16-*.png):
+- Drag of the joined vessel now: tank drawn alone at the pointer, Well alone (symbol 26 px to 11 px wide), group kept, `apart` saved, Undo restores point and joined drawing, reload keeps it, Explode keeps the tank where dragged. Plain click on the vessel does not break it; dragging the Well circle keeps it joined.
+- SURPRISE: a 4 px drag breaks the joined drawing (apart=true) and re-centres the tank on the pointer; tank point jumped 699 to 520 (the hidden point was ~180 units off the drawn vessel). No drag threshold seen.
+- Scenario vessel drag: apartIn {s1:true}; Base still joined after switching back.
+- Zero tank diameter flagged "EPANET does not accept zero or a negative number here." but EPANET (and lpn-native-run) treat zero area as a reservoir, not a refusal; claim doubtful for zero.
+- NOT DONE: typed X/Y by hand in a box, .inp round trip by hand (node harness only), dark theme, other languages, mutation test.
