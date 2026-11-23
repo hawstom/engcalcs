@@ -436,7 +436,7 @@ run_check "english rulings harvested"   blocking php dev/scripts/harvest_english
 # Count derived, not typed: the label said "(12)" while 15 scripts were running, because
 # run_harnesses.sh globs and nothing tied the number to the glob. A stale count in a checklist is
 # the same defect this file exists to remove.
-LPN_HARNESS_N=$(for f in dev/lpn-spike/*harness*.js dev/lpn-spike/validate*.js; do [ -f "$f" ] || continue; grep -qxF "$(basename "$f")" dev/scripts/on_demand_harnesses.txt 2>/dev/null || echo "$f"; done | wc -l | tr -d " ")
+LPN_HARNESS_N=$(for f in dev/lpn-spike/*harness*.js dev/lpn-spike/validate*.js; do [ -f "$f" ] || continue; grep -qxF "$(basename "$f")" dev/scripts/on_demand_harnesses.txt dev/scripts/group_harness_members.txt 2>/dev/null || echo "$f"; done | wc -l | tr -d " ")
 if [ $FAST -eq 1 ]; then
 	printf '  SKIP  lpn harnesses (--fast)\n'
 else

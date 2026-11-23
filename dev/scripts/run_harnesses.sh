@@ -30,6 +30,7 @@
 # under it, because the two are different guarantees: fixing one harness stops one hang, and a
 # timeout makes EVERY future one a red line naming the file instead of a suite that stalls.
 #
+# (A *-group-harness.js gets 900 s; its library enforces 290 s on each member.)
 # 300 s is far above the slowest honest harness on a loaded machine and far below the point where
 # somebody kills the run by hand. A timed-out harness counts as FAILED, which is what it is.
 DIR="$(cd "$(dirname "$0")/../lpn-spike" && pwd)"
@@ -51,6 +52,18 @@ ON_DEMAND_LIST="$(dirname "$0")/on_demand_harnesses.txt"
 is_on_demand() {
 	grep -vE '^[[:space:]]*(#|$)' "$ON_DEMAND_LIST" 2>/dev/null | grep -qxF "$(basename "$1")"
 }
+# GROUP MEMBERS (test-trim pass 2, 2026-11-22): dev/scripts/group_harness_members.txt lists browser
+# harnesses that a *-group-harness.js runs in one process on one server and one Chromium (see
+# dev/lpn-spike/browser-group-lib.js). A member is skipped here, because its group runs it, and a
+# member that no group file names is a FAILURE below, so a listing can never drop a harness.
+MEMBER_LIST="$(dirname "$0")/group_harness_members.txt"
+is_member() {
+	grep -vE '^[[:space:]]*(#|$)' "$MEMBER_LIST" 2>/dev/null | grep -qxF "$(basename "$1")"
+}
+ORPHANS=""
+for _m in $(grep -vE '^[[:space:]]*(#|$)' "$MEMBER_LIST" 2>/dev/null); do
+	grep -lF "'$_m'" "$DIR"/*-group-harness.js >/dev/null 2>&1 || ORPHANS="$ORPHANS $_m"
+done
 
 # WHICH HARNESSES DRIVE A REAL BROWSER is DERIVED from the source rather than typed, so a new one
 # cannot be forgotten: a harness that requires playwright or puppeteer, or calls launchBrowser( or
@@ -69,7 +82,7 @@ SKIPPED=0
 ON_DEMAND_SKIPPED=0
 # `timeout` is in GNU coreutils and is present everywhere this runs; if it ever is not, run without
 # it rather than skipping the harnesses, because no net is better than no tests.
-if command -v timeout >/dev/null 2>&1; then RUN_ONE="timeout 300"; else RUN_ONE=""; fi
+if command -v timeout >/dev/null 2>&1; then RUN_ONE="timeout 300"; RUN_GROUP="timeout 900"; else RUN_ONE=""; RUN_GROUP=""; fi
 
 OUT="$(mktemp -d)"
 trap 'rm -rf "$OUT"' EXIT INT TERM
@@ -80,6 +93,7 @@ ASKED=0
 : > "$OUT/node.list"; : > "$OUT/browser.list"; : > "$OUT/all.list"
 for f in "$DIR"/*harness*.js "$DIR"/validate*.js; do
 	[ -f "$f" ] || continue
+	is_member "$f" && continue
 	if [ -n "$ONLY_ON_DEMAND" ]; then
 		is_on_demand "$f" || continue
 	elif [ -z "$ALL" ] && is_on_demand "$f"; then
@@ -171,7 +185,10 @@ run_one() {
 	_f="$1"; _o="$2"
 	{
 		echo "=== $_f ==="
-		if $RUN_ONE node "$_f" < /dev/null 2>&1; then
+		# A group runs several harnesses in one process (browser-group-lib.js, which holds each
+		# member to its own 290 s), so its own net is three times longer.
+		case "$_f" in *-group-harness.js) _T="$RUN_GROUP" ;; *) _T="$RUN_ONE" ;; esac
+		if $_T node "$_f" < /dev/null 2>&1; then
 			:
 		else
 			_s=$?
@@ -235,6 +252,11 @@ while read -r _n _f; do
 done < "$OUT/all.list"
 
 echo ""
+if [ -n "$ORPHANS" ]; then
+	echo "GROUP MEMBER(S) NO GROUP FILE RUNS:$ORPHANS"
+	echo "Each name in group_harness_members.txt must be listed in a dev/lpn-spike/*-group-harness.js."
+	FAILED="$FAILED group_harness_members.txt"
+fi
 echo "$RAN/$ASKED lpn harnesses passed."
 if [ -n "$FAILED" ]; then
 	echo "FAILED:$FAILED"

@@ -10,7 +10,6 @@
 79	label-pass-economy-browser-harness.js
 78	message-hide-reload-harness.js
 67	workspace-browser-harness.js
-66	user-guide-find-harness.js
 64	undo-redo-label-harness.js
 63	contour-browser-harness.js
 59	dialog-modal-browser-harness.js
@@ -37,7 +36,6 @@
 34	zoom-selection-browser-harness.js
 33	default-pattern-shown-browser-harness.js
 32	pane-heading-rule-harness.js
-30	user-guide-point-harness.js
 30	web-mercator-browser-harness.js
 29	convert-search-browser-harness.js
 28	engine-idle-prefetch-harness.js
@@ -48,9 +46,7 @@
 26	table-export-dialog-browser-harness.js
 26	tank-depth-volume-browser-harness.js
 25	analyze-tip-fold-browser-harness.js
-25	user-guide-harness.js
 24	shape-import-qgis-harness.js
-23	user-guide-rail-harness.js
 21	dock-default-harness.js
 21	feedback-box-browser-harness.js
 21	pda-status-browser-harness.js
@@ -71,7 +67,6 @@
 14	menu-mnemonic-harness.js
 14	settings-phone-width-browser-harness.js
 13	paste-quote-browser-harness.js
-13	user-guide-hierarchy-harness.js
 12	alt-table-layout-harness.js
 12	analyze-clock-browser-harness.js
 12	properties-box-fill-harness.js
@@ -82,9 +77,7 @@
 10	snip-markup-harness.js
 9	alt-autohide-width-browser-harness.js
 9	property-arrow-key-harness.js
-8	guide-style-harness.js
 8	mac-cmd-words-harness.js
-8	user-guide-column-harness.js
 7	inline-colour-harness.js
 7	menu-keyboard-harness.js
 7	preset-tip-browser-harness.js
@@ -107,3 +100,7 @@
 2	start-fresh-consent-harness.js
 1	help-calculators-harness.js
 0	zoom-control-harness.js
+180	user-guide-a-group-harness.js
+280	user-guide-b-group-harness.js
+230	user-guide-c-group-harness.js
+175	user-guide-d-group-harness.js

@@ -1,0 +1,31 @@
+# Browser harnesses that a dev/lpn-spike/*-group-harness.js runs (test-trim pass 2, 2026-11-22), in
+# one process on one PHP server and one Chromium. run_harnesses.sh does not run them itself, and
+# fails if a name here is in no group file. Each still runs alone: node dev/lpn-spike/<name>.
+# One basename per line.
+user-guide-find-harness.js
+user-guide-harness.js
+user-guide-column-harness.js
+guide-style-harness.js
+user-guide-boxes-harness.js
+user-guide-search-hit-harness.js
+user-guide-tables-harness.js
+user-guide-toolbar-harness.js
+user-guide-map-harness.js
+user-guide-library-harness.js
+user-guide-hierarchy-harness.js
+user-guide-point-harness.js
+user-guide-settings-harness.js
+user-guide-using-harness.js
+user-guide-scenarios-harness.js
+user-guide-reports-harness.js
+user-guide-notes-harness.js
+user-guide-energy-harness.js
+user-guide-fireflow-harness.js
+user-guide-properties-harness.js
+user-guide-rail-harness.js
+user-guide-contour-harness.js
+user-guide-criticality-harness.js
+user-guide-demandscale-harness.js
+user-guide-menus-harness.js
+user-guide-calibration-harness.js
+user-guide-own-harness.js
