@@ -238,8 +238,8 @@ importText(usInp, 'import-cases.inp');
 	ok('a throttle valve arrives as a VALVE, of zero length, so it adds friction to nothing',
 		v1.type === 'valve' && v1._length === 0, v1.type + ', L=' + v1._length);
 	ok('...of the type the file named', v1.valveType === 'TCV', v1.valveType);
-	ok('...carrying the valve setting, and NOT the ignored minor-loss column',
-		v1._setting === 12 && v1._k === 0, 'setting=' + v1._setting + ' k=' + v1._k);
+	ok('...carrying the valve setting, and the stated minor loss kept apart (it is the loss only when the valve is fixed open)',
+		v1._setting === 12 && v1._k === 3, 'setting=' + v1._setting + ' k=' + v1._k);
 
 	const pu = links.find(l => l.id === 'PU1');
 	// **THE PUMP NAMES A CURVE AND THE CURVE IS THE DOCUMENT'S** (Task 586). The points are stored

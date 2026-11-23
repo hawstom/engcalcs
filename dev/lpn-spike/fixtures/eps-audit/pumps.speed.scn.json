@@ -1,0 +1,6 @@
+{
+ "name": "Faster pumps",
+ "note": "Scenario override of pump speed over the run: PU1 (speed 1.0, with a speed pattern) to 1.15, PU2 (no speed stated) to 0.8. The reference is pumps.inp with the same two numbers written in by hand, and PU3 (stated SPEED 0) stated Closed, which is how the page exports it (see the audit record: EPANET reports a speed-0 pump Open).",
+ "props": [["link", "PU1", "speed", 1.15], ["link", "PU2", "speed", 0.8]],
+ "edits": [["^\\[PATTERNS\\]", "[STATUS]\nPU3 Closed\n\n[PATTERNS]"], ["^PU1(\\s+R1\\s+J1\\s+HEAD PC1\\s+)SPEED 1\\.0", "PU1$1SPEED 1.15"], ["^PU2  R1  J1  HEAD PC3\\s*$", "PU2  R1  J1  HEAD PC3  SPEED 0.8"]]
+}

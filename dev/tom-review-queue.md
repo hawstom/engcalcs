@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-448. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-454. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -183,12 +183,18 @@ judgement and does not belong to a script.
 ## 2026-11-18 evening (reply to the evening report)
 
 - [ ] R-438 feat/pick-chooser | (phone, r7) "(1) Zoomed far out, all I can see at the cluster is the reservoir with the pump symbol possibly peeking out at its bottom. When I tap, I get either reservoir River or junction 61. I never get a chooser, and I never get anything else. (2) When I zoom in, I get what I tap, and never a box ... (3) As before, I get a chooser when I tap a tank." Allowance: "We may need to add a finger allowance that would cause more chooser occurences. But first we need to resolve the current bugs above." -- round 8
-- [ ] R-439 feat/assembly | "Shouldn't the Tank have the standard DEM row?" -- answered in the 11-18 night report; nothing built
-- [ ] R-440 feat/assembly | "We've disabled the Base Elevation, Tank diameter etc. entry. Please audit. This is non-functional." -- audited round 14 (works; tank section moved to the top of the Well's box)
-- [ ] R-441 feat/assembly | (Explode) "See /tmp/volume-bug-*.png" -- round 14: the box after Explode fixed; data never changed
+- [ ] R-439 feat/assembly | "Shouldn't the Tank have the standard DEM row?" (11-20: "Unlock it and add DEM. Their elevation must be independent like their position.") -- round 15; nothing built
+- [x] R-440 feat/assembly | "We've disabled the Base Elevation, Tank diameter etc. entry. Please audit. This is non-functional." -- audited round 14 (works; tank section moved to the top of the Well's box)
+- [x] R-441 feat/assembly | (Explode) "See /tmp/volume-bug-*.png" -- round 14: the box after Explode fixed; data never changed
 - [x] R-442 feat/assembly | "Move the wells." -- round 14
-- [ ] R-443 feat/volume-unit | (four-figure floor) "This causes a problem because the user has no control. I think we must give them what they request." -- round 4: Decimals blank means no rounding
+- [x] R-443 feat/volume-unit | (four-figure floor) "This causes a problem because the user has no control. I think we must give them what they request." -- round 4: Decimals blank means no rounding
 - [x] R-444 feat/graph-scrub | "I love it. Merge feat/graph-scrub" -- merged 11-18
 - [x] R-445 - | "Contour plot box: (1) It appears not to be translated. I thought we translated everything. Did we push to github?" -- on GitHub it was translated but for two notes added 11-16, which feat/library-order carried
 - [x] R-446 - | "I don't see a prominent link to the source code. Why doesn't the commit id in Help, About have a link? Where is the link to Github?" -- fix/about-source
-- [ ] R-447 feat/assembly | (locking) "I'm lost. Hold my hand. I forgot where we are on this." (tank label hidden while joined) "I don't know. What's your advice." -- answered in the 11-18 night report
+- [x] R-447 feat/assembly | (locking) "I'm lost. Hold my hand. I forgot where we are on this." (tank label hidden while joined) "I don't know. What's your advice." -- answered in the 11-18 night report
+- [ ] R-448 feat/pick-chooser | (phone, r8) "On my phone, it's very hard to select the pump ... When I zoom in close enough to see the pump and the pipes around it, I am able to reasonably reliably select the pump. But I can't select the pipes even though they are clearly visible. ... I think the real need is to let me select what I tap, and I am certain that much of the time I am really tapping on the pipes." "I have to zoom in very close to select pipes." "My verdict. Phone mode is seriously broken." -- round 9
+- [ ] R-449 feat/pick-chooser | (16 notches, River over Junction 60) "I don't get it. I get River." -- round 9; finger allowance: "we have bugs to fix before tweaking the allowance. So I believe that I cannot say."
+- [ ] R-450 feat/assembly | (Well with tank is one symbol) "Not true. It's three." Lock: "Good. But not elevation." Tank label while joined: "I agree. Proceed." -- round 15 built, awaits his pass
+- [ ] R-451 feat/volume-unit | (Decimals to zero) "Keep. User should know better. We can warn that \"There are values (n) that would be converted to 0\". Your advice?" -- round 5
+- [x] R-452 - | (Chlorine concentration bold) "Yes." -- fix/chlorine-bold
+- [x] R-453 - | (audit 2) "Proceed with the audit." -- fix/eps-audit-3, merged 11-20

@@ -559,15 +559,17 @@ EngCalcs.lpnIsSolveable = function (model) {
 // The minor-loss coefficient a link actually contributes, stated ONCE because it is read in two
 // places (the iteration and the report) and they must not diverge.
 //
-// A TCV'S LOSS IS ITS SETTING AND NOTHING ELSE, and that is EPANET's behaviour rather than a
-// simplification of it -- measured against js/vendor/epanet-js.js: a TCV with setting 16 and minor
-// loss 0 gives 8.00 ft, setting 12 with minor loss 3 gives 6.00 ft (= 12/16 of it), and setting 0
-// with minor loss 16 gives exactly zero. EPANET IGNORES the [VALVES] minor-loss column for a TCV;
-// ADDING the two -- the obvious reading of the column heading -- puts ~10.6 m of phantom head into
-// a real model. This page therefore never offers a separate minor loss on a TCV: one number, both
-// engines, same answer.
+// A REGULATING TCV'S LOSS IS ITS SETTING AND NOTHING ELSE, and that is EPANET's behaviour rather than a
+// simplification of it -- hydcoeffs.c tcvcoeff() replaces Km by 0.02517 x setting / d^4 for the solve
+// (measured against js/vendor/epanet-js.js: setting 16 with minor loss 0 gives 8.00 ft, setting 12 with
+// minor loss 3 gives 6.00 ft, setting 0 with minor loss 16 gives zero). ADDING the two -- the obvious
+// reading of the column heading -- puts ~10.6 m of phantom head into a real model. But a TCV fixed OPEN
+// (setting MISSING: [STATUS] Open, or a control or rule that opens it, setlinkstatus() in hydraul.c) keeps
+// Km as read, so its loss is the stated minor loss k and the setting is not used. `valveFixed: 'open'`
+// is how a model says so. One rule, both engines.
 EngCalcs.lpnLinkK = function (link) {
 	if (link.type === 'valve' && (link.valveType || 'TCV').toUpperCase() === 'TCV') {
+		if (link.valveFixed === 'open') { return link.k || 0; }
 		return link.setting || 0;
 	}
 	return link.k || 0;
@@ -1030,7 +1032,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		// MISSING -- what a simple control's `LINK v OPEN` leaves (hydraul.c controls(), with
 		// input3.c controldata() setting MISSING for a valve). It is a plain minor loss and its
 		// state is never re-decided: hydstatus.c valvestatus() and linkstatus() both skip a valve
-		// whose setting is MISSING. Only js/lpn-native-run.js sets it; nothing on the page does.
+		// whose setting is MISSING. A file's `[STATUS] Open` sets it (the importer's `valveOpen`, through assembleModel), and so does js/lpn-native-run.js when a control or rule opens the valve.
 		// A valve's status is carried from solve to solve by an extended-period run (`valveStart`), as EPANET carries
 		// LinkStatus; a run's first solve and the single instant start it ACTIVE, as inithyd() does.
 		vStat[k] = links[k].valveFixed === 'open' ? 'open' :
