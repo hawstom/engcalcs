@@ -110,8 +110,8 @@ async function main() {
 			await P.mouse.click(wc2.x, wc2.y); await a.settle(800);
 			ok(label + ': the Well\'s box still has Explode', await hasExplode());
 			if (kind === 'welltank') {
-				// A negative or zero tank diameter on the Well's box is flagged with the page's own words.
-				for (const bad of ['-5', '0']) {
+				// A negative tank diameter on the Well's box is flagged (zero is legal and is not, checked below) with the page's own words.
+				for (const bad of ['-5']) {
 					const flagged = await P.evaluate((v) => {
 						const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^\s*Tank diameter/.test(x.textContent))[0];
 						if (!l) { return { found: false }; }
@@ -124,13 +124,15 @@ async function main() {
 						const w = l && l.querySelector('.lpn-valwarn');
 						return { warn: !!w, tip: l ? l.outerHTML : '' };
 					});
-					const want = await P.evaluate(() => (EngCalcs.pageConfig || {}).lpn_valwarn_positive);
+					const want = await P.evaluate(() => (EngCalcs.pageConfig || {}).lpn_valwarn_negative);
 					ok('a Tank diameter of ' + bad + ' typed on the Well\'s box shows the warning', flagged.found && after.warn && after.tip.indexOf(want) >= 0, JSON.stringify([flagged, after.warn]));
 				}
-				await P.evaluate(() => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^\s*Tank diameter/.test(x.textContent))[0]; const i = l.querySelector('input'); i.value = '12'; i.dispatchEvent(new Event('change', { bubbles: true })); });
+				for (const good of ['0', '12']) {
+				await P.evaluate((v) => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^\s*Tank diameter/.test(x.textContent))[0]; const i = l.querySelector('input'); i.value = v; i.dispatchEvent(new Event('change', { bubbles: true })); });
 				await a.settle(800);
 				const clear = await P.evaluate(() => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^\s*Tank diameter/.test(x.textContent))[0]; return !!l && !l.querySelector('.lpn-valwarn'); });
-				ok('a positive Tank diameter shows no warning', clear);
+				ok('a Tank diameter of ' + good + ' shows no warning', clear);
+				}
 			}
 		}
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));

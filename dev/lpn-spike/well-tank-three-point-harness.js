@@ -848,13 +848,13 @@ console.log('\n--- 13. the tank diameter warning (round 16) ---');
 {
 	const doc = fresh(); const a = place3(200, 150, 500, 150, 500, 400);
 	const tk = L.nodeById(a.tank);
-	ok('a negative, a zero and a positive diameter: flagged, flagged, not', EC.lpnValueWarning('tankDiameter', -1) !== null && EC.lpnValueWarning('tankDiameter', 0) !== null && EC.lpnValueWarning('tankDiameter', 5) === null);
-	ok('the tip says zero or negative', /zero or a negative/.test(L.valueWarnText('tankDiameter', tk, 0)), L.valueWarnText('tankDiameter', tk, 0));
+	ok('a negative diameter is flagged; zero (a legal, zero-area tank) and a positive one are not', EC.lpnValueWarning('tankDiameter', -1) !== null && EC.lpnValueWarning('tankDiameter', 0) === null && EC.lpnValueWarning('tankDiameter', 5) === null);
+	ok('the tip says negative, and zero shows none', /negative/.test(L.valueWarnText('tankDiameter', tk, -1)) && L.valueWarnText('tankDiameter', tk, 0) === '', L.valueWarnText('tankDiameter', tk, -1));
 	doc.curves.push({ id: 'V1', kind: 'volume', points: [[0, 0], [5, 10], [10, 40]] });
 	const ot = L.addNode('tank', 900, 900);   // an ordinary tank (a Well's own tank owns its curve)
-	ok('an ordinary tank with no curve and a zero diameter is flagged', L.valueWarnText('tankDiameter', ot, 0) !== '');
+	ok('an ordinary tank with no curve and a negative diameter is flagged', L.valueWarnText('tankDiameter', ot, -1) !== '');
 	L.setProp(ot, 'volCurve', 'V1');
-	ok('a tank that runs on a usable volume curve is not flagged for its unused diameter', L.valueWarnText('tankDiameter', ot, 0) === '', L.valueWarnText('tankDiameter', ot, 0));
+	ok('a tank that runs on a usable volume curve is not flagged for its unused diameter', L.valueWarnText('tankDiameter', ot, -1) === '', L.valueWarnText('tankDiameter', ot, -1));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

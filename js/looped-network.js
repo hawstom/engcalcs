@@ -64097,8 +64097,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the same for a valve's).
 		length: { all: { above: 0, key: 'lpn_valwarn_positive' } },
 		k: { all: { min: 0, key: 'lpn_valwarn_negative' } },
-		// A tank's diameter: EPANET refuses a negative one, and a zero one gives the tank no area unless a VOLUME curve states its volume (valueWarnText() skips a tank that runs on a curve).
-		tankDiameter: { all: { above: 0, key: 'lpn_valwarn_positive' } },
+		// A tank's diameter: EPANET refuses a negative one; zero is legal (a zero-area tank is treated as a reservoir). valueWarnText() skips a tank that runs on a volume curve, where the diameter is unused.
+		tankDiameter: { all: { min: 0, key: 'lpn_valwarn_negative' } },
 		// EPANET input3.c emitterdata(): error 209 on a coefficient < 0.
 		emitter: { all: { min: 0, key: 'lpn_valwarn_negative' } },
 		// EPANET validate.c tanklevels(): error 225 when the initial level is above the maximum or
