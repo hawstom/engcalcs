@@ -467,7 +467,7 @@
 					// `ON=3 OFF=6` after a well's ids: the pump-on and pump-off tank depths its two controls were written from.
 					// `TEE=` `TANK=` `PIPES=a,b` after a Well with tank's ids: its tee, its tank and the two pipes between them (Round 7).
 					// `ID=` the Well's own id, written where it is not the pump's (Round 8: the outlet node's, W1, the pump being W1P).
-					// `PT=vol,pre,on,off,curve` a Well with pressure tank's own numbers as typed (the empty pressure blank while it follows its default), and the VOLUME curve it wrote.
+					// `PT=vol,pre,on,off,curve,V` (V: the volume is in the Volume unit; a file without it holds the Elevation/Head unit cubed) a Well with pressure tank's own numbers as typed (the empty pressure blank while it follows its default), and the VOLUME curve it wrote.
 					if (gm[1] === 'VIRTUAL') {
 						// `id` or `id=length|diameter|roughness|minor`: the pipe's own typed numbers, which the stand-in row replaced (written by this page).
 						gt.forEach(function (tk) { var eq = tk.indexOf('='); markVirtual.push(eq < 0 ? { id: tk } : { id: tk.slice(0, eq), tok: tk.slice(eq + 1).split('|') }); });
@@ -1484,8 +1484,9 @@
 						w.tee = opt.tee; w.tank = opt.tank; w.branch = pipes;
 						if (opt.apart) { w.apart = true; }
 						ptf = String(opt.pt || '').split(',');
-						if (ptf.length === 5 && ptf[4] && [ptf[0], ptf[2], ptf[3]].every(function (x) { return x !== '' && isFinite(+x); }) && (ptf[1] === '' || isFinite(+ptf[1]))) {
+						if ((ptf.length === 5 || (ptf.length === 6 && ptf[5] === 'V')) && ptf[4] && [ptf[0], ptf[2], ptf[3]].every(function (x) { return x !== '' && isFinite(+x); }) && (ptf[1] === '' || isFinite(+ptf[1]))) {
 							w.pt = { vol: +ptf[0], on: +ptf[2], off: +ptf[3], curve: ptf[4] };
+							if (ptf[5] === 'V') { w.pt.vu = 1; } else { w.pt.legacyVol = true; }   // a sixth field V: the volume is in the Volume unit; else the Elevation/Head unit cubed
 							if (ptf[1] !== '') { w.pt.pre = +ptf[1]; }
 						}
 					}
@@ -4099,7 +4100,7 @@
 				out += ';ASSEMBLY: ' + [a.kind || 'pump'].concat(ends, a.links).join(' ') +
 					(a.kind === 'well' && a.idBy === 'node' ? ' ID=' + a.id : '') + (a.kind === 'well' && wellOwns(a, 'open') ? ' ON=' + a.pumpOn : '') + (a.kind === 'well' && wellOwns(a, 'closed') ? ' OFF=' + a.pumpOff : '') +
 					(tail.length ? ' TEE=' + tail[0] + ' TANK=' + tail[1] + ' PIPES=' + tail[2] + ',' + tail[3] : '') +
-					(tail.length && a.pt && a.pt.curve ? ' PT=' + [a.pt.vol, a.pt.pre === undefined ? '' : a.pt.pre, a.pt.on, a.pt.off, a.pt.curve].join(',') : '') +
+					(tail.length && a.pt && a.pt.curve ? ' PT=' + [a.pt.vol, a.pt.pre === undefined ? '' : a.pt.pre, a.pt.on, a.pt.off, a.pt.curve, 'V'].join(',') : '') +
 					(tail.length && a.apart ? ' APART' : '') + '\n';
 			});
 			return out ? out + '\n' : '';

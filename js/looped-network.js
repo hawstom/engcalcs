@@ -19610,6 +19610,8 @@ var EngCalcs = EngCalcs || {};
 		reader.readAsDataURL(file);
 	}
 	EngCalcs.lpnEffDefaultPattern = function () { return effDefaultPattern(); };
+	// The places a unit select's quantity shows in labels and results, for a harness to read as the page does.
+	EngCalcs.lpnUnitDecimals = function (sel) { return labelDecimalsForUnit(sel, unitKey(sel)); };
 	EngCalcs.lpnBackdropProbe = function () {
 		var inp = EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()).inp, m = /\[BACKDROP\]([^\[]*)/.exec(inp);
 		return {
@@ -41353,6 +41355,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						// A pressure tank's own numbers; the curve, the limits and the controls are in the file already and are not rewritten here.
 						if (a.pt && typeof a.pt === 'object' && ['vol', 'on', 'off'].every(function (k) { return typeof a.pt[k] === 'number'; })) {
 							w.pt = { vol: a.pt.vol, on: a.pt.on, off: a.pt.off };
+							if (a.pt.vu) { w.pt.vu = 1; } else { w.pt.legacyVol = true; }   // no `vu`: the volume is in the Elevation/Head unit cubed (ptNormalizeLegacy())
 							if (typeof a.pt.pre === 'number') { w.pt.pre = a.pt.pre; }
 							if (typeof a.pt.curve === 'string') { w.pt.curve = a.pt.curve; }
 						}
@@ -41683,14 +41686,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!p) { return null; }
 		on = toSI(p.on, 'lpn_u_pressure'); off = toSI(p.off, 'lpn_u_pressure');
 		pre = typeof p.pre === 'number' ? toSI(p.pre, 'lpn_u_pressure') : on - ptGapM();
-		vol = p.vol / (unitFactor('lpn_u_elevhead') * unitFactor('lpn_u_elevhead') * unitFactor('lpn_u_elevhead'));
+		vol = toSI(p.vol, 'lpn_u_volume');
 		if (![on, off, pre, vol].every(function (x) { return typeof x === 'number' && isFinite(x); }) || !pressureTankPoints({ vol: vol, pre: pre, on: on, off: off })) { return null; }
 		return { vol: vol, pre: pre, on: on, off: off };
 	}
 	// What a new pressure tank opens on: a reasonable single-home size, the 20-gallon class (2.7 ft^3, or 80 L), a 40 to 60 psi switch, precharge following.
 	function pressureTankDefaults() {
-		var k = unitKey('lpn_u_elevhead'), f = unitFactor('lpn_u_elevhead');
-		return { vol: k === 'fth2o' ? 2.7 : k === 'mh2o' ? 0.08 : +(0.0757 * f * f * f).toPrecision(2),
+		return { vol: +toDisplay(0.0757, 'lpn_u_volume').toPrecision(2), vu: 1,
 			on: niceDefault('lpn_u_pressure', 'psi', 40, 28), off: niceDefault('lpn_u_pressure', 'psi', 60, 42) };
 	}
 	// The group that wrote this curve, if any: it is read-only in the Library and changed in that group's Properties box.
@@ -41764,10 +41766,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		syncWellControls(a);
 		updateNode(tank.id, true);
 	}
-	// The pressure tank's volume is typed in the Elevation/Head unit cubed; its mark.
-	function elevVolumeUnitText() {
-		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_elevhead');
-		return k === 'fth2o' ? (pc.u_ft3 || 'ft^3') : k === 'mh2o' ? (pc.u_m3 || 'm^3') : unitLabel('lpn_u_elevhead') + '^3';
+	// **THE PRESSURE TANK'S VOLUME IS TYPED IN THE VOLUME UNIT**, as a tank's Minimum volume is; `vu: 1` on `pt` says so. A pressure tank saved before that (no `vu`; its
+	// volume was in the Elevation/Head unit cubed) is read once, after the file's units are installed, as the same physical volume in the Volume unit; the file itself is not rewritten
+	// until it is saved again.
+	function ptNormalizeLegacy() {
+		assemblyList().forEach(function (a) {
+			var p = a.pt, fh;
+			if (!p || !p.legacyVol) { return; }
+			delete p.legacyVol;
+			fh = unitFactor('lpn_u_elevhead');
+			if (typeof p.vol === 'number' && fh > 0) { p.vol = +toDisplay(p.vol / (fh * fh * fh), 'lpn_u_volume').toPrecision(10); }
+			p.vu = 1;
+		});
 	}
 	function syncAllPressureTanks() { assemblyList().forEach(function (a) { if (a.pt) { syncPressureTank(a); } }); }
 	function completeWell(d, x, y) {
@@ -42203,7 +42213,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		unitNumberFieldBlank(fields, pc.lpn_field_well_pt_empty || 'Empty pressure', 'lpn_u_pressure', function () { return p.pre; },
 			function (v) { if (v === undefined || !isFinite(v)) { delete p.pre; } else { p.pre = v; } apply(); },
 			typeof p.on === 'number' ? toDisplay(toSI(p.on, 'lpn_u_pressure') - ptGapM(), 'lpn_u_pressure') : undefined, pc.lpn_field_well_pt_empty_tip);
-		numberFieldPlain(fields, (pc.lpn_field_well_pt_volume || 'Total tank volume') + ' (' + elevVolumeUnitText() + ')', p.vol, function (v) { p.vol = v; apply(); }, pc.lpn_field_well_pt_volume_tip);
+		numberFieldPlain(fields, (pc.lpn_field_well_pt_volume || 'Total tank volume') + ' (' + tankVolumeUnitText() + ')', p.vol, function (v) { p.vol = v; apply(); }, pc.lpn_field_well_pt_volume_tip);
 		if (s) {
 			readonlyUnitField(fields, pc.lpn_field_well_pt_on_head || 'Pump on pressure head', 'lpn_u_elevhead', s.on, pc.lpn_field_well_pt_head_tip);
 			readonlyUnitField(fields, pc.lpn_field_well_pt_off_head || 'Pump off pressure head', 'lpn_u_elevhead', s.off, pc.lpn_field_well_pt_head_tip);
@@ -46369,6 +46379,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// under mm now opens under mm however this browser was last left, because its numbers only
 		// mean anything alongside the units they were typed in.
 		applyUnitSelections(saved.units);
+		ptNormalizeLegacy();
 		// **A DECIMALS COUNT THE FILE DOES NOT STATE IS THE ONE ITS OWN UNITS CALL FOR** (R-328). The
 		// defaults above were computed under whatever units were showing BEFORE this document's own
 		// were installed; a count the file states is the user's and is never touched.
@@ -63573,6 +63584,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// it there, so the first change converted from the wrong unit or asked nothing (Task 857).
 		// Here is the one door every document's units pass through, so the memory follows it.
 		rememberUnitSelections();
+		ptNormalizeLegacy();
 		return changed;
 	}
 	// ---- CHANGING A UNIT THAT DECIDES SOMETHING ASKS FIRST (Task 422, narrowed by Task 522) ------
@@ -63611,7 +63623,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (name === 'lpn_u_length') {
 			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter'];
 		}
-		if (name === 'lpn_u_volume') { return [pc.lpn_field_tank_minvol || 'Minimum volume']; }
+		if (name === 'lpn_u_volume') { return [pc.lpn_field_tank_minvol || 'Minimum volume', pc.lpn_field_well_pt_volume || 'Total tank volume']; }
 		if (name === 'lpn_u_diameter') { return [pc.lpn_field_diameter || 'Diameter']; }
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
 		if (name === 'lpn_u_elevhead') {
@@ -63729,6 +63741,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (!probe && k !== 1 && o.tok) { delete o.tok.minVolume; }   // base-write: a unit change rewrites Base and every scenario together
 				return true;
 			}
+			// A Well's pressure tank volume is typed in the Volume unit too; its curve and limits are derived from it (syncPressureTank()).
+			assemblyList().forEach(function (a) { if (a.pt) { conv(a.pt, 'vol'); } });
 			doc.nodes.forEach(function (nd) { if (convVol(nd) && !probe && k !== 1 && nodeEls[nd.id]) { updateNode(nd.id, true); } });
 			eachOverrideMap(function (map) {
 				Object.keys(map).forEach(function (key) { convVol(map[key]); });
@@ -63754,8 +63768,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				conv(nd, 'maxLevel'); conv(nd, '_head');
 			});
 			convOverrides('level'); convOverrides('head');
-			// A pressure tank's volume is in this unit cubed, as its curve's axis is.
-			(function () { var k1 = k; k = k1 * k1 * k1; assemblyList().forEach(function (a) { if (a.pt) { conv(a.pt, 'vol'); } }); k = k1; }());
 			// Overridable since 2026-10-12, so a scenario's own ground and depth limits move too.
 			convOverrides('elev'); convOverrides('bottomElev'); convOverrides('minLevel'); convOverrides('maxLevel');
 			// Head error limit is a head typed in this unit (Task 762 pass: it was missed here).

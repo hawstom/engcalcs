@@ -222,9 +222,9 @@ async function runForm(browser, Session, form) {
 	// 4. the results follow
 	if (!pressure) {
 		const head = rowValue(own, 'Head'), avail = rowValue(own, 'Available volume');
-		const wantAvail = (Math.PI / 4 * 60 * 60 * (12 - 2)).toFixed(2);
+		const volDec = await P.evaluate(() => EngCalcs.lpnUnitDecimals('lpn_u_volume')), wantAvail = (Math.PI / 4 * 60 * 60 * (12 - 2)).toFixed(volDec);
 		ok(form + ': the tank\'s head is its base plus its initial depth (3 + 12)', head === '15.00', head);
-		ok(form + ': its available volume comes from the diameter and the depths (60 ft, 12 less 2 ft)', avail === wantAvail, avail + ' want ' + wantAvail);
+		ok(form + ': its available volume comes from the diameter and the depths (60 ft, 12 less 2 ft), to the Volume unit places', avail === wantAvail, avail + ' want ' + wantAvail);
 	} else {
 		const head = rowValue(own, 'Head');
 		ok(form + ': the tank\'s head is its base plus its (derived) initial depth', head !== undefined && +head > 3, head);

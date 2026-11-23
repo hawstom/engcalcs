@@ -98,7 +98,7 @@ setUnitSet('us');
 			JSON.stringify(L.unitServes(n))));
 	// A tank's volume is typed and solved in the one Volume unit, like Length (Task 857): a typed Minimum
 	// volume is served by Volume and by no other selector.
-	ok('lpn_u_volume decides the typed Minimum volume', L.unitServes('lpn_u_volume').join() === 'Minimum volume', L.unitServes('lpn_u_volume').join());
+	ok('lpn_u_volume decides the typed Minimum volume', L.unitServes('lpn_u_volume').join() === 'Minimum volume,Total tank volume', L.unitServes('lpn_u_volume').join());
 	ok('...and Length no longer does', L.unitServes('lpn_u_length').indexOf('Minimum volume') < 0, L.unitServes('lpn_u_length').join());
 	ok('a solved Available volume reads in the same selector', L.resultUnit('volume') === 'lpn_u_volume');
 }

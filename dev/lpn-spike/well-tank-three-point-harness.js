@@ -399,11 +399,11 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	press(500, 400);
 	const a = doc.assemblies[0], t = L.nodeById('T2') || L.nodeById(a.tank);
 	ok('the third press makes the tank, the group is a Well with a tank and a pressure tank', a.kind === 'well' && a.tank === t.id && !!a.pt && a.tee === 'J1' && doc.assemblies.length === 1, JSON.stringify(a));
-	ok('typed in the project\'s units: 40 and 60 psi are 28 and 42 m in SI, volume 0.08 m3, empty pressure follows (absent)', a.pt.on === 28 && a.pt.off === 42 && a.pt.vol === 0.08 && a.pt.pre === undefined, JSON.stringify(a.pt));
+	ok('typed in the project\'s units: 40 and 60 psi are 28 and 42 m in SI, volume 0.076 m3 (the 20-gallon class, in the Volume unit), empty pressure follows (absent)', a.pt.on === 28 && a.pt.off === 42 && a.pt.vol === 0.076 && a.pt.vu === 1 && a.pt.pre === undefined, JSON.stringify(a.pt));
 	const c = L.curveById(a.pt.curve);
 	ok('the VOLUME curve is in the document, written by the group', !!c && c.kind === 'volume' && c.points.length > 12 && c.id === 'W1TV', c && JSON.stringify(c.points.slice(0, 3)));
 	ok('the tank stands on the ground: minimum level 0, maximum level the pump-off head, on the curve, starting between', t.minLevel === 0 && Math.abs(t.maxLevel - 42) < 1e-6 && t.volCurve === c.id && t._level > 28 && t._level < 42, JSON.stringify([t.minLevel, t.maxLevel, t.volCurve, t._level]));
-	ok('the curve reaches the maximum level and the drawdown water at pump-off, by Boyle (precharge 28 m less 2 psi, atmosphere 14.7 psi)', Math.abs(c.points[c.points.length - 1][0] - 42) < 1e-6 && Math.abs(c.points[c.points.length - 1][1] - 0.08 * (1 - (28 - 2 * psiT + 14.7 * psiT) / (42 + 14.7 * psiT))) < 1e-6, JSON.stringify(c.points[c.points.length - 1]));
+	ok('the curve reaches the maximum level and the drawdown water at pump-off, by Boyle (precharge 28 m less 2 psi, atmosphere 14.7 psi)', Math.abs(c.points[c.points.length - 1][0] - 42) < 1e-6 && Math.abs(c.points[c.points.length - 1][1] - 0.076 * (1 - (28 - 2 * psiT + 14.7 * psiT) / (42 + 14.7 * psiT))) < 1e-6, JSON.stringify(c.points[c.points.length - 1]));
 	ok('its controls are in pressure head: pump on below 28 and pump off above 42, written for the pump and the tank', a.pumpOn === 28 && a.pumpOff === 42 && doc.controls.filter((x) => x.asm === 'W1' && x.condition.node === t.id).length === 2, JSON.stringify(doc.controls.map((x) => x.raw)));
 	// follows the well's elevation, at ground
 	L.setProp(L.nodeById('W1'), 'elev', 123);
@@ -422,7 +422,7 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	// .inp round trip
 	const out = EC.lpnExportInp(L.serializeProject(), {});
 	const line = (out.inp.match(/^;ASSEMBLY.*$/m) || [''])[0];
-	ok('the assembly comment carries PT= with the numbers and the curve', / PT=0\.08,,28,42,W1TV$/.test(line), line);
+	ok('the assembly comment carries PT= with the numbers and the curve', / PT=0\.076,,28,42,W1TV,V$/.test(line), line);
 	ok('the curve and the tank row are in the file as EPANET reads them', /\[CURVES\][\s\S]*W1TV/.test(out.inp) && /;VOLUME:/.test(out.inp) && /W1TV/.test((out.inp.match(/\[TANKS\][^[]*/) || [''])[0]));
 	const parsed = EC.lpnInpParse(out.inp);
 	ok('read back with nothing reported', parsed.ok && parsed.assemblies[0].pt && parsed.assemblies[0].pt.curve === 'W1TV' && !(parsed.dropped || []).some((d) => /^assembly/.test(d.code)), JSON.stringify(parsed.assemblies[0] && parsed.assemblies[0].pt));
@@ -434,8 +434,17 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	const again = EC.lpnExportInp(L.serializeProject(), {}).inp, out_ = out2; if (again !== out_) { const A = out_.split('\n'), B = again.split('\n'); const i = A.findIndex((x, k) => x !== B[k]); console.log('        differs at line ' + i + ': ' + A[i] + ' | ' + B[i]); }
 	ok('export, import, export, import, export is byte-identical from the second export', again === out_);
 	const sv = JSON.parse(JSON.stringify(L.serializeProject())); L.applySaved(L.migrateSaved(sv)); L.buildDom();
-	ok('the project file round trip keeps pt', L.getDoc().assemblies[0].pt.curve === 'W1TV' && L.getDoc().assemblies[0].pt.vol === 0.08);
+	ok('the project file round trip keeps pt', L.getDoc().assemblies[0].pt.curve === 'W1TV' && L.getDoc().assemblies[0].pt.vol === 0.076);
 
+	// A file from before the Volume unit (no `vu` on pt): its volume was in the Elevation/Head unit cubed, and opens as the same physical volume in the Volume unit.
+	{
+		const old = JSON.parse(JSON.stringify(L.serializeProject()));
+		old.units = Object.assign({}, old.units, { lpn_u_elevhead: 'fth2o', lpn_u_volume: 'm3' });
+		old.assemblies.forEach((g) => { if (g.pt) { g.pt.vol = 2.7; delete g.pt.vu; } });
+		L.applySaved(L.migrateSaved(old)); L.buildDom();
+		const pt = L.getDoc().assemblies[0].pt;
+		ok('an older file holding 2.7 (ft^3 of head cubed) opens as 0.0765 m^3 in the Volume unit, marked as such', Math.abs(pt.vol - 2.7 * Math.pow(0.3048, 3)) < 1e-6 && pt.vu === 1 && !pt.legacyVol, JSON.stringify(pt));
+	}
 	// Explode and regroup
 	L.snap(); L.explode('W1');
 	ok('Explode ends the group; the tank, the curve and the controls stay as ordinary elements', L.getDoc().assemblies.length === 0 && !!L.curveById('W1TV') && L.getDoc().controls.length === 2 && L.getDoc().controls.every((x) => !x.asm) && L.nodeById(b.tank).volCurve === 'W1TV');
@@ -515,13 +524,13 @@ console.log('\n--- 10. round 11 review fixes ---');
 {
 	// 7. One volume family: Length in metres, Elevation/Head in feet.
 	const doc = fresh();
-	L.applyOneUnit('lpn_u_length', 'm'); L.applyOneUnit('lpn_u_elevhead', 'fth2o'); L.applyOneUnit('lpn_u_pressure', 'psi');
+	L.applyOneUnit('lpn_u_length', 'm'); L.applyOneUnit('lpn_u_elevhead', 'fth2o'); L.applyOneUnit('lpn_u_pressure', 'psi'); L.applyOneUnit('lpn_u_volume', 'ft3');
 	L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
 	const a = doc.assemblies[0];
 	const ft = 0.3048, c = L.curveById(a.pt.curve), last = c.points[c.points.length - 1];
-	ok('the volume is typed in the Elevation/Head unit cubed: a new tank is 2.7 ft^3 here, whatever the Length unit', a.pt.vol === 2.7 && a.pt.on === 40 && a.pt.off === 60, JSON.stringify(a.pt));
+	ok('the volume is typed in the Volume unit: a new tank is 2.7 ft^3 here, whatever the Length and Elevation/Head units', a.pt.vol === 2.7 && a.pt.on === 40 && a.pt.off === 60, JSON.stringify(a.pt));
 	const exp = 2.7 * (1 - (38 + 14.7) / (60 + 14.7));
-	ok('the curve\'s volume axis is in that same unit: at the pump-off head the water is V (1 - P0/P) in ft^3', Math.abs(last[1] - exp) < 1e-3 && Math.abs(last[0] - 60 / EC.unitFactors.psi / ft) < 1e-3, last[0] + ' ' + last[1] + ' vs ' + exp);
+	ok('the curve\'s volume axis is in the Elevation/Head unit cubed (ft^3 here): at the pump-off head the water is V (1 - P0/P) in ft^3', Math.abs(last[1] - exp) < 1e-3 && Math.abs(last[0] - 60 / EC.unitFactors.psi / ft) < 1e-3, last[0] + ' ' + last[1] + ' vs ' + exp);
 	ok('and in SI it is the same vessel: 2.7 ft^3 is 0.0765 m^3', Math.abs(L.pressureTankSI(a).vol - 2.7 * ft * ft * ft) < 1e-9);
 	L.applyOneUnit('lpn_u_length', 'ft'); L.applyOneUnit('lpn_u_elevhead', 'mh2o'); L.applyOneUnit('lpn_u_pressure', 'kpa');
 	setUnitSet('si');

@@ -101,6 +101,19 @@ async function main() {
 		ok('the four locked rows stand together, in one run under the sentence', Math.max.apply(null, at) - Math.min.apply(null, at) === 3, JSON.stringify(at));
 		const wellRows = await (async () => { await P.keyboard.press('Escape'); const w0 = await centreOf('W1'); await P.mouse.click(w0.x, w0.y); await a.settle(900); const r0 = await rows(); await P.keyboard.press('Escape'); return r0; })();
 		ok('the Well\'s own volume row is "Total tank volume" (m^3 or ft^3), and the Well has no plain "Tank volume" row', wellRows.some((r) => /^Total tank volume/.test(r.t)) && !wellRows.some((r) => /^Tank volume/.test(r.t)), wellRows.map((r) => r.t).join(' | '));
+		// The Well's tank volume is typed and shown in the Volume unit, and a Convert keeps the physical volume (fixture: no `vu`, i.e. a file from before, in m and m of head, so 1000 m^3).
+		const ptNow = () => P.evaluate(() => { const i = JSON.parse(localStorage.getItem('lpn_index') || '{}').openId, d = JSON.parse(localStorage.getItem('lpn_project_' + i) || 'null'), g = ((d || {}).assemblies || []).filter((x) => x.pt)[0]; return { pt: g && g.pt, unit: document.getElementById('lpn_u_volume').value, units: d && d.units && d.units.lpn_u_volume }; });
+		const volRow = async () => { await P.keyboard.press('Escape'); const w1 = await centreOf('W1'); await P.mouse.click(w1.x, w1.y); await a.settle(900); const r1 = await rows(); const row = r1.filter((r) => /^Total tank volume/.test(r.t))[0]; const v = await P.evaluate(() => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^Total tank volume/.test(x.textContent.replace(/\s+/g, ' ').trim()))[0], i = l && l.querySelector('input'); return i ? i.value : null; }); await P.keyboard.press('Escape'); return { t: row && row.t, v: v }; };
+				let vr = await volRow(); const u0 = (await ptNow()).unit, u0text = await P.evaluate(() => { const s = document.getElementById('lpn_u_volume'); return s.options[s.selectedIndex].textContent.trim(); });
+		ok('the Well\'s volume row is labelled in the current Volume unit (' + u0 + ': ' + u0text + ') and reads 1000', !!vr.t && vr.t.indexOf('(' + u0text + ')') >= 0 && +vr.v === 1000, JSON.stringify(vr));
+		await P.evaluate(() => { const s = document.getElementById('lpn_u_volume'); s.value = 'l'; s.dispatchEvent(new Event('change', { bubbles: true })); });
+		await a.settle(600);
+		await P.evaluate(() => { const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === ((EngCalcs.pageConfig || {}).lpn_convas_ok || 'Convert')); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); } });
+		await a.settle(1500);
+		const afterConv = await ptNow(); vr = await volRow();
+		const lText = await P.evaluate(() => { const s = document.getElementById('lpn_u_volume'); return s.options[s.selectedIndex].textContent.trim(); });
+		ok('Convert to litres: the stored volume is 1,000,000 L (the same 1000 m^3), marked as in the Volume unit', afterConv.unit === 'l' && afterConv.pt && Math.abs(afterConv.pt.vol - 1e6) < 1e-3 && afterConv.pt.vu === 1 && !afterConv.pt.legacyVol, JSON.stringify(afterConv));
+		ok('and the row is now labelled in litres (' + lText + ') and reads 1000000', !!vr.t && vr.t.indexOf('(' + lText + ')') >= 0 && +vr.v === 1e6, JSON.stringify(vr));
 		const c1 = await centreOf('T1'); await P.mouse.click(c1.x, c1.y); await a.settle(900); rs = await rows();
 		ok('Elevation is the tank\'s own (round 15; Tom: "Their elevation must be independent like their position."): a typeable row on the tank\'s box, and Base elevation is a read-only one', find('Elevation').controls > 0 && find('Base elevation').controls === 0);
 		const demRows = await P.evaluate(() => document.querySelectorAll('#lpn_popup_fields .lpn-elev-dem').length);

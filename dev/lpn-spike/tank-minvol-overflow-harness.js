@@ -221,7 +221,7 @@ console.log('\n--- 5. the Volume unit converts a typed volume; a Length change l
 	ok('and the scenario\'s override too', Math.abs(L.effective(tank(), 'minVolume') - 2000 * k) < 1e-9, String(L.effective(tank(), 'minVolume')));
 	ok('it counted the numbers it decides', n >= 1, String(n));
 	ok('the question names Minimum volume under Volume and not under Length',
-		L.unitServes('lpn_u_volume').join() === 'Minimum volume' && L.unitServes('lpn_u_length').indexOf('Minimum volume') < 0,
+		L.unitServes('lpn_u_volume')[0] === 'Minimum volume' && L.unitServes('lpn_u_volume').indexOf('Total tank volume') > 0 && L.unitServes('lpn_u_length').indexOf('Minimum volume') < 0,
 		L.unitServes('lpn_u_volume').join() + ' / ' + L.unitServes('lpn_u_length').join());
 }
 
