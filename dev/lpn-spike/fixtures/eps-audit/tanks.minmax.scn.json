@@ -1,0 +1,6 @@
+{
+ "name": "Narrower range",
+ "note": "Scenario override of a tank's minimum and maximum level: T3 2..18 to 6..12, T1 2..18 to 1..13, T2 (minimum volume) 1..6 to 2..4. Reference: tanks.inp with the columns written in by hand.",
+ "props": [["node", "T3", "minLevel", 6], ["node", "T3", "maxLevel", 12], ["node", "T1", "minLevel", 1], ["node", "T1", "maxLevel", 13], ["node", "T2", "minLevel", 2], ["node", "T2", "maxLevel", 4]],
+ "edits": [["^(T3  20   10      )2      18", "$16      12"], ["^(T1  20   10      )2      18", "$11      13"], ["^(T2  30   3       )1      6", "$12      4"]]
+}

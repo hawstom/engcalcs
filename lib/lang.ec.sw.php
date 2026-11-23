@@ -1262,22 +1262,6 @@ $ec_lang['lpn_demand_tip']='Mtiririko unaotolewa kwenye mtandao katika kifundo h
 // **THE UNITS STRIP IS TWO GROUPS** (Task 422). The first decides what the numbers in the document
 // MEAN, so changing one is a model change and the page asks first; the second is how results are
 // read, and changes with no fanfare. Three quantities appear in both because they serve both sides.
-// The question an INPUT unit change asks, in Tom's own wording (2026-08-18, Task 425) rather than a
-// paraphrase of it: name the quantity, list the fields it decides ONE PER LINE, then name the two
-// answers by what they do to the numbers already typed. {unit} is a unit name; the field names are
-// built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
-// NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
-// 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='Kitengo hiki huamua jinsi maingizo yako yanavyosomwa';
-$ec_lang['lpn_units_warn_lead']='{unit} ndicho kitengo cha unachoandika kwa ajili ya:';
-$ec_lang['lpn_units_options_head']='Unapobadilisha kitengo:';
-// Each option's sentence opens with the word on its own button, so the button and the explanation
-// say the same word. Non-destructive is the suite's standing behaviour and the first button;
-// Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='Haiharibu';
-$ec_lang['lpn_units_nondestructive_desc']='Haiharibu: huacha kila ulichoandika kama kilivyo na kukisoma tena kwa kitengo kipya.';
-$ec_lang['lpn_units_destructive']='Huharibu';
-$ec_lang['lpn_units_destructive_desc']='Huharibu: huandika upya kila ulichoingiza kwa kubadilisha kihesabu, ili mtandao ubaki karibu sawa kimaumbile, ndani ya mipaka ya ubadilishaji. Namba za awali zinapotea. Tendua huzirudisha.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='Thamani ({n}) sasa zinamaanisha {unit}. Hakuna kilichoandikwa upya.';
 $ec_lang['lpn_status_converted']='Thamani ({n}) ziliandikwa upya kuwa {unit}.';

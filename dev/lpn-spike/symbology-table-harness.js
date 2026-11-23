@@ -310,7 +310,7 @@ console.log('== 5. decimals by unit (R-328) ==');
 	ok('gpm opens at 1 place', L.ls().decimals.link.flow === 1);
 	// WITH THE PANEL OPEN (pre-review, 2026-09-27: the stored count moved to 3 while the box on
 	// screen still read 0). afterUnitChange() is the seam both the plain switch and the
-	// reinterpretation dialog's Non-destructive and Destructive buttons end in.
+	// unit question's Convert and Keep buttons end in.
 	L.rebuildLabels();
 	const flowBox = () => byId['lpn_labels_link_fields'].children
 		.find((r) => (r.children[0].textContent || '').indexOf('Flow') >= 0).children[1].children[3];

@@ -8,17 +8,17 @@
 //
 // The four claims, and what each failure looks like on the page:
 //
-//   1. **An empty project is asked nothing.** Non-destructive and Destructive end at the same
+//   1. **An empty project is asked nothing.** Keep and Convert end at the same
 //      document when there is no number to reinterpret, so a modal there is a dialog in front of
 //      the commonest first action on the page -- the kind of thing Tom has already ruled against
 //      when a feature announcement dressed itself as a required choice.
-//   2. **Non-destructive leaves every stored number BYTE-IDENTICAL.** Not "within tolerance":
+//   2. **Keep leaves every stored number BYTE-IDENTICAL.** Not "within tolerance":
 //      identical. It is the suite's standing rule ("changing a unit reinterprets the typed number;
 //      it does not convert it"), it is marked absolute, and this page is the one place that ever
 //      broke it. A conversion creeping in here is invisible -- 710 comes back 709.9913664.
-//   3. **Destructive converts, and ONE undo reverts the whole change.** The whole change means the
+//   3. **Convert converts, and ONE undo reverts the whole change.** The whole change means the
 //      numbers AND the unit: a snapshot that restored the values under the NEW unit would land the
-//      user in the Non-destructive outcome they had just declined, silently.
+//      user in the Keep outcome they had just declined, silently.
 //   4. **Cancel changes nothing at all, not even the unit** -- and the field list is one name per
 //      line, not a comma list (Tom, 2026-08-18).
 
@@ -35,7 +35,7 @@ const L = loadLoopedNetwork(
 	"\t\tonUnitChange: onUnitChange, remember: rememberUnitSelections,\n" +
 	"\t\tapplyUnitSelections: applyUnitSelections, readUnitSelections: readUnitSelections,\n" +
 	"\t\tunitKey: unitKey, undo: undo, undoDepth: function () { return undoStack.length; },\n" +
-	"\t\tINPUTS: LPN_UNIT_SELECTS,\n" +
+	"\t\tINPUTS: LPN_UNIT_SELECTS, getSettings: function () { return settings; },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +
@@ -80,6 +80,13 @@ function dialogLines() {
 	}
 	return walk(byId.lpn_dialog_body).filter(s => s !== '');
 }
+// The Decimals field(s) the question carries, found by the attribute the page gives each one.
+function decimalFields() {
+	const out = [];
+	(function walk(el) { (el.children || []).forEach(c => { if (c._tag === 'input' && c.getAttribute('data-decimals-for')) { out.push(c); } walk(c); }); })(byId.lpn_dialog_body);
+	return out;
+}
+function setDecimals(n) { decimalFields().forEach(f => { f.value = String(n); }); }
 function dialogOpen() { return dialogLines().length > 0; }
 function buttonLabels() { return byId.lpn_dialog_buttons.children.map(b => b.textContent); }
 function press(label) {
@@ -143,38 +150,24 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	pickUnit('lpn_u_flow', 'ft3ps');
 	const lines = dialogLines();
 	ok('a project with content IS asked', dialogOpen());
-	ok('the title is the one written for this question',
-		lines[0] === PC.lpn_units_warn_title, lines[0]);
-	// The lead names the unit CHOSEN, not the one still on the strip -- the select was put back
-	// while the question stands, so reading it would name the old unit and the sentence would be a lie.
-	// (The stub's option text is the unit's own name -- 'ft3ps' where the shipped select says 'cfs'
-	// -- because it builds options straight out of lib/Units.lib.php's factor table. What is under
-	// test is that the OPTION'S OWN TEXT is used, so the assertion reads it from the select rather
-	// than hard-coding either spelling.)
-	const chosen = unitSelects.lpn_u_flow.options.find(o => o.value === 'ft3ps').textContent;
-	ok('the lead names the chosen unit and what it is the unit OF',
-		lines[1] === PC.lpn_units_warn_lead.replace('{unit}', chosen), lines[1]);
+	// Tom, 2026-11-18: "Convert inputs from old unit to new? [Convert] [Keep] [Cancel]". The names are
+	// the OPTIONS' own text (the stub spells ft3ps where the shipped select says cfs), read from the
+	// select rather than hard-coded.
+	const optText = (k) => unitSelects.lpn_u_flow.options.find(o => o.value === k).textContent;
+	ok('the question names the old unit and the new one',
+		lines[0] === PC.lpn_units_convert_q.replace('{old}', optText('gpm')).replace('{new}', optText('ft3ps')), lines[0]);
 	// **ONE NAME PER LINE, NOT A COMMA LIST** (Tom, 2026-08-18).
-	const fieldLines = lines.slice(2, lines.indexOf(global.EngCalcs.pageConfig.lpn_units_options_head));
+	const fieldLines = lines.slice(1, lines.indexOf(PC.lpn_labels_col_decimals));
 	ok('the fields it decides are listed', fieldLines.length >= 2, JSON.stringify(fieldLines));
 	ok('...one name per line', fieldLines.every(l => l.indexOf(',') < 0), JSON.stringify(fieldLines));
 	// "Base demand" since 2026-08-25: this list is the TYPED fields a unit decides the meaning of,
 	// and the resolved Demand beside it is not typed anywhere.
 	ok('...and Base demand is one of them', fieldLines.indexOf('Base demand') >= 0, JSON.stringify(fieldLines));
-	// Reworded by sprint 459's Wave 0 (2026-08-24): 'Options for units change:' is a noun pile that
-	// parses two ways -- [options for units] [change] or [options for] [units change]. The heading is
-	// read from the key rather than retyped here, so the next rewording is not a second failure.
-	ok('the options are headed', lines.indexOf(global.EngCalcs.pageConfig.lpn_units_options_head) >= 0, JSON.stringify(lines));
-	ok('Non-destructive says it leaves the inputs alone',
-		lines.indexOf(PC.lpn_units_nondestructive_desc) >= 0, JSON.stringify(lines));
-	// Whole sentence, so what it costs AND the answer to Task 425's open question -- that the undo
-	// snapshot IS the backup -- are both promised where the user is deciding.
-	ok('Destructive says it rewrites them, loses the originals, and that Undo puts them back',
-		lines.indexOf(PC.lpn_units_destructive_desc) >= 0, JSON.stringify(lines));
-	ok('three buttons, Non-destructive first and Cancel last',
-		JSON.stringify(buttonLabels()) === JSON.stringify(
-			[PC.lpn_units_nondestructive, PC.lpn_units_destructive, PC.lpn_cancel]),
+	ok('a Decimals field follows the list', lines.indexOf(PC.lpn_labels_col_decimals) > 0, JSON.stringify(lines));
+	ok('three buttons: Convert, Keep, Cancel',
+		JSON.stringify(buttonLabels()) === JSON.stringify([PC.lpn_convas_ok, PC.lpn_units_keep, PC.lpn_cancel]),
 		JSON.stringify(buttonLabels()));
+	ok('the old Destructive and Non-destructive words are gone', lines.concat(buttonLabels()).every(l => !/destructive/i.test(l)));
 	// Nothing has happened yet: the select is back on the old unit and the document is untouched.
 	ok('the unit is held at the old one while the question stands',
 		L.unitKey('lpn_u_flow') === 'gpm', L.unitKey('lpn_u_flow'));
@@ -196,13 +189,13 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	press('Cancel');
 }
 
-// ---- 4. Non-destructive: every stored number BYTE-IDENTICAL ---------------------------------------
+// ---- 4. Keep: every stored number BYTE-IDENTICAL ---------------------------------------
 {
-	console.log('\n--- Non-destructive ---');
+	console.log('\n--- Keep ---');
 	const net = buildNetwork();
 	const before = snapshot();
 	pickUnit('lpn_u_length', 'm');
-	press('Non-destructive');
+	press('Keep');
 	ok('the unit changed', L.unitKey('lpn_u_length') === 'm', L.unitKey('lpn_u_length'));
 	ok('...and every stored number is byte-identical', snapshot() === before);
 	ok('...710 is still exactly 710', net.pipe._length === 710, String(net.pipe._length));
@@ -216,28 +209,29 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 		const sel = unitSelects[name];
 		const other = sel.options.map(o => o.value).find(v => v !== from);
 		pickUnit(name, other);
-		if (dialogOpen()) { press('Non-destructive'); }
-		ok(name + ': Non-destructive rewrites nothing', snapshot() === b, from + ' -> ' + other);
+		if (dialogOpen()) { press('Keep'); }
+		ok(name + ': Keep rewrites nothing', snapshot() === b, from + ' -> ' + other);
 		void net2;
 	});
 }
 
-// ---- 5. Destructive: converts, and ONE undo reverts the whole change -------------------------------
+// ---- 5. Convert: converts, and ONE undo reverts the whole change -------------------------------
 {
-	console.log('\n--- Destructive, and the undo that answers the backup question ---');
+	console.log('\n--- Convert, and the undo that answers the backup question ---');
 	const net = buildNetwork();
 	const before = snapshot();
 	pickUnit('lpn_u_length', 'm');
-	press('Destructive');
+	setDecimals(3);
+	press('Convert');
 	ok('the unit changed', L.unitKey('lpn_u_length') === 'm');
-	ok('...and 710 ft was rewritten as 216.408 m',
-		Math.abs(net.pipe._length - 710 * 0.3048) < 1e-9, String(net.pipe._length));
+	ok('...and 710 ft was rewritten as 216.408 m (Decimals 3)',
+		net.pipe._length === 216.408, String(net.pipe._length));
 	ok('...and it is NOT byte-identical, which is the whole difference between the two answers',
 		snapshot() !== before);
 	ok('...and one snapshot was taken', L.undoDepth() === 1, String(L.undoDepth()));
 
 	// **ONE UNDO REVERTS THE WHOLE SET** -- the numbers and the unit. Restoring the numbers under
-	// the NEW unit would be half an undo, and it would leave the user in the Non-destructive
+	// the NEW unit would be half an undo, and it would leave the user in the Keep
 	// outcome they had just declined.
 	L.undo();
 	ok('one undo puts every number back, byte-identical', snapshot() === before, String(L.getDoc().links[0]._length));
@@ -256,12 +250,261 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	L.getScenarios().push({ id: 's1', name: 'Fire flow', overrides: { ['link:' + net2.pipe.id]: { length: 800 } } });
 	const b2 = snapshot();
 	pickUnit('lpn_u_length', 'm');
-	press('Destructive');
+	setDecimals(6);
+	press('Convert');
 	const ov = L.getScenarios()[1].overrides['link:' + net2.pipe.id].length;
-	ok('a scenario override converts with Base', Math.abs(ov - 800 * 0.3048) < 1e-9, String(ov));
+	ok('a scenario override converts with Base', Math.abs(ov - 800 * 0.3048) < 1e-6, String(ov));
 	L.undo();
 	ok('...and one undo restores it with Base', snapshot() === b2,
 		String(L.getScenarios()[1].overrides['link:' + net2.pipe.id].length));
+}
+
+// ---- 6. Decimals, for Length and for Volume ----------------------------------------------------------
+{
+	console.log('\n--- Decimals ---');
+	// Length: the default is the number of places the page shows the new unit with (meters: 1).
+	let net = buildNetwork();
+	pickUnit('lpn_u_length', 'm');
+	ok('the Decimals field opens blank (no rounding)', decimalFields().length === 1 && decimalFields()[0].value === '', decimalFields().map(f => f.value).join());
+	press('Convert');
+	ok('Length: blank Decimals does not round (710 ft -> 216.408 m)', Math.abs(net.pipe._length - 216.408) < 1e-9, String(net.pipe._length));
+	L.undo();
+	net = L.getDoc().links[0];
+	pickUnit('lpn_u_length', 'm');
+	setDecimals(0);
+	press('Convert');
+	ok('Length: Decimals 0 rounds to exactly 0 places (710 ft -> 216)', L.getDoc().links[0]._length === 216, String(L.getDoc().links[0]._length));
+	L.undo();
+	pickUnit('lpn_u_length', 'm');
+	setDecimals(4);
+	press('Convert');
+	ok('Length: Decimals 4 keeps four places (216.408)', L.getDoc().links[0]._length === 216.408, String(L.getDoc().links[0]._length));
+	L.undo();
+	// A blank or negative entry falls back to the default rather than writing garbage.
+	pickUnit('lpn_u_length', 'm');
+	setDecimals('');
+	press('Convert');
+	ok('Length: a blank Decimals field means no rounding', Math.abs(L.getDoc().links[0]._length - 216.408) < 1e-9, String(L.getDoc().links[0]._length));
+	L.undo();
+	// Keep never rounds, whatever the field says.
+	const before = snapshot();
+	pickUnit('lpn_u_length', 'm');
+	setDecimals(0);
+	press('Keep');
+	ok('Keep ignores Decimals and leaves every number as typed', snapshot() === before);
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm' });
+	L.remember();
+
+	// Volume: a tank's Minimum volume, 20,000 ft3 (EPANET's own cubic feet), asked about gal.
+	function volumeNetwork() {
+		L.reset();
+		L.setCanvas(800, 600);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_volume: 'ft3' });
+		L.remember();
+		const t = L.addNode('tank', 0, 0);
+		L.setProp(t, 'minVolume', 20000);
+		L.buildDom();
+		return t;
+	}
+	volumeNetwork();
+	const T = () => L.getDoc().nodes[0];
+	pickUnit('lpn_u_volume', 'gal');
+	const vlines = dialogLines();
+	const volText = (k) => unitSelects.lpn_u_volume.options.find(o => o.value === k).textContent;
+	ok('Volume asks the same question, naming ft3 and gal',
+		vlines[0] === PC.lpn_units_convert_q.replace('{old}', volText('ft3')).replace('{new}', volText('gal')), vlines[0]);
+	ok('...lists Minimum volume as what it decides', vlines.indexOf(PC.lpn_field_tank_minvol) >= 0, JSON.stringify(vlines));
+	ok('...with the same three buttons', JSON.stringify(buttonLabels()) === JSON.stringify([PC.lpn_convas_ok, PC.lpn_units_keep, PC.lpn_cancel]));
+	ok('...and a Decimals field that opens blank', decimalFields().length === 1 && decimalFields()[0].value === '', decimalFields().map(f => f.value).join());
+	press('Convert');
+	ok('Volume: blank Decimals gives the full 149610.389... gal', Math.abs(T().minVolume - 149610.3896) < 1e-3 && T().minVolume !== 149610.39, String(T().minVolume));
+	ok('...and the unit is gal', L.unitKey('lpn_u_volume') === 'gal');
+	L.undo();
+	ok('...one Undo restores 20000 and ft3', T().minVolume === 20000 && L.unitKey('lpn_u_volume') === 'ft3', T().minVolume + ' ' + L.unitKey('lpn_u_volume'));
+	pickUnit('lpn_u_volume', 'gal');
+	setDecimals(2);
+	press('Convert');
+	ok('Volume: Decimals 2 gives 149610.39', T().minVolume === 149610.39, String(T().minVolume));
+	L.undo();
+	pickUnit('lpn_u_volume', 'gal');
+	press('Keep');
+	ok('Volume: Keep reads the typed 20000 as gallons', T().minVolume === 20000 && L.unitKey('lpn_u_volume') === 'gal', T().minVolume + ' ' + L.unitKey('lpn_u_volume'));
+	volumeNetwork();
+	pickUnit('lpn_u_volume', 'gal');
+	press('Cancel');
+	ok('Volume: Cancel leaves the unit as it was', L.unitKey('lpn_u_volume') === 'ft3' && T().minVolume === 20000);
+	// Exactly the Decimals asked for, even when that gives zero.
+	T().minVolume = 0.0004;
+	pickUnit('lpn_u_volume', 'gal');
+	setDecimals(0);
+	press('Convert');
+	ok('Volume: Decimals 0 rounds exactly (0.0004 ft3 -> 0 gal)', T().minVolume === 0, String(T().minVolume));
+}
+
+// ---- 7. Rounding is exactly the Decimals chosen --------------------------------------------------
+{
+	console.log('\n--- exact Decimals ---');
+	function one(dec, want) {
+		L.reset(); L.setCanvas(800, 600);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'mm', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'lps', lpn_u_roughness: 'mm', lpn_u_volume: 'ft3' });
+		L.remember();
+		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0);
+		const pipe = L.addLink('pipe', r.id, j.id);
+		pipe.diameter = undefined; L.setProp(pipe, 'diameter', 150); L.buildDom();
+		pickUnit('lpn_u_diameter', 'in');
+		setDecimals(dec);
+		press('Convert');
+		ok('150 mm to in at Decimals ' + dec + ' is ' + want, L.getDoc().links[0]._diameter === want, String(L.getDoc().links[0]._diameter));
+		L.undo();
+		ok('Undo restores 150 mm', L.getDoc().links[0]._diameter === 150 && L.unitKey('lpn_u_diameter') === 'mm', L.getDoc().links[0]._diameter + ' ' + L.unitKey('lpn_u_diameter'));
+	}
+	one(0, 6); one(2, 5.91);
+	// Blank: full precision, and the Settings tolerances are never rounded even when Decimals is typed.
+	function exact(dec, want, label) {
+		L.reset(); L.setCanvas(800, 600);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'mm', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'lps', lpn_u_roughness: 'mm', lpn_u_volume: 'ft3' });
+		L.remember();
+		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0);
+		const pipe = L.addLink('pipe', r.id, j.id);
+		pipe.diameter = undefined; L.setProp(pipe, 'diameter', 150); L.buildDom();
+		pickUnit('lpn_u_diameter', 'in');
+		setDecimals(dec);
+		press('Convert');
+		const got = L.getDoc().links[0]._diameter;
+		ok(label, Math.abs(got - want) <= 1e-9 * want, String(got));
+	}
+	exact('', 150 / 25.4, '150 mm to in with blank Decimals is 5.905511811...');
+	exact(10, 5.9055118110, '150 mm to in at typed Decimals 10 is obeyed (not clamped to 8)');
+	// Blank Decimals stores no binary noise: 14 in and 24 in to mm are 355.6 and 609.6, not 355.59999999999997.
+	{
+		L.reset(); L.setCanvas(800, 600);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_roughness: 'mm', lpn_u_volume: 'ft3' });
+		L.remember();
+		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0), k = L.addNode('junction', 200, 0);
+		const p1 = L.addLink('pipe', r.id, j.id), p2 = L.addLink('pipe', j.id, k.id);
+		p1.diameter = undefined; p2.diameter = undefined; L.setProp(p1, 'diameter', 14); L.setProp(p2, 'diameter', 24); L.buildDom();
+		pickUnit('lpn_u_diameter', 'mm');
+		setDecimals('');
+		press('Convert');
+		const ds = L.getDoc().links.map(x => String(x._diameter)).join();
+		ok('14 in and 24 in to mm with blank Decimals store 355.6 and 609.6', ds === '355.6,609.6', ds);
+	}
+	{
+		L.reset(); L.setCanvas(800, 600);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_roughness: 'mm' });
+		L.remember();
+		const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0), p = L.addLink('pipe', r.id, j.id);
+		L.getSettings().method = 'dw';
+		L.setProp(p, 'roughness', 2); L.buildDom();
+		pickUnit('lpn_u_roughness', 'ft');
+		press('Convert');
+		const got = L.getDoc().links[0]._roughness;
+		ok('Darcy-Weisbach roughness 2 mm -> ft with blank Decimals within 1e-9', Math.abs(got - 2 / 304.8) <= 1e-9 * 2 / 304.8, String(got));
+	}
+}
+
+// ---- 8. Enter after a keyboard unit change keeps (code review: Convert was the focused button) ------
+{
+	console.log('\n--- the focused answer is Keep ---');
+	buildNetwork();
+	pickUnit('lpn_u_length', 'm');
+	const btns = byId.lpn_dialog_buttons.children;
+	ok('the visual order is still Convert, Keep, Cancel', JSON.stringify(btns.map(b => b.textContent)) === JSON.stringify([PC.lpn_convas_ok, PC.lpn_units_keep, PC.lpn_cancel]));
+	ok('Keep holds the focus', global.document.activeElement === btns[1], global.document.activeElement && global.document.activeElement.textContent);
+	press('Keep');
+}
+
+// ---- 9. Settings > New assets numbers, the legacy Volume fallback, the stale token -------------------
+{
+	console.log('\n--- the other numbers a Convert owes ---');
+	buildNetwork();
+	const d0 = L.getSettings().defaults.diameter;
+	pickUnit('lpn_u_diameter', 'mm');
+	press('Convert');
+	const d1 = L.getSettings().defaults.diameter;
+	ok('Convert moves the New assets diameter too (' + d0 + ' in -> ' + d1 + ' mm)', Math.abs(d1 - d0 * 25.4) <= 5e-4 * d0 * 25.4, String(d1));
+	buildNetwork();
+	const d2 = L.getSettings().defaults.diameter;
+	pickUnit('lpn_u_diameter', 'mm');
+	press('Keep');
+	ok('Keep leaves the New assets diameter alone', L.getSettings().defaults.diameter === d2);
+	// A project saved before the Volume selector: its volume unit comes from its own length unit.
+	['ft', 'm', 'in'].forEach((k) => {
+		const units = { lpn_u_length: k }, copy = JSON.stringify(units);
+		L.applyUnitSelections(units);
+		const want = k === 'm' ? 'm3' : 'ft3';
+		ok('a legacy project in ' + k + ' opens on ' + want + ' whatever the last project left', L.unitKey('lpn_u_volume') === want, L.unitKey('lpn_u_volume'));
+		ok('...and the caller\'s units object is not written to', JSON.stringify(units) === copy);
+		L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_volume: 'l' });
+	});
+	// The converted Minimum volume sheds the file's text for the old number.
+	L.reset(); L.setCanvas(800, 600);
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_volume: 'ft3' });
+	L.remember();
+	const t = L.addNode('tank', 0, 0);
+	L.setProp(t, 'minVolume', 20000); L.getDoc().nodes[0].tok = { minVolume: '20000.0' };
+	L.buildDom();
+	pickUnit('lpn_u_volume', 'gal');
+	press('Convert');
+	ok('the converted Minimum volume keeps no stale .inp text', !(L.getDoc().nodes[0].tok && L.getDoc().nodes[0].tok.minVolume), JSON.stringify(L.getDoc().nodes[0].tok));
+}
+
+// ---- 8. The Decimals warning: nonzero values that Convert would turn into 0 ---------------------
+{
+	console.log('\n--- the Decimals warning ---');
+	// Tom, 2026-11-20: "Keep. User should know better. We can warn that there are values (n) that
+	// would be converted to 0." A count, shown beside the Decimals field, never a block.
+	function warnEl() {
+		let out = null;
+		(function walk(el) { (el.children || []).forEach(c => { if (c.className === 'lpn-unit-zero-warn') { out = c; } walk(c); }); })(byId.lpn_dialog_body);
+		return out;
+	}
+	function typeDecimals(v) {
+		decimalFields().forEach(f => { f.value = String(v); (f._listeners.input || []).forEach(fn => fn()); });
+	}
+	const shown = () => { const w = warnEl(); return w ? w.textContent : ''; };
+	const want = n => PC.lpn_units_zero_warn.replace('{n}', String(n));
+	L.reset(); L.setCanvas(800, 600);
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'mm', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'lps', lpn_u_roughness: 'mm', lpn_u_volume: 'ft3' });
+	L.remember();
+	const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0), k = L.addNode('junction', 200, 0);
+	const p1 = L.addLink('pipe', r.id, j.id), p2 = L.addLink('pipe', j.id, k.id);
+	L.setProp(p1, 'diameter', 12); L.setProp(p2, 'diameter', 150);
+	L.buildDom();
+	const before = snapshot();
+	pickUnit('lpn_u_diameter', 'in');
+	ok('the warning line exists and is hidden while Decimals is blank', warnEl() && shown() === '', shown());
+	typeDecimals(0);
+	ok('Decimals 0: the 12 mm pipe is counted, the 150 mm pipe is not', shown() === want(1), shown());
+	ok('the warning leads with the warning sign', shown().charAt(0) === '⚠');
+	typeDecimals(2);
+	ok('Decimals 2: nothing would become 0, so the warning goes', shown() === '', shown());
+	typeDecimals(0);
+	ok('...and returns at Decimals 0', shown() === want(1), shown());
+	typeDecimals('');
+	ok('a blank Decimals field removes the warning', shown() === '', shown());
+	ok('counting changed nothing in the document', snapshot() === before);
+	typeDecimals(0);
+	press('Convert');
+	ok('the warning never blocked: Convert rounded 12 mm to 0 and 150 mm to 6 in', p1._diameter === 0 && p2._diameter === 6, p1._diameter + ' ' + p2._diameter);
+	L.undo();
+	// A stated zero is not "would become 0": it already is.
+	L.getDoc().links[0]._diameter = 0;   // undo restored the document, so the old reference is stale
+	pickUnit('lpn_u_diameter', 'in');
+	typeDecimals(0);
+	ok('a value that is already 0 is not counted', shown() === '', shown());
+	press('Cancel');
+	// A small demand and a tiny volume count too (a Volume minimum of 0 is "no minimum", so a
+	// nonzero one that rounds to 0 is the case worth the warning).
+	L.reset(); L.setCanvas(800, 600);
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_volume: 'ft3' });
+	L.remember();
+	const t = L.addNode('tank', 0, 0);
+	L.setProp(t, 'minVolume', 0.0004); L.buildDom();
+	pickUnit('lpn_u_volume', 'gal');
+	typeDecimals(0);
+	ok('Volume: a 0.0004 ft3 minimum at Decimals 0 is counted', shown() === want(1), shown());
+	press('Keep');
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

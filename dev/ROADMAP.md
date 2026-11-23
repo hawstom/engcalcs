@@ -287,7 +287,6 @@ the block.
   R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
   interim workflow, verbatim in `dev/dxf-interface.md`. **DXF export merged 2026-10-08**; import is
   what remains.
-- 75|857| **A Volume unit in Settings for tank volumes.** Tom, 2026-11-09: *"I just noticed that the "Available volume" unit for a tank time series graph is ft^3 and that we don't have a units selector for Volume in settings. I think we need to fix this."* A new unit family in every preset (gal, ft³, m³, L; `dev/unit-rulings.md`). Priority set by CC.
 - 50|856| **A map inset that zooms one spot on its own.** Tom, 2026-11-06, on labels at a Pump+: *"there may be too much happening at one point to convey on the map ... it might be nice to provide an ability to create Map, Inset or viewport where a square on the map can be independently zoomed, and a nice inset arrow connects the viewport to its asset or location on the overall map, and this is loosely related to Task 146.09."* His other option, (a): labels stay on every element and gang nicely at a close zoom.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:

@@ -49,8 +49,8 @@ under Export EPANET file…, in `js/looped-network.js` (`exportGeoJsonFile`). Ha
   `pump_curve_name`, `vol_curve_name`, `headloss_curve_name`. A junction with no pattern of its own
   gets the project's default pattern, resolved, because that is what EPANET applies. Writing the
   name in the Gusnet field would be read as a one-multiplier pattern (name `3` triples the demand).
-- **Tank `min_vol` is 0**, the `.inp` writer's own value; this page does not hold it. With a volume
-  curve EPANET takes the minimum volume from the curve. Gusnet requires the field.
+- **Tank `min_vol` is the tank's Minimum volume**, as typed, in the Volume unit `units` names for it (0 when
+  none is stated). With a volume curve EPANET takes the minimum volume from the curve. Gusnet requires the field.
 - **Results are rounded to 6 significant figures** (they are ours, with float noise in the tail;
   typed inputs are never rounded). A pump's `headloss` is as the map shows it; **EPANET and WNTR
   report a pump's headloss as negative** (a gain). `lwn.unit_note`, `headloss_sign` and

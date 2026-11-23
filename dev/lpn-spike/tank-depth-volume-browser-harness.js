@@ -107,6 +107,14 @@ async function main() {
 			const k = Object.keys(row).filter((h) => h.indexOf(prefix) === 0)[0];
 			return k === undefined ? undefined : row[k];
 		};
+		// The Volume selector, the way a reader changes it: the unit's name as the option value.
+		const setVol = async (a, unit) => {
+			await a.page.evaluate((u) => {
+				const sel = document.getElementById('lpn_u_volume');
+				sel.value = u; sel.dispatchEvent(new Event('change', { bubbles: true }));
+			}, unit);
+			await a.settle(700);
+		};
 		const consent = (a) => a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 
 		// ---- 1. Net3 ----------------------------------------------------------------------------
@@ -119,6 +127,8 @@ async function main() {
 		await a.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
 		await runDone(a);
 		await openTanks(a);
+		// A US example opens on cubic feet (its MinVol unit); the checks below are in them, so say so anyway.
+		await setVol(a, 'ft3');
 		const depthName = await a.lang('lpn_result_depth');
 		const volName = await a.lang('lpn_result_tank_volume');
 		const headName = await a.lang('lpn_field_head');
@@ -202,7 +212,7 @@ async function main() {
 		const heads = Object.keys((await table(a))[0]);
 		const dh = heads.filter((h) => h.indexOf(depthName) === 0)[0], vh = heads.filter((h) => h.indexOf(volName) === 0)[0];
 		ok('Depth heading states the head unit: ' + dh, /\(ft H2O\)/.test(dh || ''));
-		ok('Available volume heading states the length unit cubed: ' + vh, /\(ft\^3\)/.test(vh || ''));
+		ok('Available volume heading states the Volume unit: ' + vh, /\(ft\^3\)/.test(vh || ''));
 
 		// ---- 3. the graph offers both (Net3 still open) ------------------------------------------
 		console.log('\n3. THE TIME-SERIES GRAPH');
@@ -211,6 +221,44 @@ async function main() {
 		const opts = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ts_quantity option')).map((o) => [o.value, o.textContent]));
 		ok('the node quantities include Depth', opts.some((o) => o[0] === 'depth' && o[1] === depthName), JSON.stringify(opts.map((o) => o[1])));
 		ok('the node quantities include Available volume', opts.some((o) => o[0] === 'volume' && o[1] === volName));
+
+		// ---- 3a. every Volume unit, Net3 at 9 h, one value checked by hand ---------------------------
+		console.log('\n3a. EACH VOLUME UNIT: TABLE, GRAPH AXIS, AND A HAND CHECK');
+		await a.page.click('#lpn_pane_tab_tanks');
+		await a.settle(500);
+		await goTo(a, 9 * 3600);
+		const ft3Row = (await table(a))[0];
+		const ft3Vol = parseFloat(col(ft3Row, volName));
+		ok('cubic feet at 9 h is a number to convert (' + ft3Vol + ')', isFinite(ft3Vol) && ft3Vol > 0);
+		// Independent constants, typed here from the definitions (1 ft3 = 28.316846592 L; 1 US gal = 3.785411784 L),
+		// NOT read from the suite's factor table.
+		const perFt3 = { gal: 28.316846592 / 3.785411784, mgal: 28.316846592 / 3.785411784 / 1e6, ft3: 1,
+			acft: 1 / 43560, m3: 0.028316846592, l: 28.316846592, megaliter: 28.316846592 / 1e6 };
+		const mark = { gal: 'gal', mgal: 'MG', ft3: 'ft^3', acft: 'ac-ft', m3: 'm^3', l: 'L', megaliter: 'ML' };
+		for (const u of Object.keys(perFt3)) {
+			await setVol(a, u);
+			const row = (await table(a))[0];
+			const hd = Object.keys(row).filter((h) => h.indexOf(volName) === 0)[0];
+			const shown = parseFloat(row[hd]);
+			const want = ft3Vol * perFt3[u];
+			// The table prints to a few decimals, so compare to the print's own resolution.
+			ok(u + ': the Tanks table shows ' + shown + ' (hand: ' + want.toPrecision(5) + ')', near(shown, want, Math.max(Math.abs(want) * 2e-3, 0.51e-3 + (Math.abs(want) < 1 ? 0.5e-3 : 0))));
+			ok(u + ': the heading says (' + mark[u] + '): ' + hd, hd.indexOf('(' + mark[u] + ')') >= 0);
+		}
+		// The graph's axis follows the selector, and the value the chart carries is in that unit.
+		await a.page.click('#lpn_pane_tab_timeseries');
+		await a.settle(600);
+		for (const u of ['gal', 'm3', 'l']) {
+			await setVol(a, u);
+			await a.page.evaluate(() => {
+				const sel = document.getElementById('lpn_ts_quantity');
+				sel.value = 'volume'; sel.dispatchEvent(new Event('change', { bubbles: true }));
+			});
+			await a.settle(700);
+			const txt = await a.page.evaluate(() => document.getElementById('lpn_ts_chart').textContent);
+			ok(u + ': the graph axis names Available volume in ' + mark[u], txt.indexOf(volName) >= 0 && txt.indexOf(mark[u]) >= 0, txt.slice(0, 140));
+		}
+		await setVol(a, 'ft3');
 
 		// ---- 2. a tank with a volume curve -------------------------------------------------------
 		console.log('\n2. A TANK WITH A VOLUME CURVE');
@@ -232,6 +280,7 @@ async function main() {
 			});
 			await b.settle(800);
 		}
+		await setVol(b, 'ft3');
 		await b.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
 		await runDone(b);
 		await openTanks(b);

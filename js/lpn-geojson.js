@@ -257,9 +257,11 @@
 				// Tank diameter is in the LENGTH unit, not the pipe-diameter unit (CLAUDE.md).
 				put(p, u, 'tank_diameter', nd, 'tankDiameter', (eff(nd, 'tankDiameter') || 0), uLen);
 				putCurve(p, 'vol_curve', eff(nd, 'volCurve'));
-				// EPANET's own MinVol column, which this page does not hold: 0, as the .inp writer
-				// writes it. With a volume curve EPANET takes the minimum volume from the curve.
-				p.min_vol = new Raw('0');
+				// MinVol as the project holds it, exactly as typed, in the Volume unit that `units` names
+				// for the field (dev/geojson.md: values are in the project's own units). Absent is 0.
+				// With a volume curve EPANET takes the minimum volume from the curve.
+				put(p, u, 'min_vol', nd, 'minVolume', eff(nd, 'minVolume') || 0, units.lpn_u_volume);
+				if (p.min_vol === undefined) { p.min_vol = new Raw('0'); }
 			}
 			extras(p, nd);
 			rs = results && results.nodes && results.nodes[nd.id];

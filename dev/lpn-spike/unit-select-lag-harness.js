@@ -130,9 +130,9 @@ console.log('--- a unit change never touches the project-arrival path ---');
 buildNetwork();
 resetCounters();
 pickUnit('lpn_u_length', 'm');
-press('Non-destructive');
+press('Keep');
 ok(global.__buildDomCalls === 0,
-	'Non-destructive: buildDom() is not called -- nothing drawn changed shape',
+	'Keep: buildDom() is not called -- nothing drawn changed shape',
 	String(global.__buildDomCalls));
 ok(global.__arrivalCalls === 0,
 	'...and refreshAllFromDocument() (the project-SWITCH path) is not called either',
@@ -141,8 +141,8 @@ ok(global.__arrivalCalls === 0,
 buildNetwork();
 resetCounters();
 pickUnit('lpn_u_flow', 'ft3ps');
-press('Destructive');
-ok(global.__buildDomCalls === 0, 'Destructive: buildDom() is not called', String(global.__buildDomCalls));
+press('Convert');
+ok(global.__buildDomCalls === 0, 'Convert: buildDom() is not called', String(global.__buildDomCalls));
 ok(global.__arrivalCalls === 0, '...nor refreshAllFromDocument()', String(global.__arrivalCalls));
 
 // A unit that needs no dialog (nothing typed in it) is the commonest case of all -- an early US/SI
@@ -165,7 +165,7 @@ console.log('--- the label pass this change owes is deferred, not paid inline --
 buildNetwork();
 resetCounters();
 pickUnit('lpn_u_diameter', 'mm');
-press('Non-destructive');
+press('Keep');
 ok(global.__labelPassesSync === 0,
 	'no SYNCHRONOUS label pass runs inside the change handler (requestLabelRefresh() only marks it owed)',
 	String(global.__labelPassesSync));
@@ -178,7 +178,7 @@ buildNetwork();
 L.settings().autoRun = false;
 resetCounters();
 pickUnit('lpn_u_pressure', 'kpa');
-if (dialogOpen()) { press('Non-destructive'); }
+if (dialogOpen()) { press('Keep'); }
 // The unit changed and a relabel is owed even with Recalculate off -- this is not an ordinary
 // element edit (which the stale-snapshot ruling keeps to just its own label): every element's
 // DISPLAYED number depends on the unit strip, so the whole map is owed one pass, exactly like a

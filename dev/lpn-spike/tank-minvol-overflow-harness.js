@@ -6,12 +6,12 @@
 // values already crossed (inp-fidelity-harness.js section 2); this holds the editors:
 //
 //   1. THE POPUP (the shipped renderNodeFields, the shipped listeners): a Minimum volume number box
-//      named for the Length unit cubed, and a Can overflow Yes/No choice. Typing writes the document;
+//      named for the Volume unit, and a Can overflow Yes/No choice. Typing writes the document;
 //      choosing the word the file already spells that way changes nothing, characters included.
 //   2. THE TABLES PANE carries both columns, and writes through the same setters.
 //   3. THE SCENARIO SEAM: both are overridable, an edit inside a scenario is that scenario's own and
 //      Base keeps its value, and the model and the .inp export of that scenario say it.
-//   4. A LENGTH UNIT CHANGE converts the volume by the CUBE of the factor, Base and overrides.
+//   4. A VOLUME UNIT CHANGE reinterprets (or, on Convert, converts) the typed volume; a Length change leaves it alone.
 //   5. FIND reads both.
 //
 // The expectation is read off the file by a deliberately dumber reader, never off the parser.
@@ -34,6 +34,7 @@ const L = loadLoopedNetwork(
 	"\t\tassembleModel: assembleModel, convertUnitValues: convertUnitValues,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), { effective: effective }); },\n" +
 	"\t\trenderNodeFields: renderNodeFields,\n" +
+	"\t\tserializeProject: serializeProject, unitKey: unitKey, colorNodeValue: colorNodeValue, tankVolumeUnitText: tankVolumeUnitText, unitServes: unitServes,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\ttableCols: function (id) { return paneCols(paneTableById(id)); },\n" +
 	"\t\tquery: function (scope, prop, op, value) {\n" +
@@ -125,7 +126,7 @@ popup();
 {
 	const mv = labelled(/^Minimum volume/), ov = labelled(/^Can overflow/);
 	ok('a tank\'s Properties carry Minimum volume and Can overflow', !!mv && !!ov, labelsOf().map((c) => c.textContent).join(' | '));
-	ok('Minimum volume names the Length unit cubed', !!mv && /ft\^3/.test(mv.textContent), mv && mv.textContent);
+	ok('Minimum volume names the Volume unit (ft^3 on a US file)', !!mv && /ft\^3/.test(mv.textContent), mv && mv.textContent);
 	ok('Minimum volume is a number box, empty-capable', !!mv && inputIn(mv) && inputIn(mv).type === 'number');
 	ok('Can overflow is a Yes/No choice and a tank with no Overflow says No',
 		!!ov && selectIn(ov) && selectIn(ov).children.map((o) => o.value).join() === 'YES,NO' && selectIn(ov).children.filter((o) => o.selected)[0].value === 'NO');
@@ -201,18 +202,27 @@ console.log('\n--- 4. a scenario owns its own ---');
 		tankRows(L.exportInp().inp).join('|') === 'T1 20 10 2 20 30 500 * NO', tankRows(L.exportInp().inp).join('|'));
 }
 
-console.log('\n--- 5. a Length unit change converts a volume by the cube ---');
+console.log('\n--- 5. the Volume unit converts a typed volume; a Length change leaves it alone (Task 857) ---');
 {
 	open(FILE(' T1 20 10 2 20 30 1000 * NO'));
 	const S = L.createScenario('Other');
 	L.switchScenario(S.id);
 	L.setProp(tank(), 'minVolume', 2000);
 	L.switchScenario(L.baseScenario().id);
-	const k = 0.3048;   // 100 ft -> 30.48 m: the length factor going from ft to m
-	L.convertUnitValues('lpn_u_length', k);
-	ok('Base\'s 1000 ft3 is now 1000 x k^3', Math.abs(tank().minVolume - 1000 * k * k * k) < 1e-9, String(tank().minVolume));
+	L.convertUnitValues('lpn_u_length', 0.3048);
+	ok('a Length change does not move Base\'s minimum volume', tank().minVolume === 1000, String(tank().minVolume));
 	L.switchScenario(S.id);
-	ok('and the scenario\'s override too', Math.abs(L.effective(tank(), 'minVolume') - 2000 * k * k * k) < 1e-9, String(L.effective(tank(), 'minVolume')));
+	ok('...nor the scenario\'s override', L.effective(tank(), 'minVolume') === 2000, String(L.effective(tank(), 'minVolume')));
+	L.switchScenario(L.baseScenario().id);
+	const k = 7.48051948;   // ft3 -> gal
+	const n = L.convertUnitValues('lpn_u_volume', k);
+	ok('the Volume unit converts Base\'s 1000 by its own factor', Math.abs(tank().minVolume - 1000 * k) < 1e-9, String(tank().minVolume));
+	L.switchScenario(S.id);
+	ok('and the scenario\'s override too', Math.abs(L.effective(tank(), 'minVolume') - 2000 * k) < 1e-9, String(L.effective(tank(), 'minVolume')));
+	ok('it counted the numbers it decides', n >= 1, String(n));
+	ok('the question names Minimum volume under Volume and not under Length',
+		L.unitServes('lpn_u_volume').join() === 'Minimum volume' && L.unitServes('lpn_u_length').indexOf('Minimum volume') < 0,
+		L.unitServes('lpn_u_volume').join() + ' / ' + L.unitServes('lpn_u_length').join());
 }
 
 console.log('\n--- 6. Find reads both ---');
@@ -222,5 +232,118 @@ console.log('\n--- 6. Find reads both ---');
 	ok('a tank is findable on Can overflow', L.query('tank', 'overflow', 'equals', 'YES').length === 1 && L.query('tank', 'overflow', 'equals', 'NO').length === 0);
 }
 
-console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
-process.exit(fails ? 1 : 0);
+console.log('\n--- 7. the Volume selector (Task 857): one unit for a typed and a solved volume ---');
+{
+	const sel = (u) => L.applyUnitSelections({ lpn_u_volume: u });
+	const TXT = FILE(' T1 20 10 2 20 30 500 * NO');
+	const clean = (t) => tankRows(t).join('|');
+	const M3_PER_GAL = 3.785411784e-3, M3_PER_FT3 = Math.pow(0.3048, 3);
+	setUnitSet('us');
+	open(TXT);
+	ok('a US file opens on cubic feet, the unit its MinVol is in', L.unitKey('lpn_u_volume') === 'ft3', L.unitKey('lpn_u_volume'));
+	const base = L.exportInp().inp;
+	const ft3 = Math.PI / 4 * 30 * 30 * (10 - 2);
+	const t = L.nodeById('T1');
+	const perFt3 = { gal: 28.316846592 / 3.785411784, ft3: 1, m3: 0.028316846592, l: 28.316846592 };
+	['ft3', 'gal', 'm3', 'l'].forEach((u) => {
+		sel(u);
+		const v = L.colorNodeValue(t, 'volume');
+		ok(u + ': Available volume at the initial depth ' + (ft3 * perFt3[u]).toFixed(2) + ' (shown ' + v + ')',
+			typeof v === 'number' && Math.abs(v - ft3 * perFt3[u]) < 1e-6 * ft3 * perFt3[u], String(v));
+		ok(u + ': the heading unit follows', L.tankVolumeUnitText() === { gal: 'gal', ft3: 'ft^3', m3: 'm^3', l: 'L' }[u], L.tankVolumeUnitText());
+		ok(u + ': a typed Minimum volume is NOT converted by the change (500 stays 500)', t.minVolume === 500, String(t.minVolume));
+		// The export: the file's own characters when the unit is the file's, a stated conversion otherwise.
+		const out = L.exportInp();
+		const want = u === 'ft3' ? 500 : 500 * (u === 'gal' ? M3_PER_GAL : u === 'm3' ? 1 : 1e-3) / M3_PER_FT3;
+		const got = parseFloat(tankRows(out.inp)[0].split(' ')[6]);
+		ok(u + ': MinVol goes out in the file\'s ft3: ' + want.toFixed(4), Math.abs(got - want) < 1e-9 * Math.max(1, want), clean(out.inp));
+		ok(u + ': ' + (u === 'ft3' ? 'the file goes out byte for byte the same' : 'the export says it converted a volume'),
+			u === 'ft3' ? out.inp === base : (out.differences || []).some((d) => d.code === 'unit-converted' && /volume/.test(d.detail || '')),
+			JSON.stringify((out.differences || []).map((d) => d.detail)));
+		// The model both engines read, in cubic metres, converted once from the unit it is typed in.
+		const m = L.assembleModel().nodes.filter((n) => n.id === 'T1')[0];
+		const wantM3 = 500 * { ft3: M3_PER_FT3, gal: M3_PER_GAL, m3: 1, l: 1e-3 }[u];
+		ok(u + ': the model carries ' + wantM3.toFixed(4) + ' m3', Math.abs(m.minVolume - wantM3) < 1e-12, String(m.minVolume));
+	});
+	// The Properties box heading and Find's unit text name the Volume unit.
+	sel('gal'); popup();
+	ok('the Properties heading says (gal) for Minimum volume', /^Minimum volume.*\(gal\)/.test((labelled(/^Minimum volume/) || {}).textContent || ''), (labelled(/^Minimum volume/) || {}).textContent);
+	ok('...and for Available volume', /^Available volume.*\(gal\)/.test((labelled(/^Available volume/) || {}).textContent || ''));
+	// A Length change no longer moves the typed volume's meaning: the Volume unit decides it.
+	sel('ft3');
+	// An SI file opens on cubic metres and exports byte for byte.
+	const SI = TXT.replace('Units GPM', 'Units LPS').replace(' P1 R1 J1 1000 12 100', ' P1 R1 J1 300 300 100').replace(' P2 J1 T1 500 8 100', ' P2 J1 T1 150 200 100');
+	setUnitSet('si');
+	open(SI);
+	ok('an SI file opens on cubic metres', L.unitKey('lpn_u_volume') === 'm3', L.unitKey('lpn_u_volume'));
+	ok('...and its tank row exports as the file wrote it', clean(L.exportInp().inp) === clean(SI), clean(L.exportInp().inp));
+	// Saved and reopened.
+	setUnitSet('us'); open(TXT);
+	sel('l');
+	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
+	ok('the project saves the Volume unit by name', saved.units && saved.units.lpn_u_volume === 'l', JSON.stringify(saved.units));
+	sel('ft3');
+	L.applyUnitSelections(saved.units);
+	ok('and reopens in it', L.unitKey('lpn_u_volume') === 'l');
+	// A project saved before the selector typed its volume in the Length unit cubed: it opens on that,
+	// so no number changes meaning, whatever the last project left showing.
+	setUnitSet('us');
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_volume: 'l' });
+	L.applyUnitSelections({ lpn_u_length: 'm', lpn_u_diameter: 'mm' });
+	ok('an old SI project: cubic metres', L.unitKey('lpn_u_volume') === 'm3', L.unitKey('lpn_u_volume'));
+	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in' });
+	ok('an old US project: cubic feet, the unit its number was typed in', L.unitKey('lpn_u_volume') === 'ft3', L.unitKey('lpn_u_volume'));
+	L.applyUnitSelections({ lpn_u_length: 'm', lpn_u_volume: 'ft3' });
+	ok('a project that states its volume unit keeps it', L.unitKey('lpn_u_volume') === 'ft3');
+	// Properties and the Tanks column print the same decimals.
+	open(TXT);
+	['gal', 'mgal', 'acft', 'm3', 'megaliter'].forEach((u) => {
+		sel(u);
+		popup();
+		const row = labelled(/^Available volume/);
+		const span = row && (row.children || []).filter((c) => c._tag === 'span').pop();
+		const col = L.tableCols('tanks').filter((c) => c.key === 'volume')[0];
+		const d = col.dec();
+		const shown = span && span.textContent;
+		const decs = shown && shown.indexOf('.') >= 0 ? shown.length - shown.indexOf('.') - 1 : 0;
+		ok(u + ': Properties prints ' + d + ' decimals like the Tanks column (' + shown + ')', !!row && decs === d, shown);
+	});
+	setUnitSet('us');
+}
+
+console.log('\n--- 8. a solve before and after a Volume unit change, the engine reading the same tank (Task 857) ---');
+(async function () {
+	const { warmEpanet } = require('./lpn-dom-stub.js');
+	await warmEpanet();
+	setUnitSet('us');
+	open(FILE(' T1 20 10 2 20 30 7500 * NO'));
+	const M3_PER_GAL = 3.785411784e-3;
+	const tankRow = (model) => (function (r) { return typeof r === "string" ? r : r.inp; }(EC.lpnToInp(model))).split(/\r?\n/).filter((l) => /^\s*T1\s/.test(l)).map((l) => l.trim().split(/\s+/));
+	const solveIt = async () => {
+		const model = L.assembleModel();
+		const inp = tankRow(model)[0];
+		const r = await EC.lpnSolveEpanet(JSON.parse(JSON.stringify(model)), { moduleUrl: require('./lpn-dom-stub.js').NODE_ENGINE_URL });
+		return { minVolume: model.nodes.filter((n) => n.id === 'T1')[0].minVolume, inpMinVol: parseFloat(inp[6]), r };
+	};
+	const a = await solveIt();
+	ok('the engine solves with a 7500 ft3 MinVol', a.r && a.r.ok !== false && a.r.heads, JSON.stringify(a.r && a.r.error));
+	ok('EPANET\'s file got the volume in cubic metres', Math.abs(a.inpMinVol - 7500 * Math.pow(0.3048, 3)) < 1e-3 * a.inpMinVol, String(a.inpMinVol));
+	// Reinterpret: the same typed 7500 now means gallons. The model must follow the unit, not the digits.
+	L.applyUnitSelections({ lpn_u_volume: 'gal' });
+	const b = await solveIt();
+	ok('after the unit becomes gallons the model\'s MinVol is 7500 gal = ' + (7500 * M3_PER_GAL).toFixed(4) + ' m3',
+		Math.abs(b.minVolume - 7500 * M3_PER_GAL) < 1e-12, String(b.minVolume));
+	ok('...and the engine was handed that number', Math.abs(b.inpMinVol - 7500 * M3_PER_GAL) < 1e-3 * b.inpMinVol, String(b.inpMinVol));
+	ok('...which is not what it was handed before', Math.abs(b.minVolume - a.minVolume) > 1);
+	ok('the engine still solves, the heads untouched by where a MinVol puts the zero of the scale',
+		b.r && b.r.heads && Math.abs(b.r.heads.T1 - a.r.heads.T1) < 1e-6, JSON.stringify([a.r.heads && a.r.heads.T1, b.r.heads && b.r.heads.T1]));
+	// Convert (Destructive): 7500 ft3 becomes the same water in gallons; the model is the number it was.
+	open(FILE(' T1 20 10 2 20 30 7500 * NO'));
+	const before = L.assembleModel().nodes.filter((n) => n.id === 'T1')[0].minVolume;
+	L.applyUnitSelections({ lpn_u_volume: 'gal' });
+	L.convertUnitValues('lpn_u_volume', 7.48051948);
+	const after = L.assembleModel().nodes.filter((n) => n.id === 'T1')[0].minVolume;
+	ok('Convert keeps the water: the model\'s MinVol is the same cubic metres before and after', Math.abs(after - before) < 1e-6 * before, before + ' -> ' + after);
+	console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
+	process.exit(fails ? 1 : 0);
+}());
