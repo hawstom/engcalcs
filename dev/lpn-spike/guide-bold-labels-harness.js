@@ -57,10 +57,14 @@ function universe(t) {
 	});
 	return U;
 }
+const fillIn = (v, f) => Object.keys(f || {}).reduce((s, k) => s.split('{' + k + '}').join(f[k]), v);
+const labelOf = (e, t) => fillIn(e.stripEllipsis ? t[e.key].replace(/…$/u, '') : t[e.key], e.fill);
 const U = universe(en);
+// A label the page composes from a template and the file's own data ("{chemical} concentration" with Net1's Chlorine): its spec entry
+// carries "fill", and the filled English string is a label too.
+Object.keys(SPEC).forEach((mk) => SPEC[mk].forEach((e) => { if (e.fill && en[e.key]) { const t = labelOf(e, en); (U[t] = U[t] || []).push(e.key); } }));
 const TOK = Object.keys(U).sort((a, b) => Buffer.byteLength(b) - Buffer.byteLength(a));
 const XREF = SPECFILE.xrefPhrases;
-const labelOf = (e, t) => e.stripEllipsis ? t[e.key].replace(/…$/u, '') : t[e.key];
 
 // What a definition says: bold spans, and the plain occurrences of each label string.
 function scan(v) {

@@ -1,0 +1,28 @@
+[TITLE]
+Audit fixture: two bulk species (first-order decay and a MASS source at R1) and a wall species, for the EPS audit's runs whose pumps, valves and tanks change under the species (MSX audit slice)
+[OPTIONS]
+AREA_UNITS M2
+RATE_UNITS HR
+SOLVER RK5
+COUPLING NONE
+TIMESTEP 300
+RTOL 0.001
+ATOL 0.0001
+[SPECIES]
+BULK CL2 MG
+BULK TR MG
+WALL BIO UG/M2
+[COEFFICIENTS]
+CONSTANT Kb 0.25
+[PIPES]
+RATE CL2 -Kb*CL2
+RATE TR 0
+RATE BIO 0.01*CL2 - 0.5*BIO
+[TANKS]
+RATE CL2 -Kb*CL2
+RATE TR 0
+[SOURCES]
+MASS R1 TR 20
+[QUALITY]
+GLOBAL CL2 0.5
+NODE R1 CL2 1.2
