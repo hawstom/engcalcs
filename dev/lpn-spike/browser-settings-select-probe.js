@@ -103,15 +103,15 @@ module.exports = async function ({ send, evaluate, logs, sleep }) {
         s.dispatchEvent(new Event('input', { bubbles: true }));
         s.dispatchEvent(new Event('change', { bubbles: true }));
         var t1 = performance.now(), dialogged = false;
-        // A UNIT SELECT SERVING A FIELD THIS PROJECT HAS VALUES IN opens the Non-destructive /
-        // Destructive question (onUnitChange()) instead of acting at once -- the select is put
+        // A UNIT SELECT SERVING A FIELD THIS PROJECT HAS VALUES IN opens the Convert /
+        // Keep question (onUnitChange()) instead of acting at once -- the select is put
         // BACK to its old value until it is answered, so the real cost this probe wants is not in
-        // the dispatch above but in the button click below. Non-destructive (the first button, and
+        // the dispatch above but in the button click below. Keep (the second button, and
         // the suite's standing default) is what a hand reaches for, so that is what is timed.
         var dlg = document.getElementById('lpn_dialog');
         if (dlg && dlg.style.display !== 'none') {
           dialogged = true;
-          var btn = document.querySelector('#lpn_dialog_buttons button');
+          var btn = document.querySelectorAll('#lpn_dialog_buttons button')[1];
           window.__t0 = performance.now();
           if (btn) { btn.click(); }
           t1 = performance.now();

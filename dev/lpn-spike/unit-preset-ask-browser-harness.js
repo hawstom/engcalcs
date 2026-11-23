@@ -3,7 +3,7 @@
 //   node dev/lpn-spike/unit-preset-ask-browser-harness.js
 //
 // Tom, 2026-10-16: "Settings > Units, SI and US buttons reinterpret every unit in one click without
-// asking: Fix it." One unit select asks first (onUnitChange: Non-destructive, Destructive, Cancel);
+// asking: Fix it." One unit select asks first (onUnitChange: Convert, Keep, Cancel);
 // the two buttons went through the suite's EngCalcs.setUnits(), which fires no change event, so
 // they reinterpreted every number in the project silently. They now ask the same question, once
 // for the whole click, and an empty project still changes with no question, as a select does.
@@ -82,7 +82,7 @@ async function main() {
 		await a.goto('Looped-Network.php?ec_nolog=1');
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		const L = {};
-		for (const k of ['lpn_units_warn_title', 'lpn_units_nondestructive', 'lpn_units_destructive', 'lpn_cancel', 'lpn_ex_valves_title']) { L[k] = await a.lang(k); }
+		for (const k of ['lpn_units_convert_q', 'lpn_convas_ok', 'lpn_units_keep', 'lpn_cancel', 'lpn_ex_valves_title']) { L[k] = await a.lang(k); }
 		await a.openExampleCard(L.lpn_ex_valves_title);
 		await a.settle(600);
 		const p0 = await open();
@@ -91,8 +91,10 @@ async function main() {
 		console.log('\n--- SI, then Cancel ---');
 		await preset('si'); await a.settle(400);
 		const d1 = await a.dialog();
-		ok('SI asks the question a unit select asks', !!d1 && d1.text.indexOf(L.lpn_units_warn_title) >= 0, d1 && d1.text.slice(0, 80));
-		ok('...with the same three answers', !!d1 && [L.lpn_units_nondestructive, L.lpn_units_destructive, L.lpn_cancel].every((x) => d1.buttons.indexOf(x) >= 0), d1 && JSON.stringify(d1.buttons));
+		ok('SI asks the question a unit select asks', !!d1 && d1.text.indexOf(L.lpn_units_convert_q.split('{old}')[0]) >= 0, d1 && d1.text.slice(0, 80));
+		ok('...with the same three answers', !!d1 && [L.lpn_convas_ok, L.lpn_units_keep, L.lpn_cancel].every((x) => d1.buttons.indexOf(x) >= 0), d1 && JSON.stringify(d1.buttons));
+		const nDec = await page.evaluate(() => document.querySelectorAll('#lpn_dialog_body input[data-decimals-for]').length);
+		ok('...each with its own Decimals field', nDec >= 4, nDec + ' fields');
 		const leads = await page.evaluate(() => document.querySelectorAll('#lpn_dialog_body .lpn-unit-fields').length);
 		ok('...naming each unit the click changes that decides a number (one list per unit)', leads >= 4, leads + ' lists');
 		ok('nothing has moved while it asks', brief(await strip()) === brief(p0.units));
@@ -101,20 +103,21 @@ async function main() {
 		ok('Cancel leaves the strip, the stored units and the numbers as they were',
 			brief(await strip()) === brief(p0.units) && brief(p1.units) === brief(p0.units) && p1.pipe.d === p0.pipe.d, brief(p1.units) + ', ' + p1.pipe.d);
 
-		console.log('\n--- SI, Non-destructive ---');
+		console.log('\n--- SI, Keep ---');
 		await preset('si'); await a.settle(400);
-		await press(L.lpn_units_nondestructive); await a.settle(600);
+		await press(L.lpn_units_keep); await a.settle(600);
 		const p2 = await open();
 		ok('every unit is SI, on the strip and in the project', brief(p2.units) === 'm / mm / mh2o / lps' && brief(await strip()) === brief(p2.units), brief(p2.units));
 		ok('...and the typed numbers are untouched (' + p0.pipe.d + ' now means mm)', p2.pipe.d === p0.pipe.d, p2.pipe.d);
 
-		console.log('\n--- US, Destructive ---');
+		console.log('\n--- US, Convert ---');
 		await preset('us'); await a.settle(400);
 		ok('US asks too', !!(await a.dialog()));
-		await press(L.lpn_units_destructive); await a.settle(600);
+		await page.evaluate(() => document.querySelectorAll('#lpn_dialog_body input[data-decimals-for]').forEach((i) => { i.value = '8'; }));
+		await press(L.lpn_convas_ok); await a.settle(600);
 		const p3 = await open();
 		ok('every unit is US again', brief(p3.units) === 'ft / in / fth2o / gpm', brief(p3.units));
-		ok('...and the numbers were rewritten (' + p0.pipe.d + ' mm is ' + (p0.pipe.d / 25.4).toFixed(4) + ' in)', Math.abs(p3.pipe.d - p0.pipe.d / 25.4) < 1e-9, p3.pipe.d);
+		ok('...and the numbers were rewritten (' + p0.pipe.d + ' mm is ' + (p0.pipe.d / 25.4).toFixed(4) + ' in)', Math.abs(p3.pipe.d - p0.pipe.d / 25.4) < 1e-8, p3.pipe.d);
 		await page.keyboard.press('Escape');
 		await page.mouse.click(5, 300).catch(() => {});
 		await page.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true })));

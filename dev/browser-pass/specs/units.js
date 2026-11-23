@@ -47,7 +47,7 @@ exports.run = async function ({ browser, report }) {
 			report.ok(strip.selects.indexOf(n) >= 0, n + ' is on the strip');
 		});
 		// `lpn_u_age` joined them 2026-09-09 with water age, and is results-only for the same reason.
-		['lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_age'].forEach((n) => {
+		['lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_age', 'lpn_u_volume'].forEach((n) => {
 			report.ok(strip.selects.indexOf(n) >= 0,
 				n + ' is on it too — results-only, and it never had an input twin');
 		});
@@ -172,8 +172,8 @@ exports.run = async function ({ browser, report }) {
 		// shipped 2026-08-24 naming the two by what they DO to the document -- a reinterpretation
 		// leaves every number alone, a conversion rewrites all of them -- and added the way out.
 		report.eq(asked.buttons.length, 3, '...with three answers');
-		report.ok(/Non-destructive/.test(asked.buttons[0]) && /Destructive/.test(asked.buttons[1]),
-			'...Non-destructive and Destructive, in that order', asked.buttons.join(' | '));
+		report.ok(/^Convert$/.test(asked.buttons[0]) && /^Keep$/.test(asked.buttons[1]),
+			'...Convert and Keep, in that order', asked.buttons.join(' | '));
 		report.ok(/Cancel/.test(asked.buttons[2]),
 			'...and Cancel, so the question can be left unanswered', asked.buttons[2]);
 		// The fields it decides are NAMED, because that is what makes the question answerable.

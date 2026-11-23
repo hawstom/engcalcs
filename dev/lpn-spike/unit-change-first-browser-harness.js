@@ -1,12 +1,14 @@
-// CHANGING A UNIT FIRST, RIGHT AFTER OPENING A PROJECT, IN A REAL CHROME (Perry's pass, Task 857).
+// CHANGING A UNIT FIRST, RIGHT AFTER OPENING A PROJECT, IN A REAL CHROME (Task 857, Perry's pass).
 //
 //   node dev/lpn-spike/unit-change-first-browser-harness.js
 //
 // The page remembers each unit select's PREVIOUS unit to know what a change moves from. A project
-// opened with a unit that differs from the page's default (an SI example on a US page) must install
-// that memory, or the first change converts from the wrong unit or asks nothing. Open an example,
-// change the unit FIRST, and check that the question appears, Cancel puts it back, and Convert moves
-// the typed numbers by the right factor.
+// opened with a unit that differs from the page's default (Net1 under Volume: ft^3 against the
+// preset's gallons) must install that memory, or the first change converts from the wrong unit,
+// or asks nothing. Open an example, type a number, change the unit FIRST (Convert, then
+// Reinterpret), and check the number, that the question appears, and that every display that
+// names the unit agrees without a Calculate. Then the same first change on every other unit,
+// on an SI example opened on a US page.
 //
 // **DO NOT PREFIX THIS WITH `flock`.** It takes /tmp/engcalcs-browser.lock itself.
 'use strict';
@@ -47,11 +49,17 @@ async function main() {
 			const a = await Session.open(browser, 'ucf', { viewport: { width: 1500, height: 950 }, extraHTTPHeaders: { 'Accept-Language': 'en-US,en;q=0.9' } });
 			await a.goto('Looped-Network.php?ec_nolog=1');
 			await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-			for (const k of ['lpn_units_nondestructive', 'lpn_units_destructive', 'lpn_cancel', 'lpn_ex_net1_title', 'lpn_ex_net1_si_title', 'lpn_field_tank_minvol', 'lpn_result_tank_volume', 'lpn_pane_toggle']) { L[k] = await a.lang(k); }
+			for (const k of ['lpn_units_keep', 'lpn_convas_ok', 'lpn_units_convert_q', 'lpn_cancel', 'lpn_ex_net1_title', 'lpn_ex_net1_si_title', 'lpn_field_tank_minvol', 'lpn_result_tank_volume', 'lpn_pane_toggle']) { L[k] = await a.lang(k); }
 			await a.openExampleCard(L[key]);
 			await a.settle(800);
 			return a;
 		};
+		// The question's Decimals field(s), set the way a visitor types in them.
+		const setDecimals = (a, n) => a.page.evaluate((n) => {
+			const f = Array.from(document.querySelectorAll('#lpn_dialog_body input[data-decimals-for]'));
+			f.forEach((i) => { i.value = String(n); i.dispatchEvent(new Event('input', { bubbles: true })); i.dispatchEvent(new Event('change', { bubbles: true })); });
+			return f.length;
+		}, n);
 		const press = (a, label) => a.page.evaluate((t) => {
 			const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === t);
 			if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); }
@@ -91,13 +99,63 @@ async function main() {
 		const graphText = (a) => a.page.evaluate(() => { const h = document.getElementById('lpn_pgraph_chart'); return h ? h.textContent : ''; });
 		const dialogOpen = (a) => a.dialog().then((d) => !!d);
 
+		for (const [mode, label] of [['destructive', 'Convert'], ['nondestructive', 'Keep']]) {
+			console.log('\n--- Net1, Volume changed FIRST, ' + label + ' ---');
+			const a = await fresh('lpn_ex_net1_title');
+			await a.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+			await a.waitFor(() => a.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 120000);
+			ok('the example opens on ft^3', await a.page.evaluate(() => document.getElementById('lpn_u_volume').value) === 'ft3');
+			await openTank(a);
+			ok('Minimum volume typed', await typeMinVol(a, 20000));
+			ok('20000 is stored', await stored(a, '2', 'minVolume') === 20000);
+			await setSel(a, 'lpn_u_volume', 'mgal');
+			await a.settle(500);
+			ok('the question appears', await dialogOpen(a));
+			ok('the question names ft^3 and MG', await a.page.evaluate(() => document.getElementById('lpn_dialog_body').textContent.indexOf('Convert inputs from ft') === 0));
+			ok('one Decimals field is offered, blank (no rounding)', await a.page.evaluate(() => { const f = document.querySelectorAll('#lpn_dialog_body input[data-decimals-for]'); return f.length === 1 && f[0].value === ''; }));
+			if (mode === 'destructive') { await setDecimals(a, 6); }
+			await press(a, L[mode === 'destructive' ? 'lpn_convas_ok' : 'lpn_units_keep']);
+			await a.settle(900);
+			const mv = await stored(a, '2', 'minVolume');
+			if (mode === 'destructive') {
+				const want = 20000 * 28.316846592 / 3.785411784 / 1e6;
+				ok('20000 ft^3 became ' + want.toFixed(4) + ' MG', Math.abs(mv - want) < 1e-6, String(mv));
+			} else {
+				ok('20000 stayed 20000 and now means MG', mv === 20000, String(mv));
+			}
+			// Every display that names the unit, with no Calculate since.
+			await openTank(a);
+			const labs = await popupLabels(a);
+			const pm = labs.find((t) => /^Minimum volume/.test(t)) || '', pv = labs.find((t) => /^Available volume/.test(t)) || '';
+			ok('Properties: Minimum volume says MG', /\(MG\)/.test(pm), pm);
+			ok('Properties: Available volume says MG', /\(MG\)/.test(pv), pv);
+			const gt = await graphText(a);
+			const sel = await a.page.evaluate(() => { const s = document.getElementById('lpn_pgraph_field'); if (s) { s.value = 'volume'; s.dispatchEvent(new Event('change', { bubbles: true })); } return !!s; });
+			await a.settle(700);
+			const gt2 = await graphText(a);
+			ok('Properties graph: Available volume axis says MG', sel && /MG/.test(gt2), gt2.slice(0, 80));
+			await a.toolbarClick(L.lpn_pane_toggle); await a.settle(500);
+			const heads = await tankHeads(a);
+			const hv = heads.find((h) => h.indexOf(L.lpn_result_tank_volume) === 0) || '', hm = heads.find((h) => h.indexOf(L.lpn_field_tank_minvol) === 0) || '';
+			ok('Tables: Available volume heading says MG', /\(MG\)/.test(hv), hv);
+			ok('Tables: Minimum volume heading says MG', /\(MG\)/.test(hm), hm);
+			ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+			await a.close();
+		}
+
 		console.log('\n--- the SI twin on a US page: the FIRST change of a unit asks ---');
 		const b = await fresh('lpn_ex_net1_si_title');
-		const first = [['lpn_u_length', 'ft']];
+		const first = [['lpn_u_length', 'ft'], ['lpn_u_diameter', 'in'], ['lpn_u_flow', 'gpm'], ['lpn_u_pressure', 'psi'], ['lpn_u_elevhead', 'fth2o']];
 		for (const [n, to] of first) {
 			const was = await b.page.evaluate((n) => document.getElementById(n).value, n);
 			await setSel(b, n, to);
 			await b.settle(500);
+			if (n === 'lpn_u_pressure') {
+				// Nothing typed in this project is a pressure (no Minimum or Required pressure set), so the
+				// change stands with no question; the strip must show the new unit.
+				ok(n + ' decides no typed number here, so it just changes', !(await dialogOpen(b)) && await b.page.evaluate((n) => document.getElementById(n).value, n) === to);
+				continue;
+			}
 			ok(n + ' (' + was + ' -> ' + to + ') asks the question as its first change', await dialogOpen(b));
 			await press(b, L.lpn_cancel);
 			await b.settle(400);
@@ -113,11 +171,44 @@ async function main() {
 		const l0 = await pipeLen();
 		await setSel(b, 'lpn_u_length', 'ft');
 		await b.settle(500);
-		await press(b, L.lpn_units_destructive);
+		await setDecimals(b, 6);
+		await press(b, L.lpn_convas_ok);
 		await b.settle(900);
 		const l1 = await pipeLen();
 		ok('Length Convert as the first change: ' + l0.v + ' m became ' + (l0.v / 0.3048).toFixed(3) + ' ft', !!l1 && l1.id === l0.id && Math.abs(l1.v - l0.v / 0.3048) < 1e-6 * l0.v, JSON.stringify(l1));
 		await b.close();
+
+		// The Decimals warning (Tom, 2026-11-20), on a Spanish page: the count must follow the Decimals
+		// field there too, with the Spanish page's own number input and labels.
+		console.log('\n--- the Decimals warning, on a Spanish page ---');
+		const es = await Session.open(browser, 'ucf-es', { viewport: { width: 1500, height: 950 }, extraHTTPHeaders: { 'Accept-Language': process.env.UCF_LANG || 'es-ES,es;q=0.9' } });
+		await es.goto('Looped-Network.php?ec_nolog=1');
+		await es.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		const ES = {};
+		for (const k of ['lpn_convas_ok', 'lpn_cancel', 'lpn_ex_net1_si_title', 'lpn_units_zero_warn']) { ES[k] = await es.lang(k); }
+		ok('the page is Spanish (its Convert button is not "Convert")', ES.lpn_convas_ok !== 'Convert', ES.lpn_convas_ok);
+		await es.openExampleCard(ES.lpn_ex_net1_si_title);
+		await es.settle(800);
+		const wantZero = await es.page.evaluate(() => {
+			const ix = JSON.parse(localStorage.getItem('lpn_index') || '{}');
+			const d = JSON.parse(localStorage.getItem('lpn_project_' + ix.openId) || 'null');
+			return d.links.filter((l) => typeof l._diameter === 'number' && l._diameter !== 0 && Math.round(l._diameter / 1000) === 0).length;
+		});
+		ok('the example has pipes to count', wantZero > 0, String(wantZero));
+		await setSel(es, 'lpn_u_diameter', 'm');
+		await es.settle(500);
+		const warn = () => es.page.evaluate(() => { const w = document.querySelector('#lpn_dialog_body .lpn-unit-zero-warn'); return w ? w.textContent : ''; });
+		ok('the question opens with no warning (Decimals blank)', await dialogOpen(es) && await warn() === '', await warn());
+		await setDecimals(es, 0);
+		ok('Decimals 0 mm to m: the warning counts every pipe', await warn() === ES.lpn_units_zero_warn.replace('{n}', String(wantZero)), await warn());
+		if (process.env.UCF_SHOT) { await es.page.screenshot({ path: process.env.UCF_SHOT }); }
+		await setDecimals(es, 3);
+		ok('Decimals 3: the warning goes', await warn() === '', await warn());
+		await setDecimals(es, 0);
+		await setDecimals(es, '');
+		ok('Decimals blank: the warning goes', await warn() === '', await warn());
+		await press(es, ES.lpn_cancel);
+		await es.close();
 	} finally { await browser.close(); env.stopServer(); }
 	console.log('\n' + NAME + ': ' + (checks - fails) + '/' + checks + ' checks passed');
 	process.exit(fails ? 1 : 0);

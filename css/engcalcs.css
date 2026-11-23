@@ -6870,6 +6870,12 @@ html[dir="rtl"] .lpn-lib-entry-sel { box-shadow: inset -3px 0 0 var(--ec-select)
    the line above them rather than as more of the sentence. No bullets -- a marker per line would
    add three glyphs and no meaning to a list of five. */
 .lpn-unit-fields { margin: 0.15em 0 0.7em 1.4em; }
+/* The Decimals field of the unit question: a small number box beside its word. */
+.lpn-unit-decimals { display: block; margin: 0 0 0.9em 1.4em; }
+.lpn-unit-decimals input { width: 4em; margin-left: 0.5em; }
+.lpn-unit-zero-warn { margin: -0.4em 0 0.9em 1.4em; color: var(--ec-warn-ink); }
+.lpn-unit-zero-warn:empty { display: none; }   /* no count, no line: a text write is the only switch */
+#lpn_convas_zero_warn { margin: 0.6em 0 0.6em 0; }   /* below the rounding grid: clear of its border */
 
 /* Print preparation: the Printable version button. */
 .engcalcs-print-tools > p { margin-bottom: 0.2em; }

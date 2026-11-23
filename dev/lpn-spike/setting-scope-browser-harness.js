@@ -240,9 +240,9 @@ async function main() {
 				// A saved change may wait on the debounced solve behind it (a unit, the engine), so the
 				// answer is polled for rather than read once.
 				// A unit that already decides typed numbers asks first (onUnitChange); the harness gives
-				// the dialog its first answer, Non-destructive, which is the suite's standing behaviour.
+				// the dialog its second answer, Keep, which is the suite's standing behaviour.
 				const dlg0 = await a.dialog();
-				if (dlg0 && dlg0.buttons.length) { await press(0); await a.settle(250); tried.push('answered a dialog: ' + dlg0.buttons[0]); }
+				if (dlg0 && dlg0.buttons.length) { await press(1); await a.settle(250); tried.push('answered a dialog: ' + dlg0.buttons[1]); }
 				let landed = false;
 				for (let w = 0; w < 4 && !landed; w++) {
 					await a.settle(250);

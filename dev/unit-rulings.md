@@ -131,6 +131,16 @@ behaves the same way we do, so there is no authority on the other side.
 **A calculator stores what the user typed. Conversion happens at the solver, and on results coming
 back from it, and nowhere else.** If a third conversion site seems necessary, the design is wrong.
 
+### `lpn_` Volume: one unit for a tank's typed and solved volumes (Task 857)
+
+Tom's "one set of units, not an input set and a result set" (Task 522) applies to volume as it does to
+Length. The Volume selector governs a tank's typed Minimum volume and its Available volume alike,
+reinterpreting on change and converting only on Convert. An `.inp` states MinVol in its length unit
+cubed: import starts the project's Volume unit as that (ft3 US, m3 SI); export converts only when
+the Volume unit differs, otherwise the file's own characters. The solver converts once, in
+`assembleModel()`. Rejected: Minimum volume held at Length cubed beside a Volume-unit result (two
+units for one tank, and a heading Tom could not read). Tom, 2026-11-16: *"Compare to other units."*
+
 ### `lpn_` only: a setting belongs to the PROJECT or to the BROWSER, never to both
 
 **SUPERSEDED 2026-09-27 (R-342).** Tom, 2026-09-04, closing Task 584, had ruled a new project

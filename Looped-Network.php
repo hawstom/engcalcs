@@ -139,6 +139,8 @@ echoHeader("EngCalcsApp", $html_title,
 		<?php // RESULTS-ONLY, like Velocity and Head loss gradient beside it: nothing on this page is
 		      // typed in hours. A source share is a percentage and has no selector at all. ?>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_water_age']?></span><?php echoUnitSelect('lpn_u_age', 'elapsed_time', '', $ec_lang['lpn_result_water_age']); ?></span>
+		<?php // The tank volumes typed (Minimum volume) and solved (Available volume, Initial volume) alike, like Length. A volume curve's ordinates are outside it: they stay in the file's length cubed, with the curve's abscissa. ?>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_curve_volume_col']?></span><?php echoUnitSelect('lpn_u_volume', 'volume_tank', '', $ec_lang['lpn_curve_volume_col']); ?></span>
 		<span class="lpn-units-item" id="lpn_u_roughness_row"><span class="lpn-units-name"><?=$ec_lang['lpn_field_roughness']?></span><?php echoUnitSelect('lpn_u_roughness', 'roughness', '', $ec_lang['lpn_field_roughness']); ?></span>
 		</div>
 	</div><?php // #lpn_units_strip ?>
@@ -1798,6 +1800,7 @@ echoHeader("EngCalcsApp", $html_title,
 			</div>
 			<?php } ?>
 		</div>
+		<p id="lpn_convas_zero_warn" class="lpn-unit-zero-warn" role="status"></p>
 		<p class="lpn-dim"><?=$ec_lang['lpn_convas_oneway']?></p>
 	</div>
 	<?php // OK and Cancel stand in a footer outside the scrolling body, so they are always in view. ?>
@@ -2297,15 +2300,13 @@ EngCalcs.pageConfig = {
 	lpn_inp_drop_gpv_curve: <?=json_encode($ec_lang['lpn_inp_drop_gpv_curve'])?>,
 	lpn_gpv_curve_source: <?=json_encode($ec_lang['lpn_gpv_curve_source'])?>,
 	lpn_gpv_curve_source_tip: <?=json_encode($ec_lang['lpn_gpv_curve_source_tip'])?>,
-	lpn_units_warn_title: <?=json_encode($ec_lang['lpn_units_warn_title'])?>,
-	lpn_units_warn_lead: <?=json_encode($ec_lang['lpn_units_warn_lead'])?>,
-	lpn_units_options_head: <?=json_encode($ec_lang['lpn_units_options_head'])?>,
-	lpn_units_nondestructive: <?=json_encode($ec_lang['lpn_units_nondestructive'])?>,
-	lpn_units_nondestructive_desc: <?=json_encode($ec_lang['lpn_units_nondestructive_desc'])?>,
-	lpn_units_destructive: <?=json_encode($ec_lang['lpn_units_destructive'])?>,
-	lpn_units_destructive_desc: <?=json_encode($ec_lang['lpn_units_destructive_desc'])?>,
+	lpn_units_convert_q: <?=json_encode($ec_lang['lpn_units_convert_q'])?>,
+	lpn_convas_ok: <?=json_encode($ec_lang['lpn_convas_ok'])?>,
+	lpn_units_keep: <?=json_encode($ec_lang['lpn_units_keep'])?>,
+	lpn_units_convert_note: <?=json_encode($ec_lang['lpn_units_convert_note'])?>,
 	lpn_status_reinterpreted: <?=json_encode($ec_lang['lpn_status_reinterpreted'])?>,
 	lpn_status_converted: <?=json_encode($ec_lang['lpn_status_converted'])?>,
+	lpn_units_zero_warn: <?=json_encode($ec_lang['lpn_units_zero_warn'])?>,
 	lpn_file_export_menu: <?=json_encode($ec_lang['lpn_file_export_menu'])?>,
 	lpn_file_export_item_inp: <?=json_encode($ec_lang['lpn_file_export_item_inp'])?>,
 	lpn_file_export_item_geojson: <?=json_encode($ec_lang['lpn_file_export_item_geojson'])?>,
@@ -2786,8 +2787,6 @@ EngCalcs.pageConfig = {
 	lpn_units_usft: <?=json_encode($ec_lang['lpn_units_usft'])?>,
 	u_m: <?=json_encode($ec_lang['u_m'])?>,
 	u_ft: <?=json_encode($ec_lang['u_ft'])?>,
-	u_m3: <?=json_encode($ec_lang['u_m3'])?>,
-	u_ft3: <?=json_encode($ec_lang['u_ft3'])?>,
 	lpn_fitting_qty: <?=json_encode($ec_lang['lpn_fitting_qty'])?>,
 	lpn_fitting_name: <?=json_encode($ec_lang['lpn_fitting_name'])?>,
 	lpn_fitting_k: <?=json_encode($ec_lang['lpn_fitting_k'])?>,
@@ -3043,6 +3042,7 @@ EngCalcs.pageConfig = {
 	lpn_field_tank_base_elev_tip: <?=json_encode($ec_lang['lpn_field_tank_base_elev_tip'])?>,
 	lpn_tank_ground_elev_tip: <?=json_encode($ec_lang['lpn_tank_ground_elev_tip'])?>,
 	lpn_field_tank_level: <?=json_encode($ec_lang['lpn_field_tank_level'])?>,
+	lpn_field_tank_initvol: <?=json_encode($ec_lang['lpn_field_tank_initvol'])?>,
 	lpn_field_tank_level_tip: <?=json_encode($ec_lang['lpn_field_tank_level_tip'])?>,
 	lpn_field_tank_minlevel: <?=json_encode($ec_lang['lpn_field_tank_minlevel'])?>,
 	lpn_field_tank_minlevel_tip: <?=json_encode($ec_lang['lpn_field_tank_minlevel_tip'])?>,

@@ -228,8 +228,8 @@ exports.run = async function ({ browser, report }) {
 				s.dispatchEvent(new Event('change', { bubbles: true }));
 			}, unit);
 			await a.settle(400);
-			// The head unit decides typed elevations, so it asks before it acts. Answer Destructive,
-			// which is the second of the three buttons (Non-destructive | Destructive | Cancel).
+			// The head unit decides typed elevations, so it asks before it acts. Answer Convert,
+			// which is the first of the three buttons (Convert | Keep | Cancel).
 			const asked = await a.page.evaluate(() => ({
 				dialog: document.getElementById('lpn_dialog').style.display,
 				buttons: [...document.querySelectorAll('#lpn_dialog_buttons button')].map(b => b.textContent)
@@ -237,7 +237,7 @@ exports.run = async function ({ browser, report }) {
 			if (asked.dialog === 'block') {
 				await a.page.evaluate(() => {
 					const b = [...document.querySelectorAll('#lpn_dialog_buttons button')];
-					(b.find(x => /Destructive/.test(x.textContent)) || b[1]).click();
+					(b.find(x => /^Convert$/.test(x.textContent)) || b[0]).click();
 				});
 			}
 			await a.settle(900);

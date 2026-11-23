@@ -68,9 +68,9 @@ setUnitSet('us');
 	console.log('\n--- one set ---');
 	const all = L.ALL;
 	['lpn_u_length', 'lpn_u_diameter', 'lpn_u_roughness', 'lpn_u_elevhead', 'lpn_u_pressure',
-		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_age']
+		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_age', 'lpn_u_volume']
 		.forEach(n => ok('the set holds ' + n, all.indexOf(n) >= 0));
-	ok('and holds nothing else', all.length === 9, JSON.stringify(all));
+	ok('and holds nothing else', all.length === 10, JSON.stringify(all));
 	// **NO `lpn_u_r_*` SURVIVES ANYWHERE IN THE SET.** Named as a pattern rather than as three
 	// strings, so a fourth one invented later is caught too.
 	ok('no result-only twin is left in the set', all.every(n => n.indexOf('lpn_u_r_') !== 0),
@@ -93,9 +93,37 @@ setUnitSet('us');
 	ok('lpn_u_gradient decides no typed field -- it was never an input', L.unitServes('lpn_u_gradient').length === 0);
 	ok('lpn_u_velocity decides exactly one typed field: the velocity warning limit', L.unitServes('lpn_u_velocity').join() === 'Velocity warning limit', L.unitServes('lpn_u_velocity').join());
 	['lpn_u_length', 'lpn_u_diameter', 'lpn_u_roughness', 'lpn_u_elevhead', 'lpn_u_pressure',
-		'lpn_u_flow'].forEach(n =>
+		'lpn_u_flow', 'lpn_u_volume'].forEach(n =>
 		ok(n + ' names the fields it decides', L.unitServes(n).length > 0,
 			JSON.stringify(L.unitServes(n))));
+	// A tank's volume is typed and solved in the one Volume unit, like Length (Task 857): a typed Minimum
+	// volume is served by Volume and by no other selector.
+	ok('lpn_u_volume decides the typed Minimum volume', L.unitServes('lpn_u_volume').join() === 'Minimum volume', L.unitServes('lpn_u_volume').join());
+	ok('...and Length no longer does', L.unitServes('lpn_u_length').indexOf('Minimum volume') < 0, L.unitServes('lpn_u_length').join());
+	ok('a solved Available volume reads in the same selector', L.resultUnit('volume') === 'lpn_u_volume');
+}
+
+// ---- 1b. the Volume unit reinterprets a typed Minimum volume, and converts it only on request ------
+{
+	console.log('\n--- the Volume unit and a typed Minimum volume ---');
+	L.reset();
+	setUnitSet('us');
+	const t = L.addNode('tank', 0, 0);
+	const lenBefore = L.countValues('lpn_u_length');
+	L.setProp(t, 'minVolume', 1000);
+	L.setOverride(t, 'minVolume', 2500);
+	ok('with a typed Minimum volume there is something to ask about', L.countValues('lpn_u_volume') >= 2, String(L.countValues('lpn_u_volume')));
+	ok('...and a Length change has nothing to say about it', L.countValues('lpn_u_length') === lenBefore, String(L.countValues('lpn_u_length')));
+	L.convertValues('lpn_u_length', 0.3048);
+	ok('a Length conversion leaves it alone', t.minVolume === 1000);
+	L.convertValues('lpn_u_volume', 7.5);
+	ok('a Volume conversion moves Base', t.minVolume === 7500, String(t.minVolume));
+	ok('...and the scenario override', L.getOverride(t, 'minVolume') === 18750, String(L.getOverride(t, 'minVolume')));
+	L.setProp(t, 'minVolume', 0);
+	ok('a stated 0 (EPANET\'s "no separate minimum") is not a number to ask about', L.countValues('lpn_u_volume') === 1, String(L.countValues('lpn_u_volume')));
+	L.reset();
+	const empty = L.countValues('lpn_u_volume');
+	ok('a project with no typed volume asks nothing', empty === 0, String(empty));
 }
 
 // ---- 2. the three kinds of file all open, and none of them asks anything ------------------------

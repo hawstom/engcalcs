@@ -34,7 +34,8 @@ const L = loadLoopedNetwork(
 	"\t\tresetLS: function () { labelSettings = defaultLabelSettings(); },\n" +
 	"\t\tcreateProjectFrom: createProjectFrom,\n" +
 	"\t\tchangedUnitSelectors: changedUnitSelectors,\n" +
-	"\t\tunitKey: unitKey,\n" +
+	"\t\tunitKey: unitKey, getDoc: function () { return doc; },\n" +
+	"\t\taddTank: function () { var t = addNode('tank', 0, 0); setProp(t, 'minVolume', 1000); return t; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -73,7 +74,7 @@ console.log('== 1. the wizard leaves every unit the same: full inheritance ==');
 	customizeCurrentProject();
 	var units = {};
 	['lpn_u_length', 'lpn_u_diameter', 'lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_flow',
-		'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_roughness', 'lpn_u_age'].forEach(function (n) {
+		'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_roughness', 'lpn_u_age', 'lpn_u_volume'].forEach(function (n) {
 		units[n] = L.unitKey(n);
 	});
 	L.createProjectFrom({ geo: false, crs: '', place: null, method: 'hw', units: units });
@@ -122,6 +123,22 @@ console.log('== 3. the wizard changes only Pressure: Length/Diameter pieces are 
 	ok('defaults.diameter carries over (its own unit did not change)', s3.defaults.diameter === 8, s3.defaults.diameter);
 	ok('useUnits.link.length carries over (its own unit did not change)', ls3.useUnits.link.length === true, ls3.useUnits.link.length);
 	ok('customerMaxWidth carries over (length did not change)', ls3.customerMaxWidth === 500, ls3.customerMaxWidth);
+}
+
+// ---- 4. a typed Minimum volume is unit-bearing for the Volume unit (Task 857) -----------------
+console.log('== 4. the wizard changes the Volume unit: no typed volume is carried across it ==');
+{
+	setUnitSet('us');
+	L.resetLS();
+	customizeCurrentProject();
+	L.addTank();
+	var changed4 = L.changedUnitSelectors({ lpn_u_volume: 'gal', lpn_u_length: 'ft' }, { lpn_u_volume: 'm3', lpn_u_length: 'ft' });
+	ok('changedUnitSelectors reports the Volume unit and only it', q(changed4) === q(['lpn_u_volume']), q(changed4));
+	L.createProjectFrom({ geo: false, crs: '', place: null, method: 'hw', units: { lpn_u_volume: 'm3' } });
+	ok('the new project opens in the unit the wizard chose', L.unitKey('lpn_u_volume') === 'm3', L.unitKey('lpn_u_volume'));
+	ok('a new project holds none of the old project\'s typed volumes (it is empty, so none can be misread)',
+		L.getDoc().nodes.every(function (n) { return n.minVolume === undefined; }), q(L.getDoc().nodes.length));
+	ok('every other customization survives a Volume-only change', L.getSettings().idPrefixes.J === 'JJ' && L.getSettings().defaults.diameter === 8 && L.ls().customerMaxWidth === 500);
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall ok');
