@@ -112,7 +112,7 @@ async function main() {
 		await a.settle(1500);
 		const afterConv = await ptNow(); vr = await volRow();
 		const lText = await P.evaluate(() => { const s = document.getElementById('lpn_u_volume'); return s.options[s.selectedIndex].textContent.trim(); });
-		ok('Convert to litres: the stored volume is 1,000,000 L (the same 1000 m^3), marked as in the Volume unit', afterConv.unit === 'l' && afterConv.pt && Math.abs(afterConv.pt.vol - 1e6) < 1e-3 && afterConv.pt.vu === 1 && !afterConv.pt.legacyVol, JSON.stringify(afterConv));
+		ok('Convert to litres: the stored volume is 1,000,000 L (the same 1000 m^3)', afterConv.unit === 'l' && afterConv.pt && Math.abs(afterConv.pt.vol - 1e6) < 1e-3, JSON.stringify(afterConv));
 		ok('and the row is now labelled in litres (' + lText + ') and reads 1000000', !!vr.t && vr.t.indexOf('(' + lText + ')') >= 0 && +vr.v === 1e6, JSON.stringify(vr));
 		const c1 = await centreOf('T1'); await P.mouse.click(c1.x, c1.y); await a.settle(900); rs = await rows();
 		ok('Elevation is the tank\'s own (round 15; Tom: "Their elevation must be independent like their position."): a typeable row on the tank\'s box, and Base elevation is a read-only one', find('Elevation').controls > 0 && find('Base elevation').controls === 0);

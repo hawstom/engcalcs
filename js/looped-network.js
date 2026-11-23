@@ -41355,7 +41355,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						// A pressure tank's own numbers; the curve, the limits and the controls are in the file already and are not rewritten here.
 						if (a.pt && typeof a.pt === 'object' && ['vol', 'on', 'off'].every(function (k) { return typeof a.pt[k] === 'number'; })) {
 							w.pt = { vol: a.pt.vol, on: a.pt.on, off: a.pt.off };
-							if (a.pt.vu) { w.pt.vu = 1; } else { w.pt.legacyVol = true; }   // no `vu`: the volume is in the Elevation/Head unit cubed (ptNormalizeLegacy())
 							if (typeof a.pt.pre === 'number') { w.pt.pre = a.pt.pre; }
 							if (typeof a.pt.curve === 'string') { w.pt.curve = a.pt.curve; }
 						}
@@ -41654,7 +41653,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function wellHasTank(a) { return !!(a && a.kind === 'well' && a.tank && nodeById(a.tank)); }
 	// **THE WELL WITH PRESSURE TANK IS THE WELL WITH TANK WHOSE TANK IS A BLADDER TANK** (Task 822; Tom, round 10 pass, 2026-11-16: "It's a lot. But let's go with a third
 	// additional form."). The group is the same Well, tee, tank and two pipes, and `pt` on it is what marks the form: `{ vol, pre, on, off, curve }`, typed in the
-	// project's own units (the volume in the Elevation/Head unit cubed, the one family a VOLUME curve is read in (lpn-time.js), so the number typed and the curve's own axis agree; the three pressures GAUGE, in the Pressure unit; `pre`, the empty (precharge)
+	// project's own units (the volume in the Volume unit, always, as a tank's Minimum volume is; the curve the group writes keeps its own axis in the Elevation/Head unit cubed, the family a VOLUME curve is read in (lpn-time.js); the three pressures GAUGE, in the Pressure unit; `pre`, the empty (precharge)
 	// pressure, absent while it follows its default, pump on less 2 psi; `curve`, the ID of the VOLUME curve the group wrote). Everything else is derived and
 	// written by syncPressureTank(), so it is never typed twice: the tank is a fixed head at its gas pressure (EngCalcs.lpnIsFixedHead), its level IS the gauge
 	// pressure head, so the tank stands on the ground with minimum level 0 and maximum level at the pump-off head, and the pump's two controls are the ordinary
@@ -41680,7 +41679,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		return pts;
 	}
-	// The typed numbers as SI (metres of head, cubic metres), or null while any is missing or they are not a tank.
+	// The typed numbers as SI (metres of head, cubic metres; the volume is read in the Volume unit), or null while any is missing or they are not a tank.
 	function pressureTankSI(a) {
 		var p = a && a.pt, on, off, pre, vol;
 		if (!p) { return null; }
@@ -41690,9 +41689,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (![on, off, pre, vol].every(function (x) { return typeof x === 'number' && isFinite(x); }) || !pressureTankPoints({ vol: vol, pre: pre, on: on, off: off })) { return null; }
 		return { vol: vol, pre: pre, on: on, off: off };
 	}
-	// What a new pressure tank opens on: a reasonable single-home size, the 20-gallon class (2.7 ft^3, or 80 L), a 40 to 60 psi switch, precharge following.
+	// What a new pressure tank opens on: a reasonable single-home size, the 20-gallon class (0.0757 m^3) written in the current Volume unit (20 gal, 2.7 ft^3, 0.076 m^3, 76 L), a 40 to 60 psi switch, precharge following.
 	function pressureTankDefaults() {
-		return { vol: +toDisplay(0.0757, 'lpn_u_volume').toPrecision(2), vu: 1,
+		return { vol: +toDisplay(0.0757, 'lpn_u_volume').toPrecision(2),
 			on: niceDefault('lpn_u_pressure', 'psi', 40, 28), off: niceDefault('lpn_u_pressure', 'psi', 60, 42) };
 	}
 	// The group that wrote this curve, if any: it is read-only in the Library and changed in that group's Properties box.
@@ -41765,19 +41764,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		a.pumpOn = lv(s.on); a.pumpOff = lv(s.off);
 		syncWellControls(a);
 		updateNode(tank.id, true);
-	}
-	// **THE PRESSURE TANK'S VOLUME IS TYPED IN THE VOLUME UNIT**, as a tank's Minimum volume is; `vu: 1` on `pt` says so. A pressure tank saved before that (no `vu`; its
-	// volume was in the Elevation/Head unit cubed) is read once, after the file's units are installed, as the same physical volume in the Volume unit; the file itself is not rewritten
-	// until it is saved again.
-	function ptNormalizeLegacy() {
-		assemblyList().forEach(function (a) {
-			var p = a.pt, fh;
-			if (!p || !p.legacyVol) { return; }
-			delete p.legacyVol;
-			fh = unitFactor('lpn_u_elevhead');
-			if (typeof p.vol === 'number' && fh > 0) { p.vol = +toDisplay(p.vol / (fh * fh * fh), 'lpn_u_volume').toPrecision(10); }
-			p.vu = 1;
-		});
 	}
 	function syncAllPressureTanks() { assemblyList().forEach(function (a) { if (a.pt) { syncPressureTank(a); } }); }
 	function completeWell(d, x, y) {
@@ -46379,7 +46365,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// under mm now opens under mm however this browser was last left, because its numbers only
 		// mean anything alongside the units they were typed in.
 		applyUnitSelections(saved.units);
-		ptNormalizeLegacy();
 		// **A DECIMALS COUNT THE FILE DOES NOT STATE IS THE ONE ITS OWN UNITS CALL FOR** (R-328). The
 		// defaults above were computed under whatever units were showing BEFORE this document's own
 		// were installed; a count the file states is the user's and is never touched.
@@ -63584,7 +63569,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// it there, so the first change converted from the wrong unit or asked nothing (Task 857).
 		// Here is the one door every document's units pass through, so the memory follows it.
 		rememberUnitSelections();
-		ptNormalizeLegacy();
 		return changed;
 	}
 	// ---- CHANGING A UNIT THAT DECIDES SOMETHING ASKS FIRST (Task 422, narrowed by Task 522) ------

@@ -399,7 +399,7 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	press(500, 400);
 	const a = doc.assemblies[0], t = L.nodeById('T2') || L.nodeById(a.tank);
 	ok('the third press makes the tank, the group is a Well with a tank and a pressure tank', a.kind === 'well' && a.tank === t.id && !!a.pt && a.tee === 'J1' && doc.assemblies.length === 1, JSON.stringify(a));
-	ok('typed in the project\'s units: 40 and 60 psi are 28 and 42 m in SI, volume 0.076 m3 (the 20-gallon class, in the Volume unit), empty pressure follows (absent)', a.pt.on === 28 && a.pt.off === 42 && a.pt.vol === 0.076 && a.pt.vu === 1 && a.pt.pre === undefined, JSON.stringify(a.pt));
+	ok('typed in the project\'s units: 40 and 60 psi are 28 and 42 m in SI, volume 0.076 m3 (the 20-gallon class, in the Volume unit), empty pressure follows (absent)', a.pt.on === 28 && a.pt.off === 42 && a.pt.vol === 0.076 && a.pt.pre === undefined, JSON.stringify(a.pt));
 	const c = L.curveById(a.pt.curve);
 	ok('the VOLUME curve is in the document, written by the group', !!c && c.kind === 'volume' && c.points.length > 12 && c.id === 'W1TV', c && JSON.stringify(c.points.slice(0, 3)));
 	ok('the tank stands on the ground: minimum level 0, maximum level the pump-off head, on the curve, starting between', t.minLevel === 0 && Math.abs(t.maxLevel - 42) < 1e-6 && t.volCurve === c.id && t._level > 28 && t._level < 42, JSON.stringify([t.minLevel, t.maxLevel, t.volCurve, t._level]));
@@ -422,7 +422,7 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	// .inp round trip
 	const out = EC.lpnExportInp(L.serializeProject(), {});
 	const line = (out.inp.match(/^;ASSEMBLY.*$/m) || [''])[0];
-	ok('the assembly comment carries PT= with the numbers and the curve', / PT=0\.076,,28,42,W1TV,V$/.test(line), line);
+	ok('the assembly comment carries PT= with the numbers and the curve', / PT=0\.076,,28,42,W1TV$/.test(line), line);
 	ok('the curve and the tank row are in the file as EPANET reads them', /\[CURVES\][\s\S]*W1TV/.test(out.inp) && /;VOLUME:/.test(out.inp) && /W1TV/.test((out.inp.match(/\[TANKS\][^[]*/) || [''])[0]));
 	const parsed = EC.lpnInpParse(out.inp);
 	ok('read back with nothing reported', parsed.ok && parsed.assemblies[0].pt && parsed.assemblies[0].pt.curve === 'W1TV' && !(parsed.dropped || []).some((d) => /^assembly/.test(d.code)), JSON.stringify(parsed.assemblies[0] && parsed.assemblies[0].pt));
@@ -436,15 +436,6 @@ console.log('\n--- 9. the Well with pressure tank (round 11) ---');
 	const sv = JSON.parse(JSON.stringify(L.serializeProject())); L.applySaved(L.migrateSaved(sv)); L.buildDom();
 	ok('the project file round trip keeps pt', L.getDoc().assemblies[0].pt.curve === 'W1TV' && L.getDoc().assemblies[0].pt.vol === 0.076);
 
-	// A file from before the Volume unit (no `vu` on pt): its volume was in the Elevation/Head unit cubed, and opens as the same physical volume in the Volume unit.
-	{
-		const old = JSON.parse(JSON.stringify(L.serializeProject()));
-		old.units = Object.assign({}, old.units, { lpn_u_elevhead: 'fth2o', lpn_u_volume: 'm3' });
-		old.assemblies.forEach((g) => { if (g.pt) { g.pt.vol = 2.7; delete g.pt.vu; } });
-		L.applySaved(L.migrateSaved(old)); L.buildDom();
-		const pt = L.getDoc().assemblies[0].pt;
-		ok('an older file holding 2.7 (ft^3 of head cubed) opens as 0.0765 m^3 in the Volume unit, marked as such', Math.abs(pt.vol - 2.7 * Math.pow(0.3048, 3)) < 1e-6 && pt.vu === 1 && !pt.legacyVol, JSON.stringify(pt));
-	}
 	// Explode and regroup
 	L.snap(); L.explode('W1');
 	ok('Explode ends the group; the tank, the curve and the controls stay as ordinary elements', L.getDoc().assemblies.length === 0 && !!L.curveById('W1TV') && L.getDoc().controls.length === 2 && L.getDoc().controls.every((x) => !x.asm) && L.nodeById(b.tank).volCurve === 'W1TV');
@@ -520,6 +511,33 @@ console.log('\n--- 10. round 11 review fixes ---');
 	L.applyUnitSelections(L.inpUnitSelections(back)); L.applySaved(L.migrateSaved(L.docFromInp(back, ''))); L.buildDom();
 	const o2 = EC.lpnExportInp(L.serializeProject(), {}).inp;
 	ok('and the next export is byte-identical', o2 === out);
+}
+{
+	// The volume is in the Volume unit and goes to the file the way a tank's MinVol does (the file's length cubed), so the vessel survives export and import: US gallons, SI litres.
+	[['us', 'gal', 20, /^20 \/ gal$/, 'ft3'], ['si', 'l', 76, /^76 \/ l$/, 'm3']].forEach((c) => {
+		fresh(); setUnitSet(c[0]); L.applyOneUnit('lpn_u_volume', c[1]);
+		L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
+		const g = L.getDoc().assemblies[0]; g.pt.vol = c[2]; L.syncPressureTank(g);
+		const si0 = L.pressureTankSI(g), on0 = g.pt.on;
+		const o1 = EC.lpnExportInp(L.serializeProject(), {}).inp, pl = (o1.match(/^;ASSEMBLY.* PT=(\S+)/m) || [])[1] || '', ptf = pl.split(',');
+		ok(c[0] + ': the file\'s PT= has five fields and holds ' + c[2] + ' ' + c[1] + ' as ' + c[4] + ' (' + pl + ')', ptf.length === 5 && Math.abs(+ptf[0] - si0.vol * (c[4] === 'ft3' ? 35.3146667 : 1)) < 1e-4 * si0.vol * 36);
+		const q = EC.lpnInpParse(o1);
+		ok(c[0] + ': read back with nothing reported', q.ok && !(q.dropped || []).some((d) => /^assembly/.test(d.code)), JSON.stringify(q.dropped));
+		L.applyUnitSelections(L.inpUnitSelections(q)); L.applySaved(L.migrateSaved(L.docFromInp(q, ''))); L.buildDom();
+		const si1 = L.pressureTankSI(L.getDoc().assemblies[0]);
+		ok(c[0] + ': the tank is the same vessel in SI after the round trip (' + (si0.vol * 1000).toFixed(2) + ' L) and the switch points too', si1 && Math.abs(si1.vol - si0.vol) < 1e-9 * 100 && Math.abs(si1.on - si0.on) < 1e-9 * 100 && Math.abs(si1.off - si0.off) < 1e-9 * 100, JSON.stringify([si0, si1]));
+		{
+			// byte-identical from the second export, as the existing round trip is (the first re-orders unrelated nodes)
+			const o2 = EC.lpnExportInp(L.serializeProject(), {}).inp, q2 = EC.lpnInpParse(o2);
+			L.applyUnitSelections(L.inpUnitSelections(q2)); L.applySaved(L.migrateSaved(L.docFromInp(q2, ''))); L.buildDom();
+			ok(c[0] + ': and the next export is byte-identical, with the same PT= line', EC.lpnExportInp(L.serializeProject(), {}).inp === o2 && (o2.match(/ PT=\S+/) || [])[0] === ' PT=' + pl);
+		}
+	});
+	{
+		// A PT= of any other field count is reported, and the group is not restored half-way.
+		const bad = EC.lpnInpParse(EC.lpnExportInp(L.serializeProject(), {}).inp.replace(/( PT=\S+)/, '$1,V'));
+		ok('a PT= with six fields is reported as a malformed ;ASSEMBLY: line and no group is restored from it', bad.ok && (bad.dropped || []).some((d) => d.code === 'assembly-malformed') && !(bad.assemblies || []).length, JSON.stringify(bad.dropped));
+	}
 }
 {
 	// 7. One volume family: Length in metres, Elevation/Head in feet.
