@@ -82,7 +82,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 
 # Strings waiting on a branch
 
-**84 still to read**, of 84 new keys across 8 unmerged branch(es).
+**86 still to read**, of 86 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -93,9 +93,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1120 (`687e8f6f5`) — adds no English strings
-
-### feat/assembly (`e581482c5`) — 67 new, 67 to read @@ NEEDS RULING
+### feat/assembly (`ee6c7a5eb`) — 67 new, 67 to read @@ NEEDS RULING
 
 - **`lpn_assembly_down_head`**
   > Downstream head
@@ -299,7 +297,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > A pressure tank is made new. Specify a point on the map, not an existing tank.
   @@ NEEDS RULING
 
-### feat/pick-chooser (`5cbe14b97`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/pick-chooser (`3a33a83cc`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pick_chooser_label`**
   > Select one of the elements here
@@ -311,9 +309,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > More time controls
   @@ NEEDS RULING
 
-### feat/volume-unit (`ba5e53414`) — adds no English strings
+### feat/volume-unit (`5ec5a719e`) — adds no English strings
 
-### feat/wtg-page-scenario (`becb557ac`) — 15 new, 15 to read @@ NEEDS RULING
+### feat/wtg-page-scenario (`de732f27e`) — 17 new, 17 to read @@ NEEDS RULING
 
 - **`lpn_wtg_export_holds_children`**
   > It holds the Base scenario and, as children of Base, scenarios ({n}): {scenarios}.
@@ -345,8 +343,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_scn_unreadable`**
   > its network could not be read.
   @@ NEEDS RULING
+- **`lpn_wtg_export_scn_unsupported`**
+  > it differs from Base in properties this export does not write: {value}.
+  @@ NEEDS RULING
 - **`lpn_wtg_export_scn_what_assets`**
   > Assets added or removed
+  @@ NEEDS RULING
+- **`lpn_wtg_export_scn_what_auto_length`**
+  > Length of pipes that follow the drawing
   @@ NEEDS RULING
 - **`lpn_wtg_export_scn_what_demand_rows`**
   > The number of demands, or a demand pattern
@@ -360,7 +364,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_scn_what_pv_elev`**
   > Elevation at a pump or valve
   @@ NEEDS RULING
-
-### fix/chlorine-bold (`0a3032b0e`) — adds no English strings
-
-### fix/eps-audit-3 (`81108d39c`) — adds no English strings

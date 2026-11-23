@@ -497,7 +497,7 @@ console.log('\n4. The file is written in the project\'s own units');
 	ok('a TCV setting is dimensionless and does not', vOut[2][5] === '12', vOut[2][5]);
 	// EPANET IGNORES a TCV's minor-loss column (EngCalcs.lpnLinkK), so writing the stored k there
 	// would state a number the engine discards.
-	ok('a TCV writes no minor loss', vOut[2][6] === '0', vOut[2][6]);
+	ok('a TCV writes its stated minor loss (EPANET uses it when the valve is fixed open)', vOut[2][6] === '3', vOut[2][6]);
 
 	// A unit whose magnitude this browser does not know is REFUSED BY NAME, never guessed at --
 	// CLAUDE.md's rule, the same one that stops the solve.

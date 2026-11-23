@@ -1,0 +1,6 @@
+{
+ "name": "No overflow",
+ "note": "Scenario override of tank overflow over the run: T2 and T4 (YES in the file) to NO, T1 (not stated, so NO) to YES. The reference is tanks.inp with the three Overflow columns written in by hand.",
+ "props": [["node", "T2", "overflow", "NO"], ["node", "T4", "overflow", "NO"], ["node", "T1", "overflow", "YES"]],
+ "edits": [["^(T2 .*\\*\\s+)YES", "$1NO"], ["^(T4 .*\\*\\s+)YES", "$1NO"], ["^T1  20   10      2      18     10   0      VC1\\s*$", "T1  20   10      2      18     10   0      VC1      YES"]]
+}

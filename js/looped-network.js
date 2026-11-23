@@ -29997,19 +29997,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function (l) { return effective(l, 'energyPattern'); },
 			function (l, v) { setProp(l, 'energyPattern', v || null); }, true, true);
 	}
-	// **A THROTTLE VALVE'S LOSS IS ITS SETTING ALONE**, which is EPANET's own simplification and
-	// ours: it ignores the [VALVES] minor-loss column for a TCV, so a number typed here would be one
-	// neither engine reads. The popup answers that by not drawing the row; a table answers it by
-	// stating the rule in the cell.
+	// A throttle valve's minor loss is its whole loss only when it is fixed open (a file's [STATUS] Open, or a control or
+	// rule that opens it; EngCalcs.lpnLinkK, hydcoeffs.c tcvcoeff()), so the column is drawn for every valve type.
 	function paneColValveK() {
 		return { key: 'km', label: 'lpn_field_km_short', em: 3, prop: 'k',
 			get: function (l) { return effective(l, 'k') || 0; },
-			plainFor: function (l) { return (l.valveType || 'TCV').toUpperCase() === 'TCV'; },
-			plainWord: paneNotUsedWord,
-			plainTip: function () {
-				var pc = EngCalcs.pageConfig || {};
-				return pc.lpn_field_valve_km_tip;
-			},
 			set: function (l, v) { setProp(l, 'k', v); } };
 	}
 	// What a Text object's own popup redraws after any of size, bold, angle or alignment moves:
@@ -41554,8 +41546,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// on Change. What only the new type has is what a newly drawn link of that type gets.
 	//
 	// **WHAT EACH TYPE HAS**, as `has(d)` on a {type, valveType} pair, because a valve's own type
-	// decides two of them: a throttle valve (TCV) reads no minor loss (EPANET ignores the column; see
-	// renderValveFields()), and only a general purpose valve (GPV) states a head-loss curve. A pump's
+	// decides one of them: only a general purpose valve (GPV) states a head-loss curve. A pump's
 	// head curve and a GPV's head-loss curve share `curveId` with different kinds, so they are two
 	// rows; no pair of types has both, so a change always drops one of them.
 	var LPN_LINK_TYPES = ['pipe', 'pump', 'valve'];
@@ -41602,7 +41593,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ has: pipe, keys: ['_length', 'lenAuto'], props: ['length'], unit: 'lpn_u_length',
 				label: pc.lpn_field_length || 'Length', decimals: l.lenAuto ? 2 : undefined },
 			{ has: pipe, keys: ['_fittingsId'], props: ['fittingsId'], label: pc.lpn_field_fittings || 'Fittings list' },
-			{ has: function (d) { return d.type === 'pipe' || (d.type === 'valve' && d.valveType !== 'TCV'); },
+			{ has: function (d) { return d.type === 'pipe' || d.type === 'valve'; },
 				keys: ['_k'], props: ['k'], none: [0], label: pc.lpn_field_km_short || 'Minor loss, k' },
 			{ has: pipe, keys: ['_bulkCoeff'], props: ['bulkCoeff'], label: pc.lpn_reaction_bulk_short || 'Bulk reaction' },
 			{ has: pipe, keys: ['_wallCoeff'], props: ['wallCoeff'], label: pc.lpn_reaction_wall_short || 'Wall reaction' },
@@ -78255,16 +78246,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function () { return effective(l, 'diameter'); },
 			function (v) { setProp(l, 'diameter', v); refreshPopupIfOpen(); },
 			pc.lpn_field_valve_diameter_tip, { el: l, prop: 'diameter' });
-		// A TCV GETS NO SEPARATE MINOR LOSS, and that is EPANET's behaviour rather than a
-		// simplification of ours: it ignores the [VALVES] minor-loss column for a throttle valve,
-		// whose loss is its setting alone (measured -- see EngCalcs.lpnLinkK). A box here would be
-		// a number the user types and neither engine reads.
-		if (vt !== 'TCV') {
-			numberFieldPlain(fields, pc.lpn_field_km_short || 'Minor loss, k',
-				effective(l, 'k') || 0,
-				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); },
-				pc.lpn_field_valve_km_short_tip, { el: l, prop: 'k' }, kmTableUrl());
-		}
+		// Every valve type has a minor loss. A TCV's is its whole loss only while the valve is fixed open (a file's
+		// [STATUS] Open, or a control or rule that opens it); EngCalcs.lpnLinkK, hydcoeffs.c tcvcoeff().
+		numberFieldPlain(fields, pc.lpn_field_km_short || 'Minor loss, k',
+			effective(l, 'k') || 0,
+			function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); },
+			pc.lpn_field_valve_km_short_tip, { el: l, prop: 'k' }, kmTableUrl());
 	}
 	function openLinkPopup(linkId, sx, sy) {
 		var l = linkById(linkId), le = linkEls[linkId];
@@ -80739,7 +80726,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 				// A valve stated Open in the file's [STATUS] is FIXED open (EPANET unsets its setting): a plain minor loss that never
 				// regulates. A PBV fixed open is a setting of 0 in both engines (hydcoeffs.c pbvcoeff()).
-				if (l.valveOpen && effective(l, 'status') !== 'closed' && /^(PRV|PSV|FCV|PBV)$/.test(out.valveType)) {
+				if (l.valveOpen && effective(l, 'status') !== 'closed' && /^(PRV|PSV|FCV|PBV|TCV)$/.test(out.valveType)) {
 					out.valveFixed = 'open';
 					if (out.valveType === 'PBV') { out.setting = 0; }
 				}

@@ -150,6 +150,13 @@
                 "bold": 1
             },
             {
+                "key": "lpn_quality_named_concentration",
+                "fill": {
+                    "chemical": "Chlorine"
+                },
+                "bold": 1
+            },
+            {
                 "key": "lpn_result_flow",
                 "bold": 1
             },
@@ -1467,6 +1474,13 @@
             },
             {
                 "key": "lpn_result_pressure",
+                "bold": 1
+            },
+            {
+                "key": "lpn_quality_named_concentration",
+                "fill": {
+                    "chemical": "Chlorine"
+                },
                 "bold": 1
             },
             {
