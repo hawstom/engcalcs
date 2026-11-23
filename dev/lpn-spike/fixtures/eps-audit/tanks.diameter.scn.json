@@ -1,0 +1,6 @@
+{
+ "name": "Bigger tanks",
+ "note": "Scenario override of tank diameter over the run: T3 12 to 20 m, T2 25 to 15 m (T2 has a minimum volume). Reference: tanks.inp with the two Diameter columns written in by hand.",
+ "props": [["node", "T3", "tankDiameter", 20], ["node", "T2", "tankDiameter", 15]],
+ "edits": [["^(T3  20   10      2      18     )12", "$120"], ["^(T2 .*\\s)25(\\s+120)", "$115$2"]]
+}

@@ -1,0 +1,6 @@
+{
+ "name": "Other start levels",
+ "note": "Scenario override of a tank's initial level: T3 10 to 15 m, T1 (volume curve) 10 to 4 m, T4 3 to 1 m. Reference: tanks.inp with the three Initial level columns written in by hand.",
+ "props": [["node", "T3", "level", 15], ["node", "T1", "level", 4], ["node", "T4", "level", 1]],
+ "edits": [["^(T3  20   )10", "$115"], ["^(T1  20   )10", "$14"], ["^(T4  24   )3", "$11"]]
+}
