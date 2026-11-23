@@ -86,7 +86,7 @@ async function main() {
 			// graph and the bubbles share pgAvailable(), so one list serves both. Plotted in the Volume unit.
 			const volName = await a.lang('lpn_result_tank_volume');
 			const pick = (v) => a.page.evaluate((q) => { const s = document.getElementById('lpn_pgraph_field'); s.value = q; s.dispatchEvent(new Event('change', { bubbles: true })); }, v);
-			const dotsOf = () => a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pgraph_chart .lpn-ts-dot title')).map((t) => parseFloat(t.textContent.trim().split(/\s+/).pop())));
+			const dotsOf = () => a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pgraph_chart .lpn-ts-dot[data-reading]')).map((t) => parseFloat(t.getAttribute('data-reading').trim().split(/\s+/).pop())));
 			ok('the tank\'s Properties graph offers Available volume', opts.some((o) => o[0] === 'volume' && o[1] === volName), JSON.stringify(opts.map((o) => o[1])));
 			await a.page.evaluate(() => { const v = document.getElementById('lpn_u_volume'); v.value = 'ft3'; v.dispatchEvent(new Event('change', { bubbles: true })); });
 			await a.settle(700);

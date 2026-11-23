@@ -5343,7 +5343,10 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 #lpn_convas_panel .lpn-convas-colhead > .lpn-gval { margin-block: 0; }
 #lpn_convas_panel .lpn-convas-colhead .lpn-gwrap > span { box-sizing: border-box; padding: 1px 6px; min-width: 0; line-height: 1.3; }
 #lpn_convas_panel .lpn-convas-colhead .lpn-convas-c2 { overflow: hidden; white-space: nowrap; }
-#lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; margin-block: 2px 0; }
+#lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; margin-block: 0; }
+/* Thirteen 28 px rows and three headings must fit a 900 px window whole, the closing sentence included (the Volume row cost one more); the slack comes out of the gaps, never the rows. */
+#lpn_convas_panel .lpn-ghead { margin-top: 4px; }
+#lpn_convas_panel .lpn-new-presets { margin-block: 0; }
 /* **CONVERT AS AND THE COORDINATE-SYSTEM CHOOSER MOVE AND RESIZE** (Tom, 2026-10-31; dev/box-float-design.md): the Find box's shell. They open
    at most 40 rem wide; once open the width is the box's own (js wireFloatBox), so a drag of the corner can widen it past that. The body scrolls
    and Convert as's OK and Cancel stay under it, always in view. */
