@@ -12071,7 +12071,7 @@ var EngCalcs = EngCalcs || {};
 	function wellJoined(a) {
 		var br = a && a.kind === 'well' && wellHasTank(a) ? a.branch : null;
 		function only(id) { return (incidentLinks[id] || []).every(function (l) { return br.indexOf(l) >= 0; }); }
-		return !!(br && br.length >= 2 && a.tee && nodeById(a.tee) && only(a.tank) && only(a.tee));
+		return !!(br && br.length >= 2 && a.tee && nodeById(a.tee) && only(a.tank) && only(a.tee) && !a.apart);
 	}
 	function wellKindOf(a) { return wellJoined(a) ? (a.pt ? 'welltankp' : 'welltank') : 'well'; }
 	function wellSymbolKind(n) { var a = n ? assemblyOfNode(n.id) : null; return a && a.kind === 'well' ? wellKindOf(a) : 'well'; }
@@ -41302,6 +41302,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					if (a.tee && a.tank && Array.isArray(a.branch) && a.branch.length === 2 && nodeIds[a.tee] && nodeIds[a.tank] && a.branch.every(function (id) { return linkIds[id]; })) {
 						w.tee = a.tee; w.tank = a.tank; w.branch = a.branch.slice();
 						if (a.teeFollow) { w.teeFollow = true; }
+						if (a.apart) { w.apart = true; }
 						if (a.followOff && typeof a.followOff === 'object') { w.followOff = JSON.parse(JSON.stringify(a.followOff)); }
 						// A pressure tank's own numbers; the curve, the limits and the controls are in the file already and are not rewritten here.
 						if (a.pt && typeof a.pt === 'object' && ['vol', 'on', 'off'].every(function (k) { return typeof a.pt[k] === 'number'; })) {
@@ -63050,7 +63051,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			shapeApplyDrag(p);
 		} else if (drag.type === 'node') {
 			snapshotDragOnce();
-			var w = screenToWorld(p.x, p.y), n = nodeById(drag.id);
+			var w = screenToWorld(p.x, p.y), n = nodeById(drag.id), hostA;
+			// **A TANK DRAWN JOINED TO ITS WELL HAS NO PLACE OF ITS OWN ON THE SCREEN, SO A DRAG TAKES IT OUT OF THE JOINED DRAWING** (Tom, round 15: "The tank has its
+			// independent position. Allow it to be dragged."): the group stays (Explode, controls, the Well's box); the tank, the tee and the two pipes are drawn as themselves
+			// (`apart` on the grouping, saved), and the tank is then in the hand, centred on the pointer. Otherwise the drag moved a point nothing drew.
+			if (n && n.type === 'tank' && (hostA = hostWellOfTank(n))) {
+				hostA.apart = true; syncAssemblyGlyphs();
+				drag.offX = 0; drag.offY = 0;
+			}
 			// **A DRAGGED POSITION AND A TYPED ONE GO THROUGH THE SAME DOOR** (Task 674), so inside
 			// a scenario a drag records that scenario's own position exactly as the boxes do, and
 			// neither editor can come to a different idea of what placing a node means.
@@ -64074,6 +64082,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the same for a valve's).
 		length: { all: { above: 0, key: 'lpn_valwarn_positive' } },
 		k: { all: { min: 0, key: 'lpn_valwarn_negative' } },
+		// A tank's diameter: EPANET's tankdata() refuses a negative one (a Well's tank is typed in the Well's box, an ordinary tank's in its own; both paint this).
+		tankDiameter: { all: { min: 0, key: 'lpn_valwarn_negative' } },
 		// EPANET input3.c emitterdata(): error 209 on a coefficient < 0.
 		emitter: { all: { min: 0, key: 'lpn_valwarn_negative' } },
 		// EPANET validate.c tanklevels(): error 225 when the initial level is above the maximum or
@@ -64120,7 +64130,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The unit each field is displayed in, which is the unit its typed number is stored in.
 	function valueWarnUnit(field) {
 		if (field === 'diameter') { return 'lpn_u_diameter'; }
-		if (field === 'length') { return 'lpn_u_length'; }
+		if (field === 'length' || field === 'tankDiameter') { return 'lpn_u_length'; }
 		if (field === 'roughness') { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : ''; }
 		if (field === 'level' || field === 'minLevel' || field === 'maxLevel') { return 'lpn_u_elevhead'; }
 		return '';

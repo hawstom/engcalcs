@@ -400,3 +400,8 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 - **The tank's label is drawn while joined** (Tom: "I agree. Proceed."): beside the vessel, through the ordinary placement (`nodeLabelAt()`, and the Well's drawing is two obstacles, circle and vessel, each ignored by its own label). It was hidden with the tank's symbol by `hideJoinedTanks()`; the tee's label stays hidden.
 - **Wording:** a Well with tank is not "one symbol with elements underneath" (Tom: "Not true. It's three."): three elements, a drawing in two parts.
 - **Exploded pressure tank keeps "Can overflow"** (Tom: "Show it. It's no longer an assembly.").
+
+### Round 16 (Tom, round 15 pass; `well-tank-drag-browser-harness.js`)
+
+- **A joined tank can be dragged** (Tom: "The tank has its independent position. Allow it to be dragged."). Reproduced in Chromium first: a drag from the joined vessel moved the tank's own point (hidden by the joined drawing) and nothing on screen. Now the drag takes the tank out of the joined drawing (`apart` on the group, saved): the tank, tee and pipes are drawn as themselves and the tank is centred on the pointer. The group stays (Explode, controls, Well box); Undo restores the joined drawing; no command rejoins.
+- **A negative Tank diameter** shows the page's value warning (`lpn_valwarn_negative`), as a negative k or emitter does; the page flags and never refuses (`dev/value-warning.md`).
