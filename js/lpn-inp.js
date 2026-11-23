@@ -473,6 +473,8 @@
 						gt.forEach(function (tk) { var eq = tk.indexOf('='); markVirtual.push(eq < 0 ? { id: tk } : { id: tk.slice(0, eq), tok: tk.slice(eq + 1).split('|') }); });
 						continue;
 					}
+					// `APART` (no value): the tank was dragged out of the joined drawing. Written only when it is so.
+					gt = gt.filter(function (tk) { if (tk === 'APART') { gOpt.apart = true; return false; } return true; });
 					gt = gt.filter(function (tk) { var kv = /^(ID|ON|OFF|TEE|TANK|PIPES|PT)=(.+)$/.exec(tk); if (kv) { gOpt[kv[1].toLowerCase()] = kv[2]; return false; } return true; });
 					if (!gt.length) { assemblyMalformed.push(cmt); continue; }
 					if (gt[0] === 'well') {
@@ -1480,6 +1482,7 @@
 					if (nodeIndex[opt.tee] && nodeIndex[opt.tee].type === 'junction' && nodeIndex[opt.tank] && nodeIndex[opt.tank].type === 'tank' && pipes.length === 2 &&
 						pipes.every(function (id) { return !!linkIndex[id]; })) {
 						w.tee = opt.tee; w.tank = opt.tank; w.branch = pipes;
+						if (opt.apart) { w.apart = true; }
 						ptf = String(opt.pt || '').split(',');
 						if (ptf.length === 5 && ptf[4] && [ptf[0], ptf[2], ptf[3]].every(function (x) { return x !== '' && isFinite(+x); }) && (ptf[1] === '' || isFinite(+ptf[1]))) {
 							w.pt = { vol: +ptf[0], on: +ptf[2], off: +ptf[3], curve: ptf[4] };
@@ -4080,7 +4083,8 @@
 				out += ';ASSEMBLY: ' + [a.kind || 'pump'].concat(ends, a.links).join(' ') +
 					(a.kind === 'well' && a.idBy === 'node' ? ' ID=' + a.id : '') + (a.kind === 'well' && wellOwns(a, 'open') ? ' ON=' + a.pumpOn : '') + (a.kind === 'well' && wellOwns(a, 'closed') ? ' OFF=' + a.pumpOff : '') +
 					(tail.length ? ' TEE=' + tail[0] + ' TANK=' + tail[1] + ' PIPES=' + tail[2] + ',' + tail[3] : '') +
-					(tail.length && a.pt && a.pt.curve ? ' PT=' + [a.pt.vol, a.pt.pre === undefined ? '' : a.pt.pre, a.pt.on, a.pt.off, a.pt.curve].join(',') : '') + '\n';
+					(tail.length && a.pt && a.pt.curve ? ' PT=' + [a.pt.vol, a.pt.pre === undefined ? '' : a.pt.pre, a.pt.on, a.pt.off, a.pt.curve].join(',') : '') +
+					(tail.length && a.apart ? ' APART' : '') + '\n';
 			});
 			return out ? out + '\n' : '';
 		}

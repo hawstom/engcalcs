@@ -96,27 +96,37 @@ async function main() {
 			await drag(dt2.x, dt2.y, 50, -70);
 			const dt3 = (await drawnTank())[0];
 			ok(label + ': the tank drawn as itself drags by its own symbol', !!dt3 && Math.abs(dt3.x - (dt2.x + 50)) < 12 && Math.abs(dt3.y - (dt2.y - 70)) < 12, JSON.stringify([dt2, dt3]));
-			// Select the Well (its box has Explode): the group is still there.
+			// Dragged right onto the Well's own outlet, the tank does not snap onto the Well's node (the pointer is the tank's centre, a few px off the Well's own point at most)
 			await P.keyboard.press('Escape'); await a.settle(300);
 			const wc = await P.evaluate(() => { const e = Array.from(document.querySelectorAll('#lpn_canvas [data-node="W1"]')).filter((x) => x.getBoundingClientRect().width > 0)[0]; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-			await P.mouse.click(wc.x, wc.y); await a.settle(800);
+			await drag(dt3.x, dt3.y, wc.x + 2 - dt3.x, wc.y - dt3.y);
+			const stW = await stored();
+			const wN = stW.nodes.filter((n) => n.id === 'W1')[0], tN = stW.nodes.filter((n) => n.type === 'tank')[0];
+			ok(label + ': a tank dropped on its Well\'s outlet is not snapped onto it (its point is not the Well\'s)', Math.hypot(tN.x - wN.x, tN.y - wN.y) > 0.5, JSON.stringify([wN.x, wN.y, tN.x, tN.y]));
+			await drag((await drawnTank())[0].x, (await drawnTank())[0].y, 120, 90);
+			// Select the Well (its box has Explode): the group is still there.
+			await P.keyboard.press('Escape'); await a.settle(300);
+			const wc2 = await P.evaluate(() => { const e = Array.from(document.querySelectorAll('#lpn_canvas [data-node="W1"]')).filter((x) => x.getBoundingClientRect().width > 0)[0]; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+			await P.mouse.click(wc2.x, wc2.y); await a.settle(800);
 			ok(label + ': the Well\'s box still has Explode', await hasExplode());
 			if (kind === 'welltank') {
-				// A negative tank diameter on the Well's box is flagged with the page's own words.
-				const flagged = await P.evaluate(() => {
-					const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^\s*Tank diameter/.test(x.textContent))[0];
-					if (!l) { return { found: false }; }
-					const i = l.querySelector('input'); i.value = '-5'; i.dispatchEvent(new Event('change', { bubbles: true }));
-					return { found: true };
-				});
-				await a.settle(800);
-				const after = await P.evaluate(() => {
-					const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^\s*Tank diameter/.test(x.textContent))[0];
-					const w = l && l.querySelector('.lpn-valwarn');
-					return { warn: !!w, tip: l ? l.outerHTML : '' };
-				});
-				const want = await P.evaluate(() => (EngCalcs.pageConfig || {}).lpn_valwarn_negative);
-				ok('a negative Tank diameter typed on the Well\'s box shows the negative-number warning', flagged.found && after.warn && after.tip.indexOf(want) >= 0, JSON.stringify([flagged, after, want]));
+				// A negative or zero tank diameter on the Well's box is flagged with the page's own words.
+				for (const bad of ['-5', '0']) {
+					const flagged = await P.evaluate((v) => {
+						const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^\s*Tank diameter/.test(x.textContent))[0];
+						if (!l) { return { found: false }; }
+						const i = l.querySelector('input'); i.value = v; i.dispatchEvent(new Event('change', { bubbles: true }));
+						return { found: true };
+					}, bad);
+					await a.settle(800);
+					const after = await P.evaluate(() => {
+						const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^\s*Tank diameter/.test(x.textContent))[0];
+						const w = l && l.querySelector('.lpn-valwarn');
+						return { warn: !!w, tip: l ? l.outerHTML : '' };
+					});
+					const want = await P.evaluate(() => (EngCalcs.pageConfig || {}).lpn_valwarn_positive);
+					ok('a Tank diameter of ' + bad + ' typed on the Well\'s box shows the warning', flagged.found && after.warn && after.tip.indexOf(want) >= 0, JSON.stringify([flagged, after.warn]));
+				}
 				await P.evaluate(() => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^\s*Tank diameter/.test(x.textContent))[0]; const i = l.querySelector('input'); i.value = '12'; i.dispatchEvent(new Event('change', { bubbles: true })); });
 				await a.settle(800);
 				const clear = await P.evaluate(() => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^\s*Tank diameter/.test(x.textContent))[0]; return !!l && !l.querySelector('.lpn-valwarn'); });

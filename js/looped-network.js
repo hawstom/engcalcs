@@ -5226,6 +5226,9 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function writeNodeCoord(n, isY, inward, outward) {
 		if (!n) { return; }
+		// A tank drawn joined to its Well has no place of its own on the screen: moving its point ends the joined drawing (wellApartEnd()).
+		var hostW = n.type === 'tank' ? hostWellOfTank(n) : null;
+		if (hostW) { wellApartEnd(hostW); syncAssemblyGlyphs(); }
 		if (!inBaseFor(categoryOf(isY ? 'y' : 'x', 'node'))) {
 			if (outward === undefined) { outward = isY ? outwardY(inward) : outwardX(inward); }
 			setOverride(n, isY ? 'y' : 'x', outward);
@@ -6118,6 +6121,16 @@ var EngCalcs = EngCalcs || {};
 	// in a scenario ends it for that scenario only (`followOff` on the grouping: scenario id -> { tee }), because the same typing there is an override, which
 	// is that scenario's and not Base's. A follower is written through setProp(), so inside a scenario it is an override too, and clearing the outlet's override
 	// there clears the followers' (wellTankFollowClear()).
+	// **A TANK DRAGGED OR TYPED OUT OF THE JOINED DRAWING IS APART** (Tom, round 15: "The tank has its independent position. Allow it to be dragged."): the joined drawing has no place of its own for the
+	// tank, so a move of the tank's point ends the joined drawing, and the tank, tee and pipes are drawn as themselves. The same shape as the tee's following, and per scenario for the same reason:
+	// a move written in Base (`apart` on the grouping, saved, and written to the .inp as APART) ends it everywhere; one written in a scenario is that scenario's position and ends the joined
+	// drawing in that scenario only (`apartIn`: scenario id -> true). Asked at writeNodeCoord(), the one place a node's position is written, so a drag, Properties, Tables and Find and replace agree.
+	function wellApart(asm) { return !!asm.apart || !!(asm.apartIn && asm.apartIn[activeScenario().id]); }
+	function wellApartEnd(asm) {
+		if (inBaseFor(categoryOf('x', 'node'))) { asm.apart = true; return; }
+		if (!asm.apartIn) { asm.apartIn = {}; }
+		asm.apartIn[activeScenario().id] = true;
+	}
 	var wellTankAuto = false;
 	function wellTeeFollowing(asm) {
 		var off = (asm.followOff || {})[activeScenario().id];
@@ -11258,6 +11271,11 @@ var EngCalcs = EngCalcs || {};
 		var ex = { nodes: {}, links: {} }, l;
 		if (dr.type === 'node') {
 			ex.nodes[dr.id] = true;
+			// A Well's tank never snaps onto its own Well's nodes (the outlet stands where the joined vessel is drawn) or its tee.
+			(function () {
+				var tn = nodeById(dr.id), wa = tn && tn.type === 'tank' ? wellTankOwner(tn) : null;
+				if (wa) { assemblyNodeIds(wa).concat([wa.tee]).forEach(function (id) { if (id) { ex.nodes[id] = true; } }); }
+			}());
 			// ...and the nodes at the far ends of its own links, which would make a link of zero
 			// length (Perry's review).
 			(incidentLinks[dr.id] || []).forEach(function (lid) {
@@ -12071,7 +12089,7 @@ var EngCalcs = EngCalcs || {};
 	function wellJoined(a) {
 		var br = a && a.kind === 'well' && wellHasTank(a) ? a.branch : null;
 		function only(id) { return (incidentLinks[id] || []).every(function (l) { return br.indexOf(l) >= 0; }); }
-		return !!(br && br.length >= 2 && a.tee && nodeById(a.tee) && only(a.tank) && only(a.tee) && !a.apart);
+		return !!(br && br.length >= 2 && a.tee && nodeById(a.tee) && only(a.tank) && only(a.tee) && !wellApart(a));
 	}
 	function wellKindOf(a) { return wellJoined(a) ? (a.pt ? 'welltankp' : 'welltank') : 'well'; }
 	function wellSymbolKind(n) { var a = n ? assemblyOfNode(n.id) : null; return a && a.kind === 'well' ? wellKindOf(a) : 'well'; }
@@ -41303,6 +41321,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						w.tee = a.tee; w.tank = a.tank; w.branch = a.branch.slice();
 						if (a.teeFollow) { w.teeFollow = true; }
 						if (a.apart) { w.apart = true; }
+						if (a.apartIn && typeof a.apartIn === 'object') { w.apartIn = JSON.parse(JSON.stringify(a.apartIn)); }
 						if (a.followOff && typeof a.followOff === 'object') { w.followOff = JSON.parse(JSON.stringify(a.followOff)); }
 						// A pressure tank's own numbers; the curve, the limits and the controls are in the file already and are not rewritten here.
 						if (a.pt && typeof a.pt === 'object' && ['vol', 'on', 'off'].every(function (k) { return typeof a.pt[k] === 'number'; })) {
@@ -63051,14 +63070,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			shapeApplyDrag(p);
 		} else if (drag.type === 'node') {
 			snapshotDragOnce();
-			var w = screenToWorld(p.x, p.y), n = nodeById(drag.id), hostA;
-			// **A TANK DRAWN JOINED TO ITS WELL HAS NO PLACE OF ITS OWN ON THE SCREEN, SO A DRAG TAKES IT OUT OF THE JOINED DRAWING** (Tom, round 15: "The tank has its
-			// independent position. Allow it to be dragged."): the group stays (Explode, controls, the Well's box); the tank, the tee and the two pipes are drawn as themselves
-			// (`apart` on the grouping, saved), and the tank is then in the hand, centred on the pointer. Otherwise the drag moved a point nothing drew.
-			if (n && n.type === 'tank' && (hostA = hostWellOfTank(n))) {
-				hostA.apart = true; syncAssemblyGlyphs();
-				drag.offX = 0; drag.offY = 0;
-			}
+			var w = screenToWorld(p.x, p.y), n = nodeById(drag.id);
+			// A tank drawn joined to its Well is taken out of the joined drawing by the write below (writeNodeCoord()) and is then in the hand, centred on the pointer.
+			if (n && n.type === 'tank' && hostWellOfTank(n)) { drag.offX = 0; drag.offY = 0; }
+
 			// **A DRAGGED POSITION AND A TYPED ONE GO THROUGH THE SAME DOOR** (Task 674), so inside
 			// a scenario a drag records that scenario's own position exactly as the boxes do, and
 			// neither editor can come to a different idea of what placing a node means.
@@ -64082,8 +64097,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the same for a valve's).
 		length: { all: { above: 0, key: 'lpn_valwarn_positive' } },
 		k: { all: { min: 0, key: 'lpn_valwarn_negative' } },
-		// A tank's diameter: EPANET's tankdata() refuses a negative one (a Well's tank is typed in the Well's box, an ordinary tank's in its own; both paint this).
-		tankDiameter: { all: { min: 0, key: 'lpn_valwarn_negative' } },
+		// A tank's diameter: EPANET refuses a negative one, and a zero one gives the tank no area unless a VOLUME curve states its volume (valueWarnText() skips a tank that runs on a curve).
+		tankDiameter: { all: { above: 0, key: 'lpn_valwarn_positive' } },
 		// EPANET input3.c emitterdata(): error 209 on a coefficient < 0.
 		emitter: { all: { min: 0, key: 'lpn_valwarn_negative' } },
 		// EPANET validate.c tanklevels(): error 225 when the initial level is above the maximum or
@@ -64143,6 +64158,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function valueWarnText(field, el, shown) {
 		var pc = EngCalcs.pageConfig || {}, unit, f, r, fmt, ctx = null;
 		if (!LPN_VALUE_RULES[field] || shown === '' || shown === null || shown === undefined) { return ''; }
+		if (field === 'tankDiameter' && el && el.type === 'tank' && tankUsesVolumeCurve(el)) { return ''; }   // the box hides the field and both engines read the curve
 		unit = valueWarnUnit(field);
 		f = unit ? unitFactor(unit) : 1;
 		if (LPN_VALUE_RULES[field].order) {
@@ -78057,6 +78073,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// in the tank's own box, and typeable when `door` is true (the Well's box, which draws only that row), written through the owner's door.
 	// **A TANK'S ELEVATION IS ITS OWN, EVEN A WELL'S** (Tom, round 14: "Unlock it and add DEM. Their elevation must be independent like their position."): the Elevation row and the DEM row
 	// are the tank's own box's, always. A Well's tank's Base elevation stays the Well's to type (`door`: the Well's box draws only that row), and reads here as the Well set it.
+	// Does this tank run on a usable VOLUME curve? Then its diameter and minimum volume are not used (both engines read the curve), and the box shows neither.
+	function tankUsesVolumeCurve(n) {
+		var ref = effective(n, 'volCurve'), c = ref ? curveById(ref) : null;
+		return !!c && !!EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(curvePointsOf(c));
+	}
 	function tankElevationRows(fields, n, nodeId, own, door) {
 		var pc = EngCalcs.pageConfig || {}, eu = ' (' + unitLabel('lpn_u_elevhead') + ')', W = door ? viaOwnerDoor : function (f) { return f(); }, base;
 		if (!door) {
@@ -78116,8 +78137,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **A TANK THAT RUNS ON A USABLE VOLUME CURVE** (a Well's pressure tank after Explode, an imported one) shows no diameter or minimum volume: both engines read
 		// the curve for volume against depth and ignore those two, so a row for them would show a number the tank does not run on (Tom, round 13 pass: Explode showed a diameter and a
 		// minimum volume the tank had not shown). The stored values are untouched; clearing the curve brings the rows back.
-		var vcRef = effective(n, 'volCurve'), vcCurve = vcRef ? curveById(vcRef) : null,
-			curved = !door && !!vcCurve && !!EngCalcs.lpnTankVolumeCurveUsable && EngCalcs.lpnTankVolumeCurveUsable(curvePointsOf(vcCurve));
+		var curved = !door && tankUsesVolumeCurve(n);
 		// Every tank's box holds the volume curve reference (EPANET's tank has a Volume Curve property), so a curve can be chosen, cleared and chosen again.
 		if (!door) { popRows(fields, '#owned', function () { curveChooser(fields, n, 'volCurve', 'volume', pc.lpn_curve_kind_volume || 'Tank volume'); }); }
 		// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it

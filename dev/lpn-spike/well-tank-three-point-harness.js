@@ -29,7 +29,7 @@ require(ROOT + 'js/lpn-native-run.js');
 const L = loadLoopedNetwork(
 	"\t\townerOfProp: ownerOfProp, pushSpecList: pushSpecList, replaceOwnedNote: replaceOwnedNote, paneTables: paneTables, paneCellIsPlain: paneCellIsPlain,\n" +
 	"\t\tviaOwnerDoor: viaOwnerDoor, paneCellText: paneCellText, wellJoined: wellJoined, wellKindOf: wellKindOf, elementsInRing: elementsInRing, joinedTankPoint: joinedTankPoint, nodeLabelAt: nodeLabelAt, staticObstacles: staticObstacles, incidentBearings: incidentBearings, joinedHiddenNow: function () { return joinedHidden; }, terrainFillElevations: terrainFillElevations,\n" +
-	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
+	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs, dragSnapOpts: dragSnapOpts, valueWarnText: valueWarnText,\n" +
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode, getMode: function () { return mode; },\n" +
 	"\t\tundo: undo, nodeById: nodeById, linkById: linkById,\n" +
@@ -793,6 +793,68 @@ console.log('\n--- 12. round 13 review: joined only when nothing else joins, box
 	ok('and the DEM fill writes it', L.effective(t2, 'elev') === 12.5, String(L.effective(t2, 'elev')));
 	L.setProp(L.nodeById('W1'), 'elev', 99);
 	ok('and the Well\'s ground elevation does not move the tank', L.effective(t2, 'elev') === 12.5 && !a.tankFollow);
+}
+
+console.log('\n--- 12. a moved tank is apart (round 16) ---');
+{
+	// Typing the tank's X in Properties/Tables/Find and replace goes through setProp() and writeNodeCoord(): it ends the joined drawing as a drag does.
+	let doc = fresh(); let a = place3(200, 150, 500, 150, 500, 400);
+	const joinedLine = (L.serializeProject && EC.lpnExportInp(L.serializeProject(), {}).inp.match(/^;ASSEMBLY.*$/m) || [''])[0];
+	ok('an unedited joined Well writes no APART token (byte-identical to before)', !/APART/.test(joinedLine) && /TANK=T1/.test(joinedLine), joinedLine);
+	const tk = L.nodeById(a.tank);
+	ok('the Well is joined before the move', L.wellJoined(a));
+	L.setProp(tk, 'x', 650);
+	ok('typing the tank\'s X ends the joined drawing (Base): the grouping says apart, the Well is drawn alone and the tank, tee and pipes are drawn as themselves', !L.wellJoined(a) && a.apart === true && L.wellKindOf(a) === 'well' && Object.keys(L.joinedHiddenNow().nodes).length === 0);
+	const out1 = EC.lpnExportInp(L.serializeProject(), {});
+	const line1 = (out1.inp.match(/^;ASSEMBLY.*$/m) || [''])[0];
+	ok('the .inp comment carries APART, once', / APART$/.test(line1) && (line1.match(/APART/g) || []).length === 1, line1);
+	const p1 = EC.lpnInpParse(out1.inp);
+	ok('read back, the grouping is restored and apart, with nothing reported', p1.ok && p1.assemblies.length === 1 && p1.assemblies[0].apart === true && !(p1.dropped || []).some((d) => /^assembly/.test(d.code)), JSON.stringify(p1.assemblies[0] && [p1.assemblies[0].tank, p1.assemblies[0].apart]));
+	L.applyUnitSelections(L.inpUnitSelections(p1));
+	L.applySaved(L.migrateSaved(L.docFromInp(p1, ''))); L.buildDom();
+	const a1 = L.getDoc().assemblies[0];
+	ok('and after the import the Well is still not joined', a1.apart === true && !L.wellJoined(a1));
+	ok('export, import, export is byte-identical for an apart tank', EC.lpnExportInp(L.serializeProject(), { title: '' }).inp === EC.lpnExportInp(L.serializeProject(), { title: '' }).inp && (EC.lpnExportInp(L.serializeProject(), {}).inp.match(/^;ASSEMBLY.*$/m) || [''])[0] === line1);
+	const sv = JSON.parse(JSON.stringify(L.serializeProject()));
+	L.applySaved(L.migrateSaved(sv)); L.buildDom();
+	ok('the project file keeps it apart', L.getDoc().assemblies[0].apart === true);
+	// A move of Y is the same; a move of the tank of a Well that is not joined writes nothing new.
+	doc = fresh(); a = place3(200, 150, 500, 150, 500, 400);
+	L.setProp(L.nodeById(a.tank), 'y', 420);
+	ok('typing the tank\'s Y ends it too', a.apart === true && !L.wellJoined(a));
+	// the Well's own x does not (the vessel follows the Well on the screen)
+	doc = fresh(); a = place3(200, 150, 500, 150, 500, 400);
+	L.setProp(L.nodeById('W1'), 'x', 260);
+	ok('moving the WELL keeps the joined drawing', L.wellJoined(a) && !a.apart);
+	// the snap never lands the tank on its own Well's nodes or tee
+	const ex = L.dragSnapOpts({ type: 'node', id: a.tank }).exclude.nodes;
+	ok('dragging a Well\'s tank excludes the Well\'s own nodes and the tee from the snap', ['W1', 'W1R', 'W1D', a.tee].every((id) => ex[id]), JSON.stringify(Object.keys(ex)));
+	// per scenario: a move made in a scenario ends the joined drawing in that scenario only
+	doc = fresh(); a = place3(200, 150, 500, 150, 500, 400);
+	const baseId = L.getScenarios().filter((x) => x.isBase)[0].id;
+	const sc = L.createScenario('Moved');
+	L.setProp(L.nodeById(a.tank), 'x', 650);
+	ok('a tank moved inside a scenario is apart in that scenario', !L.wellJoined(a) && !a.apart && a.apartIn && a.apartIn[sc.id] === true, JSON.stringify([a.apart, a.apartIn]));
+	L.switchScenario(baseId);
+	ok('and still joined in Base, where it was not moved', L.wellJoined(a) && L.wellKindOf(a) === 'welltank' && Object.keys(L.joinedHiddenNow().nodes).length > 0);
+	L.switchScenario(sc.id);
+	ok('and apart again when that scenario is current', !L.wellJoined(a));
+	const sv3 = JSON.parse(JSON.stringify(L.serializeProject()));
+	L.applySaved(L.migrateSaved(sv3)); L.buildDom();
+	ok('the scenario\'s apart state is saved with the project', !!L.getDoc().assemblies[0].apartIn && L.getDoc().assemblies[0].apartIn[sc.id] === true && !L.getDoc().assemblies[0].apart);
+}
+
+console.log('\n--- 13. the tank diameter warning (round 16) ---');
+{
+	const doc = fresh(); const a = place3(200, 150, 500, 150, 500, 400);
+	const tk = L.nodeById(a.tank);
+	ok('a negative, a zero and a positive diameter: flagged, flagged, not', EC.lpnValueWarning('tankDiameter', -1) !== null && EC.lpnValueWarning('tankDiameter', 0) !== null && EC.lpnValueWarning('tankDiameter', 5) === null);
+	ok('the tip says zero or negative', /zero or a negative/.test(L.valueWarnText('tankDiameter', tk, 0)), L.valueWarnText('tankDiameter', tk, 0));
+	doc.curves.push({ id: 'V1', kind: 'volume', points: [[0, 0], [5, 10], [10, 40]] });
+	const ot = L.addNode('tank', 900, 900);   // an ordinary tank (a Well's own tank owns its curve)
+	ok('an ordinary tank with no curve and a zero diameter is flagged', L.valueWarnText('tankDiameter', ot, 0) !== '');
+	L.setProp(ot, 'volCurve', 'V1');
+	ok('a tank that runs on a usable volume curve is not flagged for its unused diameter', L.valueWarnText('tankDiameter', ot, 0) === '', L.valueWarnText('tankDiameter', ot, 0));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

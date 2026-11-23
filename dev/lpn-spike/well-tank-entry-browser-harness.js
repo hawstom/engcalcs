@@ -239,21 +239,41 @@ async function runForm(browser, Session, form) {
 	ok(form + ': one Undo takes the last typed value (' + last[0] + ') back', tank[last[3]] !== (last[3] === 'overflow' ? last[1] : +last[1]) && INPUTS.slice(0, -1).every((i) => tank[i[3]] === (i[3] === 'overflow' ? i[1] : +i[1])), JSON.stringify(tank));
 	await openBox(ctx, 'W1');
 	await typeInSection(ctx, last[0], last[1]);
-	// 5b. round 15: the tank's Elevation is its own, typeable in the tank's box, and does not follow the Well's Elevation
+	// 5b. round 15: the tank's Elevation is its own, typeable in the tank's box, and does not follow the Well's Elevation.
+	// Each write is found by its row, null-checked (a missing row is a FAIL, never a throw), and both Elevations are put back after, so later steps see what they did.
+	const elevBefore = { well: (doc.nodes.find((n) => n.id === 'W1') || {}).elev, tank: (doc.nodes.find((n) => n.id === 'T1') || {}).elev };
+	const typeElev = (val, inSection) => P.evaluate(([v, wantSection]) => {
+		const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^Elevation/.test(x.textContent.replace(/\s+/g, ' ').trim()) && (wantSection === null || !!x.closest('section') === wantSection))[0];
+		const i = l && l.querySelector('input');
+		if (!i) { return null; }
+		const r = { typeable: !i.disabled && !i.readOnly };
+		i.value = v; i.dispatchEvent(new Event('change', { bubbles: true }));
+		return r;
+	}, [String(val), inSection]);
 	await P.keyboard.press('Escape');
 	await openBox(ctx, 'T1');
-	const elevRow = (label) => P.evaluate((t) => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.textContent.replace(/\s+/g, ' ').trim().indexOf(t) === 0 && !/^Base elevation/.test(x.textContent.trim()))[0]; const i = l && l.querySelector('input'); return i ? { value: i.value, typeable: !i.disabled && !i.readOnly } : null; }, label);
-	const tankElev = await elevRow('Elevation');
+	const tankElev = await typeElev(7, null);
 	ok(form + ': the tank\'s own box has a typeable Elevation row', !!tankElev && tankElev.typeable, JSON.stringify(tankElev));
-	await P.evaluate(() => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^Elevation/.test(x.textContent.replace(/\s+/g, ' ').trim()))[0]; const i = l.querySelector('input'); i.value = '7'; i.dispatchEvent(new Event('change', { bubbles: true })); });
 	await a.settle(600);
 	await P.keyboard.press('Escape');
 	await openBox(ctx, 'W1');
-	await P.evaluate(() => { const secs = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^Elevation/.test(x.textContent.replace(/\s+/g, ' ').trim()) && !x.closest('section'))[0]; const i = secs && secs.querySelector('input'); if (i) { i.value = '9'; i.dispatchEvent(new Event('change', { bubbles: true })); } });
+	const wellElev = await typeElev(9, false);
+	ok(form + ': the Well\'s box has its own Elevation row outside the tank section', !!wellElev && wellElev.typeable, JSON.stringify(wellElev));
 	await a.settle(2400);
 	doc = await stored(P); tank = doc.nodes.find((n) => n.id === 'T1');
 	const wellOut = doc.nodes.find((n) => n.id === 'W1');
-	ok(form + ': the Well\'s Elevation was changed to 9 and the tank\'s own Elevation stays 7', wellOut.elev === 9 && tank.elev === 7, JSON.stringify([wellOut.elev, tank.elev]));
+	ok(form + ': the Well\'s Elevation was changed to 9 and the tank\'s own Elevation stays 7', !!tankElev && !!wellElev && wellOut.elev === 9 && tank.elev === 7, JSON.stringify([wellOut.elev, tank.elev]));
+	// put both back (through the same boxes), so steps 6 to 8 start from what they always did
+	await P.keyboard.press('Escape');
+	await openBox(ctx, 'T1');
+	if (tankElev) { await P.evaluate((v) => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^Elevation/.test(x.textContent.replace(/\s+/g, ' ').trim()))[0]; const i = l && l.querySelector('input'); if (i) { i.value = String(v === undefined ? '' : v); i.dispatchEvent(new Event('change', { bubbles: true })); } }, elevBefore.tank); }
+	await a.settle(600);
+	await P.keyboard.press('Escape');
+	await openBox(ctx, 'W1');
+	if (wellElev) { await typeElev(elevBefore.well, false); }
+	await a.settle(2400);
+	doc = await stored(P);
+	ok(form + ': both Elevations are back as they were', (doc.nodes.find((n) => n.id === 'W1') || {}).elev === elevBefore.well && (doc.nodes.find((n) => n.id === 'T1') || {}).elev === elevBefore.tank, JSON.stringify([elevBefore, doc.nodes.filter((n) => n.id === 'W1' || n.id === 'T1').map((n) => n.elev)]));
 	// 6. a scenario
 	const made = await U.createScenarioViaMenu(ctx);
 	const scnId = made.scenario && made.scenario.id;
