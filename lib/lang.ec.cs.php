@@ -1262,22 +1262,6 @@ $ec_lang['lpn_demand_tip']='Průtok odebíraný ze sítě v tomto uzlu. Pro prů
 // **THE UNITS STRIP IS TWO GROUPS** (Task 422). The first decides what the numbers in the document
 // MEAN, so changing one is a model change and the page asks first; the second is how results are
 // read, and changes with no fanfare. Three quantities appear in both because they serve both sides.
-// The question an INPUT unit change asks, in Tom's own wording (2026-08-18, Task 425) rather than a
-// paraphrase of it: name the quantity, list the fields it decides ONE PER LINE, then name the two
-// answers by what they do to the numbers already typed. {unit} is a unit name; the field names are
-// built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
-// NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
-// 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='Tato jednotka určuje, jak se čtou vaše vstupy';
-$ec_lang['lpn_units_warn_lead']='{unit} je jednotka toho, co zadáváte pro:';
-$ec_lang['lpn_units_options_head']='Když změníte jednotku:';
-// Each option's sentence opens with the word on its own button, so the button and the explanation
-// say the same word. Non-destructive is the suite's standing behaviour and the first button;
-// Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='Nedestruktivní';
-$ec_lang['lpn_units_nondestructive_desc']='Nedestruktivní: ponechá každý vstup tak, jak je, a přečte jej v nové jednotce.';
-$ec_lang['lpn_units_destructive']='Destruktivní';
-$ec_lang['lpn_units_destructive_desc']='Destruktivní: přepočítá každý vstup matematickým převodem, takže síť zůstane fyzicky téměř stejná, v mezích přesnosti převodu. Původní zadané hodnoty se ztratí. Zpět je vrátí.';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='Hodnoty ({n}) nyní znamenají {unit}. Nic nebylo přepsáno.';
 $ec_lang['lpn_status_converted']='Hodnoty ({n}) byly přepsány na {unit}.';

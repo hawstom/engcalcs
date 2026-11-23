@@ -5057,6 +5057,29 @@ OBSERVED (re-verify; real Chromium via env.js server, scratchpad perry2.js: taps
 - Branch harnesses pick-chooser-zoom (54) and pick-chooser-browser (153) pass. Phone taps ON Pump 335's ink select the pump at every notch 0-8 (the one overlap point with N61 at 8 notches opens the box, correct).
 - Pump 335 is 13x18 px at the opening view, 9x12 at 4 notches, 6x8 at 8 notches (N60-N61 9 px apart). Phone tap 3 px OFF the ink: pump up to 2 notches, N61 from 4 notches (off3), River/N60/N61/601 at 6 px+. So the fix helps only a finger that lands exactly on the glyph; a 3 px miss still selects N61 at 4+ notches. PC: no tap off ink selects a node.
 - NOT DONE: Tank 1 four notches, Lake, test project HJ by own probe (relied on harnesses); mutation test; light/dark.
+## 2026-11-16 feat/volume-unit (Task 857)
+OBSERVED (re-verify; real Chromium via the branch's own env.js server, scratchpad scripts p1-p4):
+- Net3 US run, 9:00: Tanks table, Properties and time-series graph agree for tanks 1 and 3 in all seven units; hand check 125,239 ft^3 = 936,849 gal = 3546.4 m^3 = 2.88 ac-ft. Graph axis title and ticks follow the selector.
+- Net2 US opens on gal, Net3 SI after US opens on m^3, Net1 US after SI opens on gal (selector resets with the project). Saved ML round-trips. Pre-857 project (no volume unit) with ft opens gal, with m opens m^3.
+- 390 px: Settings opens, Available volume sits last in Units, no sideways scroll. ?lang=es: "Volumen disponible (gal)", options pies^3, no errors.
+- CONCERN (judgement): Tanks table and Properties show "Minimum volume (ft^3)" beside "Available volume (gal)" under the US default.
+- NOT DONE: mutation test, map colouring, .inp import in the browser, Net2 graph, light/dark.
+
+## 2026-11-18 feat/volume-unit round 2 (f49bc5564), Task 857
+OBSERVED (re-verify; real Chromium via the branch's env.js server, Net3 US, scratchpad p3-p9; check_all --fast: only payload freshness failed, as expected):
+- Settings > Units row is "Volume", after Water age, before Roughness; choices gal, MG, ft^3, ac-ft, m^3, L, ML. Net3 US opens on ft^3, new US project on gal, new SI project on m^3, Net1 US on ft^3. A master-saved Net3 (MinVol 20000) reopens on ft^3 / 20000.
+- Tanks table, Properties, Properties-box graph, map bubble and bottom Time series all offer "Available volume" and agree after Calculate (ft^3 73768.52 -> gal 551826.87).
+- DEFECT (data): after opening an example the Volume select reads ft^3 but the page's memory of it is still the page default gal. First change to gal: no question, no refresh. First change to another unit (MG) with 20000 ft^3 typed: question asks, but Destructive converts as if the 20000 were gallons: 0.02 MG instead of 0.1496 MG; Available volume beside it 0.552 MG.
+- DEFECT: that silent change leaves Properties box, Properties graph, bubble and Time series on ft^3 numbers and titles until Calculate.
+- Stale comment left in js/looped-network.js near the Properties-box Minimum volume field: still says the Length unit cubed and no selector.
+- .inp export: ft^3 20000 -> 20000; after gal reinterpret 20000 gal -> 2673.61 ft^3. Right.
+- NOT DONE: mutation test, SI example, phone, other languages, volume-curve tank, scenarios.
+
+## 2026-11-18 feat/volume-unit round 3 (Task 857)
+- OBSERVED: Net3 tank 1, Minimum volume 20000, Volume ft^3 to gal Convert gives 149610; Keep is the focused button and Enter keeps; Cancel leaves ft; Length ft to m Convert, Decimals 2 gives 25.91 m (85 ft); 3 ft^3 to gal with Decimals 0 gives 22.44 (4 significant figure floor); SI preset Convert asks five blocks with one set of buttons, one Undo restores units and numbers. Harnesses green: unit-change, unit-change-first-browser, tank-depth-volume-browser, unit-preset-ask-browser, initial-volume-label (compares EPANET's own initial volume), convert-as, geojson, inp-export. No em dash in new English.
+- TRAP for drivers: a bare element.click() in page.evaluate is ignored by the dialog buttons (needs a pointer press, detail 1); use a real click.
+- Not checked: how Vi= looks on the map; Settings > New assets conversion by eye.
+
 ## 2026-11-16 feat/library-order round 5 (c5ae4391a), Task 859: comment rows, bold labels
 OBSERVED (re-verify; real Chromium via the branch's env.js server, Net3 gallery example, scratchpad s2.js/s3.js/cmp.php):
 - Five browser harnesses run alone: user-guide-library 50 pass, library-description-browser all passed, import-export-menu 60/60, table-export-dialog 81/81, box-view-visible all passed. inp-export 4497 and inp-roundtrip-net3 pass.
@@ -5118,3 +5141,16 @@ OBSERVED (re-verify; real Chromium 390x844 DPR 3 isMobile touch, CDP touch taps,
 - Round-9 text promised "At 16 notches or closer": wrong direction (box needs MORE zoomed out) and a phone has no notches.
 - Harnesses: zoom ALL PASS 74; pick-chooser-browser see report.
 - NOT DONE: real finger, mutation test of the B7 harness, Text-label overlaps (a Text RIVER shows in boxes at a 0.6 pinch).
+## 2026-11-18 feat/volume-unit round 4 (0d78e562d), Perry
+- OBSERVED (Chromium, Net1 and Net3 US): the unit question's Decimals box opens blank; typed 0 and 2 are obeyed exactly (Net3 tank 85 ft -> 25.91 m at 2; pipe 457 at 0; pump-curve points rounded likewise); Ctrl+Z after one Convert restores numbers and unit.
+- OBSERVED: blank Convert stores binary noise (609.5999999999999 mm, 40.203120000000006 m, curve point 126.18039279999998); Settings tolerances are held to 6 sig figs, element inputs are not.
+- OBSERVED: Decimals input has max 8, so a typed larger number is silently clamped; convert-as/unit-change/pda/initial-volume harnesses pass.
+- CITED: lang.ec.en.php vs round 3 lost no keys; master-only keys are the removed units_* set and lpn_about_source (master moved after the last merge).
+- Not checked: File > Convert as in a browser (static: select defaults to No rounding), DW roughness conversion, how noise displays.
+
+## 2026-11-20 feat/volume-unit round 5 (9ab9abfa9, ef4cc96b3), Perry
+- OBSERVED (Chromium, Net1 US and SI): the Decimals warning count equals the nonzero numbers that actually became 0 in the stored project (before/after diff, labelSettings excluded) in every case tried: diameter in/mm to m at 0 decimals 13, demand to m3/s at 0 decimals 9 (8 nodes + 1 pump-curve point), to mgd 8, Minimum volume to ML 1. Blank, and any Decimals that zeroes nothing, show no line. Settings tolerances never counted (no settings path ever zeroed).
+- OBSERVED: typing updates live; Cancel leaves the document byte-identical; Convert as counts (13 SI, 11 US at step 100) equal the new copy's real zeros; an edit to a node's Base demand under the open Convert as box moved the count 8 -> 8 (0) -> 8 (5000) -> 9 (7).
+- OBSERVED: out-of-range Decimals (13, -1) are treated as no rounding by Convert and the warning agrees; 1.5 behaves as 1 decimal.
+- OBSERVED: Convert as line sits tight under the Head row with no gap; the warning glyph renders as a box in headless Chromium (font, probably environmental).
+- Not checked: scenario overrides with numbers (Net1's are empty; harness covers only convert); how the glyph looks in Tom's browser.

@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 3384,
-        "delta_key_count": 4,
-        "english_changed_key_count": 2,
+        "expected_key_count": 3386,
+        "delta_key_count": 15,
+        "english_changed_key_count": 4,
         "exempt_key_count": 40,
         "exempt_keys": [
             "u_imgd",
@@ -50,7 +50,8 @@
         "out_of_scope_key_count": 7,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
-            "lpn"
+            "lpn",
+            "u"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -71,20 +72,159 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: លំហូរ\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: ល្បឿន\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ក្បាលទឹក\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ការបាត់បង់ថ្ពល់\n- flow used, taken, or consumed\n    English: demand\n    Your language: តម្រូវការ\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: សម្ពាធ\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: ថ្នាំង\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: តំណ\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- checking, adjusting, or tuning the model against field readings or measurements\n    English: calibration\n    Your language: ការក្រិតតាមទិន្នន័យ\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: លំហូរ\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: ល្បឿន\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ក្បាលទឹក\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ការបាត់បង់ថ្ពល់\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: តម្រូវការ\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: សម្ពាធ\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: ថ្នាំង\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: តំណ\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ធុងទឹក\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: តម្លៃផ្ទាល់ខ្លួន\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- checking, adjusting, or tuning the model against field readings or measurements\n    English: calibration\n    Your language: ការក្រិតតាមទិន្នន័យ\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
+        "u_gal": "gal",
+        "u_mgal": "MG",
+        "u_l": "L",
+        "u_megaliter": "ML",
+        "lpn_field_tank_initvol": "Initial volume",
+        "lpn_field_tank_minvol_tip": "The volume of water in the tank at its minimum depth, in the Volume unit, for a tank with a sloped or curved bottom; 0 uses the tank diameter and minimum depth, and a volume curve overrides it.",
+        "lpn_guide_set_units_def": "<p>Each quantity has its own unit in <strong>Units<\/strong>. When values in the project are entered in that unit, changing it asks a question first. <strong>Convert<\/strong> rewrites the numbers by conversion, rounded to the <strong>Decimals<\/strong> you give (blank means no rounding), so the network stays physically the same; one <strong>Undo<\/strong> restores the numbers and the unit. <strong>Keep<\/strong> leaves every number as typed and reads it in the new unit. <strong>Cancel<\/strong> leaves everything as it was.<\/p><p>Example on Net1: choose mm for <strong>Diameter<\/strong> in <strong>Units<\/strong>. With the field blank, <strong>Convert<\/strong> rewrites 13 values, and Pipe 10 reads 457.2 mm. <strong>Keep<\/strong> leaves the 13 values alone, and Pipe 10 reads 18 mm.<\/p>",
         "lpn_guide_fr_what_def": "<p>Choose <strong>Water<\/strong>, <strong>Reports<\/strong>, <strong>Full<\/strong>. The table has one row for each node and link at each reporting time step, in the units of the <strong>Tables<\/strong> pane. Its columns are <strong>Type<\/strong>, <strong>ID<\/strong>, <strong>Demand<\/strong>, <strong>Head<\/strong>, <strong>Pressure<\/strong>, <strong>Chlorine concentration<\/strong>, <strong>Flow<\/strong>, <strong>Velocity<\/strong>, <strong>Head loss<\/strong>, <strong>Pump head<\/strong>, and <strong>Status<\/strong>, and a cell is blank where the asset has no such quantity. The <strong>Time step<\/strong> list chooses the step shown, and <strong>Download CSV<\/strong>, <strong>Copy HTML<\/strong>, and <strong>Print report<\/strong> carry every step. Without an extended period simulation, the table shows the current solution at one instant.<\/p>",
         "lpn_guide_cal_what_def": "<p>Choose <strong>Water<\/strong>, <strong>Reports<\/strong>, <strong>Calibration<\/strong>. The <strong>Parameter<\/strong> list chooses what the file measures: <strong>Demand<\/strong>, <strong>Head<\/strong>, <strong>Pressure<\/strong>, <strong>Chlorine concentration<\/strong>, <strong>Flow<\/strong>, or <strong>Velocity<\/strong>. One file is held for each parameter, and the <strong>Load calibration file…<\/strong> button opens a file chooser. The report has three pages. <strong>Statistics<\/strong> gives, for each location, the number of observations, the observed mean, the computed mean, the mean error, and the <strong>RMS error<\/strong>, then a <strong>Network<\/strong> row for all locations together and the correlation between the means. <strong>Correlation plot<\/strong> puts each measurement at its observed value across and its computed value up, with a diagonal line where the two agree. <strong>Mean comparisons<\/strong> draws the observed and computed means as a pair of bars for each location.<\/p><p>The computed value is read from the extended period run, and a measurement between two reporting steps is compared with the value interpolated between them. A measurement outside the times the run reported is skipped and counted. With a single instant solution, every measurement is compared with that one result, whatever time the file gives. The report fills in after the network is calculated.<\/p>",
+        "lpn_units_convert_q": "Convert inputs from {old} to {new}?",
+        "lpn_units_keep": "Keep",
+        "lpn_units_convert_note": "Convert rewrites each number in the new unit, rounded to the Decimals given; blank means no rounding. Keep leaves each number as typed and reads it in the new unit. Undo puts back a conversion.",
+        "lpn_units_zero_warn": "⚠ There are values ({n}) that would be converted to 0.",
         "lpn_pick_chooser_label": "Select one of the elements here",
         "lpn_inp_dup_comma": ", "
     },
     "keys": {
+        "u_gal": "gal",
+        "u_mgal": "MG",
+        "u_l": "L",
+        "u_megaliter": "ML",
+        "lpn_field_tank_initvol": "Initial volume",
+        "lpn_field_tank_minvol_tip": "The volume of water in the tank at its minimum depth, in the Volume unit, for a tank with a sloped or curved bottom; 0 uses the tank diameter and minimum depth, and a volume curve overrides it.",
+        "lpn_guide_set_units_def": "<p>Each quantity has its own unit in <strong>Units<\/strong>. When values in the project are entered in that unit, changing it asks a question first. <strong>Convert<\/strong> rewrites the numbers by conversion, rounded to the <strong>Decimals<\/strong> you give (blank means no rounding), so the network stays physically the same; one <strong>Undo<\/strong> restores the numbers and the unit. <strong>Keep<\/strong> leaves every number as typed and reads it in the new unit. <strong>Cancel<\/strong> leaves everything as it was.<\/p><p>Example on Net1: choose mm for <strong>Diameter<\/strong> in <strong>Units<\/strong>. With the field blank, <strong>Convert<\/strong> rewrites 13 values, and Pipe 10 reads 457.2 mm. <strong>Keep<\/strong> leaves the 13 values alone, and Pipe 10 reads 18 mm.<\/p>",
         "lpn_guide_fr_what_def": "<p>Choose <strong>Water<\/strong>, <strong>Reports<\/strong>, <strong>Full<\/strong>. The table has one row for each node and link at each reporting time step, in the units of the <strong>Tables<\/strong> pane. Its columns are <strong>Type<\/strong>, <strong>ID<\/strong>, <strong>Demand<\/strong>, <strong>Head<\/strong>, <strong>Pressure<\/strong>, <strong>Chlorine concentration<\/strong>, <strong>Flow<\/strong>, <strong>Velocity<\/strong>, <strong>Head loss<\/strong>, <strong>Pump head<\/strong>, and <strong>Status<\/strong>, and a cell is blank where the asset has no such quantity. The <strong>Time step<\/strong> list chooses the step shown, and <strong>Download CSV<\/strong>, <strong>Copy HTML<\/strong>, and <strong>Print report<\/strong> carry every step. Without an extended period simulation, the table shows the current solution at one instant.<\/p>",
         "lpn_guide_cal_what_def": "<p>Choose <strong>Water<\/strong>, <strong>Reports<\/strong>, <strong>Calibration<\/strong>. The <strong>Parameter<\/strong> list chooses what the file measures: <strong>Demand<\/strong>, <strong>Head<\/strong>, <strong>Pressure<\/strong>, <strong>Chlorine concentration<\/strong>, <strong>Flow<\/strong>, or <strong>Velocity<\/strong>. One file is held for each parameter, and the <strong>Load calibration file…<\/strong> button opens a file chooser. The report has three pages. <strong>Statistics<\/strong> gives, for each location, the number of observations, the observed mean, the computed mean, the mean error, and the <strong>RMS error<\/strong>, then a <strong>Network<\/strong> row for all locations together and the correlation between the means. <strong>Correlation plot<\/strong> puts each measurement at its observed value across and its computed value up, with a diagonal line where the two agree. <strong>Mean comparisons<\/strong> draws the observed and computed means as a pair of bars for each location.<\/p><p>The computed value is read from the extended period run, and a measurement between two reporting steps is compared with the value interpolated between them. A measurement outside the times the run reported is skipped and counted. With a single instant solution, every measurement is compared with that one result, whatever time the file gives. The report fills in after the network is calculated.<\/p>",
+        "lpn_units_convert_q": "Convert inputs from {old} to {new}?",
+        "lpn_units_keep": "Keep",
+        "lpn_units_convert_note": "Convert rewrites each number in the new unit, rounded to the Decimals given; blank means no rounding. Keep leaves each number as typed and reads it in the new unit. Undo puts back a conversion.",
+        "lpn_units_zero_warn": "⚠ There are values ({n}) that would be converted to 0.",
         "lpn_pick_chooser_label": "Select one of the elements here",
         "lpn_inp_dup_comma": ", "
     },
     "key_context": {
+        "u_gal": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "u_cmd",
+                    "value": "m^3\/ថ្ងៃ",
+                    "english": "m^3\/d"
+                },
+                "next_translated": {
+                    "key": "menu_brand",
+                    "value": "HawsEDC ម៉ាស៊ីនគណនា",
+                    "english": "HawsEDC Calculators"
+                }
+            }
+        },
+        "u_mgal": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "u_cmd",
+                    "value": "m^3\/ថ្ងៃ",
+                    "english": "m^3\/d"
+                },
+                "next_translated": {
+                    "key": "menu_brand",
+                    "value": "HawsEDC ម៉ាស៊ីនគណនា",
+                    "english": "HawsEDC Calculators"
+                }
+            }
+        },
+        "u_l": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "u_cmd",
+                    "value": "m^3\/ថ្ងៃ",
+                    "english": "m^3\/d"
+                },
+                "next_translated": {
+                    "key": "menu_brand",
+                    "value": "HawsEDC ម៉ាស៊ីនគណនា",
+                    "english": "HawsEDC Calculators"
+                }
+            }
+        },
+        "u_megaliter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "u_cmd",
+                    "value": "m^3\/ថ្ងៃ",
+                    "english": "m^3\/d"
+                },
+                "next_translated": {
+                    "key": "menu_brand",
+                    "value": "HawsEDC ម៉ាស៊ីនគណនា",
+                    "english": "HawsEDC Calculators"
+                }
+            }
+        },
+        "lpn_field_tank_initvol": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_tank_level",
+                    "value": "ជម្រៅទឹក",
+                    "english": "Water depth"
+                },
+                "next_translated": {
+                    "key": "lpn_field_tank_level_tip",
+                    "value": "ជម្រៅទឹកនៅក្នុងធុងទឹក វាស់ឡើងលើពីបាតធុង។ ផ្ទៃទឹកគឺជាកម្ពស់បាតធុងបូកនឹងជម្រៅនេះ។",
+                    "english": "Depth of water in the tank, measured up from the tank bottom."
+                }
+            }
+        },
+        "lpn_field_tank_minvol_tip": {
+            "reason": "english_changed",
+            "current_value": "មាឌទឹកក្នុងធុងទឹកនៅជម្រៅអប្បបរមារបស់វា ជាគូបនៃខ្នាតប្រវែង សម្រាប់ធុងទឹកដែលមានបាតទំនោរ ឬកោង៖ 0 ប្រើអង្កត់ផ្ចិតធុងទឹក ហើយខ្សែកោងមាឌបដិសេធវា។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_tank_minvol",
+                    "value": "មាឌអប្បបរមា",
+                    "english": "Minimum volume"
+                },
+                "next_translated": {
+                    "key": "lpn_field_tank_overflow",
+                    "value": "អាចហូរហៀរ",
+                    "english": "Can overflow"
+                }
+            },
+            "label": {
+                "key": "lpn_field_tank_minvol",
+                "english": "Minimum volume",
+                "value": "មាឌអប្បបរមា"
+            }
+        },
+        "lpn_guide_set_units_def": {
+            "reason": "english_changed",
+            "current_value": "<p>បរិមាណនីមួយៗមានខ្នាតផ្ទាល់ខ្លួនក្នុង <strong>ខ្នាតវាស់<\/strong>។ ពេលតម្លៃក្នុងគម្រោងត្រូវបានបញ្ចូលក្នុងខ្នាតនោះ ការផ្លាស់ប្ដូរវាសួរសំណួរមួយជាមុនសិន។ <strong>មិនកែប្រែលេខ<\/strong> រក្សាគ្រប់លេខដូចដែលបានវាយ ហើយអានវាក្នុងខ្នាតថ្មី។ <strong>កែប្រែលេខ<\/strong> សរសេរលេខឡើងវិញដោយការបំប្លែង ដូច្នេះបណ្ដាញនៅដដែលតាមរូបវន្ត ហើយលេខដើមបាត់បង់លើកលែងតែប្រើ <strong>ត្រឡប់ក្រោយ<\/strong> មួយ <strong>ត្រឡប់ក្រោយ<\/strong> ស្ដារលេខ និងខ្នាត។ <strong>បោះបង់<\/strong> ទុកអ្វីៗនៅដដែល។<\/p><p>ឧទាហរណ៍លើ Net1៖ ជ្រើសរើស mm សម្រាប់ <strong>អង្កត់ផ្ចិត<\/strong> ក្នុង <strong>ខ្នាតវាស់<\/strong>។ <strong>កែប្រែលេខ<\/strong> សរសេរតម្លៃ 13 ឡើងវិញ ហើយបំពង់ 10 អាន 457.2 mm។ <strong>មិនកែប្រែលេខ<\/strong> ទុកតម្លៃ 13 ដដែល ហើយបំពង់ 10 អាន 18 mm។<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_set_units_term",
+                    "value": "ការផ្លាស់ប្ដូរខ្នាត",
+                    "english": "Changing a unit"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_set_assets_term",
+                    "value": "ធាតុថ្មី និងការអនុវត្តតម្លៃទៅធាតុដែលមានស្រាប់",
+                    "english": "New assets, and applying values to existing ones"
+                }
+            }
+        },
         "lpn_guide_fr_what_def": {
             "reason": "english_changed",
             "current_value": "<p>ជ្រើសរើស <strong>ទឹក<\/strong>, <strong>របាយការណ៍<\/strong>, <strong>ពេញលេញ<\/strong>។ តារាងមានមួយជួរដេកសម្រាប់ថ្នាំង និងតំណនីមួយៗនៅជំហានពេលវេលារាយការណ៍នីមួយៗ ក្នុងខ្នាតរបស់ផ្ទាំង<strong>តារាង<\/strong>។ ជួរឈររបស់វាគឺ <strong>ប្រភេទ<\/strong> <strong>លេខសម្គាល់<\/strong> <strong>តម្រូវការ<\/strong> <strong>ក្បាលទឹក<\/strong> <strong>សម្ពាធ<\/strong> <strong>កំហាប់ក្លរីន<\/strong> <strong>លំហូរ<\/strong> <strong>ល្បឿន<\/strong> <strong>ការបាត់បង់ក្បាលទឹក<\/strong> <strong>ក្បាលទឹកម៉ាស៊ីនបូម<\/strong> និង <strong>ស្ថានភាព<\/strong> ហើយក្រឡាទទេកន្លែងដែលធាតុគ្មានបរិមាណបែបនោះ។ បញ្ជី <strong>ជំហានពេលវេលា<\/strong> ជ្រើសរើសជំហានដែលបានបង្ហាញ ហើយ <strong>ទាញយក CSV<\/strong> <strong>ចម្លង HTML<\/strong> និង <strong>បោះពុម្ពរបាយការណ៍<\/strong> ផ្ទុកគ្រប់ជំហាន។ បើគ្មានការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ តារាងបង្ហាញដំណោះស្រាយបច្ចុប្បន្ននៅពេលតែមួយ។<\/p>",
@@ -114,6 +254,70 @@
                     "key": "lpn_guide_cal_file_term",
                     "value": "ឯកសារក្រិត",
                     "english": "The calibration file"
+                }
+            }
+        },
+        "lpn_units_convert_q": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "លំហូរដែលទាញយកចេញពីបណ្ដាញនៅថ្នាំងនេះ។ បញ្ចូលលេខអវិជ្ជមាន សម្រាប់លំហូរដែលបញ្ចូលទៅក្នុងបណ្ដាញត្រង់ចំណុចនេះ។",
+                    "english": "Flows taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "តម្លៃ ({n}) ឥឡូវនេះមានន័យ {unit}។ គ្មានអ្វីត្រូវបានសរសេរឡើងវិញឡើយ។",
+                    "english": "Values ({n}) now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_keep": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "លំហូរដែលទាញយកចេញពីបណ្ដាញនៅថ្នាំងនេះ។ បញ្ចូលលេខអវិជ្ជមាន សម្រាប់លំហូរដែលបញ្ចូលទៅក្នុងបណ្ដាញត្រង់ចំណុចនេះ។",
+                    "english": "Flows taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "តម្លៃ ({n}) ឥឡូវនេះមានន័យ {unit}។ គ្មានអ្វីត្រូវបានសរសេរឡើងវិញឡើយ។",
+                    "english": "Values ({n}) now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_convert_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "លំហូរដែលទាញយកចេញពីបណ្ដាញនៅថ្នាំងនេះ។ បញ្ចូលលេខអវិជ្ជមាន សម្រាប់លំហូរដែលបញ្ចូលទៅក្នុងបណ្ដាញត្រង់ចំណុចនេះ។",
+                    "english": "Flows taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "តម្លៃ ({n}) ឥឡូវនេះមានន័យ {unit}។ គ្មានអ្វីត្រូវបានសរសេរឡើងវិញឡើយ។",
+                    "english": "Values ({n}) now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_zero_warn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "តម្លៃ ({n}) ឥឡូវនេះមានន័យ {unit}។ គ្មានអ្វីត្រូវបានសរសេរឡើងវិញឡើយ។",
+                    "english": "Values ({n}) now mean {unit}. Nothing was rewritten."
+                },
+                "next_translated": {
+                    "key": "lpn_status_converted",
+                    "value": "តម្លៃ ({n}) ត្រូវបានសរសេរឡើងវិញទៅជា {unit}។",
+                    "english": "Values ({n}) were rewritten into {unit}."
                 }
             }
         },

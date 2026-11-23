@@ -1869,8 +1869,8 @@
 	// elevation in fth2o is ALREADY in EPANET's US length unit and must not be "converted" through a
 	// pair of factors whose product is not exactly 1.
 	var FILE_UNITS = {
-		us: { len: 'ft', dia: 'in', head: 'ft', press: 'psi' },
-		si: { len: 'm', dia: 'mm', head: 'm', press: 'mh2o' }
+		us: { len: 'ft', dia: 'in', head: 'ft', press: 'psi', vol: 'ft3' },
+		si: { len: 'm', dia: 'mm', head: 'm', press: 'mh2o', vol: 'm3' }
 	};
 	/**
 	 * The pressure unit an `.inp` written for this project's flow unit is read in (psi for a US
@@ -3060,6 +3060,23 @@
 			cHead = converter(units.lpn_u_elevhead, fileU.head, 'elevation'),
 			cPress = converter(units.lpn_u_pressure, fileU.press, 'pressure'),
 			cFlow = converter(units.lpn_u_flow, FLOW_KEYWORD_UNIT[flowKey], 'flow');
+		// **A TANK'S MinVol IS THE FILE'S LENGTH UNIT CUBED** and the project holds it in its Volume
+		// unit (Task 857), so it converts exactly as a length does: only when the two differ, said
+		// once, and the file's own characters otherwise. Made only when a tank states one, so a file
+		// with none never reports a volume conversion it did not make. A document saved before the
+		// Volume selector existed typed it in its Length unit cubed, and still writes that way.
+		var cVolMade = null;
+		function cVolume() {
+			if (cVolMade) { return cVolMade; }
+			if (units.lpn_u_volume) {
+				cVolMade = converter(units.lpn_u_volume, fileU.vol, 'volume');
+			} else {
+				cVolMade = cLen.same ? PLAIN : { same: false, mul: Math.pow(cLen.mul, 3) };
+			}
+			return cVolMade;
+		}
+		var PLAIN = { same: true, mul: 1 };
+		if ((doc.nodes || []).some(function (x) { return x.type === 'tank' && eff(x, 'minVolume') > 0; })) { cVolume(); }
 		if (failure) { return failure; }
 
 		// ONE NUMBER, WRITTEN. `rec`/`key` name where the file's own text was kept, and lpnNumText()
@@ -3071,8 +3088,7 @@
 			if (c.same) { return EngCalcs.lpnNumText(rec, key, v); }
 			return String(v * c.mul);
 		}
-		// A dimensionless number -- roughness C, minor loss k, a map coordinate. Same token rule.
-		var PLAIN = { same: true, mul: 1 };
+		// A dimensionless number -- roughness C, minor loss k, a map coordinate. Same token rule (PLAIN, above).
 
 		// Column-separated like EPANET's own writer, because the first thing anybody does with an
 		// exported file is read it.
@@ -3200,10 +3216,10 @@
 					n(cHead, nd, 'minLevel', eff(nd, 'minLevel') || 0),
 					n(cHead, nd, 'maxLevel', eff(nd, 'maxLevel') || 0),
 					n(cLen, nd, 'tankDiameter', eff(nd, 'tankDiameter') || 0),
-					// MinVol, as the file wrote it (a volume: the length unit cubed). Absent is EPANET's
-					// own 0, "no separate minimum volume".
+					// MinVol, as the file wrote it unless the Volume unit differs from the file's length
+					// unit cubed. Absent is EPANET's own 0, "no separate minimum volume".
 					(typeof eff(nd, 'minVolume') === 'number' && isFinite(eff(nd, 'minVolume')))
-						? n(cLen.same ? PLAIN : { same: false, mul: Math.pow(cLen.mul, 3) }, nd, 'minVolume', eff(nd, 'minVolume')) : '0'];
+						? n(eff(nd, 'minVolume') === 0 ? PLAIN : cVolume(), nd, 'minVolume', eff(nd, 'minVolume')) : '0'];
 				if (eff(nd, 'volCurve')) {
 					tankRow.push(String(eff(nd, 'volCurve')));
 				} else if (eff(nd, 'overflow')) {

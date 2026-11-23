@@ -60,6 +60,7 @@ d.units0 = d.units;
 d.units = { lpn_u_length: 'm', lpn_u_elevhead: 'mh2o', lpn_u_pressure: 'mh2o', lpn_u_diameter: 'mm',
 	lpn_u_flow: 'lps', lpn_u_velocity: 'mps', lpn_u_gradient: d.units.lpn_u_gradient };
 if (d.units0.lpn_u_roughness) { d.units.lpn_u_roughness = 'mm'; }
+d.units.lpn_u_volume = 'm3';
 if (d.units0.lpn_u_age) { d.units.lpn_u_age = d.units0.lpn_u_age; }
 
 const Dr = geo ? ((x) => x) : ((x) => Number((x * FT).toPrecision(DSIG)));
@@ -67,6 +68,8 @@ d.nodes.forEach((n) => {
 	conv(n, ['x', 'y', 'lx', 'ly'], Dr);
 	conv(n, ['elev', '_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter', 'bottomElev'], L3);
 	conv(n, ['_demand'], Q3);
+	// A typed Minimum volume is in the Volume unit (ft3 in a US example): cubic metres now.
+	if (n.minVolume) { n.minVolume = Number((n.minVolume * FT * FT * FT).toPrecision(DSIG)); delete (n.tok || {}).minVolume; }
 	if (n.demands) { throw new Error('node ' + n.id + ' has a demand list; extend the converter'); }
 });
 d.links.forEach((l) => {

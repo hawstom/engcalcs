@@ -395,7 +395,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_convas_panel', 'lpn_convas_units_fields', 'lpn_convas_kind_epsg', 'lpn_convas_kind_unnamed',
   'lpn_convas_kind_none', 'lpn_convas_crs_pick', 'lpn_convas_crs_name', 'lpn_convas_from',
   'lpn_convas_ok', 'lpn_convas_cancel', 'lpn_convas_close', 'lpn_convas_si', 'lpn_convas_us',
-  'lpn_u_mapcoords', 'lpn_convas_round_diameter', 'lpn_convas_round_depth', 'lpn_convas_round_flow', 'lpn_convas_round_head',
+  'lpn_u_mapcoords', 'lpn_convas_zero_warn', 'lpn_convas_round_diameter', 'lpn_convas_round_depth', 'lpn_convas_round_flow', 'lpn_convas_round_head',
   // The Label column beside the rounding selects (Task 696 part 2): one suffix box per row.
   'lpn_convas_suffix_diameter', 'lpn_convas_suffix_depth', 'lpn_convas_suffix_flow', 'lpn_convas_suffix_head',
   // The satellite teaser, a cell of that strip (ROADMAP Task 452).
@@ -700,6 +700,8 @@ function setUnitSet(which) {
   // two presets agree -- an hour is an hour on both sides of the Atlantic -- so there is no `us ?`
   // here and that is not an omission.
   mkUnitSelect('lpn_u_age', 'elapsed_time', familyUnits('elapsed_time'), 'hr');
+  // A tank's Available volume, results-only; the one family whose US default (gal) is not a length cubed.
+  mkUnitSelect('lpn_u_volume', 'volume_tank', familyUnits('volume_tank'), us ? 'gal' : 'm3');
   // Darcy-Weisbach roughness height e (ROADMAP Task 271) -- family `roughness`, which lib/Units.lib.php
   // lists m/mm/ft/in and millifeet (EPANET's US D-W unit), us => ft, si => mm. Conditional in the PAGE (shown only
   // under Darcy-Weisbach) but unconditional here: applyMethodUI() hides the row, and a stub that

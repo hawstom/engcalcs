@@ -44,6 +44,7 @@ const L = loadLoopedNetwork(
 	"\t\tnewProject: newProject, saveToStorage: saveToStorage,\n" +
 	"\t\tlibrary: function () { return library; }, unitKey: unitKey,\n" +
 	"\t\topenFileMenu: openFileMenu, openConvertAsBox: openConvertAsBox,\n" +
+	"\t\tconvasUnits: function () { return convasUnits; }, convasZeroed: convasZeroedCount, convasWarn: refreshConvasZeroWarn,\n" +
 	"\t\tconvasAnswers: convasAnswers, runConvertAs: runConvertAs, coordKind: projectCoordKind,\n" +
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tgeoref: function () { return georef; }, georefAttach: georefAttach,\n" +
@@ -136,6 +137,28 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			JSON.stringify(a0.units));
 		ok('...with no rounding chosen', Object.keys(a0.rounding).every((k) => a0.rounding[k] === ''));
 
+		// The warning's count (Tom, 2026-11-20): nonzero numbers the chosen step would round to 0.
+		{
+			const u = L.convasUnits().filter((x) => x.name === 'lpn_u_diameter')[0];
+			p2._diameter = 0.4;   // 0.4 in is 10.16 mm: a step of 100 rounds it to 0, 8 in (203.2 mm) to 200
+			u.sel.value = 'mm';
+			const snap0 = JSON.stringify([L.getDoc(), L.getProject()]);
+			byId.lpn_convas_round_diameter.value = '';
+			L.convasWarn();
+			ok('Convert as: no step chosen, no warning', L.convasZeroed() === 0 && byId.lpn_convas_zero_warn.textContent === '');
+			byId.lpn_convas_round_diameter.value = '100';
+			L.convasWarn();
+			ok('Convert as: a step of 100 counts the one 0.4 in pipe', L.convasZeroed() === 1 && byId.lpn_convas_zero_warn.textContent !== ''
+				&& byId.lpn_convas_zero_warn.textContent === String(PC.lpn_units_zero_warn).replace('{n}', '1'), byId.lpn_convas_zero_warn.textContent);
+			byId.lpn_convas_round_diameter.value = '1';
+			L.convasWarn();
+			ok('Convert as: a step of 1 counts nothing and the warning goes', L.convasZeroed() === 0 && byId.lpn_convas_zero_warn.textContent === '');
+			u.sel.value = 'in';
+			byId.lpn_convas_round_diameter.value = '100';
+			ok('Convert as: an unchanged unit counts nothing', L.convasZeroed() === 0);
+			ok('Convert as: counting the warning changed nothing in the document', JSON.stringify([L.getDoc(), L.getProject()]) === snap0);
+			p2._diameter = 6; u.sel.value = 'mm'; byId.lpn_convas_round_diameter.value = '';
+		}
 		L.runConvertAs({ kind: 'none', crs: '', units: SI,
 			rounding: { diameter: '1', depth: '', flow: '0.1', head: '0.01' } });
 		const d = L.getDoc();
@@ -146,13 +169,15 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			L.unitKey('lpn_u_flow') === 'lps' && L.unitKey('lpn_u_diameter') === 'mm');
 		const n = (id) => d.nodes.filter((x) => x.id === id)[0];
 		const l = (id) => d.links.filter((x) => x.id === id)[0];
-		ok('diameter converted and rounded to the nearest 1', l(p1.id)._diameter === 203 && l(p2.id)._diameter === 152,
+		// The one rounding (roundToStep) gives exactly the step chosen: 8 in is 203 mm and 120 gpm is 7.6 L/s.
+		ok('diameter converted, rounded to the nearest 1', l(p1.id)._diameter === 203 && l(p2.id)._diameter === 152,
 			l(p1.id)._diameter + ', ' + l(p2.id)._diameter);
-		ok('demand converted and rounded to the nearest 0.1', n(A.id)._demand === 7.6 && n(B.id)._demand === 5,
+		ok('demand converted, rounded to the nearest 0.1', n(A.id)._demand === 7.6 && n(B.id)._demand === 5,
 			n(A.id)._demand + ', ' + n(B.id)._demand);
 		ok('reservoir head converted and rounded to the nearest 0.01', n(R.id)._head === 76.32, n(R.id)._head);
 		ok('elevation converted (it is not one of the four rounded fields)', near(n(A.id).elev, 30.48, 1e-9), n(A.id).elev);
 		ok('pipe length converted', near(l(p2.id)._length, 365.76, 1e-9), l(p2.id)._length);
+		ok('unrounded converted numbers carry no binary noise', String(l(p2.id)._length) === '365.76' && String(l(p1.id)._length) === '304.8', l(p1.id)._length + ', ' + l(p2.id)._length);
 		// A local grid's coordinates are in its length unit (Task 693), so they rescale with it.
 		ok('the grid coordinates rescale with the length unit',
 			near(L.outwardX(n(A.id).x), 304.8, 1e-9) && near(L.outwardX(n(B.id).x), 609.6, 1e-9),

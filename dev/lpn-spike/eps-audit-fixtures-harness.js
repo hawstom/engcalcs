@@ -23,6 +23,7 @@ const NEEDS = {
 	valves: (c) => c.valveSettings >= 8 && c.statusChanges > 4,
 	valves2: (c) => c.valveSettings >= 8 && c.statusChanges > 3,
 	valves3: (c) => c.valveSettings >= 2,
+	valves4: (c) => c.valveSettings >= 4 && c.statusChanges > 2,
 	emitters: (c) => c.minEmit < -1e-3 && c.maxEmit > 1e-3,
 	emitters2: (c) => c.minEmit < -1e-3 && c.maxEmit > 1e-3,
 	'emitters-pda': (c) => c.minEmit < -1e-3 && c.maxEmit > 1e-3
@@ -34,7 +35,12 @@ const HAS_PUMPS = { pumps: 1, pumps2: 1, valves2: 1, valves3: 1, energy: 1, 'pum
 const SPEED0 = { pumps: ['PU3'] };
 const SCENARIOS = {
 	'pumps.speed': (c) => c.scenarioMoved > 0.05 && c.pumpSettings >= 6,
-	'tanks.overflow': (c) => c.scenarioMoved > 0.05 && c.tankVolSpan > 300
+	'tanks.overflow': (c) => c.scenarioMoved > 0.05 && c.tankVolSpan > 300,
+	// Fourth pass (2026-11-22): overrides of a valve's setting, a tank's diameter, initial level, and minimum and maximum level
+	'tanks.diameter': (c) => c.scenarioMoved > 0.05 && c.tankVolSpan > 300,
+	'tanks.level': (c) => c.scenarioMoved > 0.05 && c.tankVolSpan > 300,
+	'tanks.minmax': (c) => c.scenarioMoved > 0.05 && c.tankVolSpan > 300,
+	'valves4.setting': (c) => c.scenarioMoved > 0.5 && c.valveSettings >= 4
 };
 const RUNS = Object.keys(NEEDS).map((n) => ({ name: n, base: n, scn: null, needs: NEEDS[n] })).concat(Object.keys(SCENARIOS).map((n) => ({ name: n + ' (scenario)', base: n.split('.')[0], scn: n, needs: SCENARIOS[n] })));
 RUNS.forEach((run) => {
@@ -45,6 +51,13 @@ RUNS.forEach((run) => {
 	let j = null; try { j = JSON.parse(fs.readFileSync(jf, 'utf8')); fs.unlinkSync(jf); } catch (e) { }
 	const res = j && j.results && j.results[0];
 	if (!res) { ok(name + ': ran', false, ((j && j.skipped) || [r.stderr]).join(' ').slice(0, 300)); return; }
+	if (run.scn) {
+		// Fourth pass: the override must not reach Base; Base asked again after the scenario was made must answer as before; the scenario must answer differently from Base,
+		// and again the same when switched back to (fingerprint of the assembled model, the key of the page's run cache, and the built-in run's frames).
+		const sc = res.switchCheck || {};
+		ok(name + ': after a switch to Base the override is not in Base (model and run as before the scenario)', sc.baseUnchanged === true && sc.baseRunUnchanged === true, JSON.stringify(sc));
+		ok(name + ': the scenario answers differently from Base, and the same again after switching back', sc.scenarioDiffersFromBase === true && sc.scenarioStable === true && sc.activeBack === true, JSON.stringify(sc));
+	}
 	['BRIDGE', 'NATIVE'].forEach((lab) => {
 		const rr = res.runs.filter((x) => x.label === lab)[0];
 		ok(name + ': ' + lab + ' agrees with the engine', !!rr && rr.exceed.length === 0 && rr.sameTimes, rr ? rr.exceed.join(',') : 'no run: ' + res.notes.join(' '));

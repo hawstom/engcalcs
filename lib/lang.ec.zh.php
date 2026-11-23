@@ -1262,22 +1262,6 @@ $ec_lang['lpn_demand_tip']='此节点取出的流量。若要向管网中输入�
 // **THE UNITS STRIP IS TWO GROUPS** (Task 422). The first decides what the numbers in the document
 // MEAN, so changing one is a model change and the page asks first; the second is how results are
 // read, and changes with no fanfare. Three quantities appear in both because they serve both sides.
-// The question an INPUT unit change asks, in Tom's own wording (2026-08-18, Task 425) rather than a
-// paraphrase of it: name the quantity, list the fields it decides ONE PER LINE, then name the two
-// answers by what they do to the numbers already typed. {unit} is a unit name; the field names are
-// built by the page and are no longer a placeholder inside a sentence, which is why the lead is a
-// NEW key rather than an edit of `lpn_units_warn_body`. Editing that one in place would have left
-// 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
-$ec_lang['lpn_units_warn_title']='此单位决定您输入内容的含义';
-$ec_lang['lpn_units_warn_lead']='{unit} 是您在此处输入内容的单位：';
-$ec_lang['lpn_units_options_head']='更改单位时：';
-// Each option's sentence opens with the word on its own button, so the button and the explanation
-// say the same word. Non-destructive is the suite's standing behaviour and the first button;
-// Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
-$ec_lang['lpn_units_nondestructive']='非破坏性';
-$ec_lang['lpn_units_nondestructive_desc']='非破坏性：保留每个输入值不变，只按新单位重新解读。';
-$ec_lang['lpn_units_destructive']='破坏性';
-$ec_lang['lpn_units_destructive_desc']='破坏性：对每个输入值进行数学换算并重写，使管网在换算误差范围内保持物理上基本不变。原始输入值会丢失，撤销可将其恢复。';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='数值（{n}）现在按 {unit} 解读，未作任何改写。';
 $ec_lang['lpn_status_converted']='数值（{n}）已被改写为 {unit}。';
