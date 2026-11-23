@@ -10363,6 +10363,15 @@ var EngCalcs = EngCalcs || {};
 	// trying to edit nodes"* back again. So within this many px of a junction's centre a line never takes the press: the symbol
 	// whose ink is nearest does (that junction, or a pump glyph nearer still). Not a reach, and touch only.
 	var TOUCH_NODE_MIN_PX = 5;
+	// **THE SWITCH FOR "A FINGER PICKS EXACTLY AS A MOUSE DOES"** (Task 861, round 10; a measuring switch, never a visitor setting, and
+	// the default stays false: Tom decides). On, a touch press skips touchNodeOver() and the chooser reads its candidates at the mouse's
+	// reach, so the browser's own hit (the bands and skirts in css/engcalcs.css) and the exact point alone decide. The tap's size
+	// and the ghost-click shield stay the finger's. The test hook `window.EC_TOUCH_PICK_LIKE_MOUSE = true` (an init script) turns it on
+	// without editing this file; `dev/lpn-spike/pick-touch-rule-measure.js` compares the two rules.
+	var TOUCH_PICK_LIKE_MOUSE = false;
+	function fingerRule(e) {
+		return !!e && e.pointerType === 'touch' && !(TOUCH_PICK_LIKE_MOUSE || window.EC_TOUCH_PICK_LIKE_MOUSE === true);
+	}
 	// **THE POINTER'S NUMBER IS NOT PART OF THAT FAMILY AND DOES NOT MOVE.** CLAUDE.md: a 44 px
 	// touch target is not an argument here -- phone ergonomics must not drive the desktop design.
 	// A mouse has a visible cursor, a hover readout and sub-pixel aim, and 14 px is the slop it has
@@ -60371,7 +60380,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Touch only, so no pointer gesture changes at all; and ABOVE selectFromHit(), so the
 			// promoted node is what gets selected -- the pointerdown-selects rule of Task 415 stays
 			// true of a near-miss drag exactly as it is of a direct one.
-			if (e.pointerType === 'touch') {
+			if (fingerRule(e)) {
 				t = touchNodeOver(e.clientX, e.clientY, t);
 			}
 			// A Shape is found by distance, under every asset; a selected Shape's grip over them all.
@@ -60703,7 +60712,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// by five pixels would open nothing. touchNodeOver() is the one door, the same one the press went through: a
 			// symbol's own ink, else a pipe's line within its band unless a symbol's mark is nearer, else the node nearest
 			// within reach. Touch only, so a pointer gesture never reaches it and no desktop behaviour moves.
-			if (e.pointerType === 'touch' && mode === 'select') {
+			if (fingerRule(e) && mode === 'select') {
 				t = touchNodeOver(e.clientX, e.clientY, t);
 				// **AND A METER GETS THE SAME REACH A NODE DOES, for the same reason** (Task 247):
 				// it is deliberately a 3 px dot at system zoom, which makes it the one symbol on
@@ -61586,7 +61595,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A Text over a pile is one more thing the press could mean, so it may start a chooser too.
 		if (!t || (t !== svg && t.dataset.node === undefined && t.dataset.lbl === undefined && t.dataset.shape === undefined &&
 			!(t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')))) { return null; }
-		list = pickCandidatesAt(e.clientX, e.clientY, e.pointerType === 'touch', pickHitOf(t));
+		list = pickCandidatesAt(e.clientX, e.clientY, fingerRule(e), pickHitOf(t));
 		return list.length >= 2 ? { id: e.pointerId, x: e.clientX, y: e.clientY, shift: !!e.shiftKey,
 			touch: e.pointerType === 'touch', list: list } : null;
 	}
@@ -61717,7 +61726,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		lpress = null;
 		if ((e.pointerType !== 'touch' && e.pointerType !== 'pen') || !ctxOnCanvas(e) || mode !== 'select' || profileDrawActive() || profileEditActive()) { return; }
 		t = mapHitAt(e.clientX, e.clientY);
-		if (e.pointerType === 'touch') { t = touchNodeOver(e.clientX, e.clientY, t); }
+		if (fingerRule(e)) { t = touchNodeOver(e.clientX, e.clientY, t); }
 		t = ctxTargetFromHit(t);
 		if (!t) { return; }
 		lpSwallowClickUntil = 0;

@@ -603,6 +603,62 @@ async function main() {
 		await junctionTaps('8 notches out');
 		await Y.page.close();
 
+		// B7. Round 10, Tom's phone test (390 x 844, tall, touch): "pump 10 under Reservoir Lake: I get Lake alone" and "River over
+		// Junction 60: I don't get the chooser". A press whose POINT is on two inks opens the box, by a finger as by a mouse: panned to the
+		// Lake (a touch swipe), the deepest point where Lake's silhouette and Pump 10's lie together lists both; pinched out until River's
+		// silhouette covers Junction 60 (the two overlap only once the network is drawn about a quarter as wide as at the opening view, which is when
+		// a finger can find the overlap at all), the deepest point of River and Junction 60 lists both. The switch (EC_TOUCH_PICK_LIKE_MOUSE)
+		// gives the same box for the same exact point.
+		console.log('\nB7. Phone 390 x 844, touch: Lake over Pump 10 after a pan, River over Junction 60 after a pinch (Tom, 2026-11-22)');
+		for (const flag of [false, true]) {
+			const Z = await Session.open(browser, NAME + '-p7' + (flag ? 's' : ''), { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 3 });
+			if (flag) { await Z.page.addInitScript(() => { window.EC_TOUCH_PICK_LIKE_MOUSE = true; }); }
+			await open(Z);
+			const zc = await Z.page.context().newCDPSession(Z.page);
+			const tag = flag ? ' (switch on)' : '';
+			const deepest = (a, b) => Z.page.evaluate(([a, b]) => {
+				const A = document.querySelector(a), B = document.querySelector(b);
+				if (!A || !B) { return null; }
+				const ab = A.getBoundingClientRect(), bb = B.getBoundingClientRect(), P = A.ownerSVGElement.createSVGPoint();
+				const inn = (e, x, y) => { P.x = x; P.y = y; return e.isPointInFill(P.matrixTransform(e.getScreenCTM().inverse())); };
+				let best = null;
+				for (let x = Math.max(ab.left, bb.left); x <= Math.min(ab.right, bb.right); x += 0.25) { for (let y = Math.max(ab.top, bb.top); y <= Math.min(ab.bottom, bb.bottom); y += 0.25) { if (inn(A, x, y) && inn(B, x, y)) { best = { x, y }; } } }
+				return best;
+			}, [a, b]);
+			const rowsAfterTap = async (pt) => {
+				await zc.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: pt.x, y: pt.y, id: 1 }] }); await sleep(35);
+				await zc.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await Z.settle(450);
+				const rows = await Z.page.$$eval('.lpn-pick-chooser button', (bs) => bs.map((b) => b.textContent.trim()));
+				await Z.page.evaluate(() => { document.querySelectorAll('.lpn-pane-ctxmenu').forEach((m) => m.remove()); const c = document.getElementById('lpn_popup_close'); if (c) { c.click(); } });
+				await Z.page.keyboard.press('Escape'); await Z.settle(200);
+				return rows;
+			};
+			const swipe = async (x0, y0, x1) => {
+				await zc.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y: y0, id: 1 }] });
+				for (let i = 1; i <= 12; i++) { await zc.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 + (x1 - x0) * i / 12, y: y0, id: 1 }] }); await sleep(16); }
+				await zc.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await Z.settle(500);
+			};
+			await swipe(40, 600, 330); await swipe(40, 600, 150);
+			const lk = await deepest('#lpn_canvas path.lpn-node-hit[data-node="Lake"]', '#lpn_canvas path.lpn-link-symbol-hit[data-link="10"]');
+			const lkRows = lk ? await rowsAfterTap(lk) : [];
+			ok('panned to the Lake, a finger on the point where the Lake and Pump 10 overlap opens the box listing both' + tag, lkRows.some((r) => /Lake/.test(r)) && lkRows.some((r) => /Pump 10/.test(r)), JSON.stringify([lk, lkRows]));
+			const pinch = async (f) => {
+				const d0 = 150, d1 = d0 * f;
+				await zc.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 195 - d0 / 2, y: 420, id: 1 }, { x: 195 + d0 / 2, y: 420, id: 2 }] });
+				for (let i = 1; i <= 15; i++) { const d = d0 + (d1 - d0) * i / 15; await zc.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 195 - d / 2, y: 420, id: 1 }, { x: 195 + d / 2, y: 420, id: 2 }] }); await sleep(16); }
+				await zc.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await Z.settle(700);
+			};
+			await Z.page.reload(); await Z.answerTrainingPanel().catch(() => {}); await Z.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } }); await Z.settle(3000);
+			let rv = null;
+			for (let k = 0; k < 4 && !rv; k++) {
+				rv = await deepest('#lpn_canvas path.lpn-node-hit[data-node="River"]', '#lpn_canvas circle.lpn-node[data-node="60"]');
+				if (!rv) { await pinch(0.5); }
+			}
+			const rvRows = rv ? await rowsAfterTap(rv) : [];
+			ok('pinched out until River covers Junction 60, a finger on the overlap opens the box listing both' + tag, rvRows.some((r) => /River/.test(r)) && rvRows.some((r) => /Junction 60/.test(r)), JSON.stringify([rv, rvRows]));
+			await Z.page.close();
+		}
+
 		ok('no page error', errors.length === 0, errors.join(' | '));
 	} finally {
 		await browser.close();

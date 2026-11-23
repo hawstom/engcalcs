@@ -33,6 +33,13 @@ deliberately undone and item 7 is still open.
    big, so zoomed out it keeps a finger's ground against the pipes through it. A node does not
    outrank a label or a vertex handle; a pipe's line outranks a node near a data label, never the
    label (Task 861, round 9).
+   **Measured, Task 861 round 10** (`dev/lpn-spike/pick-touch-rule-measure.js`, Net3, real Chromium, Gaussian scatter of 4 px SD, 40
+   taps per target kind; the SD is assumed, not sourced): of taps aimed at a pipe's middle or a pipe 12 px from its end, the finger rule
+   selects that pipe 73-93 %, the mouse's exact-point rule 25-48 % (the rest land on bare map: a pipe is 6 px of band); aimed at an isolated
+   junction, 58-63 % against 5-38 %. At 2 px SD the finger rule is 85-100 % everywhere and the mouse rule 25-75 %. The switch
+   `TOUCH_PICK_LIKE_MOUSE` (a constant; `window.EC_TOUCH_PICK_LIKE_MOUSE` in a harness) turns only the JS half of the mouse rule on for a touch
+   press, and gives the Pump 335 cluster back to the reservoir's band. Default off. The box opens only where the point is on two inks, and
+   River and Junction 60 overlap only once the network is drawn about a quarter as wide as at the opening view.
 5. **Nothing done for the finger changes anything for the mouse.** Every touch rule is reached only
    on a touch press; the desktop paths are untouched by construction. The precedence in rule 4 is
    the sharpest case: a mouse can see it is on the pipe and correct by three pixels, so it does not
