@@ -5109,3 +5109,12 @@ OBSERVED (re-verify; real Chromium phone 412x915 2.6x, CDP touch taps, Net3, own
 - Pump 10 (Lake end) is off-screen at the opening view and to 12 notches on a 412 phone (glyph x = -149 .. -14), so Tom cannot see it without panning. At 16 notches every tap within 10 px gives box "Reservoir Lake / Pump 10" or Lake/J10; the pump alone is only reachable through the box.
 - Unreproduced: one first-tap-after-zoom "selects nothing" at the glyph centre (4 and 8 notches); repeated, 6 of 6 gave the pump. Zoom by wheel notches is not repeatable in size run to run (glyph 12.2 vs 9.1 px at "4 notches").
 - NOT DONE: the 5-12 px junction-vs-pipe percentages (taken from the builder), long-press and drag harnesses, a real finger, mutation test.
+
+## 2026-11-22 feat/pick-chooser round 10 (429054e4b), Task 861, Perry
+OBSERVED (re-verify; real Chromium 390x844 DPR 3 isMobile touch, CDP touch taps, Net3; own scripts, builder's coordinates not used):
+- Pump 10 / Lake, panned (Lake x 105..129): ink masks from screenshots with each symbol hidden in turn: Lake ink 198 css px2, pump ink 127, overlap 36.7 (29% of the pump's ink is under the Lake; 71% visible). The Lake is drawn on top (z-order) but covers only a corner of the pump circle.
+- 1 px tap grid over Lake+pump (1645 touch taps): box iff on the ink of both (all 17 boxes off both inks and all non-boxes on both were within 1.2 px of an ink edge, antialiasing). Taps on the visible pump alone select the pump; taps on the visible Lake alone select the Lake. Taps off any ink within ~24 px reach still select Lake (finger allowance, by design).
+- River/Junction 60, pinch 0.8 per step: opening view gap 9.7 px (bbox), tap on J60 gives J60, no box; first box at scale 0.41 of the opening view (0.51 none); at 0.33 three rows. DOM bbox overlap begins at 0.64 but the triangle's ink does not reach the dot until about 0.45.
+- Round-9 text promised "At 16 notches or closer": wrong direction (box needs MORE zoomed out) and a phone has no notches.
+- Harnesses: zoom ALL PASS 74; pick-chooser-browser see report.
+- NOT DONE: real finger, mutation test of the B7 harness, Text-label overlaps (a Text RIVER shows in boxes at a 0.6 pinch).
