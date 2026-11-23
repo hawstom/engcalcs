@@ -38,10 +38,10 @@ const SENTENCE = /^Associated with Well W1\. Change volume and control propertie
 
 // The inputs the Well's box holds for the tank, with the value typed in Base, the value typed in the scenario, and the key the tank stores it under.
 const OPEN = [
-	['Elevation', '5', '6', 'elev'], ['Base elevation', '3', '4', 'bottomElev'], ['Initial depth', '12', '13', '_level'], ['Minimum depth', '2', '3', 'minLevel'],
+	['Base elevation', '3', '4', 'bottomElev'], ['Initial depth', '12', '13', '_level'], ['Minimum depth', '2', '3', 'minLevel'],
 	['Maximum depth', '40', '41', 'maxLevel'], ['Tank diameter', '60', '61', 'tankDiameter'], ['Minimum volume', '500', '501', 'minVolume'], ['Can overflow', 'YES', 'NO', 'overflow']
 ];
-const PRESSURE = [['Elevation', '5', '6', 'elev'], ['Base elevation', '3', '4', 'bottomElev']];
+const PRESSURE = [['Base elevation', '3', '4', 'bottomElev']];
 
 async function openSession(browser, Session, project) {
 	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 1000 }, serviceWorkers: 'block' });
@@ -188,6 +188,7 @@ async function runForm(browser, Session, form) {
 		const r = rowIn(rows, i[0]);
 		ok(form + ': the Well\'s box shows a typeable "' + i[0] + '" row in the tank\'s section', !!r && r.has && r.visible && !r.disabled, JSON.stringify(r));
 	});
+	ok(form + ': the Well\'s box has NO Elevation row in the tank\'s section (round 15: the tank\'s ground Elevation is typed in the tank\'s own box)', !rowIn(rows, 'Elevation'), JSON.stringify(rowIn(rows, 'Elevation')));
 	const order = await P.evaluate(() => {
 		const secs = Array.from(document.querySelectorAll('#lpn_popup_fields section.lpn-asm-section')), top = (e) => e.getBoundingClientRect().top;
 		const tank = secs.filter((x) => /^Tank /.test(x.textContent.trim()))[0], others = secs.filter((x) => x !== tank);
@@ -238,6 +239,21 @@ async function runForm(browser, Session, form) {
 	ok(form + ': one Undo takes the last typed value (' + last[0] + ') back', tank[last[3]] !== (last[3] === 'overflow' ? last[1] : +last[1]) && INPUTS.slice(0, -1).every((i) => tank[i[3]] === (i[3] === 'overflow' ? i[1] : +i[1])), JSON.stringify(tank));
 	await openBox(ctx, 'W1');
 	await typeInSection(ctx, last[0], last[1]);
+	// 5b. round 15: the tank's Elevation is its own, typeable in the tank's box, and does not follow the Well's Elevation
+	await P.keyboard.press('Escape');
+	await openBox(ctx, 'T1');
+	const elevRow = (label) => P.evaluate((t) => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.textContent.replace(/\s+/g, ' ').trim().indexOf(t) === 0 && !/^Base elevation/.test(x.textContent.trim()))[0]; const i = l && l.querySelector('input'); return i ? { value: i.value, typeable: !i.disabled && !i.readOnly } : null; }, label);
+	const tankElev = await elevRow('Elevation');
+	ok(form + ': the tank\'s own box has a typeable Elevation row', !!tankElev && tankElev.typeable, JSON.stringify(tankElev));
+	await P.evaluate(() => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^Elevation/.test(x.textContent.replace(/\s+/g, ' ').trim()))[0]; const i = l.querySelector('input'); i.value = '7'; i.dispatchEvent(new Event('change', { bubbles: true })); });
+	await a.settle(600);
+	await P.keyboard.press('Escape');
+	await openBox(ctx, 'W1');
+	await P.evaluate(() => { const secs = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => /^Elevation/.test(x.textContent.replace(/\s+/g, ' ').trim()) && !x.closest('section'))[0]; const i = secs && secs.querySelector('input'); if (i) { i.value = '9'; i.dispatchEvent(new Event('change', { bubbles: true })); } });
+	await a.settle(2400);
+	doc = await stored(P); tank = doc.nodes.find((n) => n.id === 'T1');
+	const wellOut = doc.nodes.find((n) => n.id === 'W1');
+	ok(form + ': the Well\'s Elevation was changed to 9 and the tank\'s own Elevation stays 7', wellOut.elev === 9 && tank.elev === 7, JSON.stringify([wellOut.elev, tank.elev]));
 	// 6. a scenario
 	const made = await U.createScenarioViaMenu(ctx);
 	const scnId = made.scenario && made.scenario.id;
