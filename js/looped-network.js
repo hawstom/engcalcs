@@ -9294,7 +9294,7 @@ var EngCalcs = EngCalcs || {};
 				applies: function (n) { return n.type === 'tank' && !wellTankOwner(n); },
 				get: function (n) { return effective(n, 'tankDiameter'); }, set: function (n, v) { n.tankDiameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** ([TANKS] columns 7 and 9). The volume is a number
-			// in the Length unit cubed; Can overflow is a YES/NO choice on the same `choices` door the
+			// in the Volume unit; Can overflow is a YES/NO choice on the same `choices` door the
 			// mixing model uses, the codes being EPANET's own words.
 			{ key: 'minVolume', group: 'node', field: 'minVolume', prop: 'minVolume', label: pc.lpn_field_tank_minvol || 'Minimum volume',
 				applies: function (n) { return n.type === 'tank' && !wellTankOwner(n); },
@@ -9393,6 +9393,7 @@ var EngCalcs = EngCalcs || {};
 			initQuality: { on: false, before: 'Init. ', show: 6, drop: 16, dec: 2, units: true },
 			demandActual: { on: false, before: 'Q=', show: 7, drop: 26, dec: 'u' },
 			level: { on: false, before: 'Y=', show: 9, drop: 12, dec: 'u' },
+			initVolume: { on: false, before: 'Vi=', show: 15, drop: 11, dec: 'u' },
 			head: { on: false, before: 'H=', show: 10, drop: 14, dec: 'u' },
 			pressure: { on: true, before: 'P=', show: 11, drop: 28, dec: 'u' },
 			quality: { on: false, before: '', dec: 1, decTrace: 0, units: true,
@@ -9436,7 +9437,7 @@ var EngCalcs = EngCalcs || {};
 	// two different units. Head loss is an Elevation/Head quantity (resultUnit('elevhead')).
 	var LPN_LABEL_FIELD_UNIT = {
 		node: { demand: 'lpn_u_flow', demandActual: 'lpn_u_flow', elev: 'lpn_u_elevhead',
-			level: 'lpn_u_elevhead', head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' },
+			level: 'lpn_u_elevhead', initVolume: 'lpn_u_volume', head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' },
 		link: { length: 'lpn_u_length', diameter: 'lpn_u_diameter', flow: 'lpn_u_flow',
 			velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient' },
 		customer: { demand: 'lpn_u_flow', demandActual: 'lpn_u_flow' }
@@ -9458,7 +9459,10 @@ var EngCalcs = EngCalcs || {};
 		lpn_u_elevhead: { fth2o: 2, mh2o: 3 },
 		lpn_u_pressure: { psi: 2, mh2o: 3, fth2o: 2 },
 		lpn_u_velocity: { ftps: 1, mps: 2 },
-		lpn_u_gradient: { gradePercent: 2, grade: 4 }
+		lpn_u_gradient: { gradePercent: 2, grade: 4 },
+		// A tank's Available volume (a results column; it has no label row). Whole gallons and litres,
+		// the unit's own size for the rest, so a million-gallon figure is not printed to the cent.
+		lpn_u_volume: { gal: 0, mgal: 3, ft3: 0, acft: 2, m3: 1, l: 0, megaliter: 3 }
 	};
 	// **THE GUESS FROM THE FACTOR, for a unit the table above does not list** (Tom's first half of
 	// R-328). A typical magnitude of each quantity in SI, times the unit's own factor, is what the
@@ -13110,7 +13114,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (field === 'volume') {
 			var volSI = tankUsableVolumeSI(n);
-			return volSI === undefined ? undefined : volSI * tankVolumeFactor();
+			return volSI === undefined ? undefined : toDisplay(volSI, resultUnit('volume'));
 		}
 		if (field === 'pressure') {
 			if (isFixedHeadNode(n)) { return fixedHeadPressure(n); }
@@ -13175,6 +13179,27 @@ var EngCalcs = EngCalcs || {};
 		if (!(g.D > 0) || !isFinite(g.D)) { return undefined; }
 		return Math.PI / 4 * g.D * g.D * (top - g.minSI);
 	}
+	// **A TANK'S INITIAL VOLUME, AS EPANET COMPUTES IT** (Task 857; input3.c tankdata(), input1.c
+	// inittanks()): a usable volume curve read at the initial depth, else the cylinder of the tank
+	// diameter, whose volume at the lowest water depth is the typed Minimum volume when it is above 0
+	// and the diameter's own area times that depth when it is 0, and which grows from there with the
+	// initial depth. SI cubic metres; undefined when there is neither a curve nor a diameter.
+	function tankInitialVolumeSI(n) {
+		var g, lvl, area, vmin;
+		if (!n || n.type !== 'tank') { return undefined; }
+		g = tankGeomLive(n);
+		lvl = toSI(effective(n, 'level') || 0, 'lpn_u_elevhead');
+		if (g.curve) { return tankCurveVolume(g.curve, lvl); }
+		if (!(g.D > 0) || !isFinite(g.D)) { return undefined; }
+		area = Math.PI / 4 * g.D * g.D;
+		vmin = toSI(effective(n, 'minVolume') || 0, 'lpn_u_volume');
+		if (!(vmin > 0)) { vmin = area * g.minSI; }
+		return vmin + area * (lvl - g.minSI);
+	}
+	function tankInitialVolumeDisplay(n) {
+		var v = tankInitialVolumeSI(n);
+		return v === undefined ? undefined : toDisplay(v, resultUnit('volume'));
+	}
 	// Linear between the curve's points, held flat beyond its ends. pts are SI and increasing in x.
 	function tankCurveVolume(pts, x) {
 		var i, a, b;
@@ -13187,9 +13212,6 @@ var EngCalcs = EngCalcs || {};
 		}
 		return pts[pts.length - 1][1];
 	}
-	// A volume is shown in the LENGTH unit cubed (cubic feet or cubic metres, which is what EPANET
-	// pairs with its length): the factor and the mark come from the one LENGTH selector.
-	function tankVolumeFactor() { var f = unitFactor('lpn_u_length'); return f * f * f; }
 	// A tank's Can overflow as EPANET's own word. The file's spelling is kept in storage (`yes`, `NO`),
 	// because it is carried and never computed with; this is how every venue reads it. Absent is NO.
 	function tankOverflowWord(n) { return /^y/i.test(String(effective(n, 'overflow') || '')) ? 'YES' : 'NO'; }
@@ -13199,12 +13221,11 @@ var EngCalcs = EngCalcs || {};
 		if (tankOverflowWord(n) === word && effective(n, 'overflow')) { return; }
 		setProp(n, 'overflow', word);
 	}
-	function tankVolumeUnitText() {
-		var pc = EngCalcs.pageConfig || {}, k = unitKey('lpn_u_length');
-		if (k === 'ft') { return pc.u_ft3 || 'ft^3'; }
-		if (k === 'm') { return pc.u_m3 || 'm^3'; }
-		return unitLabel('lpn_u_length') + '^3';
-	}
+	// **ONE VOLUME UNIT, TYPED AND SOLVED ALIKE** (Task 857; Tom's "one set of units", Task 522): a tank's
+	// typed Minimum volume and its Available volume result are both in the Volume selector, as a pipe
+	// Length and a pipe's solved length are in Length. The .inp boundary (js/lpn-inp.js) converts to
+	// the file's own length unit cubed; assembleModel() converts to cubic metres for both engines.
+	function tankVolumeUnitText() { return unitLabel('lpn_u_volume'); }
 	function colorLinkValue(l, field) {
 		if (field === 'diameter') { return l.type === 'pump' ? undefined : effective(l, 'diameter'); }
 		if (field === 'roughness') { return l.type === 'pipe' ? effective(l, 'roughness') : undefined; }
@@ -13385,7 +13406,7 @@ var EngCalcs = EngCalcs || {};
 		// **A TANK'S TWO RESULTS ARE NOT COLOUR OR LABEL FIELDS** (Task 783; the chemical-symbology
 		// harness holds every colour field to a Labels row, and these have neither), so they sit
 		// outside COLOR_NODE_FIELDS and the unit is answered here. Depth reads in the Elevation/Head
-		// unit like the three typed levels; volume in the LENGTH unit cubed.
+		// unit like the three typed levels; volume in the Volume unit.
 		if (group === 'node' && field === 'volume') { return tankVolumeUnitText(); }
 		if (group === 'node' && field === 'depth') { return unitLabel(resultUnit('elevhead')); }
 		id = colorFieldUnit(group, field);
@@ -23518,7 +23539,7 @@ var EngCalcs = EngCalcs || {};
 	// threshold and the shed cascade act on drawn glyphs after the composers have run, and the card
 	// never calls them.
 	var LPN_CARD_FIELDS = {
-		node: ['id', 'desc', 'tag', 'demandActual', 'demand', 'head', 'pressure', 'elev', 'level', 'quality', 'initQuality'],
+		node: ['id', 'desc', 'tag', 'demandActual', 'demand', 'head', 'pressure', 'elev', 'level', 'initVolume', 'quality', 'initQuality'],
 		link: ['id', 'desc', 'tag', 'initStatus', 'diameter', 'length', 'roughness', 'km', 'bulkCoeff', 'wallCoeff',
 			'flow', 'velocity', 'headloss', 'gradient', 'friction', 'status', 'quality', 'rate'],
 		customer: ['id', 'demandActual', 'demand', 'desc', 'tag', 'count']
@@ -25271,7 +25292,7 @@ var EngCalcs = EngCalcs || {};
 			var tankVal = prop === 'bottomElev' ? tankBottom(cand.el) : effective(cand.el, prop);
 			return (typeof tankVal === 'number' && isFinite(tankVal)) ? tankVal : undefined;
 		}
-		// **MINIMUM VOLUME AND CAN OVERFLOW** (a volume in the Length unit cubed; EPANET's YES/NO).
+		// **MINIMUM VOLUME AND CAN OVERFLOW** (a volume in the Volume unit; EPANET's YES/NO).
 		if (prop === 'minVolume') {
 			var mv = (cand.group === 'node' && cand.el.type === 'tank') ? effective(cand.el, 'minVolume') : undefined;
 			return (typeof mv === 'number' && isFinite(mv)) ? mv : undefined;
@@ -30863,7 +30884,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						get: function (n) { return effective(n, 'tankDiameter'); },
 						set: function (n, v) { setProp(n, 'tankDiameter', v); updateNode(n.id, true); } },
 					// **EPANET'S MINIMUM VOLUME AND CAN OVERFLOW** (audit 2026-11). The volume is in the
-					// Length unit cubed, so its heading names that, as the Available volume column does.
+					// Volume unit, so its heading names that, as the Available volume column beside it does.
 					(function () {
 						var c = { key: 'minVolume', em: 4.5, label: 'lpn_field_tank_minvol', blank: true, prop: 'minVolume', plainFor: paneOwnedFor('minVolume'), plainWord: paneNotUsedWord, plainWordIf: paneOnPressureTank,
 							get: function (n) { return effective(n, 'minVolume'); },
@@ -30895,6 +30916,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					(function () {
 						var c = paneColNodeResult('volume', 'lpn_result_tank_volume', null);
 						c.unitText = tankVolumeUnitText;
+						c.dec = function () { return labelDecimalsForUnit('lpn_u_volume', unitKey('lpn_u_volume')); };
 						return c;
 					}()),
 					paneColNodeInitQuality(),
@@ -39188,12 +39210,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// run too, but they are its identity rather than a condition it starts from, a flat line for
 	// them says something true, and Tom named one field.
 	var TS_FIELD_SKIP = { node: { initQuality: 1 }, link: {} };
+	// **A TANK'S TWO RESULTS THAT ARE NEITHER A MAP COLOUR NOR A LABEL** (Task 783), the one list both
+	// graphs read: the Time series tab below (tsFieldOptions) and the Properties box's own graph
+	// (PG_FIELDS), so a result offered by one is never missing from the other (Task 857, Tom 2026-11-16).
+	var TANK_RESULT_FIELDS = ['depth', 'volume'];
 	function tsFieldOptions(group) {
 		var skip = TS_FIELD_SKIP[group] || {},
 			out = colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
 		// A tank's depth and usable volume (Task 783): graphable, but neither a map colour nor a label.
 		if (group === 'node') {
-			out.push(['depth', colorFieldLabel('node', 'depth')], ['volume', colorFieldLabel('node', 'volume')]);
+			TANK_RESULT_FIELDS.forEach(function (f) { out.push([f, colorFieldLabel('node', f)]); });
 		}
 		return out;
 	}
@@ -39934,9 +39960,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// starting level (see its `pressure` branch), so over a run it is a flat line while the head
 	// above it moves. The head is the tank's moving reading, and it is offered.
 	var PG_FIELDS = {
-		// 'depth' is a tank-only result (Task 783): pgAvailable() keeps a candidate only if the run has a
-		// number for this element, so a junction, a reservoir and every link never offer it.
-		node: ['pressure', 'head', 'depth', 'demandActual', 'quality'],
+		// A tank's depth and Available volume are tank-only results (Task 783): pgAvailable() keeps a
+		// candidate only if the run has a number for this element, so a junction, a reservoir and every
+		// link never offer them.
+		node: ['pressure', 'head'].concat(TANK_RESULT_FIELDS, ['demandActual', 'quality']),
 		link: ['velocity', 'flow', 'headloss', 'gradient', 'friction', 'status', 'quality', 'rate']
 	};
 	var PG_SKIP_BY_TYPE = { tank: { pressure: 1 } };
@@ -45403,6 +45430,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function scheduleSave() {
 		if (saveTimer) { clearTimeout(saveTimer); }
 		saveTimer = setTimeout(function () { saveTimer = null; saveToStorage(); }, LPN_SAVE_PAUSE_MS);
+		// Convert as is not modal, so an edit can land under it: its count follows the document.
+		var cb = convasEl();
+		if (cb && cb.style.display === 'flex') { refreshConvasZeroWarn(); }
 	}
 	// Write now whatever is owed. Returns whether anything was: the harness asserts on that, and a
 	// flush of nothing must be free, because two of the three doors above fire on an ordinary tab
@@ -49212,7 +49242,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_u_pressure: us ? 'psi' : 'mh2o',
 			lpn_u_diameter: us ? 'in' : 'mm',
 			lpn_u_flow: LPN_INP_FLOW_UNIT[parsed.flowUnits] || (us ? 'gpm' : 'lps'),
-			lpn_u_velocity: us ? 'ftps' : 'mps'
+			lpn_u_velocity: us ? 'ftps' : 'mps',
+			// A file states no volume unit, but its MinVol is the length unit cubed: the project's Volume
+			// unit starts as that, so no typed number changes and an unedited export is byte-identical.
+			lpn_u_volume: us ? 'ft3' : 'm3'
 			// No lpn_u_gradient: head-loss gradient is dimensionless and an .inp does not name one.
 		};
 		// **A D-W FILE'S ROUGHNESS IS IN EPANET'S OWN UNIT** (audit 2026-11, F1): millimetres in an
@@ -52221,8 +52254,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (close) { close.addEventListener('click', closeConvasBox); }
 		wireFloatBox(box);
 		wireConvasColSplit(box);
-		if (si) { si.addEventListener('click', function () { applyPresetToClones(convasUnits, 'si'); refreshConvasSuffixPrefill(); }); }
-		if (us) { us.addEventListener('click', function () { applyPresetToClones(convasUnits, 'us'); refreshConvasSuffixPrefill(); }); }
+		if (si) { si.addEventListener('click', function () { applyPresetToClones(convasUnits, 'si'); refreshConvasSuffixPrefill(); refreshConvasZeroWarn(); }); }
+		if (us) { us.addEventListener('click', function () { applyPresetToClones(convasUnits, 'us'); refreshConvasSuffixPrefill(); refreshConvasZeroWarn(); }); }
+		LPN_CONVAS_ROUND.forEach(function (k) {
+			var el = document.getElementById('lpn_convas_round_' + k);
+			if (el) { el.addEventListener('change', refreshConvasZeroWarn); }
+		});
 		['epsg', 'unnamed', 'none'].forEach(function (k) {
 			var r = document.getElementById('lpn_convas_kind_' + k);
 			if (r) { r.addEventListener('change', syncConvasCrs); }
@@ -52289,8 +52326,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (u.name === 'lpn_u_diameter' || u.name === 'lpn_u_elevhead' || u.name === 'lpn_u_flow') {
 				u.sel.addEventListener('change', refreshConvasSuffixPrefill);
 			}
+			u.sel.addEventListener('change', refreshConvasZeroWarn);
 		});
 		refreshConvasSuffixPrefill();
+		refreshConvasZeroWarn();
 		syncConvasCrs();
 		// A movable, resizable box (round 11b, wireFloatBox): centred, or where it was left this session; a phone fills the window.
 		box.style.display = 'flex';
@@ -52405,6 +52444,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!el || el.disabled || !u || !u.sel || !u.sel.options.length) { return; }
 			el.value = ' ' + u.sel.options[u.sel.selectedIndex].textContent;
 		});
+	}
+	// The nonzero numbers this Convert as would round to 0, for the box as it stands now.
+	function convasZeroedCount() {
+		var a = convasAnswers(), mult = convasUnitMultipliers(a.units), probe = { zeroed: 0, k: mult };
+		convasRound(mult, a.rounding || {}, probe);
+		return probe.zeroed;
+	}
+	function refreshConvasZeroWarn() {
+		var el = document.getElementById('lpn_convas_zero_warn'), n;
+		if (!el) { return; }
+		n = convasZeroedCount();
+		el.textContent = formatZeroWarn(n);
 	}
 	// The box's answers as a plain value, so a harness can hand runConvertAs() one without a browser.
 	// { kind, crs, units: { lpn_u_*: unitKey }, rounding: { diameter: '0.1', ... } }
@@ -52636,22 +52687,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else if (kind === 'unnamed') { p.georef = georefT; }
 		else { delete p.basemap; }
 	}
-	// **THE UNITS, ONCE, INTO THE COPY** (Task 688). The same converter the strip's Destructive
+	// **THE UNITS, ONCE, INTO THE COPY** (Task 688). The same converter the strip's Convert
 	// answer uses, so the two cannot come to disagree about which numbers a unit decides; the
 	// difference is only where it runs, which is a project nobody has typed into yet. Returns the
 	// unit names that actually changed, which is what the rounding reads.
-	function convasApplyUnits(a) {
-		var changed = {}, fromUnits = readUnitSelections();
+	// **THE ONE LIST OF UNITS A CONVERT AS CHANGES**, as {name: multiplier} (that unit per old unit):
+	// convasApplyUnits() converts by it and the box's warning counts by it, so they cannot disagree.
+	// A unit is left out when it is unchanged, unknown, or not an option the page's select offers.
+	function convasUnitMultipliers(units) {
+		var out = {};
 		LPN_UNIT_SELECTS.forEach(function (name) {
-			var from = unitKey(name), to = a.units && a.units[name], fOld, fNew;
-			if (!to || !from || to === from) { return; }
-			fOld = EngCalcs.unitFactors[from];
-			fNew = EngCalcs.unitFactors[to];
-			if (!fOld || !fNew) { return; }
-			applyOneUnit(name, to);
-			if (unitKey(name) !== to) { return; }   // not an option this select offers
-			convertUnitValues(name, fNew / fOld);
-			convertDefaultInputs(name, fNew / fOld);
+			var from = unitKey(name), to = units && units[name], sel = unitEl(name), i, offered = false;
+			if (!to || !from || to === from || !EngCalcs.unitFactors[from] || !EngCalcs.unitFactors[to]) { return; }
+			for (i = 0; sel && sel.options && i < sel.options.length; i++) { if (sel.options[i].value === to) { offered = true; } }
+			if (offered) { out[name] = EngCalcs.unitFactors[to] / EngCalcs.unitFactors[from]; }
+		});
+		return out;
+	}
+	function convasApplyUnits(a) {
+		var changed = {}, fromUnits = readUnitSelections(), mult = convasUnitMultipliers(a.units);
+		Object.keys(mult).forEach(function (name) {
+			applyOneUnit(name, a.units[name]);
+			convertUnitValues(name, mult[name]);
+			convertDefaultInputs(name, mult[name]);
 			changed[name] = true;
 		});
 		convasRound(changed, a.rounding || {});
@@ -52677,15 +52735,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// Nearest `step`, then written with no more decimals than the step has, so 0.1 gives 12.3 and
 	// not 12.299999999999999.
+	// **THE ONE ROUNDING OF A CONVERTED NUMBER** (the strip's Decimals and Convert as's steps both come
+	// here, so the two doors give the same document). Exactly what the user chose, nothing more
+	// (Tom: "we must give them what they request"): 150 mm as inches is 6 at Decimals 0, 5.91 at 2.
 	function roundToStep(v, step) {
 		var d = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
 		return +(Math.round(v / step) * step).toFixed(d);
 	}
 	// **ONLY WHAT THIS CONVERSION REWROTE.** A number whose unit did not change is the user's as
 	// typed, and rounding it would be a second edit nobody asked for.
-	function convasRound(changed, rounding) {
+	// `probe` ({zeroed: 0, k: multipliers}) makes it a dry run for the Convert as warning: the numbers are still in their OLD unit, and the nonzero ones
+	// that the multiplier and the step would turn into 0 are counted. Nothing is written.
+	function convasRound(changed, rounding, probe) {
+		var kk = 1;
 		function step(k) { var s = parseFloat(rounding[k]); return (isFinite(s) && s > 0) ? s : 0; }
-		function rnd(obj, prop, s) { if (obj && typeof obj[prop] === 'number') { obj[prop] = roundToStep(obj[prop], s); } }
+		function rnd(obj, prop, s) {
+			if (!obj || typeof obj[prop] !== 'number') { return; }
+			if (probe) {
+				// The same two steps as the real Convert: tidied to 12 figures by convertUnitValues(), then stepped.
+				var v = obj[prop] * kk;
+				if (obj[prop] !== 0 && roundToStep(isFinite(v) ? Number(v.toPrecision(12)) : v, s) === 0) { probe.zeroed++; }
+				return;
+			}
+			obj[prop] = roundToStep(obj[prop], s);
+		}
 		function ovs(prop, s) {
 			eachOverrideMap(function (map) {
 				Object.keys(map).forEach(function (k) { rnd(map[k], prop, s); });
@@ -52693,21 +52766,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		var s = step('diameter');
 		if (s && changed.lpn_u_diameter) {
+			kk = probe ? probe.k.lpn_u_diameter : 1;
 			doc.links.forEach(function (l) { rnd(l, '_diameter', s); });
 			ovs('diameter', s);
 		}
 		s = step('depth');
 		if (s && changed.lpn_u_elevhead) {
+			kk = probe ? probe.k.lpn_u_elevhead : 1;
 			doc.nodes.forEach(function (n) { rnd(n, '_level', s); rnd(n, 'minLevel', s); rnd(n, 'maxLevel', s); });
 			ovs('level', s);
 		}
 		s = step('head');
 		if (s && changed.lpn_u_elevhead) {
+			kk = probe ? probe.k.lpn_u_elevhead : 1;
 			doc.nodes.forEach(function (n) { rnd(n, '_head', s); });
 			ovs('head', s);
 		}
 		s = step('flow');
 		if (s && changed.lpn_u_flow) {
+			kk = probe ? probe.k.lpn_u_flow : 1;
 			doc.nodes.forEach(function (n) {
 				rnd(n, '_demand', s);
 				(n.extraDemands || []).forEach(function (d) { rnd(d, 'base', s); });
@@ -63316,7 +63393,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// In strip order, which is Looped-Network.php's order.
 	var LPN_UNIT_SELECTS = ['lpn_u_length', 'lpn_u_diameter', 'lpn_u_elevhead', 'lpn_u_pressure',
-		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_roughness', 'lpn_u_age'];
+		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_roughness', 'lpn_u_age', 'lpn_u_volume'];
 	// **THE OLD RESULT KEYS, KEPT ONLY TO BE READ OUT OF AN OLD FILE.** Written by no code path;
 	// this map exists so reconcileLegacyUnits() below can name them, and for nothing else.
 	var LPN_LEGACY_RESULT_KEYS = {
@@ -63335,7 +63412,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// hours. It reads a WATER AGE and only a water age -- a source share is a percentage and
 		// has no unit at all, which is why qualityUnitId() below answers '' for that mode rather
 		// than naming this one.
-		age: 'lpn_u_age'
+		age: 'lpn_u_age',
+		// A tank's Available volume, in the same Volume unit its typed Minimum volume is in.
+		volume: 'lpn_u_volume'
 	};
 	function resultUnit(q) { return LPN_RESULT_UNIT[q]; }
 	// **AN EMITTER COEFFICIENT IN THE UNITS ON SCREEN, AND BACK** (Task 191; Tom, 2026-09-08).
@@ -63443,13 +63522,34 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return units;
 	}
+	// The cubic unit of a Length unit: the volume option (ft3, m3) whose factor is nearest the length's
+	// factor cubed, for every length key, so a project saved before the Volume selector existed never
+	// borrows whatever the last project left showing. undefined when no volume option is offered.
+	function cubedVolumeUnit(lengthKey) {
+		var f = EngCalcs.unitFactors && EngCalcs.unitFactors[lengthKey], sel = unitEl('lpn_u_volume'), best, bd = Infinity, i, k, g, d;
+		if (!(f > 0) || !sel || !sel.options) { return undefined; }
+		for (i = 0; i < sel.options.length; i++) {
+			k = sel.options[i].value; g = EngCalcs.unitFactors[k];
+			if (!/3$/.test(k) || !(g > 0)) { continue; }
+			d = Math.abs(Math.log(g / (f * f * f)));
+			if (d < bd) { bd = d; best = k; }
+		}
+		return best;
+	}
 	function applyUnitSelections(units) {
+		// A copy: the caller's object (a saved record, a parsed file) is never written to here.
+		units = units ? Object.assign({}, units) : units;
 		reconcileLegacyUnits(units);
 		// Cleared unconditionally, INCLUDING on the early return: this function is the one place a
 		// document's units are installed, so it owns the whole of that state. Clearing only in the
 		// matched branch would leave one document's unknown unit refusing to solve the next one.
 		unresolvedUnits = {};
 		if (!units) { rememberUnitSelections(); return false; }
+		// A project saved before the Volume selector existed typed its Minimum volume in the Length unit
+		// cubed: take that (feet: cubic feet; metres: cubic metres), as an .inp import does, so no
+		// number changes meaning and never whatever the last project left showing.
+		if (!units.lpn_u_volume && units.lpn_u_length) { units.lpn_u_volume = cubedVolumeUnit(units.lpn_u_length); }
+		if (!units.lpn_u_volume) { delete units.lpn_u_volume; }
 		var changed = false;
 		LPN_UNIT_SELECTS.forEach(function (name) {
 			var want = units[name], sel = unitEl(name), i;
@@ -63509,9 +63609,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// that actually now owns the number, or a Length change would rescale a field this dialog
 		// never mentioned.
 		if (name === 'lpn_u_length') {
-			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter',
-				pc.lpn_field_tank_minvol || 'Minimum volume'];
+			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter'];
 		}
+		if (name === 'lpn_u_volume') { return [pc.lpn_field_tank_minvol || 'Minimum volume']; }
 		if (name === 'lpn_u_diameter') { return [pc.lpn_field_diameter || 'Diameter']; }
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
 		if (name === 'lpn_u_elevhead') {
@@ -63549,11 +63649,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// whichever scenario happened to be open. The writes are dynamic (`obj[prop]`), so
 	// scenario_seam_check.php cannot see them either way; this paragraph is the justification the
 	// check would otherwise be asking for.
-	function convertUnitValues(name, k) {
+	// `probe`, when given ({zeroed: 0}), makes this a dry run that writes nothing: it counts the
+	// nonzero numbers that the same multiplication and the same rounding would turn into 0 (the
+	// Decimals warning in the unit question), so the warning can never disagree with Convert.
+	function convertUnitValues(name, k, dec, probe) {
 		var n = 0;
+		// `dec`, when given, is the Decimals the visitor chose in the unit question: every converted
+		// input is rounded to that many places by roundToStep(), the one rounding of this page.
+		// No Decimals asked: the product is tidied to 12 significant figures so binary noise
+		// (609.5999999999999) is not stored, and the one shared path gives File > Convert as the same.
+		// k = 1 is the counting call, which must change nothing.
+		function rnd(v) {
+			if (typeof dec === 'number') { return roundToStep(v, Math.pow(10, -dec)); }
+			return (k === 1 || !isFinite(v)) ? v : Number(v.toPrecision(12));
+		}
 		function conv(obj, prop) {
 			if (!obj || typeof obj[prop] !== 'number') { return; }
-			obj[prop] = obj[prop] * k;
+			if (probe) { if (obj[prop] !== 0 && rnd(obj[prop] * k) === 0) { probe.zeroed++; } return; }
+			obj[prop] = rnd(obj[prop] * k);
 			n++;
 		}
 		// **ONE AXIS OF EVERY CURVE OF THE NAMED KINDS** (Task 586). A curve is a DOCUMENT object, so
@@ -63565,8 +63678,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// typed. Demands and elevations are rounded for display elsewhere; these are shown raw.
 		function convSetting(key) {
 			var h = settings.hydraulics;
-			if (!h || typeof h[key] !== 'number') { return; }
-			h[key] = +(h[key] * k).toPrecision(6);
+			if (probe || !h || typeof h[key] !== 'number') { return; }
+			h[key] = +(h[key] * k).toPrecision(6);   // a Settings value: never rounded by Decimals
 			n++;
 		}
 		function convCurveAxis(axis, kinds, factor) {
@@ -63574,7 +63687,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			docCurvesRead().forEach(function (c) {
 				if (kinds.indexOf(c.kind) < 0) { return; }
 				(c.points || []).forEach(function (pt) {
-					if (pt && typeof pt[axis] === 'number') { pt[axis] = pt[axis] * factor; moved++; }
+					if (probe) {
+						if (pt && typeof pt[axis] === 'number' && pt[axis] !== 0 && rnd(pt[axis] * factor) === 0) { probe.zeroed++; }
+						return;
+					}
+					if (pt && typeof pt[axis] === 'number') { pt[axis] = rnd(pt[axis] * factor); moved++; }
 				});
 				// The file's own text no longer states these numbers (CLAUDE.md's token rule: the
 				// text must still SAY the value), so neither the lines nor the tokens may go back out.
@@ -63599,14 +63716,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// rescale it and an Elevation/Head change must leave it alone, both now true below.
 			doc.nodes.forEach(function (nd) { conv(nd, 'tankDiameter'); });
 			convOverrides('tankDiameter');
-			// **MINIMUM VOLUME IS THE LENGTH UNIT CUBED**, so it moves by the cube of the length factor.
-			(function () {
-				var k1 = k;
-				k = k1 * k1 * k1;
-				doc.nodes.forEach(function (nd) { conv(nd, 'minVolume'); });
-				convOverrides('minVolume');
-				k = k1;
-			}());
+		} else if (name === 'lpn_u_volume') {
+			// **MINIMUM VOLUME IS TYPED IN THE VOLUME UNIT** (Task 857), not the Length unit cubed: a
+			// Length change leaves it alone, as an Elevation/Head change leaves a tank diameter alone.
+			// A stated zero is EPANET's "no separate minimum volume" and means the same in any unit, so
+			// it is neither counted (it would ask the question over nothing) nor rewritten.
+			// The file's own text for the old number goes too (CLAUDE.md's token rule: the text must still
+			// SAY the value), and a converted tank is redrawn, so nothing keeps the old volume.
+			function convVol(o) {
+				if (!o || !o.minVolume) { return false; }
+				conv(o, 'minVolume');
+				if (!probe && k !== 1 && o.tok) { delete o.tok.minVolume; }   // base-write: a unit change rewrites Base and every scenario together
+				return true;
+			}
+			doc.nodes.forEach(function (nd) { if (convVol(nd) && !probe && k !== 1 && nodeEls[nd.id]) { updateNode(nd.id, true); } });
+			eachOverrideMap(function (map) {
+				Object.keys(map).forEach(function (key) { convVol(map[key]); });
+			});
 		} else if (name === 'lpn_u_diameter') {
 			doc.links.forEach(function (l) { conv(l, '_diameter'); });
 			convOverrides('diameter');
@@ -63618,7 +63744,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				convOverrides('roughness');
 				// mm -> ft moves e three orders of magnitude, so the places that showed 1.5 show
 				// 0.0 (Task 491). Raised only when it has gone unreadable, never lowered.
-				syncRoughnessLabelDecimals();
+				if (!probe) { syncRoughnessLabelDecimals(); }
 			}
 		} else if (name === 'lpn_u_elevhead') {
 			// tankDiameter is NOT one of these any more (CLAUDE.md: it is a LENGTH, handled in the
@@ -63660,9 +63786,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		} else if (name === 'lpn_u_velocity') {
 			// The velocity warning limit is typed in this unit; a scenario's own is the same number in the same unit.
-			velocityLimitHolders().forEach(function (h) { h.velocityLimit = +(h.velocityLimit * k).toPrecision(6); n++; });
+			if (!probe) { velocityLimitHolders().forEach(function (h) { h.velocityLimit = +(h.velocityLimit * k).toPrecision(6); n++; }); }
 			// A scenario's settings are read through a resolved-tree cache: the written numbers must be re-read.
-			if (n) { touchTree('convertUnitValues'); }
+			if (n && !probe) { touchTree('convertUnitValues'); }
 		} else if (name === 'lpn_u_flow') {
 			convSetting('flowChange');   // a flow typed in this unit
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
@@ -63701,53 +63827,83 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **NO QUESTION WHEN THERE IS NOTHING TO DECIDE** (ROADMAP Task 425). The dialog is for a project
 	// that ALREADY HAS CONTENT. With no stored number in this quantity -- an empty project, or one
-	// whose elements simply carry nothing this unit decides -- Non-destructive and Destructive end at
+	// whose elements simply carry nothing this unit decides -- Convert and Keep end at
 	// the same document, so the question has no answer that matters and a modal in front of the
 	// commonest first action on the page is pure cost. countUnitValues() is the exact test rather
 	// than "is doc.nodes empty": it counts the very numbers a conversion would rewrite, so the two
 	// can never disagree.
 	function unitChangeNeedsDialog(name) { return countUnitValues(name) > 0; }
-	// The question, in Tom's own words (2026-08-18), and NOT paraphrased: the title, the lead line,
-	// the field names ONE PER LINE rather than a comma list, and the two options named by what they
-	// do to the numbers already typed.
-	//
-	// The list is one element per name because a comma list is what he asked it not to be -- a
-	// reader scanning for "is my elevation in this?" reads a column, not a sentence.
-	//
-	// THE LEAD IS `lpn_units_warn_lead`, NOT the `lpn_units_warn_body` it replaces. The old key put the
-	// field names inside the sentence as `{list}`; the column is now built here, so an edit in place
-	// would have left 26 translations carrying a placeholder the page no longer fills -- a literal
-	// "{list}" on the map, which lang_tag_parity_check.php is blocking for exactly that reason. A new
-	// key falls back to English until a sprint reaches it, which is the correct untranslated state.
-	// `more`, from the SI and US buttons: further [sel, name, to] the same click changes, each given
-	// its own lead line and column under the one title.
-	function buildUnitDialogBody(body, sel, name, to, more) {
-		var pc = EngCalcs.pageConfig || {};
-		var h = document.createElement('div'), oh = document.createElement('div');
-		h.style.fontWeight = 'bold';
-		h.textContent = pc.lpn_units_warn_title || 'This unit defines how your inputs are read';
-		body.appendChild(h);
-		[[sel, name, to]].concat(more || []).forEach(function (u) {
-			var lead = document.createElement('div'), list = document.createElement('div');
-			lead.textContent = String(pc.lpn_units_warn_lead || '{unit} is the unit of what you enter for:')
-				.replace('{unit}', unitLabelFor(u[0], u[2]));
-			body.appendChild(lead);
+	// The question, in Tom's own words (2026-11-18): "Convert inputs from {old} to {new}?" with
+	// Convert, Keep and Cancel. The field names the unit decides are listed ONE PER LINE, because a
+	// reader scanning for "is my elevation in this?" reads a column, not a sentence. From the SI and
+	// US buttons there is one block per unit the click changes, under one set of buttons.
+	// `units` is [{sel, name, from, to}], one block each: the question, the fields that unit decides
+	// one per line, and the Decimals field the Convert answer rounds to. Returns each unit's field.
+	function buildUnitDialogBody(body, units) {
+		var pc = EngCalcs.pageConfig || {}, fields = [], note = document.createElement('div');
+		units.forEach(function (u) {
+			var q = document.createElement('div'), list = document.createElement('div'),
+				row = document.createElement('label'), inp = document.createElement('input'),
+				warn = document.createElement('div');
+			q.style.fontWeight = 'bold';
+			q.textContent = String(pc.lpn_units_convert_q || 'Convert inputs from {old} to {new}?')
+				.replace('{old}', unitLabelFor(u.sel, u.from)).replace('{new}', unitLabelFor(u.sel, u.to));
+			body.appendChild(q);
 			list.className = 'lpn-unit-fields';
-			unitServes(u[1]).forEach(function (f) {
-				var row = document.createElement('div');
-				row.textContent = f;
-				list.appendChild(row);
+			unitServes(u.name).forEach(function (f) {
+				var r = document.createElement('div');
+				r.textContent = f;
+				list.appendChild(r);
 			});
 			body.appendChild(list);
+			// BLANK MEANS NO ROUNDING (Tom: "give them what they request"): the map-label display
+			// precision is not a request, so it is never the default. A typed number is obeyed exactly.
+			inp.type = 'number'; inp.min = '0'; inp.max = '12'; inp.step = '1';
+			inp.value = '';
+			row.className = 'lpn-unit-decimals';
+			inp.setAttribute('data-decimals-for', u.name);
+			row.appendChild(document.createTextNode(pc.lpn_labels_col_decimals || 'Decimals'));
+			row.appendChild(inp);
+			body.appendChild(row);
+			// **THE WARNING IS A COUNT, NEVER A BLOCK** (Tom, 2026-11-20: "Keep. User should know
+			// better. We can warn that there are values (n) that would be converted to 0."). Counted by
+			// convertUnitValues() itself in probe mode, so it is the Convert's own arithmetic. Blank
+			// Decimals rounds nothing and so warns of nothing.
+			warn.className = 'lpn-unit-zero-warn';
+			body.appendChild(warn);
+			warn.setAttribute('role', 'status');
+			warn.setAttribute('aria-live', 'polite');
+			inp.addEventListener('input', function () { refreshUnitZeroWarn(warn, u, unitDecimalsOf([{ name: u.name, input: inp }], u.name)); });
+			fields.push({ name: u.name, input: inp });
 		});
-		oh.style.fontWeight = 'bold';
-		oh.textContent = pc.lpn_units_options_head || 'When you change a unit:';
-		body.appendChild(oh);
-		[pc.lpn_units_nondestructive_desc, pc.lpn_units_destructive_desc].forEach(function (t) {
-			var d = document.createElement('div');
-			d.textContent = t || '';
-			body.appendChild(d);
-		});
+		note.textContent = pc.lpn_units_convert_note;
+		body.appendChild(note);
+		return fields;
+	}
+	// The nonzero stored numbers that Convert at `dec` Decimals would turn into 0, for one unit change.
+	function unitZeroedCount(name, from, to, dec) {
+		var fOld = EngCalcs.unitFactors[from], fNew = EngCalcs.unitFactors[to], probe = { zeroed: 0 };
+		if (typeof dec !== 'number' || !fOld || !fNew) { return 0; }
+		convertUnitValues(name, fNew / fOld, dec, probe);
+		return probe.zeroed;
+	}
+	function refreshUnitZeroWarn(el, u, dec) {
+		var n = unitZeroedCount(u.name, u.from, u.to, dec);
+		el.textContent = formatZeroWarn(n);
+	}
+	// The one sentence of both Decimals warnings; no count, no sentence.
+	function formatZeroWarn(n) {
+		return n > 0 ? String((EngCalcs.pageConfig || {}).lpn_units_zero_warn
+			|| '\u26a0 There are values ({n}) that would be converted to 0.').replace('{n}', String(n)) : '';
+	}
+	function unitDecimalsOf(fields, name) {
+		var i, v;
+		for (i = 0; i < fields.length; i++) {
+			if (fields[i].name !== name) { continue; }
+			v = parseInt(fields[i].input.value, 10);
+			return (isFinite(v) && v >= 0) ? Math.min(v, 12) : undefined;   // blank: no rounding
+		}
+		return undefined;
 	}
 	function unitFromMap(name, from) { var m = {}; m[name] = from; return m; }
 	function onUnitChange(sel, name) {
@@ -63764,13 +63920,32 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Put it back until the question is answered. Nothing acts on the new unit before then --
 		// which is also what makes Cancel free: the select never left the unit it was on.
 		applyOneUnit(name, from);
-		openDialog(function (body) { buildUnitDialogBody(body, sel, name, to); }, [
-			// **NON-DESTRUCTIVE IS FIRST, AND IT IS THE SUITE'S STANDING BEHAVIOUR** -- "changing a
-			// unit reinterprets the typed number; it does not convert it", which CLAUDE.md marks
-			// absolute and which this page was once the one place to break. Destructive is the
-			// opt-in and must never become the quiet path: it is reached only by pressing the button
-			// that says what it does.
-			{ label: pc.lpn_units_nondestructive || 'Non-destructive', fn: function () {
+		var fields = [];
+		openDialog(function (body) { fields = buildUnitDialogBody(body, [{ sel: sel, name: name, from: from, to: to }]); }, [
+			// **THE UNDO SNAPSHOT IS THE BACKUP, AND NO SECOND COPY IS OFFERED** (Task 425). Convert is
+			// a user-initiated edit of the document, so it gets one snapshot, taken before anything
+			// moves, and one Undo restores the numbers and the unit (saveUndoSnapshot() records the
+			// unit selections). Switching projects clears the stack, so after that the original
+			// inputs live only in the file on disk, which is untouched until the user saves.
+			// Converting happens only on this button: only the user touches a file's numbers.
+			{ label: pc.lpn_convas_ok || 'Convert', fn: function () {
+				var fOld = EngCalcs.unitFactors[from], fNew = EngCalcs.unitFactors[to], n,
+					dec = unitDecimalsOf(fields, name);
+				saveUndoSnapshot();
+				applyOneUnit(name, to);
+				n = (fOld && fNew) ? convertUnitValues(name, fNew / fOld, dec) : 0;
+				// Settings > New assets numbers go with the network's, as Convert as does it.
+				if (fOld && fNew) { convertDefaultInputs(name, fNew / fOld); }
+				rememberUnitSelections();
+				afterUnitChange(unitFromMap(name, from));
+				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
+					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
+			} },
+			// **KEEP IS THE SUITE'S STANDING BEHAVIOUR, AND THE QUIET PATH**: changing a unit
+			// reinterprets the typed number and does not convert it (CLAUDE.md, absolute). It is the
+			// answer the dialog focuses (isDefault), so an Enter after a keyboard unit change keeps
+			// the numbers; Convert, the first button, is reached only by choosing it.
+			{ label: pc.lpn_units_keep || 'Keep', isDefault: true, fn: function () {
 				var n = countUnitValues(name);
 				applyOneUnit(name, to);
 				rememberUnitSelections();
@@ -63778,37 +63953,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				setNotice(String(pc.lpn_status_reinterpreted || 'Values ({n}) now mean {unit}. Nothing was rewritten.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
-			// **THE UNDO SNAPSHOT IS THE BACKUP, AND NO SECOND COPY IS OFFERED** (Task 425's open
-			// question, answered here).
-			//
-			// A Destructive change is a user-initiated edit of the document, so it gets exactly what
-			// every other edit gets: one snapshot, taken before anything moves, on the same 20-deep
-			// stack. A separate backup would be a second document with no home -- this page has one
-			// document and one undo stack (Task 184) -- and offering the choice would put a second
-			// question inside a dialog whose whole job is to ask one, at the moment the user is
-			// already deciding something harder.
-			//
-			// What was genuinely missing was not a backup but HALF AN UNDO: the snapshot carried the
-			// numbers and not the UNITS, so Ctrl+Z gave back the original values with the NEW unit
-			// still on the strip -- silently landing the user in the Non-destructive outcome they
-			// had just declined. saveUndoSnapshot() now records readUnitSelections() and undo()
-			// restores it, so one Ctrl+Z reverts the whole change.
-			//
-			// The one limit, stated because it is the only way to lose these numbers: switching
-			// projects clears the undo stack (clearUndo()), so after a project switch the original
-			// inputs live only in the file on disk -- which is untouched until the user saves.
-			{ label: pc.lpn_units_destructive || 'Destructive', fn: function () {
-				var fOld = EngCalcs.unitFactors[from], fNew = EngCalcs.unitFactors[to], n;
-				saveUndoSnapshot();
-				applyOneUnit(name, to);
-				n = (fOld && fNew) ? convertUnitValues(name, fNew / fOld) : 0;
-				rememberUnitSelections();
-				afterUnitChange(unitFromMap(name, from));
-				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
-					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
-			} },
-			// Cancel does nothing on purpose, and there is nothing for it to do: the select was put
-			// back before the dialog opened, no snapshot was taken, and no number was read.
+			// Cancel does nothing on purpose: the select was put back before the dialog opened, no
+			// snapshot was taken, and no number was read.
 			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
 		]);
 	}
@@ -63830,8 +63976,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **NOT refreshAllFromDocument() -- THAT IS THE PROJECT-ARRIVAL PATH** (ROADMAP Task 653, LEFT
 	// half). A unit change is not a different network arriving: nothing moves. CLAUDE.md's Unit
 	// Sets rule is "changing a unit reinterprets the typed number; it never converts it" -- so the
-	// STORED numbers are untouched (Non-destructive) or rewritten in place by convertUnitValues()
-	// (Destructive) before this runs either way, and no unit here ever decides a coordinate (see
+	// STORED numbers are untouched (Keep) or rewritten in place by convertUnitValues()
+	// (Convert) before this runs either way, and no unit here ever decides a coordinate (see
 	// unitServes() and LPN_UNIT_SELECTS -- length, diameter, roughness, elevation/head, pressure,
 	// flow, velocity, gradient, age; x/y and lon/lat are never among them). So buildDom() has
 	// nothing to rebuild: every element keeps its shape and its place, and rebuilding the whole SVG
@@ -63911,28 +64057,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		function finish() { rememberUnitSelections(); afterUnitChange(fromMap); }
 		function names() { return asked.map(function (c) { return unitLabel(c.name); }).join(', '); }
 		if (!asked.length) { applyAll(); finish(); return; }
+		var fields = [];
 		openDialog(function (body) {
-			buildUnitDialogBody(body, asked[0].sel, asked[0].name, asked[0].to,
-				asked.slice(1).map(function (c) { return [c.sel, c.name, c.to]; }));
+			fields = buildUnitDialogBody(body, asked.map(function (c) { return { sel: c.sel, name: c.name, from: c.from, to: c.to }; }));
 		}, [
-			{ label: pc.lpn_units_nondestructive || 'Non-destructive', fn: function () {
-				var n = 0;
-				asked.forEach(function (c) { n += countUnitValues(c.name); });
-				applyAll();
-				finish();
-				setNotice(String(pc.lpn_status_reinterpreted || 'Values ({n}) now mean {unit}. Nothing was rewritten.')
-					.replace('{n}', String(n)).replace('{unit}', names()));
-			} },
-			{ label: pc.lpn_units_destructive || 'Destructive', fn: function () {
+			{ label: pc.lpn_convas_ok || 'Convert', fn: function () {
 				var n = 0;
 				saveUndoSnapshot();
 				changes.forEach(function (c) {
 					var fOld = EngCalcs.unitFactors[c.from], fNew = EngCalcs.unitFactors[c.to];
 					applyOneUnit(c.name, c.to);
-					if (fOld && fNew) { n += convertUnitValues(c.name, fNew / fOld); }
+					if (fOld && fNew) {
+						n += convertUnitValues(c.name, fNew / fOld, unitDecimalsOf(fields, c.name));
+						convertDefaultInputs(c.name, fNew / fOld);
+					}
 				});
 				finish();
 				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
+					.replace('{n}', String(n)).replace('{unit}', names()));
+			} },
+			{ label: pc.lpn_units_keep || 'Keep', isDefault: true, fn: function () {
+				var n = 0;
+				asked.forEach(function (c) { n += countUnitValues(c.name); });
+				applyAll();
+				finish();
+				setNotice(String(pc.lpn_status_reinterpreted || 'Values ({n}) now mean {unit}. Nothing was rewritten.')
 					.replace('{n}', String(n)).replace('{unit}', names()));
 			} },
 			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
@@ -64668,6 +64817,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **TANK WATER DEPTH** (Task 696). A tank is the one node type that has it, and the node
 			// loop prints it only where one is typed.
 			['level', pc.lpn_field_tank_level || 'Water depth'],
+			// **A TANK'S INITIAL VOLUME** (Task 857, Tom 2026-11-18), in the Volume unit; blank for any other node.
+			['initVolume', pc.lpn_field_tank_initvol || 'Initial volume'],
 			['head', pc.lpn_field_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
 			// Off by default. No network has it until a run has been made with the analysis switched
 			// on, and its heading follows that switch -- the name comes from qualityLabel(), never a
@@ -71466,8 +71617,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (kind === 'volume') {
 			// A volume curve's axes are a LEVEL and a VOLUME. The level is in the elevation unit like
-			// every other vertical distance on a tank; the volume has no family on this page and is
-			// carried as the file's own number, so it names no unit rather than an invented one.
+			// every other vertical distance on a tank; the volume is carried as the file's own number
+			// (the elevation unit cubed), outside the Volume selector, so it names no unit rather than an invented one.
 			return { x: (pc.lpn_field_tank_level || 'Water depth') + ' (' + unitLabel('lpn_u_elevhead') + ')',
 				y: pc.lpn_curve_volume_col || 'Volume' };
 		}
@@ -74362,6 +74513,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// The file's own lines and tokens state numbers the document no longer holds.
 			delete c.src; delete c.tok;
 			libCommit();
+			// A tank's Initial volume label reads this curve, so the labels owe a pass.
+			if (c.kind === 'volume') { requestLabelRefresh(); }
 			refreshPopupIfOpen();
 			return true;
 		}
@@ -82046,10 +82199,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// curve's points (overridable since 2026-10-12, so the document's name is not enough).
 					volCurveName: effective(n, 'volCurve') || null,
 					// **THE FILE'S MinVol AND Overflow** (audit 2026-11, F2), for both engines: MinVol in
-					// cubic metres (the length unit cubed), Overflow as a flag. Absent where the file
-					// stated none, so a tank drawn here is built exactly as before.
+					// cubic metres, from the Volume unit it is typed in (the one place it is converted for
+					// a solve; Task 857), Overflow as a flag. Absent where the file stated none, so a tank
+					// drawn here is built exactly as before.
 					minVolume: (typeof effective(n, 'minVolume') === 'number' && effective(n, 'minVolume') > 0)
-						? effective(n, 'minVolume') * Math.pow(toSI(1, 'lpn_u_length'), 3) : undefined,
+						? toSI(effective(n, 'minVolume'), 'lpn_u_volume') : undefined,
 					overflow: (effective(n, 'overflow') && /^y/i.test(String(effective(n, 'overflow')))) ? true : undefined
 				};
 			}
@@ -83931,6 +84085,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// field on this list keeps.
 			var levelVal = n.type === 'tank' ? effective(n, 'level') : undefined;
 			if (ls.node.level && typeof levelVal === 'number') { lines.push(affix('node', 'level', rawLine(levelVal, ex.level, nd.level))); }
+			// Tank only, and only when its volume can be worked out (a diameter or a curve); typed inputs, so in the display unit already.
+			var initVolVal = n.type === 'tank' ? tankInitialVolumeDisplay(n) : undefined;
+			if (ls.node.initVolume && typeof initVolVal === 'number') { lines.push(affix('node', 'initVolume', rawLine(initVolVal, ex.initVolume, nd.initVolume))); }
 			// **LAST, AND ONLY WHERE THERE IS ONE.** A network with the analysis off, or one that has
 			// not been run since it was switched on, prints nothing here rather than a zero -- the
 			// same rule an unsolved pressure and an unstated elevation already follow.
@@ -84042,6 +84199,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// is a typed number already in the Elevation/Head display unit, the same treatment elev
 			// gets above.
 			level: nodeValueMap(function (n) { return n.type === 'tank' ? plainRound(effective(n, 'level'), nd.level) : undefined; }),
+			initVolume: nodeValueMap(function (n) { return n.type === 'tank' ? plainRound(tankInitialVolumeDisplay(n), nd.initVolume) : undefined; }),
 			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(baseDemandTotal(n), nd.demand) : undefined; }),
 			// plainRound(), not displayRound(): a resolved demand is a typed number times a
 			// dimensionless multiplier, so it is already in the displayed unit and never crossed SI.
@@ -84091,6 +84249,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var extrema = {
 			elev: fieldExtrema(nodeVal.elev.list),
 			level: fieldExtrema(nodeVal.level.list),
+			initVolume: fieldExtrema(nodeVal.initVolume.list),
 			demand: fieldExtrema(nodeVal.demand.list),
 			demandActual: fieldExtrema(nodeVal.demandActual.list),
 			head: fieldExtrema(nodeVal.head.list),
