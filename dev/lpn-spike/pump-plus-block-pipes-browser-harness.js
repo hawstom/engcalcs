@@ -142,7 +142,7 @@ async function main() {
 		// The Well: its block clears every pipe, and no leader of it runs down over the pump box at the bottom of the Well's own symbol.
 		// A Well with no drawdown curve or pump head curve is refused, and a refused solve leaves no answer, so its block would have no rows and
 		// the check would measure nothing. Each Well is given a drawdown curve (C1, added to the document here) and Net1's own pump head curve.
-		const wbad = [], wlead = []; let wdrawn = 0;
+		const wbad = [], wlead = [], setupFails = []; let wdrawn = 0, wunsolved = 0;
 		const netW = JSON.parse(JSON.stringify(net1));
 		netW.curves = (netW.curves || []).concat([{ id: 'C1', kind: 'headloss', points: [[0, 0], [1000, 20], [2000, 60]] }]);
 		for (const pid of pipes) {
@@ -150,12 +150,19 @@ async function main() {
 			if (!A.at(pid)) { await A.s.close(); continue; }
 			await A.arm('3', 'add-well'); await A.click(A.at(pid)); await A.off(); await A.s.settle(800);
 			const ws = await P.evaluate(() => { const e = document.querySelector('#lpn_canvas .lpn-node-symbol-well'); if (!e) { return null; } const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
-			if (ws) {
+			if (!ws) { setupFails.push(pid + ': no Well symbol'); await A.s.close(); continue; }
+			{
 				await A.click(ws); await A.s.settle(500);
 				for (const [rx, want] of [[/Drawdown curve/, 'C1'], [/Pump head curve/, '1']]) {
+					let done = false;
 					for (const sel of await P.$$('select.lpn-gw-fill')) {
-						if (rx.test(await sel.evaluate((x) => x.parentElement.textContent))) { await sel.selectOption({ label: want }); await A.s.settle(500); break; }
+						if (!rx.test(await sel.evaluate((x) => x.parentElement.textContent))) { continue; }
+						// by value, else by exact text, else by text beginning with the id (never a label match that throws)
+						const pick = await sel.evaluate((x, w) => { const o = Array.from(x.options), f = o.find((q) => q.value === w) || o.find((q) => q.textContent.trim() === w) || o.find((q) => q.textContent.trim().indexOf(w) === 0); return f ? f.value : null; }, want);
+						if (pick === null) { break; }
+						await sel.selectOption({ value: pick }); await A.s.settle(500); done = true; break;
 					}
+					if (!done) { setupFails.push(pid + ': no ' + rx.source + ' option ' + want); }
 				}
 				await P.keyboard.press('Escape'); await A.s.settle(1200);
 			}
@@ -172,7 +179,9 @@ async function main() {
 				return out;
 			});
 			const m = await measure(P);
-			if (r.rows.length) {
+			const solved = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas text[data-nodelbl^="W"]')).some((t) => /\d/.test((t.textContent || '').replace(/W\d+[RD]?/g, ''))));
+			if (r.rows.length && !solved) { wunsolved++; }
+			if (r.rows.length && solved) {
 				wdrawn++;
 				if (m.segs.some((sg) => r.rows.some((b) => touches(sg, b)))) { wbad.push(pid); }
 				if (r.sym) {
@@ -182,6 +191,8 @@ async function main() {
 			}
 			await A.s.close();
 		}
+		ok('every Well was given its curves (symbol found, both options chosen)', setupFails.length === 0, setupFails.join('; '));
+		ok('every Well that is drawn also solved (its block carries numbers, not only IDs)', wunsolved === 0, wunsolved + ' unsolved');
 		ok('every Well block that is drawn clears every pipe in every row (' + wdrawn + ' drawn)', wdrawn >= pipes.length - 3 && wbad.length === 0, 'crossing on pipes: ' + wbad.join(','));
 		ok('the placer keeps a Well block\'s leader off the pump box of its symbol wherever any other side is clear: at most 3 of 12 pipes leave only a side below', wlead.length <= 3, 'pipes: ' + wlead.join(','));
 		ok('every Pump+ block that is drawn clears every pipe in every row (' + drawn + ' drawn of ' + pipes.length + ' pipes)', drawn >= pipes.length - 3 && bad.length === 0, 'crossing on pipes: ' + bad.join(','));

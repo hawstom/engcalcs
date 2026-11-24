@@ -533,6 +533,46 @@ console.log('\n--- 10. round 11 review fixes ---');
 			ok(c[0] + ': and the next export is byte-identical, with the same PT= line', EC.lpnExportInp(L.serializeProject(), {}).inp === o2 && (o2.match(/ PT=\S+/) || [])[0] === ' PT=' + pl);
 		}
 	});
+	// A Pressure unit that is not the file's (kPa in a metric project, bar in a US one) converts to the file's (m of head, psi) and back: on, off and the empty pressure.
+	[['si', 'kpa', 400, 600, 250], ['us', 'bar', 3, 4, 2]].forEach((c) => {
+		fresh(); setUnitSet(c[0]); L.applyOneUnit('lpn_u_pressure', c[1]);
+		L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
+		const g = L.getDoc().assemblies[0]; g.pt.on = c[2]; g.pt.off = c[3]; g.pt.pre = c[4]; L.syncPressureTank(g);
+		const si0 = L.pressureTankSI(g);
+		const o1 = EC.lpnExportInp(L.serializeProject(), {}).inp, pl = (o1.match(/^;ASSEMBLY.* PT=(\S+)/m) || [])[1] || '', f = pl.split(','), k = c[0] === 'si' ? 1 : EC.unitFactors.psi;   // the file's unit per metre of head: m, or psi
+		ok(c[1] + ' project: PT= on, off and empty pressure are in the file\'s unit (' + (c[0] === 'si' ? 'm of head' : 'psi') + '): ' + pl, f.length === 5 && Math.abs(+f[2] - si0.on * k) < 1e-6 * si0.on * k && Math.abs(+f[3] - si0.off * k) < 1e-6 * si0.off * k && Math.abs(+f[1] - si0.pre * k) < 1e-6 * si0.pre * k, JSON.stringify([si0, f]));
+		ok(c[1] + ' project: the numbers are tidy (no binary noise), at most 12 significant figures', f.slice(1, 4).every((x) => x.replace(/^-?0?\.?0*/, '').replace('.', '').length <= 12), pl);
+		const q = EC.lpnInpParse(o1);
+		L.applyUnitSelections(L.inpUnitSelections(q)); L.applySaved(L.migrateSaved(L.docFromInp(q, ''))); L.buildDom();
+		const si1 = L.pressureTankSI(L.getDoc().assemblies[0]);
+		ok(c[1] + ' project: on, off, empty pressure and volume are the same in SI after the round trip', si1 && ['on', 'off', 'pre', 'vol'].every((x) => Math.abs(si1[x] - si0[x]) <= 1e-9 * Math.max(1, Math.abs(si0[x]))), JSON.stringify([si0, si1]));
+	});
+	{
+		// An unknown Volume unit fails the export even where only a pressure tank holds a volume (no tank states a MinVol), as a MinVol's does; a document with no Volume unit reads it as the cube of its Length unit.
+		fresh(); setUnitSet('us');
+		L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
+		const sv = JSON.parse(JSON.stringify(L.serializeProject()));
+		sv.units = Object.assign({}, sv.units, { lpn_u_volume: 'bogus' });
+		const bad = EC.lpnExportInp(sv, {});
+		ok('an unknown Volume unit with a pressure tank (and no MinVol) fails as unknown-unit', bad.ok === false && bad.error === 'unknown-unit', JSON.stringify([bad.ok, bad.error, bad.detail]));
+		delete sv.units.lpn_u_volume;
+		const none = EC.lpnExportInp(sv, {});
+		ok('a document with no Volume unit and Length in feet writes the number as stored, read as ft^3 (the page reads it so on opening)', !!none.inp && /^;ASSEMBLY.* PT=20,/m.test(none.inp), (none.inp || '').match(/PT=\S+/) + '');
+	}
+	{
+		// An ;ASSEMBLY: line is kept under 255 characters (EPANET reads a line to 255), continued as `;ASSEMBLY: + ...` like the ;VIRTUAL: lines, and read back whole.
+		fresh(); setUnitSet('us');
+		L.setMode('add-welltankp'); press(200, 150); press(500, 150); press(500, 400);
+		let sv = JSON.stringify(L.serializeProject());
+		const ids = new Set(); const d0 = JSON.parse(sv);
+		(d0.nodes || []).forEach((x) => ids.add(x.id)); (d0.links || []).forEach((x) => ids.add(x.id)); (d0.curves || []).forEach((x) => ids.add(x.id)); (d0.assemblies || []).forEach((x) => { ids.add(x.id); if (x.pt && x.pt.curve) { ids.add(x.pt.curve); } });
+		ids.forEach((id) => { sv = sv.split('"' + id + '"').join('"' + id + '_' + 'long_id_'.repeat(5) + '"'); });
+		L.applySaved(L.migrateSaved(JSON.parse(sv))); L.buildDom();
+		const o1 = EC.lpnExportInp(L.serializeProject(), {}).inp, al = o1.split('\n').filter((l) => /^;ASSEMBLY: /.test(l));
+		ok('with long IDs the group is written on several ;ASSEMBLY: lines, none over 254 characters (' + al.map((l) => l.length).join(',') + ')', al.length >= 2 && al.every((l) => l.length <= 254) && /^;ASSEMBLY: \+ /.test(al[1]), al[0] && al[0].slice(0, 80));
+		const q = EC.lpnInpParse(o1);
+		ok('and read back whole: the group and its pressure tank are restored, nothing reported', q.ok && q.assemblies.length === 1 && !!q.assemblies[0].pt && !(q.dropped || []).some((x) => /^assembly/.test(x.code)), JSON.stringify(q.dropped));
+	}
 	{
 		// A PT= of any other field count is reported, and the group is not restored half-way.
 		const bad = EC.lpnInpParse(EC.lpnExportInp(L.serializeProject(), {}).inp.replace(/( PT=\S+)/, '$1,V'));

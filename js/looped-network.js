@@ -63522,15 +63522,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// factor cubed, for every length key, so a project saved before the Volume selector existed never
 	// borrows whatever the last project left showing. undefined when no volume option is offered.
 	function cubedVolumeUnit(lengthKey) {
-		var f = EngCalcs.unitFactors && EngCalcs.unitFactors[lengthKey], sel = unitEl('lpn_u_volume'), best, bd = Infinity, i, k, g, d;
-		if (!(f > 0) || !sel || !sel.options) { return undefined; }
-		for (i = 0; i < sel.options.length; i++) {
-			k = sel.options[i].value; g = EngCalcs.unitFactors[k];
-			if (!/3$/.test(k) || !(g > 0)) { continue; }
-			d = Math.abs(Math.log(g / (f * f * f)));
-			if (d < bd) { bd = d; best = k; }
-		}
-		return best;
+		var sel = unitEl('lpn_u_volume'), keys = [], i;
+		if (!sel || !sel.options || !EngCalcs.lpnCubedVolumeKey) { return undefined; }
+		for (i = 0; i < sel.options.length; i++) { keys.push(sel.options[i].value); }
+		return EngCalcs.lpnCubedVolumeKey(lengthKey, keys);   // js/lpn-inp.js: the writer reads a document with no Volume unit the same way
 	}
 	function applyUnitSelections(units) {
 		// A copy: the caller's object (a saved record, a parsed file) is never written to here.

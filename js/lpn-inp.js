@@ -406,8 +406,27 @@
 		});
 		return { kept: kept, clashed: clashed, renamed: renamed };
 	};
+	// The cubic Volume unit nearest a Length unit's cube (ft -> ft3, m -> m3, mm -> m3): the one reading of "the Volume unit of a document that states none", used by
+	// the page (a project saved before the Volume selector) and by the writer below. `keys` are the candidates, the Volume selector's own options on the page.
+	EngCalcs.lpnCubedVolumeKey = function (lengthKey, keys) {
+		var t = EngCalcs.unitFactors || {}, f = t[lengthKey], best, bd = Infinity, i, k, g, d;
+		keys = keys || Object.keys(t).filter(function (x) { return /3$/.test(x); });
+		if (!(f > 0)) { return undefined; }
+		for (i = 0; i < keys.length; i++) {
+			k = keys[i]; g = t[k];
+			if (!/3$/.test(k) || !(g > 0)) { continue; }
+			d = Math.abs(Math.log(g / (f * f * f)));
+			if (d < bd) { bd = d; best = k; }
+		}
+		return best;
+	};
 	EngCalcs.lpnInpParse = function (text) {
-		var lines = String(text == null ? '' : text).split(/\r\n|\r|\n/),
+		var lines = String(text == null ? '' : text).split(/\r\n|\r|\n/).reduce(function (acc, l) {
+				// `;ASSEMBLY: + tokens` continues the `;ASSEMBLY:` line above it (the writer keeps each line under 255 characters, which EPANET reads to).
+				var m = /^;ASSEMBLY: \+ (.*)$/.exec(l);
+				if (m && acc.length && /^;ASSEMBLY: /.test(acc[acc.length - 1])) { acc[acc.length - 1] += ' ' + m[1]; } else { acc.push(l); }
+				return acc;
+			}, []),
 			section = '',
 			rawSections = {},   // name -> array of token arrays, for the sections we read below
 			seen = {},          // name -> row count, for the ones we only count
@@ -3205,15 +3224,12 @@
 		var cVolMade = null;
 		function cVolume() {
 			if (cVolMade) { return cVolMade; }
-			if (units.lpn_u_volume) {
-				cVolMade = converter(units.lpn_u_volume, fileU.vol, 'volume');
-			} else {
-				cVolMade = cLen.same ? PLAIN : { same: false, mul: Math.pow(cLen.mul, 3) };
-			}
+			var vk = units.lpn_u_volume || EngCalcs.lpnCubedVolumeKey(units.lpn_u_length);   // the page's own reading (cubedVolumeUnit()) of a document that states no Volume unit
+			cVolMade = vk ? converter(vk, fileU.vol, 'volume') : (cLen.same ? PLAIN : { same: false, mul: Math.pow(cLen.mul, 3) });
 			return cVolMade;
 		}
 		var PLAIN = { same: true, mul: 1 };
-		if ((doc.nodes || []).some(function (x) { return x.type === 'tank' && eff(x, 'minVolume') > 0; })) { cVolume(); }
+		if ((doc.nodes || []).some(function (x) { return x.type === 'tank' && eff(x, 'minVolume') > 0; }) || (doc.assemblies || []).some(function (a) { return a && a.pt && a.pt.curve; })) { cVolume(); }   // before the gate below: an unknown Volume unit fails here, as MinVol's does
 		if (failure) { return failure; }
 
 		// ONE NUMBER, WRITTEN. `rec`/`key` name where the file's own text was kept, and lpnNumText()
@@ -4083,6 +4099,8 @@
 			return (doc.controls || []).some(function (c) { return c && c.asm === a.id && c.action && c.action.status === action && c.raw && !offLink[c.link]; }) &&
 				typeof (action === 'open' ? a.pumpOn : a.pumpOff) === 'number';
 		}
+		// A converted PT= number: tidied to 12 significant figures, as a Convert does (binary noise is not written); the same unit writes the characters as stored.
+		function ptNum(c, rec, key, v) { return c.same ? n(c, rec, key, v) : String(+(v * c.mul).toPrecision(12)); }
 		function assemblyComments() {
 			var out = '', live = {};
 			doc.links.forEach(function (l2) { if (!offLink[l2.id]) { live[l2.id] = 1; } });
@@ -4099,11 +4117,20 @@
 				var ends = a && a.kind === 'well' ? a.nodes : a && [a.up, a.down], tail = a && a.kind === 'well' && a.tank && a.tee && a.branch ? [a.tee, a.tank].concat(a.branch) : [];
 				if (!a || !ends || !ends.every(Boolean) || !a.links || !a.links.length) { return; }
 				if (ends.concat(tail.slice(0, 2)).some(function (id) { return omitted[id]; }) || !a.links.concat(tail.slice(2)).every(function (id) { return live[id]; })) { return; }
-				out += ';ASSEMBLY: ' + [a.kind || 'pump'].concat(ends, a.links).join(' ') +
-					(a.kind === 'well' && a.idBy === 'node' ? ' ID=' + a.id : '') + (a.kind === 'well' && wellOwns(a, 'open') ? ' ON=' + a.pumpOn : '') + (a.kind === 'well' && wellOwns(a, 'closed') ? ' OFF=' + a.pumpOff : '') +
-					(tail.length ? ' TEE=' + tail[0] + ' TANK=' + tail[1] + ' PIPES=' + tail[2] + ',' + tail[3] : '') +
-					(tail.length && a.pt && a.pt.curve ? ' PT=' + [n(cVolume(), a.pt, 'vol', a.pt.vol), a.pt.pre === undefined ? '' : n(cPress, a.pt, 'pre', a.pt.pre), n(cPress, a.pt, 'on', a.pt.on), n(cPress, a.pt, 'off', a.pt.off), a.pt.curve].join(',') : '') +
-					(tail.length && a.apart ? ' APART' : '') + '\n';
+				var toks = [a.kind || 'pump'].concat(ends, a.links), cur;
+				if (a.kind === 'well' && a.idBy === 'node') { toks.push('ID=' + a.id); }
+				if (a.kind === 'well' && wellOwns(a, 'open')) { toks.push('ON=' + a.pumpOn); }
+				if (a.kind === 'well' && wellOwns(a, 'closed')) { toks.push('OFF=' + a.pumpOff); }
+				if (tail.length) { toks.push('TEE=' + tail[0], 'TANK=' + tail[1], 'PIPES=' + tail[2] + ',' + tail[3]); }
+				if (tail.length && a.pt && a.pt.curve) { toks.push('PT=' + [ptNum(cVolume(), a.pt, 'vol', a.pt.vol), a.pt.pre === undefined ? '' : ptNum(cPress, a.pt, 'pre', a.pt.pre), ptNum(cPress, a.pt, 'on', a.pt.on), ptNum(cPress, a.pt, 'off', a.pt.off), a.pt.curve].join(',')); }
+				if (tail.length && a.apart) { toks.push('APART'); }
+				// Several lines, none over 254 characters (EPANET reads a line to 255), as the ;VIRTUAL: lines are: a continuation reads `;ASSEMBLY: + tokens`.
+				cur = ';ASSEMBLY:';
+				toks.forEach(function (t) {
+					if (cur.length + 1 + t.length > 254 && !/^;ASSEMBLY:( \+)?$/.test(cur)) { out += cur + '\n'; cur = ';ASSEMBLY: +'; }
+					cur += ' ' + t;
+				});
+				out += cur + '\n';
 			});
 			return out ? out + '\n' : '';
 		}

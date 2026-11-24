@@ -478,7 +478,7 @@ console.log('\n4. The file is written in the project\'s own units');
 	const zeroDoc = volDoc('gal', 'ft'); zeroDoc.nodes[zeroDoc.nodes.length - 1].minVolume = 0; delete zeroDoc.nodes[zeroDoc.nodes.length - 1].tok;
 	ok('a stated 0 is no volume to convert: no conversion is reported', !EngCalcs.lpnExportInp(zeroDoc).differences.some((d) => /volume/.test(d.detail || '')) && volTok(zeroDoc) === '0');
 	ok('Volume in cubic metres converts to cubic feet', Math.abs(parseFloat(volTok(volDoc('m3', 'ft'))) - 500 * EngCalcs.unitFactors.ft3) < 1e-6);
-	ok('a document with no Volume unit (saved before it existed) still cubes its Length', volTok(volDoc(null, 'm')) === String(500 * Math.pow(EngCalcs.unitFactors.ft / EngCalcs.unitFactors.m, 3)), volTok(volDoc(null, 'm')));
+	ok('a document with no Volume unit (saved before it existed) still cubes its Length (read as the nearest cubic Volume unit, as the page does)', Math.abs(parseFloat(volTok(volDoc(null, 'm'))) / (500 * Math.pow(EngCalcs.unitFactors.ft / EngCalcs.unitFactors.m, 3)) - 1) < 1e-9, volTok(volDoc(null, 'm')));
 
 	// A VALVE'S SETTING IS A DIFFERENT QUANTITY PER TYPE, and the two that convert differently are
 	// the pair to separate: under m3ps->LPS an FCV's setting is a FLOW and moves by 1000, while a
