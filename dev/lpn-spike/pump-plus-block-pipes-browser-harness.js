@@ -140,14 +140,33 @@ async function main() {
 			await A.s.close();
 		}
 		// The Well: its block clears every pipe, and no leader of it runs down over the pump box at the bottom of the Well's own symbol.
+		// A Well with no drawdown curve or pump head curve is refused, and a refused solve leaves no answer, so its block would have no rows and
+		// the check would measure nothing. Each Well is given a drawdown curve (C1, added to the document here) and Net1's own pump head curve.
 		const wbad = [], wlead = []; let wdrawn = 0;
+		const netW = JSON.parse(JSON.stringify(net1));
+		netW.curves = (netW.curves || []).concat([{ id: 'C1', kind: 'headloss', points: [[0, 0], [1000, 20], [2000, 60]] }]);
 		for (const pid of pipes) {
-			const A = await openNet1(browser, net1, { width: 1800, height: 1200 }), P = A.P;
+			const A = await openNet1(browser, netW, { width: 1800, height: 1200 }), P = A.P;
 			if (!A.at(pid)) { await A.s.close(); continue; }
-			await A.arm('3', 'add-well'); await A.click(A.at(pid)); await A.off(); await A.s.settle(1200);
+			await A.arm('3', 'add-well'); await A.click(A.at(pid)); await A.off(); await A.s.settle(800);
+			const ws = await P.evaluate(() => { const e = document.querySelector('#lpn_canvas .lpn-node-symbol-well'); if (!e) { return null; } const b = e.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
+			if (ws) {
+				await A.click(ws); await A.s.settle(500);
+				for (const [rx, want] of [[/Drawdown curve/, 'C1'], [/Pump head curve/, '1']]) {
+					for (const sel of await P.$$('select.lpn-gw-fill')) {
+						if (rx.test(await sel.evaluate((x) => x.parentElement.textContent))) { await sel.selectOption({ label: want }); await A.s.settle(500); break; }
+					}
+				}
+				await P.keyboard.press('Escape'); await A.s.settle(1200);
+			}
 			const r = await P.evaluate(() => {
-				const t = document.querySelector('#lpn_canvas text[data-nodelbl$="D"][data-nodelbl^="W"]'); const out = { rows: [] };
-				if (t && t.style.visibility !== 'hidden' && t.textContent) { Array.from(t.querySelectorAll('tspan')).forEach((x) => { const b = x.getBoundingClientRect(); if (b.width > 0) { out.rows.push({ l: b.left, r: b.right, t: b.top, b: b.bottom }); } }); }
+				const out = { rows: [] };
+				// A Well draws ONE label block, headed by its ID (W1), its rows tagged by the member's own ID; the W1R and W1D labels are empty.
+				Array.from(document.querySelectorAll('#lpn_canvas text[data-nodelbl^="W"]')).forEach((t) => {
+					if (t.style.visibility === 'hidden' || !t.textContent) { return; }
+					const sp = Array.from(t.querySelectorAll('tspan')).filter((x) => x.getBoundingClientRect().width > 0);
+					(sp.length ? sp : [t]).forEach((x) => { const b = x.getBoundingClientRect(); out.rows.push({ l: b.left, r: b.right, t: b.top, b: b.bottom }); });
+				});
 				const sym = document.querySelector('#lpn_canvas .lpn-node-symbol-well');
 				if (sym) { const b = sym.getBoundingClientRect(); out.sym = { l: b.left, r: b.right, t: b.top, b: b.bottom }; }
 				return out;

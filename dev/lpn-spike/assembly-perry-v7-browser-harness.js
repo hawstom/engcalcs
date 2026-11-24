@@ -1,7 +1,7 @@
 // PERRY'S FIVE FINDINGS ON TIP 6af7fa10d, in a real Chrome. Run with:
 //   node dev/lpn-spike/assembly-perry-v7-browser-harness.js
 //
-// Task 822. (1) A refusal (a Well with no curves) leaves the previous results on screen, as the snapshot rule says.
+// Task 822. (1) A refusal (a Well with no curves) of a solve that was asked for leaves no answer: the old result labels are gone and the banner says why (master's rule; the snapshot rule keeps results only where no solve ran, tested by stale-snapshot-harness.js).
 // (3) A Pump+ link label does not overlap an ordinary link label at Net1's fit view. (4) The two coincident-node labels of a
 // Valve+ on a vertical pipe do not overlap each other. (5) A reopened Well's node label has no leader through its text.
 'use strict';
@@ -149,7 +149,7 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	try {
 		const net1 = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
-		console.log('\n--- 1. a refusal keeps the previous results ---');
+		console.log('\n--- 1. a refused solve leaves no answer ---');
 		const A = await openNet1(browser, net1), P = A.P;
 		const before = await labelTexts(P);
 		ok('Net1 shows result labels before the Well', before.length > 5, before.length + ' labels');
@@ -158,7 +158,7 @@ async function main() {
 		const banner = await P.evaluate(() => (document.getElementById('lpn_status') || document.body).textContent);
 		ok('the banner asks for the drawdown and pump head curves', /drawdown curve and a pump head curve/.test(banner));
 		const after = await labelTexts(P);
-		ok('the previous result labels are still on the map', after.length >= before.length, before.length + ' -> ' + after.length);
+		ok('the previous result labels are gone: only the typed inputs (Z, Qb) are still drawn', after.length < before.length && after.every((x) => /Z=|Qb=/.test(x)), before.length + ' -> ' + after.length + ' ' + JSON.stringify(after.filter((x) => !/Z=|Qb=/.test(x))));
 		if (PICS) { await P.screenshot({ path: path.join(PICS, 'well-no-curves-keeps-results-v7.png') }); }
 		await A.s.close();
 

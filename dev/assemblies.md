@@ -218,7 +218,7 @@ takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6).
 
 ### Perry's round 6 findings, fixed (`assembly-perry-v7-browser-harness.js`)
 
-- A refusal (`lpnDiagnose`, e.g. a Well with no curves) keeps the last results on screen; the banner says why there is no new answer. Every refusal did the opposite before; it is now one rule. An unknown unit still clears them.
+- A refusal (`lpnDiagnose`, e.g. a Well with no curves) of a solve that was asked for (Recalculate on, or Calculate) leaves no answer: the last results are cleared and the banner says why. The snapshot rule keeps results only where no solve ran (Recalculate off, an edit). Master's rule, merged in 5e87804d4.
 - The Well's static water level follows its ground, keeping its depth, until the user types a static value; `staticTyped` on the grouping records that in the project, and an imported well's is typed.
 - A Pump+, Valve+ or Well link label is an obstacle to the aligned pipe labels. A Valve+ on a vertical pipe keeps each node label wholly on its own half. A Well's virtual pipe label takes a quarter the pump's label and leader do not cross.
 
